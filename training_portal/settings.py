@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import dj_database_url
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +27,7 @@ SECRET_KEY = "django-insecure-c#^mgbgl=#!qat2rw@)@1suoyl(&r=u^-ie1r@i19%v@--z*mg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['']
+ALLOWED_HOSTS = ['127.0.0.1','mevimanagement-production.up.railway.app']
 
 
 # Application definition
@@ -85,12 +86,15 @@ WSGI_APPLICATION = "training_portal.wsgi.application"
 }"""
 
 DATABASES = {
-    'default': dj_database_url.parse(
-        "postgresql://postgres:abc123@containers-us-west-42.railway.app:6432/railway",
-        conn_max_age=600
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'railway',        # e.g., 'railway'
+        'USER': 'postgres',             # e.g., 'postgres'
+        'PASSWORD': 'BvlGhqlHtkVMqklzPAdgFaXKBPqaUOdV',         # your Railway or local DB password
+        'HOST': 'interchange.proxy.rlwy.net',                 # e.g., 'containers-us-west-45.railway.app'
+        'PORT': '24372',                      # default PostgreSQL port
+    }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
