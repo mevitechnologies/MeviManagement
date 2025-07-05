@@ -43,7 +43,6 @@ path('followups/delete/<int:pk>/', views.delete_followup, name='delete_followup'
         path('office-trainings/view/<int:pk>/', views.view_office_training, name='view_office_training'),
 
     path('office-trainings/delete/<int:pk>/', views.delete_office_training, name='delete_office_training'),
-    path('todo/', views.trainer_todo, name='trainer_todo'),
 
       # To-Do URLs
    path('todo/', views.trainer_todo, name='trainer_todo'),  # for dashboard with ?trainer=

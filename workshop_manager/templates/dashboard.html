@@ -1,68 +1,205 @@
 {% extends 'base.html' %}
 {% load static %}
-
 {% block content %}
+
+<!-- FullCalendar CSS + JS -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
+
+<style>
+  :root {
+    --primary-color: #B7B1F2;
+    --accent-color: #FDB7EA;
+    --highlight-color: #FFDCCC;
+    --light-bg: #FBF3B9;
+  }
+
+  .legend-badge {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    margin-right: 6px;
+  }
+
+  .kanban-card:hover {
+    transform: scale(1.015);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease-in-out;
+    background-color: #fef8e7;
+  }
+
+  .kanban-card h6 {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  #workshop-calendar {
+    background-color: #fff9e8;
+    border-radius: 10px;
+    padding: 10px;
+  }
+
+  .card-header i {
+    opacity: 0.9;
+  }
+</style>
+
 <div class="container mt-4">
-  <h2 class="mb-4">📝 Daily To-Do for {{ trainer.Name }}</h2>
 
-  <form method="post" class="mb-3">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Add Task</button>
-  </form>
+  <!-- 🔰 Dashboard Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold" style="color: var(--primary-color);">
+      <i class="bi bi-kanban-fill me-2"></i> Workshop Dashboard
+    </h2>
+  </div>
 
-  {% if tasks %}
-    <ul class="list-group shadow-sm">
-      {% for task in tasks %}
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        <div>
-          {{ task.task }}
-          {% if task.is_done %}
-            <span class="badge bg-success ms-2">Done</span>
-          {% else %}
-            <span class="badge bg-warning text-dark ms-2">Pending</span>
-          {% endif %}
+  <!-- 🔔 Follow-Up Kanban Card -->
+  {% if followups_due %}
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card shadow border-start border-5" style="border-color: var(--accent-color);">
+        <div class="card-header fw-bold text-dark" style="background-color: var(--accent-color);">
+          <i class="bi bi-bell-fill me-2"></i> Follow-Ups ({{ followups_due.count }})
         </div>
-        <div class="btn-group" role="group">
-          {% if not task.is_done %}
-            <a href="{% url 'mark_task_done' trainer.id task.id %}" class="btn btn-sm btn-outline-success me-1" title="Mark Done">✓</a>
-          {% else %}
-            <a href="{% url 'undo_task_done' trainer.id task.id %}" class="btn btn-sm btn-outline-secondary me-1" title="Undo">↺</a>
-          {% endif %}
-
-          <!-- 📝 Edit Modal Trigger -->
-          <button type="button" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editModal{{ task.id }}" title="Edit">✎</button>
-
-          <!-- 🗑️ Delete Link -->
-          <a href="{% url 'delete_task' trainer.id task.id %}" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Delete this task?');">🗑️</a>
-        </div>
-      </li>
-
-      <!-- 📝 Edit Modal -->
-      <div class="modal fade" id="editModal{{ task.id }}" tabindex="-1" aria-labelledby="editModalLabel{{ task.id }}" aria-hidden="true">
-        <div class="modal-dialog">
-          <form method="post" action="{% url 'edit_task' trainer.id task.id %}">
-            {% csrf_token %}
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel{{ task.id }}">Edit Task</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                <input type="text" name="task" value="{{ task.task }}" class="form-control" required>
-              </div>
-              <div class="modal-footer">
-                <button type="submit" class="btn btn-primary">Save Changes</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-              </div>
+        <div class="card-body bg-white" style="max-height: 400px; overflow-y: auto;">
+          {% for f in followups_due %}
+          <div class="card mb-3 shadow-sm border-start border-3 kanban-card" style="border-color: var(--accent-color);">
+            <div class="card-body py-2 px-3">
+              <h6 class="mb-1 text-dark">
+                <i class="bi bi-arrow-right-circle text-warning"></i> {{ f.workshop.title }}
+              </h6>
+              <p class="small text-muted mb-2">
+                <i class="bi bi-bell"></i> {{ f.follow_up_type }} on {{ f.due_date }}
+              </p>
+              <a href="{% url 'workshop_detail' f.workshop.pk %}" class="btn btn-sm btn-outline-dark w-100">
+                <i class="bi bi-eye"></i> View Workshop
+              </a>
             </div>
-          </form>
+          </div>
+          {% empty %}
+          <p class="text-muted">No follow-ups</p>
+          {% endfor %}
         </div>
       </div>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <div class="alert alert-info mt-3">No tasks for today.</div>
+    </div>
+  </div>
   {% endif %}
+
+  <!-- 🗂️ Kanban for Workshop Status -->
+  <div class="row mb-5">
+    {% for column in status_columns %}
+      {% if column.label != "Cancelled" %}
+      <div class="col-md-6 mb-4">
+        <div class="card border-0 shadow-lg">
+          <div class="card-header fw-bold text-dark"
+               style="background: linear-gradient(45deg, var(--primary-color), #856ef4);">
+            <i class="bi bi-layout-text-sidebar-reverse me-2"></i> {{ column.label }} Workshops
+          </div>
+          <div class="card-body bg-white" style="max-height: 450px; overflow-y: auto;">
+            {% for workshop in column.workshops %}
+            <div class="card mb-3 border-start border-5 kanban-card shadow-sm"
+                 style="border-color: var(--primary-color);">
+              <div class="card-body py-2 px-3">
+                <h6 class="mb-1 text-dark">
+                  <i class="bi bi-bookmark-fill" style="color: var(--primary-color);"></i> {{ workshop.title }}
+                </h6>
+                <p class="small text-secondary mb-2">
+                  <i class="bi bi-building"></i> {{ workshop.college }}<br>
+                  <i class="bi bi-calendar-check"></i> {{ workshop.start_date }} → {{ workshop.end_date }}
+                </p>
+                <a href="{% url 'workshop_detail' workshop.pk %}" class="btn btn-outline-dark btn-sm w-100">
+                  <i class="bi bi-eye-fill"></i> View Details
+                </a>
+              </div>
+            </div>
+            {% empty %}
+            <p class="text-muted">No workshops in this stage.</p>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <!-- 📅 Workshop Calendar -->
+  <div class="card shadow-sm mb-5">
+    <div class="card-header text-white fw-bold d-flex justify-content-between align-items-center"
+         style="background-color: var(--primary-color);">
+      <span><i class="bi bi-calendar-event-fill me-2"></i> Workshop Calendar</span>
+      <div class="d-none d-md-flex align-items-center small">
+        <span class="legend-badge bg-primary me-1"></span> Scheduled
+        <span class="legend-badge bg-success ms-3 me-1"></span> Ongoing
+        <span class="legend-badge bg-secondary ms-3 me-1"></span> Completed
+        <span class="legend-badge bg-warning ms-3 me-1"></span> Follow-Up
+      </div>
+    </div>
+    <div class="card-body">
+      <div id="workshop-calendar"></div>
+    </div>
+  </div>
 </div>
+
+<!-- 🔄 FullCalendar Script -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const calendarEl = document.getElementById('workshop-calendar');
+
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      height: 600,
+      themeSystem: 'bootstrap5',
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,listMonth'
+      },
+      events: [
+        {% for w in calendar_workshops %}
+        {
+          title: "🎓 {{ w.title|escapejs }}",
+          start: "{{ w.start_date|date:'Y-m-d' }}",
+          end: "{{ w.end_date|date:'Y-m-d' }}",
+          color: `{% if w.start_date > today %}#0d6efd{% elif w.end_date >= today and w.start_date <= today %}#198754{% else %}#6c757d{% endif %}`,
+          url: "{% url 'workshop_detail' w.pk %}",
+          extendedProps: {
+            college: "{{ w.college|escapejs }}",
+            department: "{{ w.department|escapejs }}"
+          }
+        },
+        {% endfor %}
+
+        {% for f in calendar_followups %}
+        {
+          title: "🔔 {{ f.follow_up_type|title }}: {{ f.workshop.title|escapejs }}",
+          start: "{{ f.due_date|date:'Y-m-d' }}",
+          color: "#ffc107",
+          url: "{% url 'workshop_detail' f.workshop.pk %}",
+          extendedProps: {
+            followupType: "{{ f.follow_up_type }}",
+            college: "{{ f.workshop.college|escapejs }}"
+          }
+        },
+        {% endfor %}
+      ],
+      eventClick: function (info) {
+        if (info.event.url) {
+          window.open(info.event.url, "_blank");
+          info.jsEvent.preventDefault();
+        }
+      },
+      eventDidMount: function (info) {
+        const props = info.event.extendedProps;
+        if (props.followupType) {
+          info.el.setAttribute('title', `🔔 Follow-Up: ${props.followupType}\n🏫 ${props.college}`);
+        } else {
+          info.el.setAttribute('title', `${info.event.title}\n🏫 ${props.college}\n🧪 ${props.department}`);
+        }
+      }
+    });
+
+    calendar.render();
+  });
+</script>
 {% endblock %}
