@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <h3 class="mb-4 text-danger">🗑️ Confirm Delete</h3>
+  <div class="alert alert-warning">
+    Are you sure you want to delete this task?
+    <br>
+    <strong>{{ task.task }}</strong> ({{ task.for_date }})
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+    <a href="{% url 'trainer_todo' %}?trainer={{ task.trainer.id }}" class="btn btn-secondary ms-2">Cancel</a>
+  </form>
+</div>
+{% endblock %}

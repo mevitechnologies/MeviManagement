@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Trainer List</h2>
+        <a href="{% url 'add_trainer' %}" class="btn btn-primary">+ Add Trainer</a>
+    </div>
+
+    {% if trainers %}
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Expertise</th>
+                    <th>Available</th>
+                    <th>CV</th>
+                    <th style="width: 160px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for trainer in trainers %}
+                <tr>
+                    <td>{{ trainer.Name }}</td>
+                    <td>{{ trainer.email }}</td>
+                    <td>{{ trainer.phone }}</td>
+                    <td>{{ trainer.expertise }}</td>
+                    <td>
+                        {% if trainer.is_available %}
+                            <span class="badge bg-success">Yes</span>
+                        {% else %}
+                            <span class="badge bg-danger">No</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if trainer.cv %}
+                            <a href="{{ trainer.cv.url }}" target="_blank" class="btn btn-sm btn-outline-info">View</a>
+                        {% else %}
+                            <span class="text-muted">No CV</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'edit_trainer' trainer.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                            <a href="{% url 'delete_trainer' trainer.pk %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this trainer?')">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-warning text-center">
+        No trainers available. Click <strong>+ Add Trainer</strong> to add one.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

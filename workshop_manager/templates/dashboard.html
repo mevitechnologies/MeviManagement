@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">📝 Daily To-Do for {{ trainer.Name }}</h2>
+
+  <form method="post" class="mb-3">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Add Task</button>
+  </form>
+
+  {% if tasks %}
+    <ul class="list-group shadow-sm">
+      {% for task in tasks %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+          {{ task.task }}
+          {% if task.is_done %}
+            <span class="badge bg-success ms-2">Done</span>
+          {% else %}
+            <span class="badge bg-warning text-dark ms-2">Pending</span>
+          {% endif %}
+        </div>
+        <div class="btn-group" role="group">
+          {% if not task.is_done %}
+            <a href="{% url 'mark_task_done' trainer.id task.id %}" class="btn btn-sm btn-outline-success me-1" title="Mark Done">✓</a>
+          {% else %}
+            <a href="{% url 'undo_task_done' trainer.id task.id %}" class="btn btn-sm btn-outline-secondary me-1" title="Undo">↺</a>
+          {% endif %}
+
+          <!-- 📝 Edit Modal Trigger -->
+          <button type="button" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editModal{{ task.id }}" title="Edit">✎</button>
+
+          <!-- 🗑️ Delete Link -->
+          <a href="{% url 'delete_task' trainer.id task.id %}" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Delete this task?');">🗑️</a>
+        </div>
+      </li>
+
+      <!-- 📝 Edit Modal -->
+      <div class="modal fade" id="editModal{{ task.id }}" tabindex="-1" aria-labelledby="editModalLabel{{ task.id }}" aria-hidden="true">
+        <div class="modal-dialog">
+          <form method="post" action="{% url 'edit_task' trainer.id task.id %}">
+            {% csrf_token %}
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel{{ task.id }}">Edit Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <input type="text" name="task" value="{{ task.task }}" class="form-control" required>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="alert alert-info mt-3">No tasks for today.</div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <h3 class="mb-4">✏️ Edit Task</h3>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="task" class="form-label">Task Description</label>
+      {{ form.task }}
+    </div>
+    <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+    <a href="{% url 'trainer_todo' %}?trainer={{ task.trainer.id }}" class="btn btn-secondary ms-2">Cancel</a>
+  </form>
+</div>
+{% endblock %}

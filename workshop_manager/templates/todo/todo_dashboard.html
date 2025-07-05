@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+
+  <h2 class="mb-4">📝 Daily To-Do Dashboard</h2>
+
+  <!-- Trainer Selector -->
+  <form method="get" class="mb-4">
+    <div class="row g-2 align-items-center">
+      <div class="col-auto">
+        <label for="trainer" class="col-form-label fw-semibold">Select Trainer:</label>
+      </div>
+      <div class="col-auto">
+        <select name="trainer" id="trainer" class="form-select" onchange="this.form.submit()">
+          <option value="">-- Select --</option>
+          {% for t in trainers %}
+            <option value="{{ t.id }}" {% if trainer and t.id == trainer.id %}selected{% endif %}>{{ t.Name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  </form>
+
+  {% if trainer %}
+    <h4 class="mb-3">Today's Tasks - {{ trainer.Name }} ({{ today }})</h4>
+
+    <!-- Task Form -->
+    <form method="post" class="mb-4">
+      {% csrf_token %}
+      <div class="input-group">
+        {{ form.task }}
+        <button type="submit" class="btn btn-primary">Add Task</button>
+      </div>
+    </form>
+
+    <!-- Task List -->
+    <ul class="list-group">
+      {% for task in tasks %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <span>
+            {% if task.is_done %}
+              <s class="text-muted">{{ task.task }}</s>
+            {% else %}
+              {{ task.task }}
+            {% endif %}
+          </span>
+
+          <div>
+            {% if task.is_done %}
+              <a href="{% url 'undo_task_done' trainer.id task.id %}" class="btn btn-sm btn-outline-secondary">Undo</a>
+            {% else %}
+              <a href="{% url 'mark_task_done' trainer.id task.id %}" class="btn btn-sm btn-success">Mark Done</a>
+            {% endif %}
+            <a href="{% url 'edit_task' trainer.id task.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
+            <a href="{% url 'delete_task' trainer.id task.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+          </div>
+        </li>
+      {% empty %}
+        <li class="list-group-item text-muted">No tasks for today.</li>
+      {% endfor %}
+    </ul>
+
+    <!-- History Button -->
+    <div class="mt-4">
+      <a href="{% url 'todo_history' %}" class="btn btn-outline-dark">📜 View Task History</a>
+    </div>
+
+  {% else %}
+    <div class="alert alert-info mt-4">
+      Please select a trainer to manage today's tasks.
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

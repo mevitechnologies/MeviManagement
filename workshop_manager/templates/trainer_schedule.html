@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Trainer Workshop Timetable{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Trainer Workshop Timetable</h2>
+
+    {% if trainer_workshops %}
+        {% for item in trainer_workshops %}
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <strong>{{ item.trainer.Name }}</strong>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Workshop Title</th>
+                                <th>College</th>
+                                <th>Department</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for workshop in item.workshops %}
+                                <tr {% if workshop.id in item.overlapping_ids %} class="table-danger" {% endif %}>
+                                    <td>{{ workshop.title }}</td>
+                                    <td>{{ workshop.college }}</td>
+                                    <td>{{ workshop.department }}</td>
+                                    <td>{{ workshop.start_date|date:"F j, Y" }}</td>
+                                    <td>{{ workshop.end_date|date:"F j, Y" }}</td>
+                                    <td>{{ workshop.status }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    {% if item.overlapping_ids %}
+                        <p class="text-danger"><strong>Note:</strong> Overlapping workshop(s) highlighted in red.</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info">No workshops assigned to any trainers yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

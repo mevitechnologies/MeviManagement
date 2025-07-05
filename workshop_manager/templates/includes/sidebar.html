@@ -1,0 +1,86 @@
+<!-- sidebar.html -->
+<div class="d-flex flex-column flex-shrink-0 p-3 bg-light shadow" style="width: 250px; height: 100vh; position: fixed;">
+  <a href="{% url 'dashboard' %}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-decoration-none text-dark">
+    <i class="bi bi-speedometer2 me-2 fs-4 text-primary"></i>
+    <span class="fs-4 fw-bold">Mevi Manager</span>
+  </a>
+  <hr>
+
+  <ul class="nav nav-pills flex-column mb-auto">
+
+    <li class="nav-item">
+      <a href="{% url 'dashboard' %}" class="nav-link text-dark">
+        <i class="bi bi-house-door-fill me-2"></i> Dashboard
+      </a>
+    </li>
+
+    <li class="mt-3 text-muted ps-2 small">🎓 Workshops</li>
+
+    <li>
+      <a href="{% url 'workshop_list' %}" class="nav-link text-dark">
+        <i class="bi bi-easel-fill me-2"></i> Workshops
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'add_workshop' %}" class="nav-link text-dark">
+        <i class="bi bi-plus-circle-fill me-2"></i> Add Workshop
+      </a>
+    </li>
+
+    <li class="mt-3 text-muted ps-2 small">👥 Trainers</li>
+
+    <li>
+      <a href="{% url 'trainer_list' %}" class="nav-link text-dark">
+        <i class="bi bi-person-badge-fill me-2"></i> Trainers
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'add_trainer' %}" class="nav-link text-dark">
+        <i class="bi bi-person-plus-fill me-2"></i> Add Trainer
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'trainer_schedule' %}" class="nav-link text-dark">
+        <i class="bi bi-calendar2-week-fill me-2"></i> Trainer Schedule
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'calendar_view' %}" class="nav-link text-dark">
+        <i class="bi bi-calendar3-event-fill me-2"></i> Trainer Calendar
+      </a>
+    </li>
+
+    <li class="mt-3 text-muted ps-2 small">📌 Follow-Ups</li>
+
+    <li>
+      <a href="{% url 'follow_ups' %}" class="nav-link text-dark">
+        <i class="bi bi-bell-fill me-2"></i> Follow-Ups
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'add_followup' %}" class="nav-link text-dark">
+        <i class="bi bi-plus-circle me-2"></i> Add Follow-Up
+      </a>
+    </li>
+
+    <li class="mt-3 text-muted ps-2 small">🏢 Office Trainings</li>
+
+    <li>
+      <a href="{% url 'office_training_list' %}" class="nav-link text-dark">
+        <i class="bi bi-building me-2"></i> Office Trainings
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'add_office_training' %}" class="nav-link text-dark">
+        <i class="bi bi-plus-square me-2"></i> Add Office Training
+      </a>
+    </li>
+
+    <li class="mt-4">
+      <a href="{% url 'logout' %}" class="nav-link text-danger fw-semibold">
+        <i class="bi bi-box-arrow-right me-2"></i> Logout
+      </a>
+    </li>
+
+  </ul>
+</div>

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">📝 Daily To-Do</h2>
+
+  <!-- Form to add task -->
+  <form method="POST" class="mb-4">
+    {% csrf_token %}
+    <div class="row g-2">
+      <div class="col-md-8">{{ form.task }}</div>
+      <div class="col-md-2">{{ form.for_date }}</div>
+      <div class="col-md-2"><button type="submit" class="btn btn-success w-100">Add Task</button></div>
+    </div>
+  </form>
+
+  <!-- Today's tasks -->
+  <h5 class="mt-4">📅 Tasks for {{ today }}</h5>
+  {% if tasks_today %}
+  <ul class="list-group mt-3">
+    {% for task in tasks_today %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <div>
+        {% if task.is_done %}
+          <del class="text-muted">{{ task.task }}</del>
+        {% else %}
+          {{ task.task }}
+        {% endif %}
+      </div>
+      <div>
+        {% if not task.is_done %}
+          <a href="{% url 'mark_task_done' task.id %}" class="btn btn-sm btn-outline-success"><i class="bi bi-check2-circle"></i> Mark Done</a>
+        {% else %}
+          <span class="badge bg-success">Done</span>
+        {% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    <p class="text-muted">No tasks for today.</p>
+  {% endif %}
+
+  <div class="mt-4">
+    <a href="{% url 'todo_history' %}" class="btn btn-secondary">📜 View Past To-Dos</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h3>📘 Training Details</h3>
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h5 class="card-title">{{ training.name }}</h5>
+      <p class="card-text">
+        <strong>Batch ID:</strong> {{ training.batch_id }}<br>
+        <strong>Batch:</strong> {{ training.batch|title }}<br>
+        <strong>Mode:</strong> {{ training.mode|title }}<br>
+        {% if training.mode == 'offline' %}
+        <strong>Hall:</strong> {{ training.hall|title }}<br>
+        {% endif %}
+        <strong>Start Date:</strong> {{ training.start_date }}<br>
+        <strong>End Date:</strong> {{ training.end_date }}<br>
+        <strong>Trainers:</strong>
+        <ul>
+          {% for trainer in training.trainers.all %}
+            <li>{{ trainer.name }}</li>
+          {% empty %}
+            <li>No trainers assigned</li>
+          {% endfor %}
+        </ul>
+      </p>
+      <a href="{% url 'edit_office_training' training.pk %}" class="btn btn-primary">Edit</a>
+      <a href="{% url 'delete_office_training' training.pk %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this training?')">Delete</a>
+      <a href="{% url 'office_training_list' %}" class="btn btn-secondary">Back</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

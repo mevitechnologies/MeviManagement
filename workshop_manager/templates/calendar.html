@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Trainer Calendar{% endblock %}
+
+{% block head %}
+  {{ block.super }}
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0">Trainer Workshop Calendar</h4>
+    </div>
+    <div class="card-body">
+      <div id="calendar"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      height: 600,
+      events: {{ events|safe }}
+    });
+    calendar.render();
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-info text-white">
+            <h4 class="mb-0">{{ workshop.title }}</h4>
+        </div>
+        <div class="card-body">
+            <p><strong>College:</strong> {{ workshop.college }}</p>
+            <p><strong>Department:</strong> {{ workshop.department }}</p>
+            <p><strong>Status:</strong> {{ workshop.get_status_display }}</p>
+            <p><strong>Start Date:</strong> {{ workshop.start_date|date:"F j, Y" }}</p>
+            <p><strong>End Date:</strong> {{ workshop.end_date|date:"F j, Y" }}</p>
+
+            <p><strong>Assigned Trainers:</strong> 
+                {% if workshop.assigned_trainers.all %}
+                    {% for t in workshop.assigned_trainers.all %}
+                        {{ t.Name }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                {% else %}
+                    No trainers assigned.
+                {% endif %}
+            </p>
+
+            {% if workshop.report %}
+                <p><strong>Report:</strong> 
+                    <a href="{{ workshop.report.url }}" class="btn btn-outline-primary btn-sm" target="_blank">Download Report</a>
+                </p>
+            {% endif %}
+
+            <div class="mt-4">
+                <a href="{% url 'edit_workshop' workshop.pk %}" class="btn btn-warning">Edit Workshop</a>
+                <a href="{% url 'workshop_list' %}" class="btn btn-secondary">Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

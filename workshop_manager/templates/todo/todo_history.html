@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2 class="text-dark mb-4">📅 Task History</h2>
+
+  {% if grouped_tasks %}
+    {% for date, tasks in grouped_tasks.items %}
+      <div class="card mb-3 shadow-sm">
+        <div class="card-header bg-secondary text-white fw-bold">
+          {{ date }}
+        </div>
+        <ul class="list-group list-group-flush">
+          {% for task in tasks %}
+            <li class="list-group-item d-flex justify-content-between">
+              <div>
+                <strong>{{ task.trainer.Name }}</strong>: {{ task.task }}
+              </div>
+              <span class="badge 
+                {% if task.is_done %}
+                  bg-success
+                {% else %}
+                  bg-warning text-dark
+                {% endif %}
+              ">
+                {% if task.is_done %}Done{% else %}Pending{% endif %}
+              </span>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="text-muted">No historical tasks found.</p>
+  {% endif %}
+
+  <a href="{% url 'trainer_todo' %}" class="btn btn-outline-primary mt-3">Back to Today</a>
+</div>
+{% endblock %}

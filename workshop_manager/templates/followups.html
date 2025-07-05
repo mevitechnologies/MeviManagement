@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h3>Follow-Up List</h3>
+    <a href="{% url 'add_followup' %}" class="btn btn-primary mb-3">Add Follow-Up</a>
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Workshop</th>
+                <th>Type</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Notes</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for followup in followups %}
+            <tr>
+                <td>{{ followup.workshop }}</td>
+                <td>{{ followup.get_follow_up_type_display }}</td>
+                <td>{{ followup.due_date }}</td>
+                <td>
+                    {% if followup.is_completed %}
+                        ✅ Completed
+                    {% else %}
+                        ❌ Pending
+                    {% endif %}
+                </td>
+                <td>{{ followup.notes|default:"—" }}</td>
+                <td>
+                    <a href="{% url 'edit_followup' followup.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'delete_followup' followup.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center">No follow-ups found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
