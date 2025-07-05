@@ -146,3 +146,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 LOGIN_URL = '/login/'
 
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://mevimanagement-production.up.railway.app/",
+    "http://127.0.0.1:8000",
+]
