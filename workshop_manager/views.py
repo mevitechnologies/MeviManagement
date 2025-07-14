@@ -71,6 +71,7 @@ def dashboard(request):
     ongoing = Workshop.objects.filter(start_date__lte=today, end_date__gte=today)
     upcoming = Workshop.objects.filter(start_date__gt=today)
     past = Workshop.objects.filter(end_date__lt=today)
+
     all_workshops = list(chain(ongoing, upcoming, past))
     followups = FollowUp.objects.select_related('workshop').all()
     followups_due = FollowUp.objects.filter(due_date__lte=today, is_completed=False)
@@ -81,10 +82,10 @@ def dashboard(request):
         "upcoming": upcoming,
         "past": past,
         "followups_due": followups_due,
-        'calendar_followups': followups,
-        "calendar_workshops": all_workshops
+        "calendar_followups": followups,
+        "calendar_workshops": all_workshops,
+        "today": today,  # ✅ Add this line
     })
-
 @login_required
 def follow_ups(request):
     today = date.today()
@@ -143,16 +144,23 @@ def edit_trainer(request, pk):
 # Workshop views
 @login_required
 def workshop_list(request):
-    query = request.GET.get('q')
+    query = request.GET.get('q', '')
     workshops = Workshop.objects.all()
+
     if query:
         workshops = workshops.filter(title__icontains=query)
 
-    paginator = Paginator(workshops, 5)
-    page = request.GET.get('page')
-    workshops = paginator.get_page(page)
+    paginator = Paginator(workshops, 5)  # 5 workshops per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
-    return render(request, 'workshop_list.html', {'workshops': workshops})
+    context = {
+        'workshops': page_obj,  # This variable name must match the template
+        'query': query
+    }
+    return render(request, 'workshop_list.html', context)
+
+
 @login_required
 def add_workshop(request):
     form = WorkshopForm(request.POST or None, request.FILES or None)

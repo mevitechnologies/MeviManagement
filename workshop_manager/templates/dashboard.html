@@ -39,10 +39,6 @@
     border-radius: 10px;
     padding: 10px;
   }
-
-  .card-header i {
-    opacity: 0.9;
-  }
 </style>
 
 <div class="container mt-4">
@@ -54,7 +50,7 @@
     </h2>
   </div>
 
-  <!-- 🔔 Follow-Up Kanban Card -->
+  <!-- 🔔 Follow-Up Card -->
   {% if followups_due %}
   <div class="row mb-4">
     <div class="col-md-6">
@@ -77,8 +73,6 @@
               </a>
             </div>
           </div>
-          {% empty %}
-          <p class="text-muted">No follow-ups</p>
           {% endfor %}
         </div>
       </div>
@@ -86,7 +80,7 @@
   </div>
   {% endif %}
 
-  <!-- 🗂️ Kanban for Workshop Status -->
+  <!-- 🗂️ Kanban Status Columns -->
   <div class="row mb-5">
     {% for column in status_columns %}
       {% if column.label != "Cancelled" %}
@@ -123,16 +117,19 @@
     {% endfor %}
   </div>
 
+  <div class="container mt-4">
   <!-- 📅 Workshop Calendar -->
   <div class="card shadow-sm mb-5">
     <div class="card-header text-white fw-bold d-flex justify-content-between align-items-center"
-         style="background-color: var(--primary-color);">
+         style="background-color: #B7B1F2;">
       <span><i class="bi bi-calendar-event-fill me-2"></i> Workshop Calendar</span>
       <div class="d-none d-md-flex align-items-center small">
         <span class="legend-badge bg-primary me-1"></span> Scheduled
         <span class="legend-badge bg-success ms-3 me-1"></span> Ongoing
         <span class="legend-badge bg-secondary ms-3 me-1"></span> Completed
         <span class="legend-badge bg-warning ms-3 me-1"></span> Follow-Up
+        <span class="legend-badge bg-orange ms-3 me-1" style="background-color: #fd7e14;"></span> Postponed
+        <span class="legend-badge bg-danger ms-3 me-1"></span> Cancelled
       </div>
     </div>
     <div class="card-body">
@@ -141,7 +138,6 @@
   </div>
 </div>
 
-<!-- 🔄 FullCalendar Script -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const calendarEl = document.getElementById('workshop-calendar');
@@ -161,9 +157,20 @@
           title: "🎓 {{ w.title|escapejs }}",
           start: "{{ w.start_date|date:'Y-m-d' }}",
           end: "{{ w.end_date|date:'Y-m-d' }}",
-          color: `{% if w.start_date > today %}#0d6efd{% elif w.end_date >= today and w.start_date <= today %}#198754{% else %}#6c757d{% endif %}`,
+          color: `{% if w.status == 'cancelled' %}
+                    #dc3545
+                  {% elif w.status == 'postponed' %}
+                    #fd7e14
+                  {% elif w.start_date > today %}
+                    #0d6efd
+                  {% elif w.end_date >= today and w.start_date <= today %}
+                    #198754
+                  {% else %}
+                    #6c757d
+                  {% endif %}`,
           url: "{% url 'workshop_detail' w.pk %}",
           extendedProps: {
+            status: "{{ w.status }}",
             college: "{{ w.college|escapejs }}",
             department: "{{ w.department|escapejs }}"
           }
@@ -202,4 +209,5 @@
     calendar.render();
   });
 </script>
+
 {% endblock %}
