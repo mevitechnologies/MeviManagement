@@ -4,7 +4,8 @@ from django.utils.safestring import mark_safe
 from .models import FollowUp
 from datetime import datetime
 from .models import OfficeTraining
-from .models import TodoTask
+from .models import TodoTask, SubTask
+from django.forms import modelformset_factory
 
 
 class TrainerForm(forms.ModelForm):
@@ -105,10 +106,38 @@ class OfficeTrainingForm(forms.ModelForm):
 class TodoTaskForm(forms.ModelForm):
     class Meta:
         model = TodoTask
-        fields = ['task']
+        fields = ['trainer', 'task', 'description', 'for_date', 'priority', 'estimated_hours']
         widgets = {
-            'task': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Enter new task'
-            })
+            'trainer': forms.Select(attrs={'class': 'form-select'}),
+            'task': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter task'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'for_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'priority': forms.Select(attrs={'class': 'form-select'}),
+            'estimated_hours': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.5'}),
         }
+
+class SubTaskForm(forms.ModelForm):
+    class Meta:
+        model = SubTask
+        fields = ['title']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter subtask title'})
+        }
+class TodoTaskForm(forms.ModelForm):
+    class Meta:
+        model = TodoTask
+        fields = ['trainer', 'task', 'description', 'priority', 'estimated_hours', 'for_date']
+        widgets = {
+            'for_date': forms.DateInput(attrs={'type': 'date'}),
+        }
+
+
+
+SubTaskFormSet = modelformset_factory(
+    SubTask,
+    fields=('title',),
+    extra=3,  # number of empty subtask fields by default
+    widgets={
+        'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter subtask title'})
+    }
+)

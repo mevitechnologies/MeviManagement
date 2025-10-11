@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3><i class="bi bi-plus-circle text-primary"></i> Create New Task</h3>
+    <a href="{% url 'admin_task_dashboard' %}" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Back to Dashboard
+    </a>
+  </div>
+
+  <form method="POST" class="card shadow-sm p-4 bg-light">
+    {% csrf_token %}
+    <div class="row g-3">
+      <div class="col-md-6">{{ form.trainer|as_crispy_field }}</div>
+      <div class="col-md-6">{{ form.task|as_crispy_field }}</div>
+      <div class="col-md-12">{{ form.description|as_crispy_field }}</div>
+      <div class="col-md-4">{{ form.for_date|as_crispy_field }}</div>
+      <div class="col-md-4">{{ form.estimated_hours|as_crispy_field }}</div>
+      <div class="col-md-4">{{ form.priority|as_crispy_field }}</div>
+    </div>
+
+    <hr class="my-4">
+
+    <h5 class="mb-3"><i class="bi bi-list-task text-success"></i> Subtasks</h5>
+    <div class="subtasks">
+      {{ subtask_formset.management_form }}
+      {% for form in subtask_formset %}
+        <div class="mb-2">{{ form.title|as_crispy_field }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mt-4 d-flex justify-content-end">
+      <button type="submit" class="btn btn-primary">
+        <i class="bi bi-save"></i> Save Task
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

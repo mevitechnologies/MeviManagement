@@ -102,11 +102,41 @@ class OfficeTraining(models.Model):
 
 
 class TodoTask(models.Model):
-    trainer = models.ForeignKey(Trainer, on_delete=models.CASCADE)
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed'),
+    ]
+
+    PRIORITY_CHOICES = [
+        ('low', 'Low'),
+        ('medium', 'Medium'),
+        ('high', 'High'),
+    ]
+
+
+    trainer = models.ForeignKey('Trainer',on_delete=models.CASCADE,limit_choices_to={'is_full_time': True})  # ✅ restricts to full-time trainers
     task = models.CharField(max_length=255)
-    date_created = models.DateField(auto_now_add=True)
+    description = models.TextField(blank=True, null=True)
     for_date = models.DateField(default=timezone.now)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
+    estimated_hours = models.DecimalField(max_digits=4, decimal_places=1, default=1.0)
     is_done = models.BooleanField(default=False)
+    created_on = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.task} - {self.trainer.Name} ({self.for_date})"
+
+
+class SubTask(models.Model):
+    parent_task = models.ForeignKey(
+        'TodoTask',
+        on_delete=models.CASCADE,
+        related_name='subtasks'   # ✅ important
+    )
+    title = models.CharField(max_length=255)
+    is_completed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.title} ({'Done' if self.is_completed else 'Pending'})"

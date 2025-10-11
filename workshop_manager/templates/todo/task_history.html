@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="fw-bold text-primary">
+      <i class="bi bi-clock-history"></i> Task History
+    </h4>
+    <a href="{% url 'admin_task_dashboard' %}" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Back to Dashboard
+    </a>
+  </div>
+
+  <!-- Filters -->
+  <form method="GET" class="card shadow-sm p-3 mb-4">
+    <div class="row g-3 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label">Trainer</label>
+        <select name="trainer" class="form-select">
+          <option value="">All Trainers</option>
+          {% for t in trainers %}
+            <option value="{{ t.id }}" {% if query_trainer == t.id|stringformat:'s' %}selected{% endif %}>{{ t.Name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Date</label>
+        <input type="date" name="date" value="{{ query_date }}" class="form-control">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Priority</label>
+        <select name="priority" class="form-select">
+          <option value="">All Priorities</option>
+          <option value="low" {% if query_priority == "low" %}selected{% endif %}>Low</option>
+          <option value="medium" {% if query_priority == "medium" %}selected{% endif %}>Medium</option>
+          <option value="high" {% if query_priority == "high" %}selected{% endif %}>High</option>
+        </select>
+      </div>
+      <div class="col-md-3 d-grid">
+        <button class="btn btn-primary fw-semibold">
+          <i class="bi bi-funnel"></i> Filter
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Table -->
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+      <table class="table table-hover table-striped align-middle mb-0">
+        <thead class="table-light text-center">
+          <tr>
+            <th>Date</th>
+            <th>Trainer</th>
+            <th>Task</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th style="width: 150px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for t in tasks %}
+          <tr>
+            <td class="text-center">{{ t.for_date }}</td>
+            <td>{{ t.trainer.Name }}</td>
+            <td>{{ t.task }}</td>
+            <td>
+              <span class="badge 
+                {% if t.priority == 'high' %}bg-danger
+                {% elif t.priority == 'medium' %}bg-warning text-dark
+                {% else %}bg-success{% endif %}">
+                {{ t.get_priority_display }}
+              </span>
+            </td>
+            <td>
+              {% if t.status == 'completed' %}
+                <span class="badge bg-success">Completed</span>
+              {% elif t.status == 'in_progress' %}
+                <span class="badge bg-warning text-dark">In Progress</span>
+              {% else %}
+                <span class="badge bg-secondary">Pending</span>
+              {% endif %}
+            </td>
+            <td class="text-center">
+              <a href="{% url 'task_detail' t.id %}" class="btn btn-outline-dark btn-sm" title="View Task">
+                <i class="bi bi-eye"></i>
+              </a>
+              <a href="{% url 'delete_task' t.id %}" class="btn btn-outline-danger btn-sm" 
+                 title="Delete Task" 
+                 onclick="return confirm('Are you sure you want to delete this task?')">
+                <i class="bi bi-trash"></i>
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center text-muted py-4">
+              <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+              No records found
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<style>
+  .table-hover tbody tr:hover {
+    background-color: #f9f9f9;
+    transition: 0.2s ease-in-out;
+  }
+</style>
+{% endblock %}

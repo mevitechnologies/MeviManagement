@@ -3,8 +3,11 @@ from .models import Workshop, Trainer, FollowUp
 from .forms import TrainerForm, WorkshopForm
 from datetime import date
 from collections import defaultdict
+from django.forms import modelformset_factory
 from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.admin.views.decorators import staff_member_required
+from .forms import TodoTaskForm, SubTaskForm, SubTaskFormSet
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -25,7 +28,8 @@ from .models import OfficeTraining
 from .models import TodoTask, Trainer
 from .forms import TodoTaskForm
 from .forms import OfficeTrainingForm
-
+from .models import Trainer, TodoTask, SubTask
+from .forms import TodoTaskForm, SubTaskForm
 # views.py
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
@@ -313,111 +317,261 @@ def view_office_training(request, pk):
     training = get_object_or_404(OfficeTraining, pk=pk)
     return render(request, 'office_training/view.html', {'training': training})
 
+# ✅ Only Admin/Superuser access
+# 🧩 Admin Task Board (Scrum View)
+@user_passes_test(lambda u: u.is_staff)
 @login_required
-## 📝 Dashboard View - Add, View today's & carry forward tasks
-def trainer_todo(request):
+def admin_task_dashboard(request):
+    """Show tasks from the past 7 days only"""
     today = timezone.now().date()
-    trainers = Trainer.objects.filter(is_full_time=True)
-    selected_trainer_id = request.GET.get('trainer') or request.POST.get('trainer')
+    one_week_ago = today - timedelta(days=7)
 
-    if selected_trainer_id:
-        trainer = get_object_or_404(Trainer, id=selected_trainer_id)
+    # Get tasks within the past week
+    tasks = TodoTask.objects.filter(for_date__gte=one_week_ago).select_related('trainer').order_by('-for_date', '-priority')
 
-        # 🔁 Carry forward yesterday's tasks if today's not created
-        if not TodoTask.objects.filter(trainer=trainer, for_date=today).exists():
-            yesterday = today - timedelta(days=1)
-            incomplete_yesterday = TodoTask.objects.filter(
-                trainer=trainer, for_date=yesterday, is_done=False
-            )
-            for task in incomplete_yesterday:
-                TodoTask.objects.create(trainer=trainer, task=task.task, for_date=today)
-
-        # ➕ Add new task
-        if request.method == 'POST':
-            form = TodoTaskForm(request.POST)
-            if form.is_valid():
-                task = form.save(commit=False)
-                task.trainer = trainer
-                task.for_date = today
-                task.save()
-                return redirect(f'/todo/?trainer={trainer.id}')
-        else:
-            form = TodoTaskForm()
-
-        tasks = TodoTask.objects.filter(trainer=trainer, for_date=today)
-        return render(request, 'todo/todo_dashboard.html', {
-            'trainers': trainers,
-            'trainer': trainer,
-            'form': form,
-            'tasks': tasks,
-            'today': today,
-        })
-
-    return render(request, 'todo/todo_dashboard.html', {
-        'trainers': trainers,
-        'trainer': None
-    })
-
-
-# ✅ Mark Task as Done
-def mark_task_done(request, trainer_id, task_id):
-    task = get_object_or_404(TodoTask, id=task_id, trainer_id=trainer_id)
-    task.is_done = True
-    task.save()
-    return redirect(f'/todo/?trainer={trainer_id}')
-
-
-# ↩️ Undo Task (Mark as Not Done)
-def undo_task_done(request, trainer_id, task_id):
-    task = get_object_or_404(TodoTask, id=task_id, trainer_id=trainer_id)
-    task.is_done = False
-    task.save()
-    return redirect(f'/todo/?trainer={trainer_id}')
-
-
-# 🗑️ Delete Task
-def delete_task(request, trainer_id, task_id):
-    task = get_object_or_404(TodoTask, id=task_id, trainer_id=trainer_id)
-
-    if request.method == 'POST':
-        task.delete()
-        messages.success(request, "Task deleted successfully.")
-        return redirect(f'/todo/?trainer={trainer_id}')
-
-    return render(request, 'todo/delete_task.html', {
-        'task': task,
-        'trainer_id': trainer_id,
-    })
-
-
-# ✏️ Edit Task
-def edit_task(request, trainer_id, task_id):
-    task = get_object_or_404(TodoTask, id=task_id, trainer_id=trainer_id)
-
-    if request.method == 'POST':
-        form = TodoTaskForm(request.POST, instance=task)
+    # Handle Quick Add Task
+    if request.method == 'POST' and 'add_task' in request.POST:
+        form = TodoTaskForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, "Task updated successfully.")
-            return redirect(f'/todo/?trainer={trainer_id}')
+            messages.success(request, "✅ Task assigned successfully!")
+            return redirect('admin_task_dashboard')
+        else:
+            messages.error(request, "⚠️ Please fix the errors.")
     else:
-        form = TodoTaskForm(instance=task)
+        form = TodoTaskForm()
 
-    return render(request, 'todo/edit_task.html', {
+    grouped_tasks = {
+        'pending': tasks.filter(status='pending'),
+        'in_progress': tasks.filter(status='in_progress'),
+        'completed': tasks.filter(status='completed'),
+    }
+
+    return render(request, 'todo/admin_dashboard.html', {
         'form': form,
-        'trainer': task.trainer,
+        'grouped_tasks': grouped_tasks,
+        'today': today,
+    })
+
+# 🔄 Change Task Status (Pending → In Progress → Completed)
+@login_required
+def change_task_status(request, task_id):
+    task = get_object_or_404(TodoTask, id=task_id)
+    status_cycle = ['pending', 'in_progress', 'completed']
+    next_status = status_cycle[(status_cycle.index(task.status) + 1) % len(status_cycle)]
+    task.status = next_status
+    task.save()
+    messages.info(request, f"🔁 Status changed to {task.get_status_display()}")
+    return redirect('admin_task_dashboard')
+
+
+# ➕ Add Subtask to a Task
+
+# 👩‍🏫 Trainer Dashboard
+@login_required
+def trainer_dashboard(request):
+    """
+    Trainer’s personal dashboard showing only their own tasks and subtasks.
+    Trainers can add subtasks under their assigned tasks.
+    """
+    trainer = getattr(request.user, 'trainer', None)
+    if not trainer:
+        messages.error(request, "No trainer profile found.")
+        return redirect('dashboard')
+
+    today = timezone.now().date()
+    tasks = TodoTask.objects.filter(trainer=trainer).order_by('-for_date')
+
+    # Add Subtask Inline
+    if request.method == 'POST' and 'add_subtask' in request.POST:
+        parent_id = request.POST.get('parent_task_id')
+        parent = get_object_or_404(TodoTask, id=parent_id, trainer=trainer)
+        form = SubTaskForm(request.POST)
+        if form.is_valid():
+            sub = form.save(commit=False)
+            sub.parent_task = parent
+            sub.save()
+            messages.success(request, "✅ Subtask added successfully!")
+            return redirect('trainer_dashboard')
+    else:
+        form = SubTaskForm()
+
+    return render(request, 'todo/trainer_dashboard.html', {
+        'trainer': trainer,
+        'tasks': tasks,
+        'form': form,
+        'today': today,
+    })
+
+
+# 🕓 Task History (Admin View)
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def task_history(request):
+    """Show tasks older than 7 days with filtering"""
+    today = timezone.now().date()
+    one_week_ago = today - timedelta(days=7)
+
+    # Fetch tasks older than 7 days
+    tasks = TodoTask.objects.filter(for_date__lt=one_week_ago).select_related('trainer')
+
+    # Fetch all trainers for dropdown
+    trainers = Trainer.objects.all().order_by('Name')
+
+    # --- Filters ---
+    query_trainer = request.GET.get('trainer')
+    query_date = request.GET.get('date')
+    query_priority = request.GET.get('priority')
+
+    if query_trainer:
+        tasks = tasks.filter(trainer_id=query_trainer)
+
+    if query_date:
+        tasks = tasks.filter(for_date=query_date)
+
+    if query_priority:
+        tasks = tasks.filter(priority=query_priority)
+
+    # Sort tasks by most recent date first
+    tasks = tasks.order_by('-for_date')
+
+    return render(request, 'todo/task_history.html', {
+        'tasks': tasks,
+        'trainers': trainers,
+        'query_trainer': query_trainer,
+        'query_date': query_date,
+        'query_priority': query_priority,
+    })
+
+# ✅ Mark Task as Done
+@login_required
+def mark_task_done(request, trainer_id, task_id):
+    """
+    Marks a task as completed.
+    """
+    task = get_object_or_404(TodoTask, id=task_id, trainer_id=trainer_id)
+    task.status = 'completed'
+    task.is_done = True
+    task.save()
+    messages.success(request, "✅ Task marked as completed.")
+    return redirect('admin_task_dashboard')
+
+
+# 🔁 Undo Task (Mark as Not Done)
+@login_required
+def undo_task_done(request, trainer_id, task_id):
+    """
+    Reverts a completed task back to pending.
+    """
+    task = get_object_or_404(TodoTask, id=task_id, trainer_id=trainer_id)
+    task.status = 'pending'
+    task.is_done = False
+    task.save()
+    messages.info(request, "↩️ Task reverted to pending.")
+    return redirect('admin_task_dashboard')
+
+# ✅ Define SubTaskFormSet (if not already in forms.py)
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def add_task_page(request):
+    """Create a full task with title, description, deadline, subtasks, and priority"""
+
+    if request.method == "POST":
+        form = TodoTaskForm(request.POST)
+        formset = SubTaskFormSet(request.POST, prefix='subtasks')
+
+        if form.is_valid() and formset.is_valid():
+            task = form.save(commit=True)
+
+            # ✅ Save all subtasks linked to this task
+            for sub_form in formset:
+                title = sub_form.cleaned_data.get('title')
+                if title:
+                    sub = sub_form.save(commit=False)
+                    sub.parent_task = task
+                    sub.save()
+
+            messages.success(request, "✅ Task created successfully with subtasks!")
+            return redirect('admin_task_dashboard')  # ✅ Redirect to dashboard
+        else:
+            print("❌ FORM ERRORS:", form.errors)
+            print("❌ SUBTASK ERRORS:", formset.errors)
+            messages.error(request, "⚠️ Please fix the form errors below.")
+    else:
+        form = TodoTaskForm()
+        formset = SubTaskFormSet(queryset=SubTask.objects.none(), prefix='subtasks')
+
+    return render(request, 'todo/add_task.html', {
+        'form': form,
+        'subtask_formset': formset,
+    })
+# 🧩 Toggle Subtask (Done / Not Done)
+def add_subtask(request, task_id):
+    parent = get_object_or_404(TodoTask, id=task_id)
+    
+    if request.method == "POST":
+        form = SubTaskForm(request.POST)
+        if form.is_valid():
+            sub = form.save(commit=False)
+            sub.parent_task = parent  # ✅ link correctly
+            sub.save()
+            messages.success(request, "🧩 Subtask added successfully!")
+            return redirect('task_detail', task_id=task_id)
+    else:
+        form = SubTaskForm()
+    
+    return render(request, 'todo/add_subtask.html', {'form': form, 'task': parent})
+
+@login_required
+def task_detail(request, task_id):
+    # ✅ Fetch main task
+    task = get_object_or_404(TodoTask, id=task_id)
+
+    # ✅ Fetch subtasks linked to this task
+    subtasks = task.subtasks.all().order_by('id')  # uses related_name='subtasks'
+
+    # ✅ Calculate progress dynamically
+    total = subtasks.count()
+    done = subtasks.filter(is_completed=True).count()
+    progress = round((done / total) * 100, 1) if total > 0 else 0
+
+    # ✅ Attach computed attributes (for use in template)
+    task.total_subtasks = total
+    task.completed_subtasks = done
+    task.progress = progress
+
+    # ✅ Render page
+    return render(request, 'todo/task_detail.html', {
         'task': task,
+        'subtasks': subtasks,
     })
 
+@login_required
+def toggle_subtask_done(request, task_id, subtask_id, trainer_id=None):
+    subtask = get_object_or_404(SubTask, id=subtask_id, parent_task_id=task_id)
+    subtask.is_completed = not subtask.is_completed
+    subtask.save()
+    messages.success(request, "✅ Subtask status updated successfully.")
 
-# 📅 Task History View
-def todo_history(request):
-    all_tasks = TodoTask.objects.exclude(for_date=timezone.now().date()).order_by('-for_date')
-    grouped = {}
+    # Redirect correctly
+    if trainer_id:
+        return redirect('trainer_todo', trainer_id=trainer_id)
+    else:
+        return redirect('task_detail', task_id=task_id)
 
-    for task in all_tasks:
-        grouped.setdefault(task.for_date, []).append(task)
 
-    return render(request, 'todo/todo_history.html', {
-        'grouped_tasks': grouped
-    })
+
+
+
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def delete_task(request, task_id):
+    """Allow admin to delete a task and its subtasks"""
+    task = get_object_or_404(TodoTask, id=task_id)
+    task.delete()
+    messages.success(request, "🗑️ Task deleted successfully!")
+    return redirect('admin_task_dashboard')
