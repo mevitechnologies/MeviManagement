@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+  <div class="d-flex justify-content-between mb-3">
+    <h4 class="fw-bold">Colleges</h4>
+    <a href="{% url 'add_college' %}" class="btn btn-success">
+      <i class="bi bi-plus-circle"></i> Add College
+    </a>
+  </div>
+
+  <table class="table table-bordered table-hover">
+    <thead class="table-dark">
+      <tr>
+        <th>Name</th>
+        <th>City</th>
+        <th>Contact</th>
+        <th width="180">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in colleges %}
+      <tr>
+        <td>{{ c.name }}</td>
+        <td>{{ c.city }}</td>
+        <td>{{ c.contact_person }}</td>
+        <td>
+          <a href="{% url 'edit_college' c.id %}" class="btn btn-sm btn-warning">Edit</a>
+          <a href="{% url 'delete_college' c.id %}"
+             class="btn btn-sm btn-danger"
+             onclick="return confirm('Delete this college?')">
+             Delete
+          </a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4">No colleges found</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

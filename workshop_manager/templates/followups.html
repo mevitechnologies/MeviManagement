@@ -1,42 +1,128 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% block content %}
-<div class="container mt-4">
-    <h3>Follow-Up List</h3>
-    <a href="{% url 'add_followup' %}" class="btn btn-primary mb-3">Add Follow-Up</a>
-    <table class="table table-bordered table-hover">
-        <thead>
-            <tr>
-                <th>Workshop</th>
-                <th>Type</th>
-                <th>Due Date</th>
-                <th>Status</th>
-                <th>Notes</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for followup in followups %}
-            <tr>
-                <td>{{ followup.workshop }}</td>
-                <td>{{ followup.get_follow_up_type_display }}</td>
-                <td>{{ followup.due_date }}</td>
-                <td>
-                    {% if followup.is_completed %}
-                        ✅ Completed
-                    {% else %}
-                        ❌ Pending
-                    {% endif %}
-                </td>
-                <td>{{ followup.notes|default:"—" }}</td>
-                <td>
-                    <a href="{% url 'edit_followup' followup.pk %}" class="btn btn-sm btn-warning">Edit</a>
-                    <a href="{% url 'delete_followup' followup.pk %}" class="btn btn-sm btn-danger">Delete</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="6" class="text-center">No follow-ups found.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
+
+<div class="container-fluid px-4 mt-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold text-primary">
+      <i class="bi bi-bell-fill"></i> Follow-Ups Tracker
+    </h3>
+
+    {% if request.user.is_staff %}
+    <a href="{% url 'add_followup' %}" class="btn btn-success">
+      <i class="bi bi-plus-circle"></i> Add Follow-Up
+    </a>
+    {% endif %}
+  </div>
+
+  <!-- ================= PENDING FOLLOWUPS ================= -->
+  <h5 class="fw-bold text-warning mb-3">
+    <i class="bi bi-hourglass-split"></i> Pending Follow-Ups
+  </h5>
+
+  <div class="row">
+    {% for f in pending_followups %}
+    <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+      <div class="card shadow-sm border-start border-4 border-warning h-100">
+        <div class="card-body">
+
+          <span class="badge bg-warning text-dark mb-2">
+            {{ f.follow_up_type|title }}
+          </span>
+
+          <h6 class="fw-bold mb-1">
+            <i class="bi bi-building"></i>
+            {{ f.college.name|default:"No College" }}
+          </h6>
+
+          {% if f.workshop %}
+          <p class="small text-muted mb-1">
+            <i class="bi bi-journal-text"></i> {{ f.workshop.title }}
+          </p>
+          {% endif %}
+
+          <p class="small mb-1">
+            <i class="bi bi-calendar-range"></i>
+            {{ f.follow_from }} → {{ f.follow_to }}
+          </p>
+
+          <p class="small mb-2">
+            <i class="bi bi-person-check"></i>
+            {{ f.assigned_to.Name|default:"Not Assigned" }}
+          </p>
+
+          {% if f.description %}
+          <p class="small text-muted">
+            {{ f.description|truncatechars:90 }}
+          </p>
+          {% endif %}
+
+          {% if request.user.is_staff %}
+          <div class="d-flex gap-2 mt-2">
+            <a href="{% url 'edit_followup' f.id %}" class="btn btn-sm btn-outline-primary w-100">
+              <i class="bi bi-pencil"></i> Edit
+            </a>
+            <a href="{% url 'delete_followup' f.id %}"
+               onclick="return confirm('Delete this follow-up?')"
+               class="btn btn-sm btn-outline-danger w-100">
+              <i class="bi bi-trash"></i> Delete
+            </a>
+          </div>
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+    {% empty %}
+      <p class="text-muted ms-3">No pending follow-ups 🎉</p>
+    {% endfor %}
+  </div>
+
+  <!-- ================= COMPLETED FOLLOWUPS ================= -->
+  <h5 class="fw-bold text-success mt-5 mb-3">
+    <i class="bi bi-check-circle-fill"></i> Completed Follow-Ups
+  </h5>
+
+  <div class="row">
+    {% for f in completed_followups %}
+    <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+      <div class="card shadow-sm border-start border-4 border-success h-100">
+        <div class="card-body">
+
+          <span class="badge bg-success mb-2">
+            {{ f.follow_up_type|title }}
+          </span>
+
+          <h6 class="fw-bold mb-1">
+            <i class="bi bi-building"></i>
+            {{ f.college.name|default:"No College" }}
+          </h6>
+
+          {% if f.workshop %}
+          <p class="small text-muted mb-1">
+            <i class="bi bi-journal-text"></i> {{ f.workshop.title }}
+          </p>
+          {% endif %}
+
+          <p class="small">
+            <i class="bi bi-calendar-check"></i>
+            {{ f.follow_from }} → {{ f.follow_to }}
+          </p>
+
+          <p class="small">
+            <i class="bi bi-person-check-fill"></i>
+            {{ f.assigned_to.Name|default:"Not Assigned" }}
+          </p>
+
+        </div>
+      </div>
+    </div>
+    {% empty %}
+      <p class="text-muted ms-3">No completed follow-ups yet.</p>
+    {% endfor %}
+  </div>
+
 </div>
+
 {% endblock %}

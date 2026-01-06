@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+  <h3 class="fw-bold text-success mb-4">
+    <i class="bi bi-check-circle-fill"></i> Completed Workshops
+  </h3>
+
+  <div class="row">
+    {% for w in workshops %}
+    <div class="col-lg-4 col-md-6 mb-4">
+      <div class="card shadow-sm border-success h-100">
+        <div class="card-body">
+
+          <span class="badge bg-success mb-2">Completed</span>
+
+          <h5 class="fw-bold">{{ w.title }}</h5>
+          <p class="text-muted">{{ w.college }}</p>
+
+          <p class="small text-muted">
+            {{ w.start_date }} → {{ w.end_date }}
+          </p>
+
+          <a href="{% url 'workshop_detail' w.id %}" class="btn btn-sm btn-outline-success">
+            View Details
+          </a>
+
+        </div>
+      </div>
+    </div>
+    {% empty %}
+      <p class="text-muted">No completed workshops yet.</p>
+    {% endfor %}
+  </div>
+
+</div>
+
+{% endblock %}

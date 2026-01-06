@@ -117,97 +117,104 @@
     {% endfor %}
   </div>
 
-  <div class="container mt-4">
-  <!-- 📅 Workshop Calendar -->
-  <div class="card shadow-sm mb-5">
-    <div class="card-header text-white fw-bold d-flex justify-content-between align-items-center"
-         style="background-color: #B7B1F2;">
-      <span><i class="bi bi-calendar-event-fill me-2"></i> Workshop Calendar</span>
-      <div class="d-none d-md-flex align-items-center small">
-        <span class="legend-badge bg-primary me-1"></span> Scheduled
-        <span class="legend-badge bg-success ms-3 me-1"></span> Ongoing
-        <span class="legend-badge bg-secondary ms-3 me-1"></span> Completed
-        <span class="legend-badge bg-warning ms-3 me-1"></span> Follow-Up
-        <span class="legend-badge bg-orange ms-3 me-1" style="background-color: #fd7e14;"></span> Postponed
-        <span class="legend-badge bg-danger ms-3 me-1"></span> Cancelled
+  <!-- 📋 TODAY'S TASKS (KANBAN STYLE) -->
+<div class="card shadow-sm mb-5">
+  <div class="card-header fw-bold d-flex justify-content-between align-items-center"
+       style="background: linear-gradient(45deg, #B7B1F2, #856ef4); color:#fff;">
+    <span>
+      <i class="bi bi-list-check me-2"></i> Tasks for Today ({{ today|date:"d M Y" }})
+    </span>
+    <span class="badge bg-dark">
+      {{ today_tasks.count }} Tasks
+    </span>
+  </div>
+
+  <div class="card-body bg-white">
+
+    {% if today_tasks %}
+    <div class="row">
+
+      <!-- 🟡 PENDING -->
+      <div class="col-md-4 mb-4">
+        <h6 class="fw-bold text-warning mb-3">
+          <i class="bi bi-hourglass-split"></i> Pending
+        </h6>
+
+        {% for task in today_tasks %}
+          {% if task.status == 'pending' %}
+          <div class="card mb-3 shadow-sm border-start border-4"
+               style="border-color:#ffc107;">
+            <div class="card-body py-2">
+              <h6 class="mb-1">{{ task.title }}</h6>
+              <p class="small text-muted mb-1">
+                <i class="bi bi-person"></i> {{ task.trainer.Name|default:"All" }}
+              </p>
+              <p class="small mb-0">
+                <span class="badge bg-warning text-dark">{{ task.priority|title }}</span>
+              </p>
+            </div>
+          </div>
+          {% endif %}
+        {% endfor %}
       </div>
+
+      <!-- 🔵 IN PROGRESS -->
+      <div class="col-md-4 mb-4">
+        <h6 class="fw-bold text-primary mb-3">
+          <i class="bi bi-play-circle-fill"></i> In Progress
+        </h6>
+
+        {% for task in today_tasks %}
+          {% if task.status == 'in_progress' %}
+          <div class="card mb-3 shadow-sm border-start border-4"
+               style="border-color:#0d6efd;">
+            <div class="card-body py-2">
+              <h6 class="mb-1">{{ task.title }}</h6>
+              <p class="small text-muted mb-1">
+                <i class="bi bi-person"></i> {{ task.trainer.Name|default:"All" }}
+              </p>
+              <span class="badge bg-primary">Working</span>
+            </div>
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <!-- 🟢 COMPLETED -->
+      <div class="col-md-4 mb-4">
+        <h6 class="fw-bold text-success mb-3">
+          <i class="bi bi-check-circle-fill"></i> Completed
+        </h6>
+
+        {% for task in today_tasks %}
+          {% if task.status == 'completed' %}
+          <div class="card mb-3 shadow-sm border-start border-4"
+               style="border-color:#198754;">
+            <div class="card-body py-2">
+              <h6 class="mb-1">{{ task.title }}</h6>
+              <p class="small text-muted mb-1">
+                <i class="bi bi-person"></i> {{ task.trainer.Name|default:"All" }}
+              </p>
+              <span class="badge bg-success">Done</span>
+            </div>
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
     </div>
-    <div class="card-body">
-      <div id="workshop-calendar"></div>
+
+    {% else %}
+    <!-- 🎉 NO TASKS -->
+    <div class="text-center py-5">
+      <i class="bi bi-emoji-smile fs-1 text-success"></i>
+      <h5 class="mt-3">No tasks scheduled for today 🎉</h5>
+      <p class="text-muted">Enjoy your day or plan ahead!</p>
     </div>
+    {% endif %}
+
   </div>
 </div>
 
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const calendarEl = document.getElementById('workshop-calendar');
-
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-      initialView: 'dayGridMonth',
-      height: 600,
-      themeSystem: 'bootstrap5',
-      headerToolbar: {
-        left: 'prev,next today',
-        center: 'title',
-        right: 'dayGridMonth,listMonth'
-      },
-      events: [
-        {% for w in calendar_workshops %}
-        {
-          title: "🎓 {{ w.title|escapejs }}",
-          start: "{{ w.start_date|date:'Y-m-d' }}",
-          end: "{{ w.end_date|date:'Y-m-d' }}",
-          color: `{% if w.status == 'cancelled' %}
-                    #dc3545
-                  {% elif w.status == 'postponed' %}
-                    #fd7e14
-                  {% elif w.start_date > today %}
-                    #0d6efd
-                  {% elif w.end_date >= today and w.start_date <= today %}
-                    #198754
-                  {% else %}
-                    #6c757d
-                  {% endif %}`,
-          url: "{% url 'workshop_detail' w.pk %}",
-          extendedProps: {
-            status: "{{ w.status }}",
-            college: "{{ w.college|escapejs }}",
-            department: "{{ w.department|escapejs }}"
-          }
-        },
-        {% endfor %}
-
-        {% for f in calendar_followups %}
-        {
-          title: "🔔 {{ f.follow_up_type|title }}: {{ f.workshop.title|escapejs }}",
-          start: "{{ f.due_date|date:'Y-m-d' }}",
-          color: "#ffc107",
-          url: "{% url 'workshop_detail' f.workshop.pk %}",
-          extendedProps: {
-            followupType: "{{ f.follow_up_type }}",
-            college: "{{ f.workshop.college|escapejs }}"
-          }
-        },
-        {% endfor %}
-      ],
-      eventClick: function (info) {
-        if (info.event.url) {
-          window.open(info.event.url, "_blank");
-          info.jsEvent.preventDefault();
-        }
-      },
-      eventDidMount: function (info) {
-        const props = info.event.extendedProps;
-        if (props.followupType) {
-          info.el.setAttribute('title', `🔔 Follow-Up: ${props.followupType}\n🏫 ${props.college}`);
-        } else {
-          info.el.setAttribute('title', `${info.event.title}\n🏫 ${props.college}\n🧪 ${props.department}`);
-        }
-      }
-    });
-
-    calendar.render();
-  });
-</script>
 
 {% endblock %}

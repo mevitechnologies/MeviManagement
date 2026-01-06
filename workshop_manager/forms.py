@@ -24,20 +24,29 @@ class TrainerForm(forms.ModelForm):
         }
 
 
+from .models import Workshop, Trainer, College, Department
+
 class WorkshopForm(forms.ModelForm):
     class Meta:
         model = Workshop
         fields = [
-            'title', 'college', 'department', 'start_date',
-            'end_date', 'status', 'remarks',
-            'assigned_trainers', 'report'
+            'title',
+            'college',
+            'departments',
+            'start_date',
+            'end_date',
+            'status',
+            'remarks',
+            'assigned_trainers',
+            'report'
         ]
+
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
-            'college': forms.TextInput(attrs={'class': 'form-control'}),
-            'department': forms.TextInput(attrs={'class': 'form-control'}),
-            'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'end_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'college': forms.Select(attrs={'class': 'form-select'}),  # ✅ dropdown
+            'departments': forms.CheckboxSelectMultiple(),           # ✅ multi dept
+            'start_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'end_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'status': forms.Select(attrs={'class': 'form-select'}),
             'remarks': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'assigned_trainers': forms.CheckboxSelectMultiple(),
@@ -49,15 +58,8 @@ class WorkshopForm(forms.ModelForm):
 
         self.conflict_trainers = []
 
-        start_date = None
-        end_date = None
-
-        if 'start_date' in self.data and 'end_date' in self.data:
-            try:
-                start_date = datetime.strptime(self.data['start_date'], '%Y-%m-%d').date()
-                end_date = datetime.strptime(self.data['end_date'], '%Y-%m-%d').date()
-            except ValueError:
-                pass
+        start_date = self.data.get('start_date')
+        end_date = self.data.get('end_date')
 
         trainers = Trainer.objects.all()
         choices = []
@@ -72,26 +74,56 @@ class WorkshopForm(forms.ModelForm):
                     end_date__gte=start_date
                 ).exists()
 
-            if conflict:
-                self.conflict_trainers.append(trainer.id)
-
-            label = f"{trainer.Name} {'— ❌ Conflict' if conflict else ''}"
+            label = f"{trainer.Name} {'❌ Conflict' if conflict else ''}"
             choices.append((trainer.id, mark_safe(label)))
 
         self.fields['assigned_trainers'].choices = choices
 
+# workshop_manager/forms.py
+
+from django import forms
+from .models import FollowUp
+
+
 class FollowUpForm(forms.ModelForm):
     class Meta:
         model = FollowUp
-        fields = ['workshop', 'follow_up_type', 'due_date', 'is_completed', 'notes']
+        fields = [
+            'college',
+            'workshop',
+            'follow_up_type',
+            'description',
+            'follow_from',
+            'follow_to',
+            'assigned_to',
+            'reminder_date',
+            'is_completed',
+        ]
+
         widgets = {
-            'due_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
-            'is_completed': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'college': forms.Select(attrs={'class': 'form-select'}),
             'workshop': forms.Select(attrs={'class': 'form-select'}),
             'follow_up_type': forms.Select(attrs={'class': 'form-select'}),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Notes / discussion points / next steps'
+            }),
+            'follow_from': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'form-control'
+            }),
+            'follow_to': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'form-control'
+            }),
+            'assigned_to': forms.Select(attrs={'class': 'form-select'}),
+            'reminder_date': forms.DateTimeInput(attrs={
+                'type': 'datetime-local',
+                'class': 'form-control'
+            }),
+            'is_completed': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
-
 
 
 class OfficeTrainingForm(forms.ModelForm):
@@ -141,3 +173,9 @@ SubTaskFormSet = modelformset_factory(
         'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter subtask title'})
     }
 )
+from .models import College
+
+class CollegeForm(forms.ModelForm):
+    class Meta:
+        model = College
+        fields = "__all__"

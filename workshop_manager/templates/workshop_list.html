@@ -1,85 +1,217 @@
 {% extends 'base.html' %}
-
 {% block content %}
-<div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Workshop List</h2>
-        <a href="{% url 'add_workshop' %}" class="btn btn-primary">+ Add Workshop</a>
-    </div>
 
-    <!-- Optional: Search Form -->
-    <form method="get" class="mb-3">
-        <div class="input-group">
-            <input type="text" name="q" class="form-control" placeholder="Search by title..." value="{{ request.GET.q }}">
-            <button class="btn btn-outline-secondary" type="submit">Search</button>
-        </div>
-    </form>
+<style>
+  .section-title{
+    border-left:4px solid;
+    padding-left:12px;
+    margin-top:40px;
+    margin-bottom:20px;
+  }
+  .card{
+    transition:all .25s ease;
+    border-radius:14px;
+  }
+  .card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 12px 30px rgba(0,0,0,.12);
+  }
+  .badge-status{
+    font-size:.75rem;
+    padding:6px 10px;
+    border-radius:20px;
+  }
+</style>
 
-    {% if workshops %}
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered align-middle">
-            <thead class="table-dark">
-                <tr>
-                    <th>Title</th>
-                    <th>College</th>
-                    <th>Status</th>
-                    <th>Start Date</th>
-                    <th>End Date</th>
-                    <th style="width: 180px;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for w in workshops %}
-                <tr>
-                    <td>{{ w.title }}</td>
-                    <td>{{ w.college }}</td>
-                    <td>{{ w.get_status_display }}</td>
-                    <td>{{ w.start_date|date:"M d, Y" }}</td>
-                    <td>{{ w.end_date|date:"M d, Y" }}</td>
-                    <td>
-                        <a href="{% url 'workshop_detail' w.pk %}" class="btn btn-sm btn-info">View</a>
-                        <a href="{% url 'edit_workshop' w.pk %}" class="btn btn-sm btn-warning">Edit</a>
-                        <a href="{% url 'delete_workshop' w.pk %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this workshop?')">Delete</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+<div class="container-fluid px-4 mt-4">
 
-    <!-- 🔄 Pagination Controls -->
-    <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center">
-            {% if workshops.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?q={{ request.GET.q }}&page={{ workshops.previous_page_number }}">&laquo;</a>
-                </li>
-            {% else %}
-                <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
-            {% endif %}
+  <!-- ================= HEADER ================= -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold text-primary">
+      <i class="bi bi-calendar-event-fill me-2"></i> Workshops Overview
+    </h3>
 
-            {% for num in workshops.paginator.page_range %}
-                {% if workshops.number == num %}
-                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                {% else %}
-                    <li class="page-item">
-                        <a class="page-link" href="?q={{ request.GET.q }}&page={{ num }}">{{ num }}</a>
-                    </li>
-                {% endif %}
-            {% endfor %}
-
-            {% if workshops.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="?q={{ request.GET.q }}&page={{ workshops.next_page_number }}">&raquo;</a>
-                </li>
-            {% else %}
-                <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
-            {% endif %}
-        </ul>
-    </nav>
-
-    {% else %}
-        <div class="alert alert-warning">No workshops found.</div>
+    {% if is_admin %}
+    <a href="{% url 'add_workshop' %}" class="btn btn-success shadow-sm">
+      <i class="bi bi-plus-circle"></i> Add Workshop
+    </a>
     {% endif %}
+  </div>
+
+  <!-- ================= UPCOMING ================= -->
+  <h5 class="section-title text-info" style="border-color:#0dcaf0;">
+    <i class="bi bi-clock-history"></i> Upcoming Workshops
+  </h5>
+  <div class="row">
+    {% for w in upcoming %}
+    <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+      <div class="card h-100">
+        <div class="card-body">
+
+          <span class="badge bg-info badge-status mb-2">Upcoming</span>
+
+          <h5 class="fw-bold mt-2">{{ w.title }}</h5>
+          <p class="text-muted mb-1">
+            <i class="bi bi-building"></i> {{ w.college }}
+          </p>
+
+          <p class="small text-muted">
+            <i class="bi bi-calendar-event"></i>
+            {{ w.start_date }} → {{ w.end_date }}
+          </p>
+
+          <div class="d-grid gap-2 mt-3">
+            <a href="{% url 'workshop_detail' w.id %}" class="btn btn-outline-primary btn-sm">View</a>
+
+            {% if is_admin %}
+            <a href="{% url 'edit_workshop' w.id %}" class="btn btn-outline-warning btn-sm">Edit</a>
+
+            <form method="post" action="{% url 'delete_workshop' w.id %}"
+                  onsubmit="return confirm('Are you sure you want to delete this workshop?');">
+              {% csrf_token %}
+              <button class="btn btn-outline-danger btn-sm w-100">
+                <i class="bi bi-trash-fill"></i> Delete
+              </button>
+            </form>
+            {% endif %}
+          </div>
+
+        </div>
+      </div>
+    </div>
+    {% empty %}
+      <p class="text-muted ms-3">No upcoming workshops</p>
+    {% endfor %}
+  </div>
+
+  <!-- ================= ONGOING ================= -->
+  <h5 class="section-title text-success" style="border-color:#198754;">
+    <i class="bi bi-play-circle-fill"></i> Ongoing Workshops
+  </h5>
+  <div class="row">
+    {% for w in ongoing %}
+    <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+      <div class="card border-success h-100">
+        <div class="card-body">
+
+          <span class="badge bg-success badge-status mb-2">Ongoing</span>
+
+          <h5 class="fw-bold">{{ w.title }}</h5>
+          <p class="text-muted">{{ w.college }}</p>
+
+          <p class="small text-muted">
+            {{ w.start_date }} → {{ w.end_date }}
+          </p>
+
+          <a href="{% url 'workshop_detail' w.id %}" class="btn btn-outline-success btn-sm mt-2 w-100">
+            View Details
+          </a>
+
+        </div>
+      </div>
+    </div>
+    {% empty %}
+      <p class="text-muted ms-3">No ongoing workshops</p>
+    {% endfor %}
+  </div>
+
+  <!-- ================= TENTATIVE ================= -->
+  <h5 class="section-title text-warning" style="border-color:#ffc107;">
+    <i class="bi bi-question-circle-fill"></i> Tentative Workshops
+  </h5>
+  <div class="row">
+    {% for w in tentative %}
+    <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+      <div class="card border-warning h-100">
+        <div class="card-body">
+
+          <span class="badge bg-warning text-dark badge-status mb-2">Tentative</span>
+
+          <h5 class="fw-bold">{{ w.title }}</h5>
+          <p class="text-muted">{{ w.college }}</p>
+
+          <p class="small text-muted">{{ w.start_date }} → {{ w.end_date }}</p>
+
+          <a href="{% url 'workshop_detail' w.id %}" class="btn btn-outline-warning btn-sm w-100">
+            View
+          </a>
+
+        </div>
+      </div>
+    </div>
+    {% empty %}
+      <p class="text-muted ms-3">No tentative workshops</p>
+    {% endfor %}
+  </div>
+
+  <!-- ================= FIXED ================= -->
+  <h5 class="section-title text-primary" style="border-color:#0d6efd;">
+    <i class="bi bi-check-circle-fill"></i> Fixed Workshops
+  </h5>
+  <div class="row">
+    {% for w in fixed %}
+    <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+      <div class="card border-primary h-100">
+        <div class="card-body">
+
+          <span class="badge bg-primary badge-status mb-2">Fixed</span>
+
+          <h5 class="fw-bold">{{ w.title }}</h5>
+          <p class="text-muted">{{ w.college }}</p>
+
+          <p class="small text-muted">{{ w.start_date }} → {{ w.end_date }}</p>
+
+          <a href="{% url 'workshop_detail' w.id %}" class="btn btn-outline-primary btn-sm w-100">
+            View
+          </a>
+
+        </div>
+      </div>
+    </div>
+    {% empty %}
+      <p class="text-muted ms-3">No fixed workshops</p>
+    {% endfor %}
+  </div>
+
+  <!-- ================= ACTION REQUIRED ================= -->
+  <h5 class="section-title text-danger" style="border-color:#dc3545;">
+    <i class="bi bi-exclamation-triangle-fill"></i> Action Required (Past Workshops)
+  </h5>
+  <div class="row">
+    {% for w in post_workshop %}
+    <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+      <div class="card border-danger h-100">
+        <div class="card-body">
+
+          <span class="badge bg-danger badge-status mb-2">Action Needed</span>
+
+          <h5 class="fw-bold">{{ w.title }}</h5>
+          <p class="text-muted">{{ w.college }}</p>
+
+          <p class="small text-muted">Ended on {{ w.end_date }}</p>
+
+          {% if is_admin %}
+          <div class="d-grid gap-2 mt-3">
+            <a href="{% url 'update_workshop_status' w.id 'completed' %}" class="btn btn-success btn-sm">
+              Mark Completed
+            </a>
+            <a href="{% url 'update_workshop_status' w.id 'postponed' %}" class="btn btn-warning btn-sm">
+              Postponed
+            </a>
+            <a href="{% url 'update_workshop_status' w.id 'cancelled' %}" class="btn btn-secondary btn-sm">
+              Cancelled
+            </a>
+          </div>
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+    {% empty %}
+      <p class="text-muted ms-3">No pending actions</p>
+    {% endfor %}
+  </div>
+
 </div>
+
 {% endblock %}

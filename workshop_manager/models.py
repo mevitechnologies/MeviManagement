@@ -7,7 +7,43 @@ from django.contrib.auth.models import User
 # models.py
 
 from django.utils import timezone
+class Department(models.Model):
+    DEPARTMENT_CHOICES = [
+        ('CSE', 'CSE'),
+        ('ISE', 'ISE'),
+        ('AIML', 'AI & ML'),
+        ('IOT', 'IoT'),
+        ('CYBER', 'Cyber Security'),
+        ('DS', 'Data Science'),
+        ('EC', 'ECE'),
+        ('CIVIL', 'Civil Engineering'),
+        ('MECH', 'Mechanical Engineering'),
+        ('CSA', 'CSA'),
+        ('MCA', 'MCA'),
+        ('BCA', 'BCA'),
+        ('MBA', 'MBA'),
+    ]
 
+    code = models.CharField(
+        max_length=20,
+        choices=DEPARTMENT_CHOICES,
+        unique=True
+    )
+
+    def __str__(self):
+        return self.get_code_display()
+
+
+class College(models.Model):
+    name = models.CharField(max_length=255)
+    city = models.CharField(max_length=100, blank=True)
+    state = models.CharField(max_length=100, blank=True)
+    contact_person = models.CharField(max_length=100, blank=True)
+    contact_phone = models.CharField(max_length=15, blank=True)
+    contact_email = models.EmailField(blank=True)
+
+    def __str__(self):
+        return self.name
 
 class Trainer(models.Model):
     Name = models.CharField(max_length=35)
@@ -33,34 +69,97 @@ class Workshop(models.Model):
     ]
 
     title = models.CharField(max_length=200)
-    college = models.CharField(max_length=200)
-    department = models.CharField(max_length=100)
+
+    college = models.ForeignKey(
+        'College',
+        on_delete=models.CASCADE
+    )
+
+    departments = models.ManyToManyField(
+        'Department',
+        blank=True
+    )
+
     start_date = models.DateField()
     end_date = models.DateField()
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='tentative')
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='tentative'
+    )
+
     remarks = models.TextField(blank=True)
+
+    assigned_trainers = models.ManyToManyField(
+        Trainer,
+        blank=True
+    )
+
+    report = models.FileField(
+        upload_to='workshop_reports/',
+        blank=True,
+        null=True
+    )
+
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
-    assigned_trainers = models.ManyToManyField(Trainer, blank=True)
-    report = models.FileField(upload_to='workshop_reports/', blank=True, null=True)
 
     def __str__(self):
         return f"{self.title} @ {self.college}"
 
 
 class FollowUp(models.Model):
-    workshop = models.ForeignKey(Workshop, on_delete=models.CASCADE)
-    follow_up_type = models.CharField(max_length=100, choices=[
-        ('proposal', 'Send Proposal'),
-        ('call', 'Follow-up Call'),
-        ('meeting', 'HOD Meeting'),
-    ])
-    due_date = models.DateField()
+    college = models.ForeignKey(
+        'College',
+        on_delete=models.CASCADE
+    )
+
+    workshop = models.ForeignKey(
+        'Workshop',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    departments = models.ManyToManyField(
+        Department,
+        blank=True
+    )
+
+    person_met = models.CharField(
+        max_length=100,
+        help_text="HOD / Faculty / Coordinator name"
+    )
+
+    follow_up_type = models.CharField(
+        max_length=50,
+        choices=[
+            ('proposal', 'Send Proposal'),
+            ('call', 'Follow-up Call'),
+            ('meeting', 'Meeting'),
+        ]
+    )
+
+    description = models.TextField(blank=True)
+
+    follow_from = models.DateField()
+    follow_to = models.DateField()
+
+    assigned_to = models.ForeignKey(
+        Trainer,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        limit_choices_to={'is_full_time': True}
+    )
+
+    reminder_date = models.DateTimeField(null=True, blank=True)
+
     is_completed = models.BooleanField(default=False)
-    notes = models.TextField(blank=True)
 
     def __str__(self):
-        return f"{self.follow_up_type} for {self.workshop}"
+        return f"{self.college} - {self.person_met}"
 
 
 class Notification(models.Model):
@@ -140,3 +239,16 @@ class SubTask(models.Model):
 
     def __str__(self):
         return f"{self.title} ({'Done' if self.is_completed else 'Pending'})"
+
+class FollowUpReminder(models.Model):
+    followup = models.ForeignKey(
+        FollowUp,
+        on_delete=models.CASCADE,
+        related_name="reminders"
+    )
+    remind_at = models.DateTimeField()
+    message = models.CharField(max_length=255, blank=True)
+    is_sent = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Reminder for {self.followup}"

@@ -1,254 +1,361 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Workshop, Trainer, FollowUp
-from .forms import TrainerForm, WorkshopForm
-from datetime import date
-from collections import defaultdict
-from django.forms import modelformset_factory
-from django.db.models import Q
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.admin.views.decorators import staff_member_required
-from .forms import TodoTaskForm, SubTaskForm, SubTaskFormSet
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Trainer, Workshop
-from .forms import TrainerForm, WorkshopForm
-from .models import FollowUp
-from .forms import FollowUpForm
-from django.core.paginator import Paginator
-from datetime import timedelta
-from datetime import datetime, timedelta
 from django.utils import timezone
-from django.utils.timezone import now
-from django.http import HttpResponseRedirect
-from django.urls import reverse
-from itertools import chain
-from .models import OfficeTraining
-from .models import TodoTask, Trainer
-from .forms import TodoTaskForm
-from .forms import OfficeTrainingForm
-from .models import Trainer, TodoTask, SubTask
-from .forms import TodoTaskForm, SubTaskForm
-# views.py
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
+from django.core.paginator import Paginator
+from datetime import timedelta, date
+from django.utils import timezone
+from django.contrib.auth.decorators import login_required
+from .models import Workshop, TodoTask,College
+
+from .models import (
+    Workshop, Trainer, FollowUp,
+    TodoTask, SubTask, OfficeTraining,College
+)
+from .forms import (
+    WorkshopForm, TrainerForm, FollowUpForm,
+    TodoTaskForm, SubTaskForm, SubTaskFormSet,
+    OfficeTrainingForm,CollegeForm
+)
+
+# =====================================================
+# HELPERS
+# =====================================================
+
+def is_admin(user):
+    return user.is_staff or user.is_superuser
 
 
-@login_required
-def update_status(request, pk, status):
-    workshop = get_object_or_404(Workshop, pk=pk)
-    workshop.status = status
-    workshop.save()
-    messages.success(request, f"Workshop '{workshop.title}' status updated to '{status}'")
-    return redirect('dashboard')
+# =====================================================
+# AUTH
+# =====================================================
 
 def login_view(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None and user.is_superuser:
+    if request.method == "POST":
+        user = authenticate(
+            request,
+            username=request.POST.get("username"),
+            password=request.POST.get("password")
+        )
+        if user:
             login(request, user)
-            return redirect('dashboard')
-        else:
-            return render(request, 'login.html', {'error': 'Invalid credentials or not a superuser'})
-    return render(request, 'login.html')
+            return redirect(request.GET.get("next", "dashboard"))
+        messages.error(request, "Invalid credentials")
+    return render(request, "login.html")
+
 
 @login_required
 def logout_view(request):
     logout(request)
-    return redirect('login')
+    return redirect("login")
+
+
+# =====================================================
+# MAIN DASHBOARD (VIEW ONLY)
+# =====================================================
+
+
 
 @login_required
 def dashboard(request):
-    today = now().date()
+    today = timezone.now().date()
 
+    # ===============================
+    # WORKSHOP STATUS COLUMNS
+    # ===============================
     status_columns = [
-        {"label": "Tentative", "workshops": Workshop.objects.filter(status='tentative'), "color": "warning"},
-        {"label": "Fixed", "workshops": Workshop.objects.filter(status='fixed'), "color": "success"},
-        {"label": "Postponed", "workshops": Workshop.objects.filter(status='postponed'), "color": "info"},
-        {"label": "Cancelled", "workshops": Workshop.objects.filter(status='cancelled'), "color": "secondary"},
-        {"label": "Completed", "workshops": Workshop.objects.filter(status='completed'), "color": "dark"},
+        ("Tentative", "tentative", "warning"),
+        ("Fixed", "fixed", "success"),
+        ("Postponed", "postponed", "info"),
+        ("Cancelled", "cancelled", "secondary"),
+        ("Completed", "completed", "dark"),
     ]
 
-    ongoing = Workshop.objects.filter(start_date__lte=today, end_date__gte=today)
-    upcoming = Workshop.objects.filter(start_date__gt=today)
-    past = Workshop.objects.filter(end_date__lt=today)
+    columns = []
+    for label, status, color in status_columns:
+        columns.append({
+            "label": label,
+            "color": color,
+            "workshops": Workshop.objects.filter(
+                status=status
+            ).order_by("start_date")
+        })
 
-    all_workshops = list(chain(ongoing, upcoming, past))
-    followups = FollowUp.objects.select_related('workshop').all()
-    followups_due = FollowUp.objects.filter(due_date__lte=today, is_completed=False)
+    # ===============================
+    # TODAY TASKS (FOR ALL USERS)
+    # ===============================
+    if request.user.is_staff:
+        today_tasks = TodoTask.objects.filter(for_date=today)
+    else:
+        trainer = getattr(request.user, "trainer", None)
+        today_tasks = (
+            TodoTask.objects.filter(for_date=today, trainer=trainer)
+            if trainer else TodoTask.objects.none()
+        )
 
     return render(request, "dashboard.html", {
-        "status_columns": status_columns,
-        "ongoing": ongoing,
-        "upcoming": upcoming,
-        "past": past,
-        "followups_due": followups_due,
-        "calendar_followups": followups,
-        "calendar_workshops": all_workshops,
-        "today": today,  # ✅ Add this line
+        "status_columns": columns,
+        "today": today,
+        "today_tasks": today_tasks,
     })
-@login_required
-def follow_ups(request):
-    today = date.today()
-    followups = FollowUp.objects.filter(is_completed=False, due_date__lte=today)
-    return render(request, 'followups.html', {'followups': followups})
-
-@login_required
-def availability_json(request):
-    events = []
-    trainers = Trainer.objects.all()
-    
-    for trainer in trainers:
-        workshops = Workshop.objects.filter(assigned_trainers=trainer, status='fixed')
-        for workshop in workshops:
-            events.append({
-                "title": f"{workshop.title} – {trainer.Name}",
-                "start": workshop.start_date.isoformat(),
-                "end": (workshop.end_date + timedelta(days=1)).isoformat(),  # FullCalendar needs exclusive end
-            })
-
-    return JsonResponse(events, safe=False)
 
 
-# Trainer views
-@login_required
-def trainer_list(request):
-    query = request.GET.get('q')
-    trainers = Trainer.objects.all()
-    if query:
-        trainers = trainers.filter(user__first_name__icontains=query)
+# =====================================================
+# WORKSHOPS
+# =====================================================
 
-    paginator = Paginator(trainers, 5)
-    page = request.GET.get('page')
-    trainers = paginator.get_page(page)
-
-    return render(request, 'trainer_list.html', {'trainers': trainers})
-@login_required
-def add_trainer(request):
-    if request.method == 'POST':
-        form = TrainerForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('trainer_list')
-    else:
-        form = TrainerForm()
-    return render(request, 'add_trainer.html', {'form': form})
-@login_required
-def edit_trainer(request, pk):
-    trainer = get_object_or_404(Trainer, pk=pk)
-    form = TrainerForm(request.POST or None, request.FILES or None, instance=trainer)
-    if form.is_valid():
-        form.save()
-        return redirect('trainer_list')
-    return render(request, 'edit_trainer.html', {'form': form, 'trainer': trainer})
-
-# Workshop views
 @login_required
 def workshop_list(request):
-    query = request.GET.get('q', '')
-    workshops = Workshop.objects.all()
+    """Card-based workshop listing with sections"""
+    today = timezone.now().date()
 
-    if query:
-        workshops = workshops.filter(title__icontains=query)
+    upcoming = Workshop.objects.filter(start_date__gt=today).order_by("start_date")
+    ongoing = Workshop.objects.filter(
+        start_date__lte=today,
+        end_date__gte=today
+    ).order_by("start_date")
 
-    paginator = Paginator(workshops, 5)  # 5 workshops per page
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    tentative = Workshop.objects.filter(
+        status="tentative",
+        start_date__gte=today
+    ).order_by("start_date")
 
-    context = {
-        'workshops': page_obj,  # This variable name must match the template
-        'query': query
-    }
-    return render(request, 'workshop_list.html', context)
+    fixed = Workshop.objects.filter(
+        status="fixed",
+        start_date__gte=today
+    ).order_by("start_date")
 
+    post_workshop = Workshop.objects.filter(
+        end_date__lt=today
+    ).exclude(status__in=["completed", "cancelled"]).order_by("-end_date")
 
-@login_required
-def add_workshop(request):
-    form = WorkshopForm(request.POST or None, request.FILES or None)
-    if request.method == 'POST' and form.is_valid():
-        form.save()
-        return redirect('workshop_list')
-    return render(request, 'add_workshop.html', {'form': form})
+    return render(request, "workshop_list.html", {
+        "upcoming": upcoming,
+        "ongoing": ongoing,
+        "tentative": tentative,
+        "fixed": fixed,
+        "post_workshop": post_workshop,
+        "today": today,
+        "is_admin": request.user.is_staff
+    })
 
-@login_required
-def edit_workshop(request, pk):
-    workshop = get_object_or_404(Workshop, pk=pk)
-    form = WorkshopForm(request.POST or None, request.FILES or None, instance=workshop)
-    if form.is_valid():
-        form.save()
-        return redirect('workshop_list')
-    return render(request, 'edit_workshop.html', {'form': form, 'workshop': workshop})
-
-@login_required
-def delete_trainer(request, pk):
-    trainer = get_object_or_404(Trainer, pk=pk)
-    trainer.delete()
-    messages.success(request, "Trainer deleted successfully.")
-    return redirect('trainer_list')
-@login_required
-def delete_workshop(request, pk):
-    workshop = get_object_or_404(Workshop, pk=pk)
-    workshop.delete()
-    messages.success(request, "Workshop deleted successfully.")
-    return redirect('workshop_list')
 
 @login_required
 def workshop_detail(request, pk):
+    return render(
+        request,
+        "workshop_detail.html",
+        {"workshop": get_object_or_404(Workshop, pk=pk)}
+    )
+
+
+@login_required
+@user_passes_test(is_admin)
+def add_workshop(request):
+    form = WorkshopForm(request.POST or None, request.FILES or None)
+    if form.is_valid():
+        form.save()
+        messages.success(request, "Workshop added successfully")
+        return redirect("workshop_list")
+    return render(request, "add_workshop.html", {"form": form})
+
+
+@login_required
+@user_passes_test(is_admin)
+def edit_workshop(request, pk):
     workshop = get_object_or_404(Workshop, pk=pk)
-    return render(request, 'workshop_detail.html', {'workshop': workshop})
-
-@login_required
-def follow_ups(request):
-    followups = FollowUp.objects.all()
-    return render(request, 'followups.html', {'followups': followups})
-@login_required
-def add_followup(request):
-    form = FollowUpForm(request.POST or None)
+    form = WorkshopForm(request.POST or None, instance=workshop)
     if form.is_valid():
         form.save()
-        return redirect('follow_ups')
-    return render(request, 'followup_form.html', {'form': form, 'title': 'Add Follow-Up'})
+        messages.success(request, "Workshop updated")
+        return redirect("workshop_list")
+    return render(request, "edit_workshop.html", {"form": form})
+
+
 @login_required
-def edit_followup(request, pk):
-    followup = get_object_or_404(FollowUp, pk=pk)
-    form = FollowUpForm(request.POST or None, instance=followup)
+@user_passes_test(is_admin)
+def delete_workshop(request, pk):
+    get_object_or_404(Workshop, pk=pk).delete()
+    messages.success(request, "Workshop deleted")
+    return redirect("workshop_list")
+
+
+@login_required
+@user_passes_test(is_admin)
+def update_workshop_status(request, pk, status):
+    workshop = get_object_or_404(Workshop, pk=pk)
+    if status not in ["completed", "cancelled", "postponed"]:
+        messages.error(request, "Invalid status")
+        return redirect("workshop_list")
+    workshop.status = status
+    workshop.save()
+    messages.success(request, f"Workshop marked as {status}")
+    return redirect("workshop_list")
+
+
+# =====================================================
+# TRAINERS
+# =====================================================
+
+@login_required
+@user_passes_test(is_admin)
+def trainer_list(request):
+    trainers = Trainer.objects.all().order_by("Name")
+    paginator = Paginator(trainers, 6)
+    return render(request, "trainer_list.html", {
+        "trainers": paginator.get_page(request.GET.get("page"))
+    })
+
+
+@login_required
+@user_passes_test(is_admin)
+def add_trainer(request):
+    form = TrainerForm(request.POST or None, request.FILES or None)
     if form.is_valid():
         form.save()
-        return redirect('follow_ups')
-    return render(request, 'followup_form.html', {'form': form, 'title': 'Edit Follow-Up'})
-@login_required
-def delete_followup(request, pk):
-    followup = get_object_or_404(FollowUp, pk=pk)
-    followup.delete()
-    return redirect('follow_ups')
+        return redirect("trainer_list")
+    return render(request, "add_trainer.html", {"form": form})
 
 
 @login_required
-def calendar_view(request):
-    events = []
+@user_passes_test(is_admin)
+def edit_trainer(request, pk):
+    trainer = get_object_or_404(Trainer, pk=pk)
+    form = TrainerForm(request.POST or None, instance=trainer)
+    if form.is_valid():
+        form.save()
+        return redirect("trainer_list")
+    return render(request, "edit_trainer.html", {"form": form})
 
-    trainers = Trainer.objects.all()
-    for trainer in trainers:
-        workshops = Workshop.objects.filter(assigned_trainers=trainer, status='fixed')
-        for workshop in workshops:
-            events.append({
-                "title": f"{workshop.title} – {trainer.Name}",
-                "start": workshop.start_date.isoformat(),
-                "end": (workshop.end_date + timedelta(days=1)).isoformat(),
-            })
 
-    return render(request, 'calendar.html', {'events': events})
+@login_required
+@user_passes_test(is_admin)
+def delete_trainer(request, pk):
+    get_object_or_404(Trainer, pk=pk).delete()
+    return redirect("trainer_list")
+
+
+# =====================================================
+# ADMIN TASK DASHBOARD
+# =====================================================
+
+@login_required
+@user_passes_test(is_admin)
+def admin_task_dashboard(request):
+    today = timezone.now().date()
+    one_week_ago = today - timedelta(days=7)
+
+    tasks = TodoTask.objects.filter(
+        for_date__gte=one_week_ago
+    ).select_related("trainer")
+
+    form = TodoTaskForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        return redirect("admin_task_dashboard")
+
+    return render(request, "todo/admin_dashboard.html", {
+        "form": form,
+        "grouped_tasks": {
+            "pending": tasks.filter(status="pending"),
+            "in_progress": tasks.filter(status="in_progress"),
+            "completed": tasks.filter(status="completed"),
+        }
+    })
+
+
+@login_required
+@user_passes_test(is_admin)
+def add_task_page(request):
+    form = TodoTaskForm(request.POST or None)
+    formset = SubTaskFormSet(
+        request.POST or None,
+        queryset=SubTask.objects.none(),
+        prefix="subtasks"
+    )
+
+    if request.method == "POST" and form.is_valid() and formset.is_valid():
+        task = form.save()
+        for sub in formset:
+            if sub.cleaned_data.get("title"):
+                s = sub.save(commit=False)
+                s.parent_task = task
+                s.save()
+        return redirect("admin_task_dashboard")
+
+    return render(request, "todo/add_task.html", {
+        "form": form,
+        "subtask_formset": formset
+    })
+
+
+@login_required
+def task_detail(request, task_id):
+    task = get_object_or_404(TodoTask, id=task_id)
+    subtasks = task.subtasks.all()
+
+    total = subtasks.count()
+    done = subtasks.filter(is_completed=True).count()
+    task.progress = int((done / total) * 100) if total else 0
+
+    return render(request, "todo/task_detail.html", {
+        "task": task,
+        "subtasks": subtasks
+    })
+
+
+@login_required
+@user_passes_test(is_admin)
+def toggle_subtask_done(request, task_id, subtask_id):
+    sub = get_object_or_404(SubTask, id=subtask_id, parent_task_id=task_id)
+    sub.is_completed = not sub.is_completed
+    sub.save()
+    return redirect("task_detail", task_id=task_id)
+
+
+@login_required
+@user_passes_test(is_admin)
+def delete_task(request, task_id):
+    get_object_or_404(TodoTask, id=task_id).delete()
+    return redirect("admin_task_dashboard")
+
+
+# =====================================================
+# TRAINER DASHBOARD
+# =====================================================
+
+@login_required
+def trainer_dashboard(request):
+    trainer = getattr(request.user, "trainer", None)
+    if not trainer:
+        messages.error(request, "Trainer profile not found")
+        return redirect("dashboard")
+
+    tasks = TodoTask.objects.filter(trainer=trainer)
+
+    return render(request, "todo/trainer_dashboard.html", {
+        "trainer": trainer,
+        "tasks": tasks
+    })
+
 @login_required
 def trainer_schedule(request):
+    """
+    Shows trainer-wise workshop schedule.
+    View-only for all users.
+    Highlights overlapping workshops.
+    """
     trainer_workshops = []
 
-    for trainer in Trainer.objects.all():
-        workshops = Workshop.objects.filter(assigned_trainers=trainer, status='fixed').order_by('start_date')
+    trainers = Trainer.objects.all().order_by("Name")
 
-        # Check for overlapping workshops
+    for trainer in trainers:
+        workshops = Workshop.objects.filter(
+            assigned_trainers=trainer,
+            status="fixed"
+        ).order_by("start_date")
+
         overlapping_ids = set()
         workshop_list = list(workshops)
 
@@ -256,322 +363,278 @@ def trainer_schedule(request):
             for j in range(i + 1, len(workshop_list)):
                 w1 = workshop_list[i]
                 w2 = workshop_list[j]
-                if (w1.start_date <= w2.end_date) and (w2.start_date <= w1.end_date):
+                if (
+                    w1.start_date <= w2.end_date
+                    and w2.start_date <= w1.end_date
+                ):
                     overlapping_ids.add(w1.id)
                     overlapping_ids.add(w2.id)
 
         trainer_workshops.append({
-            'trainer': trainer,
-            'workshops': workshop_list,
-            'overlapping_ids': overlapping_ids
+            "trainer": trainer,
+            "workshops": workshop_list,
+            "overlapping_ids": overlapping_ids
         })
 
-    return render(request, 'trainer_schedule.html', {
-        'trainer_workshops': trainer_workshops
+    return render(request, "trainer_schedule.html", {
+        "trainer_workshops": trainer_workshops
     })
 
-
-def office_training_list(request):
-    today = date.today()
-    trainings = OfficeTraining.objects.all()
-    ongoing = trainings.filter(start_date__lte=today, end_date__gte=today)
-    scheduled = trainings.filter(start_date__gt=today)
-    past = trainings.filter(end_date__lt=today)
-
-    context = {
-        'ongoing': ongoing,
-        'scheduled': scheduled,
-        'past': past,
-        'calendar_trainings': trainings,
-        'today': today,
-    }
-    return render(request, 'office_training/list.html', context)
-
-def add_office_training(request):
-    if request.method == 'POST':
-        form = OfficeTrainingForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('office_training_list')
-    else:
-        form = OfficeTrainingForm()
-    return render(request, 'office_training/form.html', {'form': form})
-
-def edit_office_training(request, pk):
-    training = get_object_or_404(OfficeTraining, pk=pk)
-    if request.method == 'POST':
-        form = OfficeTrainingForm(request.POST, instance=training)
-        if form.is_valid():
-            form.save()
-            return redirect('office_training_list')
-    else:
-        form = OfficeTrainingForm(instance=training)
-    return render(request, 'office_training/form.html', {'form': form})
-
-def delete_office_training(request, pk):
-    training = get_object_or_404(OfficeTraining, pk=pk)
-    training.delete()
-    return redirect('office_training_list')
-
-def view_office_training(request, pk):
-    training = get_object_or_404(OfficeTraining, pk=pk)
-    return render(request, 'office_training/view.html', {'training': training})
-
-# ✅ Only Admin/Superuser access
-# 🧩 Admin Task Board (Scrum View)
-@user_passes_test(lambda u: u.is_staff)
 @login_required
-def admin_task_dashboard(request):
-    """Show tasks from the past 7 days only"""
+def follow_ups(request):
+    """
+    View follow-ups.
+    Admin can edit/delete.
+    Others can only view.
+    """
     today = timezone.now().date()
-    one_week_ago = today - timedelta(days=7)
 
-    # Get tasks within the past week
-    tasks = TodoTask.objects.filter(for_date__gte=one_week_ago).select_related('trainer').order_by('-for_date', '-priority')
+    followups = (
+        FollowUp.objects
+        .select_related("workshop", "college", "assigned_to")
+        .order_by("follow_from")   # ✅ FIXED
+    )
 
-    # Handle Quick Add Task
-    if request.method == 'POST' and 'add_task' in request.POST:
-        form = TodoTaskForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "✅ Task assigned successfully!")
-            return redirect('admin_task_dashboard')
-        else:
-            messages.error(request, "⚠️ Please fix the errors.")
-    else:
-        form = TodoTaskForm()
+    pending = followups.filter(is_completed=False)
+    completed = followups.filter(is_completed=True)
 
-    grouped_tasks = {
-        'pending': tasks.filter(status='pending'),
-        'in_progress': tasks.filter(status='in_progress'),
-        'completed': tasks.filter(status='completed'),
-    }
-
-    return render(request, 'todo/admin_dashboard.html', {
-        'form': form,
-        'grouped_tasks': grouped_tasks,
-        'today': today,
+    return render(request, "followups.html", {
+        "pending_followups": pending,
+        "completed_followups": completed,
+        "today": today,
     })
 
-# 🔄 Change Task Status (Pending → In Progress → Completed)
 @login_required
-def change_task_status(request, task_id):
-    task = get_object_or_404(TodoTask, id=task_id)
-    status_cycle = ['pending', 'in_progress', 'completed']
-    next_status = status_cycle[(status_cycle.index(task.status) + 1) % len(status_cycle)]
-    task.status = next_status
-    task.save()
-    messages.info(request, f"🔁 Status changed to {task.get_status_display()}")
-    return redirect('admin_task_dashboard')
+@user_passes_test(lambda u: u.is_staff)
+def add_followup(request):
+    """
+    Admin-only: Add a follow-up for a workshop
+    """
+    if request.method == "POST":
+        form = FollowUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "✅ Follow-up added successfully.")
+            return redirect('follow_ups')
+    else:
+        form = FollowUpForm()
+
+    return render(request, 'followup_form.html', {
+        'form': form,
+        'title': 'Add Follow-Up'
+    })
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def edit_followup(request, pk):
+    followup = get_object_or_404(FollowUp, pk=pk)
+
+    if request.method == "POST":
+        form = FollowUpForm(request.POST, instance=followup)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "✅ Follow-up updated successfully.")
+            return redirect('follow_ups')
+    else:
+        form = FollowUpForm(instance=followup)
+
+    return render(request, 'followup_form.html', {
+        'form': form,
+        'title': 'Edit Follow-Up'
+    })
 
 
-# ➕ Add Subtask to a Task
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def delete_followup(request, pk):
+    followup = get_object_or_404(FollowUp, pk=pk)
+    followup.delete()
+    messages.success(request, "🗑️ Follow-up deleted.")
+    return redirect('follow_ups')
 
-# 👩‍🏫 Trainer Dashboard
+def calendar_view(request):
+    events = []
+    for w in Workshop.objects.filter(status="fixed"):
+        events.append({
+            "title": w.title,
+            "start": w.start_date.isoformat(),
+            "end": (w.end_date + timedelta(days=1)).isoformat()
+        })
+    return render(request, "calendar.html", {"events": events})
+
 @login_required
 def trainer_dashboard(request):
     """
-    Trainer’s personal dashboard showing only their own tasks and subtasks.
-    Trainers can add subtasks under their assigned tasks.
+    Trainer dashboard – view only.
     """
-    trainer = getattr(request.user, 'trainer', None)
+    trainer = Trainer.objects.filter(email=request.user.email).first()
+
     if not trainer:
-        messages.error(request, "No trainer profile found.")
-        return redirect('dashboard')
+        messages.error(request, "Trainer profile not found.")
+        return redirect("dashboard")
 
+    tasks = TodoTask.objects.filter(trainer=trainer).order_by("-for_date")
+
+    return render(request, "todo/trainer_dashboard.html", {
+        "trainer": trainer,
+        "tasks": tasks,
+    })
+
+# =====================================================
+# OFFICE TRAININGS
+# =====================================================
+
+@login_required
+def office_training_list(request):
+    """
+    View all office trainings.
+    Admin: full access
+    Others: view only
+    """
     today = timezone.now().date()
-    tasks = TodoTask.objects.filter(trainer=trainer).order_by('-for_date')
 
-    # Add Subtask Inline
-    if request.method == 'POST' and 'add_subtask' in request.POST:
-        parent_id = request.POST.get('parent_task_id')
-        parent = get_object_or_404(TodoTask, id=parent_id, trainer=trainer)
-        form = SubTaskForm(request.POST)
-        if form.is_valid():
-            sub = form.save(commit=False)
-            sub.parent_task = parent
-            sub.save()
-            messages.success(request, "✅ Subtask added successfully!")
-            return redirect('trainer_dashboard')
-    else:
-        form = SubTaskForm()
+    trainings = OfficeTraining.objects.all().order_by("-start_date")
 
-    return render(request, 'todo/trainer_dashboard.html', {
-        'trainer': trainer,
-        'tasks': tasks,
-        'form': form,
-        'today': today,
+    ongoing = trainings.filter(start_date__lte=today, end_date__gte=today)
+    upcoming = trainings.filter(start_date__gt=today)
+    completed = trainings.filter(end_date__lt=today)
+
+    return render(request, "office_training/list.html", {
+        "ongoing": ongoing,
+        "upcoming": upcoming,
+        "completed": completed,
+        "today": today,
+        "is_admin": request.user.is_staff,
     })
 
 
-# 🕓 Task History (Admin View)
 @login_required
-@user_passes_test(lambda u: u.is_staff)
+@user_passes_test(is_admin)
+def add_office_training(request):
+    form = OfficeTrainingForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        messages.success(request, "Office training added successfully.")
+        return redirect("office_training_list")
+    return render(request, "office_training/form.html", {
+        "form": form,
+        "title": "Add Office Training"
+    })
+
+
+@login_required
+@user_passes_test(is_admin)
+def edit_office_training(request, pk):
+    training = get_object_or_404(OfficeTraining, pk=pk)
+    form = OfficeTrainingForm(request.POST or None, instance=training)
+    if form.is_valid():
+        form.save()
+        messages.success(request, "Office training updated.")
+        return redirect("office_training_list")
+    return render(request, "office_training/form.html", {
+        "form": form,
+        "title": "Edit Office Training"
+    })
+
+
+@login_required
+@user_passes_test(is_admin)
+def delete_office_training(request, pk):
+    training = get_object_or_404(OfficeTraining, pk=pk)
+    training.delete()
+    messages.success(request, "Office training deleted.")
+    return redirect("office_training_list")
+
+
+@login_required
+def view_office_training(request, pk):
+    training = get_object_or_404(OfficeTraining, pk=pk)
+    return render(request, "office_training/view.html", {
+        "training": training
+    })
+# =====================================================
+# TASK HISTORY (ADMIN ONLY)
+# =====================================================
+
+@login_required
+@user_passes_test(is_admin)
 def task_history(request):
-    """Show tasks older than 7 days with filtering"""
+    """
+    Shows tasks older than 7 days.
+    Admin only.
+    """
     today = timezone.now().date()
     one_week_ago = today - timedelta(days=7)
 
-    # Fetch tasks older than 7 days
-    tasks = TodoTask.objects.filter(for_date__lt=one_week_ago).select_related('trainer')
+    tasks = TodoTask.objects.filter(
+        for_date__lt=one_week_ago
+    ).select_related("trainer").order_by("-for_date")
 
-    # Fetch all trainers for dropdown
-    trainers = Trainer.objects.all().order_by('Name')
+    trainers = Trainer.objects.filter(is_full_time=True).order_by("Name")
 
-    # --- Filters ---
-    query_trainer = request.GET.get('trainer')
-    query_date = request.GET.get('date')
-    query_priority = request.GET.get('priority')
+    # Filters
+    trainer_id = request.GET.get("trainer")
+    date_filter = request.GET.get("date")
+    priority = request.GET.get("priority")
 
-    if query_trainer:
-        tasks = tasks.filter(trainer_id=query_trainer)
-
-    if query_date:
-        tasks = tasks.filter(for_date=query_date)
-
-    if query_priority:
-        tasks = tasks.filter(priority=query_priority)
-
-    # Sort tasks by most recent date first
-    tasks = tasks.order_by('-for_date')
-
-    return render(request, 'todo/task_history.html', {
-        'tasks': tasks,
-        'trainers': trainers,
-        'query_trainer': query_trainer,
-        'query_date': query_date,
-        'query_priority': query_priority,
-    })
-
-# ✅ Mark Task as Done
-@login_required
-def mark_task_done(request, trainer_id, task_id):
-    """
-    Marks a task as completed.
-    """
-    task = get_object_or_404(TodoTask, id=task_id, trainer_id=trainer_id)
-    task.status = 'completed'
-    task.is_done = True
-    task.save()
-    messages.success(request, "✅ Task marked as completed.")
-    return redirect('admin_task_dashboard')
-
-
-# 🔁 Undo Task (Mark as Not Done)
-@login_required
-def undo_task_done(request, trainer_id, task_id):
-    """
-    Reverts a completed task back to pending.
-    """
-    task = get_object_or_404(TodoTask, id=task_id, trainer_id=trainer_id)
-    task.status = 'pending'
-    task.is_done = False
-    task.save()
-    messages.info(request, "↩️ Task reverted to pending.")
-    return redirect('admin_task_dashboard')
-
-# ✅ Define SubTaskFormSet (if not already in forms.py)
-
-
-@login_required
-@user_passes_test(lambda u: u.is_staff)
-def add_task_page(request):
-    """Create a full task with title, description, deadline, subtasks, and priority"""
-
-    if request.method == "POST":
-        form = TodoTaskForm(request.POST)
-        formset = SubTaskFormSet(request.POST, prefix='subtasks')
-
-        if form.is_valid() and formset.is_valid():
-            task = form.save(commit=True)
-
-            # ✅ Save all subtasks linked to this task
-            for sub_form in formset:
-                title = sub_form.cleaned_data.get('title')
-                if title:
-                    sub = sub_form.save(commit=False)
-                    sub.parent_task = task
-                    sub.save()
-
-            messages.success(request, "✅ Task created successfully with subtasks!")
-            return redirect('admin_task_dashboard')  # ✅ Redirect to dashboard
-        else:
-            print("❌ FORM ERRORS:", form.errors)
-            print("❌ SUBTASK ERRORS:", formset.errors)
-            messages.error(request, "⚠️ Please fix the form errors below.")
-    else:
-        form = TodoTaskForm()
-        formset = SubTaskFormSet(queryset=SubTask.objects.none(), prefix='subtasks')
-
-    return render(request, 'todo/add_task.html', {
-        'form': form,
-        'subtask_formset': formset,
-    })
-# 🧩 Toggle Subtask (Done / Not Done)
-def add_subtask(request, task_id):
-    parent = get_object_or_404(TodoTask, id=task_id)
-    
-    if request.method == "POST":
-        form = SubTaskForm(request.POST)
-        if form.is_valid():
-            sub = form.save(commit=False)
-            sub.parent_task = parent  # ✅ link correctly
-            sub.save()
-            messages.success(request, "🧩 Subtask added successfully!")
-            return redirect('task_detail', task_id=task_id)
-    else:
-        form = SubTaskForm()
-    
-    return render(request, 'todo/add_subtask.html', {'form': form, 'task': parent})
-
-@login_required
-def task_detail(request, task_id):
-    # ✅ Fetch main task
-    task = get_object_or_404(TodoTask, id=task_id)
-
-    # ✅ Fetch subtasks linked to this task
-    subtasks = task.subtasks.all().order_by('id')  # uses related_name='subtasks'
-
-    # ✅ Calculate progress dynamically
-    total = subtasks.count()
-    done = subtasks.filter(is_completed=True).count()
-    progress = round((done / total) * 100, 1) if total > 0 else 0
-
-    # ✅ Attach computed attributes (for use in template)
-    task.total_subtasks = total
-    task.completed_subtasks = done
-    task.progress = progress
-
-    # ✅ Render page
-    return render(request, 'todo/task_detail.html', {
-        'task': task,
-        'subtasks': subtasks,
-    })
-
-@login_required
-def toggle_subtask_done(request, task_id, subtask_id, trainer_id=None):
-    subtask = get_object_or_404(SubTask, id=subtask_id, parent_task_id=task_id)
-    subtask.is_completed = not subtask.is_completed
-    subtask.save()
-    messages.success(request, "✅ Subtask status updated successfully.")
-
-    # Redirect correctly
     if trainer_id:
-        return redirect('trainer_todo', trainer_id=trainer_id)
-    else:
-        return redirect('task_detail', task_id=task_id)
+        tasks = tasks.filter(trainer_id=trainer_id)
+    if date_filter:
+        tasks = tasks.filter(for_date=date_filter)
+    if priority:
+        tasks = tasks.filter(priority=priority)
 
+    return render(request, "todo/task_history.html", {
+        "tasks": tasks,
+        "trainers": trainers,
+        "query_trainer": trainer_id,
+        "query_date": date_filter,
+        "query_priority": priority,
+    })
 
-
-
-
-
+@login_required
+def completed_workshops(request):
+    workshops = Workshop.objects.filter(status='completed').order_by('-end_date')
+    return render(request, 'completed_workshops.html', {
+        'workshops': workshops
+    })
 
 @login_required
 @user_passes_test(lambda u: u.is_staff)
-def delete_task(request, task_id):
-    """Allow admin to delete a task and its subtasks"""
-    task = get_object_or_404(TodoTask, id=task_id)
-    task.delete()
-    messages.success(request, "🗑️ Task deleted successfully!")
-    return redirect('admin_task_dashboard')
+def college_list(request):
+    colleges = College.objects.all().order_by("name")
+
+    return render(request, "college/list.html", {
+        "colleges": colleges
+    })
+
+@login_required
+@user_passes_test(is_admin)
+def add_college(request):
+    form = CollegeForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        messages.success(request, "College added successfully")
+        return redirect("college_list")
+    return render(request, "college/form.html", {"form": form, "title": "Add College"})
+
+
+@login_required
+@user_passes_test(is_admin)
+def edit_college(request, pk):
+    college = get_object_or_404(College, pk=pk)
+    form = CollegeForm(request.POST or None, instance=college)
+    if form.is_valid():
+        form.save()
+        messages.success(request, "College updated successfully")
+        return redirect("college_list")
+    return render(request, "college/form.html", {"form": form, "title": "Edit College"})
+
+
+@login_required
+@user_passes_test(is_admin)
+def delete_college(request, pk):
+    college = get_object_or_404(College, pk=pk)
+    college.delete()
+    messages.success(request, "College deleted")
+    return redirect("college_list")
