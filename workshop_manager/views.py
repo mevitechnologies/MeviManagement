@@ -318,7 +318,7 @@ def toggle_subtask_done(request, task_id, subtask_id):
 @user_passes_test(is_admin)
 def delete_task(request, task_id):
     get_object_or_404(TodoTask, id=task_id).delete()
-    return redirect("admin_task_dashboard")
+    return redirect("task_history")
 
 
 # =====================================================
