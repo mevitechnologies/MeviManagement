@@ -149,9 +149,8 @@ LOGIN_URL = '/login/'
 
 
 CSRF_TRUSTED_ORIGINS = [
-   'mevimanagement-production-8eb8.up.railway.app'
     "https://mevimanagement-production.up.railway.app",
-    "https://mevimanagement-production-8eb8.up.railway.app/"
+    "https://mevimanagement-production-8eb8.up.railway.app/",
     "http://127.0.0.1:8000",
     "https://mevimanagement-production.up.railway.app/"
 ]
