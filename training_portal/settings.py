@@ -93,8 +93,8 @@ DATABASES = {
         'NAME': 'railway',        # e.g., 'railway'
         'USER': 'postgres',             # e.g., 'postgres'
         'PASSWORD': 'riSYPJnYjMSlKBpuDBTxZSJoHHSEWrrW',         # your Railway or local DB password
-        'HOST': 'interchange.proxy.rlwy.net',                 # e.g., 'containers-us-west-45.railway.app'
-        'PORT': '24372',                      # default PostgreSQL port
+        'HOST': 'mainline.proxy.rlwy.net',                 # e.g., 'containers-us-west-45.railway.app'
+        'PORT': '44653',                      # default PostgreSQL port
     }
 }
 
