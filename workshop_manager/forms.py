@@ -44,7 +44,7 @@ class WorkshopForm(forms.ModelForm):
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'college': forms.Select(attrs={'class': 'form-select'}),  # ✅ dropdown
-            'departments': forms.CheckboxSelectMultiple(),           # ✅ multi dept
+            'departments': forms.CheckboxSelectMultiple()  ,           # ✅ multi dept
             'start_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'end_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'status': forms.Select(attrs={'class': 'form-select'}),
