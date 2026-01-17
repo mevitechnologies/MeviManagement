@@ -27,7 +27,7 @@ SECRET_KEY = "django-insecure-c#^mgbgl=#!qat2rw@)@1suoyl(&r=u^-ie1r@i19%v@--z*mg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1','mevimanagement-production.up.railway.app','https://mevimanagement-production-8eb8.up.railway.app/','https://mevimanagement-production.up.railway.app/']
+ALLOWED_HOSTS = ['127.0.0.1','mevimanagement-production-8eb8.up.railway.app','https://mevimanagement-production-8eb8.up.railway.app/','https://mevimanagement-production.up.railway.app/']
 
 
 # Application definitionhttps://mevimanagement-production-8eb8.up.railway.app/
@@ -93,7 +93,7 @@ DATABASES = {
         'NAME': 'railway',        # e.g., 'railway'
         'USER': 'postgres',             # e.g., 'postgres'
         'PASSWORD': 'riSYPJnYjMSlKBpuDBTxZSJoHHSEWrrW',         # your Railway or local DB password
-        'HOST': 'mainline.proxy.rlwy.net',                 # e.g., 'containers-us-west-45.railway.app'
+        'HOST': 'interchange.proxy.rlwy.net',                 # e.g., 'containers-us-west-45.railway.app'
         'PORT': '44653',                      # default PostgreSQL port
     }
 }
@@ -149,7 +149,7 @@ LOGIN_URL = '/login/'
 
 
 CSRF_TRUSTED_ORIGINS = [
-   
+   'mevimanagement-production-8eb8.up.railway.app'
     "https://mevimanagement-production.up.railway.app",
     "https://mevimanagement-production-8eb8.up.railway.app/"
     "http://127.0.0.1:8000",
