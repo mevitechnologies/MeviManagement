@@ -211,6 +211,41 @@
       <p class="text-muted ms-3">No pending actions</p>
     {% endfor %}
   </div>
+<!-- ================= COMPLETED ================= -->
+<h5 class="section-title text-dark" style="border-color:#6c757d;">
+  <i class="bi bi-check2-circle"></i> Completed Workshops
+</h5>
+
+<div class="row">
+  {% for w in completed %}
+  <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+    <div class="card border-secondary h-100">
+      <div class="card-body">
+
+        <span class="badge bg-secondary badge-status mb-2">Completed</span>
+
+        <h5 class="fw-bold">{{ w.title }}</h5>
+        <p class="text-muted">
+          <i class="bi bi-building"></i> {{ w.college }}
+        </p>
+
+        <p class="small text-muted">
+          <i class="bi bi-calendar-check"></i>
+          {{ w.start_date }} → {{ w.end_date }}
+        </p>
+
+        <a href="{% url 'workshop_detail' w.id %}"
+           class="btn btn-outline-secondary btn-sm w-100">
+          View Details
+        </a>
+
+      </div>
+    </div>
+  </div>
+  {% empty %}
+    <p class="text-muted ms-3">No completed workshops</p>
+  {% endfor %}
+</div>
 
 </div>
 

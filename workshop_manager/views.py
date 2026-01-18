@@ -106,11 +106,14 @@ def dashboard(request):
 # =====================================================
 
 @login_required
+@login_required
 def workshop_list(request):
-    """Card-based workshop listing with sections"""
     today = timezone.now().date()
 
-    upcoming = Workshop.objects.filter(start_date__gt=today).order_by("start_date")
+    upcoming = Workshop.objects.filter(
+        start_date__gt=today
+    ).order_by("start_date")
+
     ongoing = Workshop.objects.filter(
         start_date__lte=today,
         end_date__gte=today
@@ -126,9 +129,15 @@ def workshop_list(request):
         start_date__gte=today
     ).order_by("start_date")
 
+    # ❗ Past workshops that still need action
     post_workshop = Workshop.objects.filter(
         end_date__lt=today
     ).exclude(status__in=["completed", "cancelled"]).order_by("-end_date")
+
+    # ✅ COMPLETED WORKSHOPS (NEW)
+    completed = Workshop.objects.filter(
+        status="completed"
+    ).order_by("-end_date")
 
     return render(request, "workshop_list.html", {
         "upcoming": upcoming,
@@ -136,8 +145,9 @@ def workshop_list(request):
         "tentative": tentative,
         "fixed": fixed,
         "post_workshop": post_workshop,
+        "completed": completed,   # ✅ pass to template
         "today": today,
-        "is_admin": request.user.is_staff
+        "is_admin": request.user.is_staff,
     })
 
 
