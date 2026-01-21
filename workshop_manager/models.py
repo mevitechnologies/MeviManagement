@@ -5,7 +5,21 @@ from django.contrib.auth.models import User
 
 
 # models.py
-
+DEPARTMENT_CHOICES = [
+        ('CSE', 'CSE'),
+        ('ISE', 'ISE'),
+        ('AIML', 'AI & ML'),
+        ('IOT', 'IoT'),
+        ('CYBER', 'Cyber Security'),
+        ('DS', 'Data Science'),
+        ('EC', 'ECE'),
+        ('CIVIL', 'Civil Engineering'),
+        ('MECH', 'Mechanical Engineering'),
+        ('CSA', 'CSA'),
+        ('MCA', 'MCA'),
+        ('BCA', 'BCA'),
+        ('MBA', 'MBA'),
+    ]
 from django.utils import timezone
 class Department(models.Model):
     DEPARTMENT_CHOICES = [
@@ -75,8 +89,9 @@ class Workshop(models.Model):
         on_delete=models.CASCADE
     )
 
-    departments = models.ManyToManyField(
-        'Department',
+    departments = models.CharField(
+        max_length=50,
+        choices=DEPARTMENT_CHOICES,
         blank=True
     )
 

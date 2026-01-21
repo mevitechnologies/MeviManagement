@@ -133,6 +133,7 @@ class OfficeTrainingForm(forms.ModelForm):
         widgets = {
             'start_date': forms.DateInput(attrs={'type': 'date'}),
             'end_date': forms.DateInput(attrs={'type': 'date'}),
+            'trainers': forms.CheckboxSelectMultiple(),
         }
 
 class TodoTaskForm(forms.ModelForm):
