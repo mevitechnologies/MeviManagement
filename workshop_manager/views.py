@@ -106,7 +106,6 @@ def dashboard(request):
 # =====================================================
 
 @login_required
-@login_required
 def workshop_list(request):
     today = timezone.now().date()
 
@@ -329,6 +328,50 @@ def toggle_subtask_done(request, task_id, subtask_id):
 def delete_task(request, task_id):
     get_object_or_404(TodoTask, id=task_id).delete()
     return redirect("task_history")
+
+@login_required
+@user_passes_test(is_admin)
+def change_task_status(request, task_id):
+    task = get_object_or_404(TodoTask, id=task_id)
+
+    if task.status == "pending":
+        task.status = "in_progress"
+    elif task.status == "in_progress":
+        task.status = "completed"
+    else:
+        task.status = "pending"   # optional reset
+
+    task.save()
+    return redirect("admin_task_dashboard")
+@login_required
+@user_passes_test(is_admin)
+def add_subtask(request, task_id):
+    task = get_object_or_404(TodoTask, id=task_id)
+
+    if request.method == "POST":
+        title = request.POST.get("title")
+        if title:
+            SubTask.objects.create(parent_task=task, title=title)
+        return redirect("task_detail", task_id=task.id)
+
+    return render(request, "todo/add_subtask.html", {
+        "task": task
+    })
+
+@login_required
+@user_passes_test(is_admin)
+def edit_task(request, task_id):
+    task = get_object_or_404(TodoTask, id=task_id)
+    form = TodoTaskForm(request.POST or None, instance=task)
+
+    if form.is_valid():
+        form.save()
+        return redirect("admin_task_dashboard")
+
+    return render(request, "todo/edit_task.html", {
+        "form": form,
+        "task": task
+    })
 
 
 # =====================================================

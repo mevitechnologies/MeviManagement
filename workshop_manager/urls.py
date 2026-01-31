@@ -81,11 +81,26 @@ path("office-training/<int:pk>/view/", views.view_office_training, name="view_of
 # TASKS
 # ===============================
  path('tasks/', views.admin_task_dashboard, name='admin_task_dashboard'),
+ path(
+    "task/<int:task_id>/subtask/add/",
+    views.add_subtask,
+    name="add_subtask"
+),
     path('tasks/add/', views.add_task_page, name='add_task_page'),
     path('tasks/history/', views.task_history, name='task_history'),
     path('task/<int:task_id>/', views.task_detail, name='task_detail'),
     path('task/<int:task_id>/delete/', views.delete_task, name='delete_task'),
     path('task/<int:task_id>/subtask/<int:subtask_id>/toggle/', views.toggle_subtask_done, name='toggle_subtask_done'),
+path(
+    "task/<int:task_id>/change-status/",
+    views.change_task_status,
+    name="change_task_status"
+),
+path(
+    "task/<int:task_id>/edit/",
+    views.edit_task,
+    name="edit_task"
+),
 
 # ===============================
 # CALENDAR
