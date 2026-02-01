@@ -40,7 +40,7 @@ def login_view(request):
         )
         if user:
             login(request, user)
-            return redirect(request.GET.get("next", "dashboard"))
+            return redirect( "dashboard")
         messages.error(request, "Invalid credentials")
     return render(request, "login.html")
 
