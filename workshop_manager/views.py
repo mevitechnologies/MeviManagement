@@ -33,16 +33,30 @@ def is_admin(user):
 
 def login_view(request):
     if request.method == "POST":
+        username = request.POST.get("username").strip().lower()
+        password = request.POST.get("password")
+
         user = authenticate(
             request,
-            username=request.POST.get("username"),
-            password=request.POST.get("password")
+            username=username,
+            password=password
         )
-        if user:
+
+        if user is not None:
             login(request, user)
-            return redirect( "dashboard")
-        messages.error(request, "Invalid credentials")
+
+            # Redirect safely
+            next_url = request.GET.get("next")
+            return redirect(next_url or "dashboard")
+
+        else:
+            messages.error(
+                request,
+                "❌ Invalid email or password"
+            )
+
     return render(request, "login.html")
+
 
 
 @login_required
