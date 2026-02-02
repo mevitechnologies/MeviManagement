@@ -152,3 +152,4 @@ CSRF_TRUSTED_ORIGINS = [
     'https://mevimanagement-production-8528.up.railway.app',
     'http://mevimanagement-production-8528.up.railway.app',
 ]
+
