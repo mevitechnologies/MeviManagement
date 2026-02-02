@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-        'workshop_manager',
+    'workshop_manager',
     'crispy_forms',         # Optional: for better form styling
     'crispy_bootstrap5',
 ]

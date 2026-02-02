@@ -31,31 +31,28 @@ def is_admin(user):
 # AUTH
 # =====================================================
 
+from django.contrib.auth import authenticate, login
+from django.contrib import messages
+from django.shortcuts import render, redirect
+
 def login_view(request):
+    if request.user.is_authenticated:
+        return redirect("dashboard")
+
     if request.method == "POST":
-        username = request.POST.get("username").strip().lower()
+        username = request.POST.get("username")
         password = request.POST.get("password")
 
-        user = authenticate(
-            request,
-            username=username,
-            password=password
-        )
+        user = authenticate(request, username=username, password=password)
 
         if user is not None:
             login(request, user)
-
-            # Redirect safely
-            next_url = request.GET.get("next")
-            return redirect(next_url or "dashboard")
-
+            return redirect("dashboard")
         else:
-            messages.error(
-                request,
-                "❌ Invalid email or password"
-            )
+            messages.error(request, "❌ Invalid username or password")
 
     return render(request, "login.html")
+
 
 
 
