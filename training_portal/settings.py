@@ -152,4 +152,5 @@ CSRF_TRUSTED_ORIGINS = [
    
     'https://mevimanagement-production-8528.up.railway.app'
     "http://127.0.0.1:8000",
+    'https://mevimanagement-production-8528.up.railway.app'
 ]
