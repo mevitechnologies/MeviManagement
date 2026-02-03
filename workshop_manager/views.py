@@ -97,22 +97,16 @@ def dashboard(request):
         })
 
     # ===============================
-    # TODAY TASKS (FOR ALL USERS)
+    # TODAY TASKS (VISIBLE TO ALL)
     # ===============================
-    if request.user.is_staff:
-        today_tasks = TodoTask.objects.filter(for_date=today)
-    else:
-        trainer = getattr(request.user, "trainer", None)
-        today_tasks = (
-            TodoTask.objects.filter(for_date=today, trainer=trainer)
-            if trainer else TodoTask.objects.none()
-        )
+    today_tasks = TodoTask.objects.filter(for_date=today).select_related("trainer")
 
     return render(request, "dashboard.html", {
         "status_columns": columns,
         "today": today,
         "today_tasks": today_tasks,
     })
+
 
 
 # =====================================================
