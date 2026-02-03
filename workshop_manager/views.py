@@ -272,20 +272,23 @@ def admin_task_dashboard(request):
         for_date__gte=one_week_ago
     ).select_related("trainer")
 
-    form = TodoTaskForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        return redirect("admin_task_dashboard")
+    form = None
+
+    # ✅ Only superuser can add task
+    if request.user.is_superuser:
+        form = TodoTaskForm(request.POST or None)
+        if request.method == "POST" and form.is_valid():
+            form.save()
+            return redirect("admin_task_dashboard")
 
     return render(request, "todo/admin_dashboard.html", {
-        "form": form,
+        "form": form,   # None for normal users
         "grouped_tasks": {
             "pending": tasks.filter(status="pending"),
             "in_progress": tasks.filter(status="in_progress"),
             "completed": tasks.filter(status="completed"),
         }
     })
-
 
 @login_required
 @user_passes_test(is_superuser)
