@@ -174,7 +174,7 @@ def workshop_detail(request, pk):
 
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_superuser)
 def add_workshop(request):
     form = WorkshopForm(request.POST or None, request.FILES or None)
     if form.is_valid():
@@ -185,7 +185,7 @@ def add_workshop(request):
 
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_superuser)
 def edit_workshop(request, pk):
     workshop = get_object_or_404(Workshop, pk=pk)
     form = WorkshopForm(request.POST or None, instance=workshop)
@@ -197,7 +197,7 @@ def edit_workshop(request, pk):
 
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_superuser)
 def delete_workshop(request, pk):
     get_object_or_404(Workshop, pk=pk).delete()
     messages.success(request, "Workshop deleted")
@@ -205,7 +205,7 @@ def delete_workshop(request, pk):
 
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_superuser)
 def update_workshop_status(request, pk, status):
     workshop = get_object_or_404(Workshop, pk=pk)
     if status not in ["completed", "cancelled", "postponed"]:
@@ -222,7 +222,7 @@ def update_workshop_status(request, pk, status):
 # =====================================================
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_superuser)
 def trainer_list(request):
     trainers = Trainer.objects.all().order_by("Name")
     paginator = Paginator(trainers, 6)
@@ -232,7 +232,7 @@ def trainer_list(request):
 
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_superuser)
 def add_trainer(request):
     form = TrainerForm(request.POST or None, request.FILES or None)
     if form.is_valid():
@@ -242,7 +242,7 @@ def add_trainer(request):
 
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_superuser)
 def edit_trainer(request, pk):
     trainer = get_object_or_404(Trainer, pk=pk)
     form = TrainerForm(request.POST or None, instance=trainer)
@@ -253,7 +253,7 @@ def edit_trainer(request, pk):
 
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_superuser)
 def delete_trainer(request, pk):
     get_object_or_404(Trainer, pk=pk).delete()
     return redirect("trainer_list")
@@ -264,7 +264,7 @@ def delete_trainer(request, pk):
 # =====================================================
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_superuser)
 def admin_task_dashboard(request):
     today = timezone.now().date()
     one_week_ago = today - timedelta(days=7)
@@ -289,7 +289,7 @@ def admin_task_dashboard(request):
 
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_superuser)
 def add_task_page(request):
     form = TodoTaskForm(request.POST or None)
     formset = SubTaskFormSet(
@@ -329,7 +329,7 @@ def task_detail(request, task_id):
 
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_superuser)
 def toggle_subtask_done(request, task_id, subtask_id):
     sub = get_object_or_404(SubTask, id=subtask_id, parent_task_id=task_id)
     sub.is_completed = not sub.is_completed
@@ -338,13 +338,13 @@ def toggle_subtask_done(request, task_id, subtask_id):
 
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_superuser)
 def delete_task(request, task_id):
     get_object_or_404(TodoTask, id=task_id).delete()
     return redirect("task_history")
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_superuser)
 def change_task_status(request, task_id):
     task = get_object_or_404(TodoTask, id=task_id)
 
@@ -357,8 +357,9 @@ def change_task_status(request, task_id):
 
     task.save()
     return redirect("admin_task_dashboard")
+
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_superuser)
 def add_subtask(request, task_id):
     task = get_object_or_404(TodoTask, id=task_id)
 
@@ -373,7 +374,7 @@ def add_subtask(request, task_id):
     })
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_superuser)
 def edit_task(request, task_id):
     task = get_object_or_404(TodoTask, id=task_id)
     form = TodoTaskForm(request.POST or None, instance=task)
@@ -576,7 +577,7 @@ def office_training_list(request):
 
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_superuser)
 def add_office_training(request):
     form = OfficeTrainingForm(request.POST or None)
     if form.is_valid():
@@ -590,7 +591,7 @@ def add_office_training(request):
 
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_superuser)
 def edit_office_training(request, pk):
     training = get_object_or_404(OfficeTraining, pk=pk)
     form = OfficeTrainingForm(request.POST or None, instance=training)
@@ -605,7 +606,7 @@ def edit_office_training(request, pk):
 
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_superuser)
 def delete_office_training(request, pk):
     training = get_object_or_404(OfficeTraining, pk=pk)
     training.delete()
@@ -624,7 +625,7 @@ def view_office_training(request, pk):
 # =====================================================
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_superuser)
 def task_history(request):
     """
     Shows tasks older than 7 days.
@@ -676,7 +677,7 @@ def college_list(request):
     })
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_superuser)
 def add_college(request):
     form = CollegeForm(request.POST or None)
     if form.is_valid():
@@ -687,7 +688,7 @@ def add_college(request):
 
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_superuser)
 def edit_college(request, pk):
     college = get_object_or_404(College, pk=pk)
     form = CollegeForm(request.POST or None, instance=college)
@@ -699,7 +700,7 @@ def edit_college(request, pk):
 
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_superuser)
 def delete_college(request, pk):
     college = get_object_or_404(College, pk=pk)
     college.delete()
