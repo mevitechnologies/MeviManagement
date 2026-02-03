@@ -22,9 +22,12 @@ from .forms import (
 # =====================================================
 # HELPERS
 # =====================================================
+def is_superuser(user):
+    return user.is_superuser
 
-def is_admin(user):
+def is_staff_or_superuser(user):
     return user.is_staff or user.is_superuser
+
 
 
 # =====================================================
