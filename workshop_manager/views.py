@@ -264,7 +264,6 @@ def delete_trainer(request, pk):
 # =====================================================
 
 @login_required
-@user_passes_test(is_superuser)
 def admin_task_dashboard(request):
     today = timezone.now().date()
     one_week_ago = today - timedelta(days=7)
