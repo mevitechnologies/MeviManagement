@@ -556,27 +556,22 @@ def view_office_training(request, pk):
 
 @login_required
 def office_training_list(request):
-    """
-    View all office trainings.
-    Admin: full access
-    Others: view only
-    """
     today = timezone.now().date()
 
     trainings = OfficeTraining.objects.all().order_by("-start_date")
 
     ongoing = trainings.filter(start_date__lte=today, end_date__gte=today)
-    upcoming = trainings.filter(start_date__gt=today)
-    completed = trainings.filter(end_date__lt=today)
+    scheduled = trainings.filter(start_date__gt=today)
+    past = trainings.filter(end_date__lt=today)
 
     return render(request, "office_training/list.html", {
         "ongoing": ongoing,
-        "upcoming": upcoming,
-        "completed": completed,
+        "scheduled": scheduled,
+        "past": past,
+        "calendar_trainings": trainings,
         "today": today,
-        "is_admin": request.user.is_staff,
+        "is_admin": request.user.is_superuser,  # 🔒 only superuser edits
     })
-
 
 @login_required
 @user_passes_test(is_superuser)
