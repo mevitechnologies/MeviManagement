@@ -547,6 +547,12 @@ def trainer_dashboard(request):
 # =====================================================
 # OFFICE TRAININGS
 # =====================================================
+@login_required
+def view_office_training(request, pk):
+    training = get_object_or_404(OfficeTraining, pk=pk)
+    return render(request, "office_training/view.html", {
+        "training": training
+    })
 
 @login_required
 def office_training_list(request):

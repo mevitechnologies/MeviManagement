@@ -77,6 +77,12 @@ path("office-training/add/", views.add_office_training, name="add_office_trainin
 path("office-training/<int:pk>/edit/", views.edit_office_training, name="edit_office_training"),
 path("office-training/<int:pk>/delete/", views.delete_office_training, name="delete_office_training"),
 path("office-training/<int:pk>/view/", views.view_office_training, name="view_office_training"),
+path(
+    "office-training/<int:pk>/",
+    views.view_office_training,
+    name="view_office_training"
+),
+
 # ===============================
 # TASKS
 # ===============================
