@@ -27,7 +27,7 @@ SECRET_KEY = "django-insecure-c#^mgbgl=#!qat2rw@)@1suoyl(&r=u^-ie1r@i19%v@--z*mg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1','localhost','mevimanagement-production-8528.up.railway.app']
+ALLOWED_HOSTS = ['127.0.0.1','localhost','mevimanagement-production-8528.up.railway.app','mevimanagement-production.up.railway.app']
 
 
 # Application definitionhttps://mevimanagement-production-8eb8.up.railway.app/
@@ -151,5 +151,6 @@ LOGIN_REDIRECT_URL = '/'
 CSRF_TRUSTED_ORIGINS = [
     'https://mevimanagement-production-8528.up.railway.app',
     'http://mevimanagement-production-8528.up.railway.app',
+    'mevimanagement-production.up.railway.app'
 ]
 
