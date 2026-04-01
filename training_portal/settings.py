@@ -151,6 +151,7 @@ LOGIN_REDIRECT_URL = '/'
 CSRF_TRUSTED_ORIGINS = [
     'https://mevimanagement-production-8528.up.railway.app',
     'http://mevimanagement-production-8528.up.railway.app',
-    'mevimanagement-production.up.railway.app'
+    'http://mevimanagement-production.up.railway.app',
+    'https://mevimanagement-production.up.railway.app'
 ]
 
