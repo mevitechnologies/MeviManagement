@@ -160,10 +160,41 @@ def workshop_list(request):
 
 @login_required
 def workshop_detail(request, pk):
+
+    workshop = get_object_or_404(
+        Workshop,
+        pk=pk
+    )
+
+    trainer = Trainer.objects.filter(
+        user=request.user
+    ).first()
+
+    trainer_report_exists = False
+    can_add_remark = False
+
+    if trainer:
+
+        can_add_remark = workshop.assigned_trainers.filter(
+            id=trainer.id
+        ).exists()
+
+        trainer_report_exists = WorkshopRemarks.objects.filter(
+            workshop=workshop,
+            trainer=trainer
+        ).exists()
+
+    context = {
+        "workshop": workshop,
+        "trainer": trainer,
+        "can_add_remark": can_add_remark,
+        "trainer_report_exists": trainer_report_exists,
+    }
+
     return render(
         request,
         "workshop_detail.html",
-        {"workshop": get_object_or_404(Workshop, pk=pk)}
+        context
     )
 
 
@@ -703,3 +734,145 @@ def delete_college(request, pk):
     college.delete()
     messages.success(request, "College deleted")
     return redirect("college_list")
+
+from .models import Workshop, WorkshopRemarks, Trainer
+from .forms import WorkshopRemarksForm
+
+@login_required
+def add_workshop_remark(request, workshop_id):
+
+    workshop = get_object_or_404(
+        Workshop,
+        id=workshop_id
+    )
+
+    trainer = Trainer.objects.filter(
+        user=request.user
+    ).first()
+
+    if not trainer:
+        messages.error(
+            request,
+            "Your account is not linked to a Trainer profile."
+        )
+
+        return redirect(
+            "workshop_detail",
+            pk=workshop.id
+        )
+
+    if request.method == "POST":
+
+        form = WorkshopRemarksForm(
+            request.POST
+        )
+
+        if form.is_valid():
+
+            remark = form.save(
+                commit=False
+            )
+
+            remark.workshop = workshop
+            remark.trainer = trainer
+
+            remark.save()
+
+            messages.success(
+                request,
+                "Workshop remark submitted successfully."
+            )
+
+            return redirect(
+                "workshop_detail",
+                pk=workshop.id
+            )
+
+    else:
+
+        form = WorkshopRemarksForm()
+
+    return render(
+        request,
+        "add_workshop_remark.html",
+        {
+            "workshop": workshop,
+            "form": form
+        }
+    )
+from .models import WorkshopRemarks
+from .forms import WorkshopRemarksForm
+
+
+@login_required
+def edit_workshop_remark(request, remark_id):
+
+    remark = get_object_or_404(
+        WorkshopRemarks,
+        id=remark_id
+    )
+
+    trainer = Trainer.objects.filter(
+        user=request.user
+    ).first()
+
+    # Superuser can edit any remark
+    if not request.user.is_superuser:
+
+        if not trainer:
+            messages.error(
+                request,
+                "Trainer profile not found."
+            )
+            return redirect(
+                "workshop_detail",
+                pk=remark.workshop.id
+            )
+
+        # Trainer can edit only their own remark
+        if remark.trainer != trainer:
+            messages.error(
+                request,
+                "You can edit only your own remarks."
+            )
+            return redirect(
+                "workshop_detail",
+                pk=remark.workshop.id
+            )
+
+    if request.method == "POST":
+
+        form = WorkshopRemarksForm(
+            request.POST,
+            instance=remark
+        )
+
+        if form.is_valid():
+
+            form.save()
+
+            messages.success(
+                request,
+                "Remark updated successfully."
+            )
+
+            return redirect(
+                "workshop_detail",
+                pk=remark.workshop.id
+            )
+
+    else:
+
+        form = WorkshopRemarksForm(
+            instance=remark
+        )
+
+    return render(
+        request,
+        "add_workshop_remark.html",
+        {
+            "form": form,
+            "workshop": remark.workshop,
+            "is_edit": True,
+        }
+    )

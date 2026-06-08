@@ -60,6 +60,13 @@ class College(models.Model):
         return self.name
 
 class Trainer(models.Model):
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
+
     Name = models.CharField(max_length=35)
     phone = models.CharField(max_length=15)
     email = models.EmailField()
@@ -267,3 +274,59 @@ class FollowUpReminder(models.Model):
 
     def __str__(self):
         return f"Reminder for {self.followup}"
+    
+class WorkshopRemarks(models.Model):
+    workshop = models.ForeignKey(
+        Workshop,
+        on_delete=models.CASCADE,
+        related_name="trainer_reports"
+    )
+
+    trainer = models.ForeignKey(
+        Trainer,
+        on_delete=models.CASCADE
+    )
+
+    topics_covered = models.TextField(
+        help_text="Topics covered during workshop"
+    )
+
+    activities_conducted = models.TextField(
+        blank=True,
+        help_text="Hands-on sessions, quizzes, projects etc."
+    )
+
+    blockers_faced = models.TextField(
+        blank=True,
+        help_text="Challenges faced during workshop"
+    )
+
+    learning_outcomes = models.TextField(
+        blank=True,
+        help_text="What trainer learned from this workshop"
+    )
+
+    innovation_added = models.TextField(
+        blank=True,
+        help_text="Unique teaching methods, demos, activities"
+    )
+
+    notes_prepared = models.BooleanField(default=False)
+
+    notes_link = models.URLField(
+        blank=True,
+        null=True
+    )
+
+    student_feedback = models.TextField(blank=True)
+
+    improvement_suggestions = models.TextField(blank=True)
+
+    overall_rating = models.IntegerField(
+        default=5
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.workshop.title} - {self.trainer.Name}"

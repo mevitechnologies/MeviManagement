@@ -180,3 +180,27 @@ class CollegeForm(forms.ModelForm):
     class Meta:
         model = College
         fields = "__all__"
+
+from django import forms
+from .models import WorkshopRemarks
+
+class WorkshopRemarksForm(forms.ModelForm):
+
+    class Meta:
+        model = WorkshopRemarks
+
+        exclude = [
+            'workshop',
+            'trainer',
+            'created_at'
+        ]
+
+        widgets = {
+            'topics_covered': forms.Textarea(attrs={'rows': 3}),
+            'activities_conducted': forms.Textarea(attrs={'rows': 3}),
+            'blockers_faced': forms.Textarea(attrs={'rows': 3}),
+            'learning_outcomes': forms.Textarea(attrs={'rows': 3}),
+            'innovation_added': forms.Textarea(attrs={'rows': 3}),
+            'student_feedback': forms.Textarea(attrs={'rows': 3}),
+            'improvement_suggestions': forms.Textarea(attrs={'rows': 3}),
+        }

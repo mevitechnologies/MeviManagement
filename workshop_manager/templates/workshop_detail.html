@@ -1,39 +1,366 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="card shadow">
-        <div class="card-header bg-info text-white">
-            <h4 class="mb-0">{{ workshop.title }}</h4>
-        </div>
-        <div class="card-body">
-            <p><strong>College:</strong> {{ workshop.college }}</p>
-            <p><strong>Department:</strong> {{ workshop.department }}</p>
-            <p><strong>Status:</strong> {{ workshop.get_status_display }}</p>
-            <p><strong>Start Date:</strong> {{ workshop.start_date|date:"F j, Y" }}</p>
-            <p><strong>End Date:</strong> {{ workshop.end_date|date:"F j, Y" }}</p>
 
-            <p><strong>Assigned Trainers:</strong> 
-                {% if workshop.assigned_trainers.all %}
-                    {% for t in workshop.assigned_trainers.all %}
-                        {{ t.Name }}{% if not forloop.last %}, {% endif %}
-                    {% endfor %}
-                {% else %}
-                    No trainers assigned.
-                {% endif %}
-            </p>
+<div class="container-fluid mt-4">
 
-            {% if workshop.report %}
-                <p><strong>Report:</strong> 
-                    <a href="{{ workshop.report.url }}" class="btn btn-outline-primary btn-sm" target="_blank">Download Report</a>
-                </p>
-            {% endif %}
+```
+<!-- Workshop Header -->
+<div class="card shadow border-0 mb-4">
 
-            <div class="mt-4">
-                <a href="{% url 'edit_workshop' workshop.pk %}" class="btn btn-warning">Edit Workshop</a>
-                <a href="{% url 'workshop_list' %}" class="btn btn-secondary">Back to List</a>
+    <div class="card-header bg-primary text-white">
+        <div class="d-flex justify-content-between align-items-center">
+
+            <div>
+                <h3 class="mb-0">
+                    <i class="bi bi-mortarboard-fill"></i>
+                    {{ workshop.title }}
+                </h3>
             </div>
+
+            <div>
+                {% if workshop.status == 'fixed' %}
+                    <span class="badge bg-success fs-6">Fixed</span>
+
+                {% elif workshop.status == 'tentative' %}
+                    <span class="badge bg-warning text-dark fs-6">Tentative</span>
+
+                {% elif workshop.status == 'completed' %}
+                    <span class="badge bg-info fs-6">Completed</span>
+
+                {% elif workshop.status == 'cancelled' %}
+                    <span class="badge bg-danger fs-6">Cancelled</span>
+
+                {% elif workshop.status == 'postponed' %}
+                    <span class="badge bg-secondary fs-6">Postponed</span>
+                {% endif %}
+            </div>
+
         </div>
     </div>
+
+    <div class="card-body">
+
+        <div class="row">
+
+            <div class="col-md-6">
+
+                <div class="mb-3">
+                    <strong>College</strong>
+                    <div>{{ workshop.college }}</div>
+                </div>
+
+                <div class="mb-3">
+                    <strong>Department</strong>
+                    <div>{{ workshop.departments }}</div>
+                </div>
+
+                <div class="mb-3">
+                    <strong>Workshop Remarks</strong>
+                    <div>
+                        {{ workshop.remarks|default:"No remarks available." }}
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-md-6">
+
+                <div class="mb-3">
+                    <strong>Start Date</strong>
+                    <div>{{ workshop.start_date }}</div>
+                </div>
+
+                <div class="mb-3">
+                    <strong>End Date</strong>
+                    <div>{{ workshop.end_date }}</div>
+                </div>
+
+                <div class="mb-3">
+                    <strong>Created On</strong>
+                    <div>{{ workshop.created_on|date:"d M Y H:i" }}</div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <hr>
+
+        <!-- Assigned Trainers -->
+        <h5 class="mb-3">
+            <i class="bi bi-people-fill text-primary"></i>
+            Assigned Trainers
+        </h5>
+
+        {% for trainer_item in workshop.assigned_trainers.all %}
+            <span class="badge bg-dark p-2 me-2 mb-2">
+                {{ trainer_item.Name }}
+            </span>
+        {% empty %}
+            <p class="text-muted">
+                No trainers assigned.
+            </p>
+        {% endfor %}
+
+        <hr>
+
+        {% if workshop.report %}
+        <div class="mb-3">
+
+            <strong>Workshop Report</strong><br>
+
+            <a href="{{ workshop.report.url }}"
+               target="_blank"
+               class="btn btn-outline-success mt-2">
+
+                <i class="bi bi-download"></i>
+                Download Report
+
+            </a>
+
+        </div>
+        {% endif %}
+
+    </div>
+
 </div>
+
+<!-- Action Buttons -->
+<div class="d-flex justify-content-between mb-4">
+
+    <div>
+
+        {% if can_add_remark and not trainer_report_exists %}
+
+        <a href="{% url 'add_workshop_remark' workshop.id %}"
+           class="btn btn-success">
+
+            <i class="bi bi-journal-plus"></i>
+            Add My Remark
+
+        </a>
+
+        {% endif %}
+
+    </div>
+
+    <div>
+
+        {% if request.user.is_superuser %}
+
+        <a href="{% url 'edit_workshop' workshop.id %}"
+           class="btn btn-warning">
+
+            <i class="bi bi-pencil-square"></i>
+            Edit Workshop
+
+        </a>
+
+        {% endif %}
+
+        <a href="{% url 'workshop_list' %}"
+           class="btn btn-secondary">
+
+            <i class="bi bi-arrow-left"></i>
+            Back
+
+        </a>
+
+    </div>
+
+</div>
+
+<!-- Trainer Reports -->
+<div class="card shadow border-0">
+
+    <div class="card-header bg-dark text-white">
+        <h4 class="mb-0">
+            <i class="bi bi-journal-text"></i>
+            Trainer Remarks & Learning Reports
+        </h4>
+    </div>
+
+    <div class="card-body">
+
+        {% for remark in workshop.trainer_reports.all %}
+
+        <div class="card shadow-sm border-start border-4 border-primary mb-4">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <h5 class="text-primary mb-1">
+                            <i class="bi bi-person-circle"></i>
+                            {{ remark.trainer.Name }}
+                        </h5>
+
+                        <small class="text-muted">
+                            Submitted on
+                            {{ remark.created_at|date:"d M Y H:i" }}
+                        </small>
+
+                    </div>
+
+                    <div>
+
+                        {% if request.user.is_superuser or trainer == remark.trainer %}
+
+                        <a href="{% url 'edit_workshop_remark' remark.id %}"
+                           class="btn btn-warning btn-sm">
+
+                            <i class="bi bi-pencil-square"></i>
+                            Edit
+
+                        </a>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <div class="row">
+
+                    <div class="col-md-6">
+
+                        <h6 class="fw-bold">Topics Covered</h6>
+                        <p>{{ remark.topics_covered }}</p>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <h6 class="fw-bold">Activities Conducted</h6>
+                        <p>{{ remark.activities_conducted|default:"Not provided" }}</p>
+
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-6">
+
+                        <h6 class="fw-bold">Blockers Faced</h6>
+                        <p>{{ remark.blockers_faced|default:"None" }}</p>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <h6 class="fw-bold">Learning Outcomes</h6>
+                        <p>{{ remark.learning_outcomes|default:"Not provided" }}</p>
+
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-6">
+
+                        <h6 class="fw-bold">Innovation Added</h6>
+                        <p>{{ remark.innovation_added|default:"None" }}</p>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <h6 class="fw-bold">Improvement Suggestions</h6>
+                        <p>{{ remark.improvement_suggestions|default:"None" }}</p>
+
+                    </div>
+
+                </div>
+
+                <div class="row mt-3">
+
+                    <div class="col-md-4">
+
+                        <strong>Notes Prepared</strong><br>
+
+                        {% if remark.notes_prepared %}
+                            <span class="badge bg-success">
+                                Yes
+                            </span>
+                        {% else %}
+                            <span class="badge bg-danger">
+                                No
+                            </span>
+                        {% endif %}
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <strong>Rating</strong><br>
+
+                        <span class="badge bg-warning text-dark">
+                            ⭐ {{ remark.overall_rating }}/5
+                        </span>
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <strong>Notes Link</strong><br>
+
+                        {% if remark.notes_link %}
+
+                        <a href="{{ remark.notes_link }}"
+                           target="_blank"
+                           class="btn btn-outline-primary btn-sm mt-1">
+
+                            Open Notes
+
+                        </a>
+
+                        {% else %}
+
+                        <span class="text-muted">
+                            Not Available
+                        </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <h6 class="fw-bold">
+                    Student Feedback
+                </h6>
+
+                <div class="alert alert-light border">
+                    {{ remark.student_feedback|default:"No feedback provided." }}
+                </div>
+
+            </div>
+
+        </div>
+
+        {% empty %}
+
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i>
+            No trainer remarks submitted yet.
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+```
+
+</div>
+
 {% endblock %}

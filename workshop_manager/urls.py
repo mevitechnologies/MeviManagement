@@ -118,5 +118,14 @@ path("colleges/", views.college_list, name="college_list"),
 path("colleges/add/", views.add_college, name="add_college"),
 path("colleges/<int:pk>/edit/", views.edit_college, name="edit_college"),
 path("colleges/<int:pk>/delete/", views.delete_college, name="delete_college"),
-
+path(
+    "workshop/<int:workshop_id>/remark/add/",
+    views.add_workshop_remark,
+    name="add_workshop_remark"
+),
+path(
+    "remark/<int:remark_id>/edit/",
+    views.edit_workshop_remark,
+    name="edit_workshop_remark"
+),
 ]

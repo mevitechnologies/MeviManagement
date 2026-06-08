@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="card shadow border-0">
+
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">
+                <i class="bi bi-journal-plus"></i>
+                Add Workshop Remark
+            </h3>
+        </div>
+
+        <div class="card-body">
+
+            <div class="alert alert-info">
+                <strong>Workshop:</strong>
+                {{ workshop.title }}
+            </div>
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <div class="row">
+
+                    <div class="col-md-12">
+                        {{ form.topics_covered|as_crispy_field }}
+                    </div>
+
+                    <div class="col-md-12">
+                        {{ form.activities_conducted|as_crispy_field }}
+                    </div>
+
+                    <div class="col-md-12">
+                        {{ form.blockers_faced|as_crispy_field }}
+                    </div>
+
+                    <div class="col-md-12">
+                        {{ form.learning_outcomes|as_crispy_field }}
+                    </div>
+
+                    <div class="col-md-12">
+                        {{ form.innovation_added|as_crispy_field }}
+                    </div>
+
+                    <div class="col-md-6">
+                        {{ form.notes_prepared|as_crispy_field }}
+                    </div>
+
+                    <div class="col-md-6">
+                        {{ form.overall_rating|as_crispy_field }}
+                    </div>
+
+                    <div class="col-md-12">
+                        {{ form.notes_link|as_crispy_field }}
+                    </div>
+
+                    <div class="col-md-12">
+                        {{ form.student_feedback|as_crispy_field }}
+                    </div>
+
+                    <div class="col-md-12">
+                        {{ form.improvement_suggestions|as_crispy_field }}
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <button type="submit"
+                        class="btn btn-success">
+                    <i class="bi bi-check-circle"></i>
+                    Submit Remark
+                </button>
+
+                <a href="{% url 'workshop_detail' workshop.id %}"
+                   class="btn btn-secondary">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
