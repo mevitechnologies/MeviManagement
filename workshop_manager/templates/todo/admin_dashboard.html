@@ -89,28 +89,7 @@
     {% endif %}
   </div>
 
-  <!-- ================= QUICK ASSIGN ================= -->
-  {% if request.user.is_superuser %}
-  <div class="card shadow-sm border-0 mb-4">
-    <div class="card-header bg-primary text-white fw-semibold">
-      <i class="bi bi-lightning-fill"></i> Quick Assign
-    </div>
-    <div class="card-body bg-light">
-      <form method="POST" class="row g-3">
-        {% csrf_token %}
-        <div class="col-md-3">{{ form.trainer|as_crispy_field }}</div>
-        <div class="col-md-3">{{ form.task|as_crispy_field }}</div>
-        <div class="col-md-2">{{ form.priority|as_crispy_field }}</div>
-        <div class="col-md-2">{{ form.for_date|as_crispy_field }}</divdiv>
-        <div class="col-md-2 d-grid align-items-end">
-          <button class="btn btn-success mt-3">
-            <i class="bi bi-check-circle"></i> Assign
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-  {% endif %}
+  
 
   <!-- ================= BOARD ================= -->
   <div class="row g-4">
@@ -169,25 +148,42 @@
           {% endif %}
 
           <!-- ACTIONS -->
-          <div class="d-flex justify-content-between mt-3">
-            <a href="{% url 'task_detail' task.id %}"
-               class="btn btn-outline-dark btn-sm">
-              <i class="bi bi-eye"></i>
-            </a>
+<div class="d-flex justify-content-between mt-3">
 
-            {% if request.user.is_superuser %}
-            <a href="{% url 'change_task_status' task.id %}"
-               class="btn btn-outline-primary btn-sm">
-              <i class="bi bi-arrow-repeat"></i>
-            </a>
+    <!-- View -->
+    <a href="{% url 'task_detail' task.id %}"
+       class="btn btn-outline-dark btn-sm"
+       title="View">
+        <i class="bi bi-eye"></i>
+    </a>
 
-            <a href="{% url 'delete_task' task.id %}"
-               class="btn btn-outline-danger btn-sm"
-               onclick="return confirm('Delete this task?')">
-              <i class="bi bi-trash"></i>
-            </a>
-            {% endif %}
-          </div>
+    {% if request.user.is_superuser %}
+
+    <!-- Edit -->
+    <a href="{% url 'edit_task' task.id %}"
+       class="btn btn-outline-warning btn-sm"
+       title="Edit">
+        <i class="bi bi-pencil-square"></i>
+    </a>
+
+    <!-- Change Status -->
+    <a href="{% url 'change_task_status' task.id %}"
+       class="btn btn-outline-primary btn-sm"
+       title="Change Status">
+        <i class="bi bi-arrow-repeat"></i>
+    </a>
+
+    <!-- Delete -->
+    <a href="{% url 'delete_task' task.id %}"
+       class="btn btn-outline-danger btn-sm"
+       title="Delete"
+       onclick="return confirm('Delete this task?')">
+        <i class="bi bi-trash"></i>
+    </a>
+
+    {% endif %}
+
+</div>
 
           {% if not request.user.is_superuser %}
             <div class="view-only">View only</div>

@@ -547,15 +547,46 @@ def delete_followup(request, pk):
     messages.success(request, "🗑️ Follow-up deleted.")
     return redirect('follow_ups')
 
+import json
+from django.urls import reverse
+
+import json
+from datetime import timedelta
+
+@login_required
 def calendar_view(request):
+
     events = []
-    for w in Workshop.objects.filter(status="fixed"):
+
+    # Workshops
+    for w in Workshop.objects.all():
+
         events.append({
-            "title": w.title,
-            "start": w.start_date.isoformat(),
-            "end": (w.end_date + timedelta(days=1)).isoformat()
+            "title": f"📚 {w.title}",
+            "start": w.start_date.strftime("%Y-%m-%d"),
+            "end": (w.end_date + timedelta(days=1)).strftime("%Y-%m-%d"),
+            "color": "#198754",
+            "url": reverse("workshop_detail", args=[w.pk])
         })
-    return render(request, "calendar.html", {"events": events})
+
+    # Office Trainings
+    for t in OfficeTraining.objects.all():
+
+        events.append({
+            "title": f"🏢 {t.name}",
+            "start": t.start_date.strftime("%Y-%m-%d"),
+            "end": (t.end_date + timedelta(days=1)).strftime("%Y-%m-%d"),
+            "color": "#0d6efd",
+            "url": reverse("view_office_training", args=[t.pk])
+        })
+
+    return render(
+        request,
+        "calendar.html",
+        {
+            "events_json": json.dumps(events)
+        }
+    )
 
 @login_required
 def trainer_dashboard(request):

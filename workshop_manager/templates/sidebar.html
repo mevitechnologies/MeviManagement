@@ -105,14 +105,19 @@
     </li>
 {% endif %}
     <!-- ================= CALENDAR ================= -->
-    <li class="nav-item mt-3 text-uppercase small text-secondary fw-bold">
-      Calendar
-    </li>
-    <li class="nav-item">
-      <a href="{% url 'calendar_view' %}" class="nav-link">
-        <i class="bi bi-calendar-event me-2"></i> Calendar View
-      </a>
-    </li>
+<li class="nav-item">
+    <a href="{% url 'calendar_view' %}" class="nav-link">
+        <i class="bi bi-calendar3 me-2"></i>
+        Master Calendar
+    </a>
+</li>
+
+<li class="nav-item">
+    <a href="{% url 'trainer_schedule' %}" class="nav-link">
+        <i class="bi bi-person-workspace me-2"></i>
+        Trainer Schedule
+    </a>
+</li>
 
     <!-- ================= LOGOUT ================= -->
     <li class="nav-item mt-4 pt-3 border-top border-secondary">
