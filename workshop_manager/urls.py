@@ -128,4 +128,32 @@ path(
     views.edit_workshop_remark,
     name="edit_workshop_remark"
 ),
+
+# ===============================
+# MEETING NOTES
+# ===============================
+
+path(
+    "meeting-notes/",
+    views.meeting_notes,
+    name="meeting_notes"
+),
+
+path(
+    "meeting-notes/add/",
+    views.add_meeting_note,
+    name="add_meeting_note"
+),
+
+path(
+    "meeting-notes/<int:pk>/edit/",
+    views.edit_meeting_note,
+    name="edit_meeting_note"
+),
+
+path(
+    "meeting-notes/<int:pk>/delete/",
+    views.delete_meeting_note,
+    name="delete_meeting_note"
+),
 ]

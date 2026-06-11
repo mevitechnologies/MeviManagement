@@ -7,7 +7,7 @@ from django.core.paginator import Paginator
 from datetime import timedelta, date
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
-from .models import Workshop, TodoTask,College
+from .models import Workshop, TodoTask,College,MeetingNote
 
 from .models import (
     Workshop, Trainer, FollowUp,
@@ -16,7 +16,7 @@ from .models import (
 from .forms import (
     WorkshopForm, TrainerForm, FollowUpForm,
     TodoTaskForm, SubTaskForm, SubTaskFormSet,
-    OfficeTrainingForm,CollegeForm
+    OfficeTrainingForm,CollegeForm,MeetingNoteForm
 )
 
 # =====================================================
@@ -906,4 +906,115 @@ def edit_workshop_remark(request, remark_id):
             "workshop": remark.workshop,
             "is_edit": True,
         }
+    )
+
+@login_required
+def meeting_notes(request):
+
+    notes = MeetingNote.objects.all().order_by(
+        "-meeting_date"
+    )
+
+    q = request.GET.get("q")
+
+    date_filter = request.GET.get("date")
+
+    if q:
+        notes = notes.filter(
+            title__icontains=q
+        )
+
+    if date_filter:
+        notes = notes.filter(
+            meeting_date=date_filter
+        )
+
+    return render(
+        request,
+        "meeting_notes/list.html",
+        {
+            "notes": notes
+        }
+    )
+
+@login_required
+def add_meeting_note(request):
+
+    form = MeetingNoteForm(
+        request.POST or None,
+        request.FILES or None
+    )
+
+    if form.is_valid():
+
+        note = form.save(
+            commit=False
+        )
+
+        note.created_by = request.user
+
+        note.save()
+
+        form.save_m2m()
+
+        return redirect(
+            "meeting_notes"
+        )
+
+    return render(
+        request,
+        "meeting_notes/form.html",
+        {
+            "form": form
+        }
+    )
+
+
+@login_required
+def edit_meeting_note(
+    request,
+    pk
+):
+
+    note = get_object_or_404(
+        MeetingNote,
+        pk=pk
+    )
+
+    form = MeetingNoteForm(
+        request.POST or None,
+        request.FILES or None,
+        instance=note
+    )
+
+    if form.is_valid():
+        form.save()
+        return redirect(
+            "meeting_notes"
+        )
+
+    return render(
+        request,
+        "meeting_notes/form.html",
+        {
+            "form": form
+        }
+    )
+
+@login_required
+@user_passes_test(is_superuser)
+def delete_meeting_note(
+    request,
+    pk
+):
+
+    note = get_object_or_404(
+        MeetingNote,
+        pk=pk
+    )
+
+    note.delete()
+
+    return redirect(
+        "meeting_notes"
     )

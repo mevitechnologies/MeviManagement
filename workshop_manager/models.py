@@ -330,3 +330,58 @@ class WorkshopRemarks(models.Model):
 
     def __str__(self):
         return f"{self.workshop.title} - {self.trainer.Name}"
+    
+
+class MeetingNote(models.Model):
+
+    meeting_date = models.DateField()
+
+    title = models.CharField(
+        max_length=200
+    )
+
+    attendees = models.ManyToManyField(
+        Trainer,
+        blank=True
+    )
+
+    discussion_points = models.TextField()
+
+    decisions_taken = models.TextField(
+        blank=True
+    )
+
+    blockers = models.TextField(
+        blank=True
+    )
+
+    action_items = models.TextField(
+        blank=True
+    )
+
+    next_steps = models.TextField(
+        blank=True
+    )
+
+    attachment = models.FileField(
+        upload_to="meeting_notes/",
+        blank=True,
+        null=True
+    )
+
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    def __str__(self):
+        return f"{self.title} ({self.meeting_date})"

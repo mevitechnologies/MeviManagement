@@ -204,3 +204,87 @@ class WorkshopRemarksForm(forms.ModelForm):
             'student_feedback': forms.Textarea(attrs={'rows': 3}),
             'improvement_suggestions': forms.Textarea(attrs={'rows': 3}),
         }
+
+
+from .models import MeetingNote
+
+class MeetingNoteForm(forms.ModelForm):
+
+    class Meta:
+        model = MeetingNote
+
+        fields = [
+            "meeting_date",
+            "title",
+            "attendees",
+            "discussion_points",
+            "decisions_taken",
+            "blockers",
+            "action_items",
+            "next_steps",
+            "attachment",
+        ]
+
+        widgets = {
+            "meeting_date": forms.DateInput(
+                attrs={
+                    "type": "date",
+                    "class": "form-control"
+                }
+            ),
+
+            "title": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Meeting Title"
+                }
+            ),
+
+            "attendees": forms.SelectMultiple(
+                attrs={
+                    "class": "form-select"
+                }
+            ),
+
+            "discussion_points": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 4,
+                    "placeholder": "Discussion points"
+                }
+            ),
+
+            "decisions_taken": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3
+                }
+            ),
+
+            "blockers": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3
+                }
+            ),
+
+            "action_items": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3
+                }
+            ),
+
+            "next_steps": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3
+                }
+            ),
+
+            "attachment": forms.ClearableFileInput(
+                attrs={
+                    "class": "form-control"
+                }
+            ),
+        }
