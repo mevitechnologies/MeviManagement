@@ -158,6 +158,16 @@ path(
     views.delete_meeting_note,
     name="delete_meeting_note"
 ),
+path(
+    "subtask/<int:subtask_id>/edit/",
+    views.edit_subtask,
+    name="edit_subtask"
+),
+path(
+    "subtask/<int:subtask_id>/delete/",
+    views.delete_subtask,
+    name="delete_subtask"
+),
 ]
 
 handler404 = 'workshop_manager.views.custom_404'

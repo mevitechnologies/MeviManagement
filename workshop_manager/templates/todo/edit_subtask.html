@@ -1,0 +1,14 @@
+<li class="list-group-item d-flex justify-content-between">
+
+    {{ sub.title }}
+
+    <div>
+
+        <a href="{% url 'edit_subtask' sub.id %}"
+           class="btn btn-sm btn-warning">
+            <i class="bi bi-pencil"></i>
+        </a>
+
+    </div>
+
+</li>

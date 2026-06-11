@@ -399,6 +399,52 @@ def add_subtask(request, task_id):
     return render(request, "todo/add_subtask.html", {
         "task": task
     })
+@login_required
+@user_passes_test(is_superuser)
+def edit_subtask(request, subtask_id):
+
+    subtask = get_object_or_404(
+        SubTask,
+        id=subtask_id
+    )
+
+    if request.method == "POST":
+
+        title = request.POST.get("title")
+
+        if title:
+            subtask.title = title
+            subtask.save()
+
+            return redirect(
+                "task_detail",
+                task_id=subtask.parent_task.id
+            )
+
+    return render(
+        request,
+        "todo/edit_subtask.html",
+        {
+            "subtask": subtask
+        }
+    )
+@login_required
+@user_passes_test(is_superuser)
+def delete_subtask(request, subtask_id):
+
+    subtask = get_object_or_404(
+        SubTask,
+        id=subtask_id
+    )
+
+    task_id = subtask.parent_task.id
+
+    subtask.delete()
+
+    return redirect(
+        "task_detail",
+        task_id=task_id
+    )
 
 @login_required
 @user_passes_test(is_superuser)
