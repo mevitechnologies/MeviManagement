@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from django.conf.urls import handler404
+
 
 urlpatterns = [
 
@@ -157,3 +159,5 @@ path(
     name="delete_meeting_note"
 ),
 ]
+
+handler404 = 'workshop_manager.views.custom_404'
