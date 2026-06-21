@@ -30,6 +30,7 @@ ALLOWED_HOSTS = [
     "mevimanagement.up.railway.app",
     "localhost",
     "127.0.0.1",
+    'mevimanagement.com'
 ]
 # Application definitionhttps://mevimanagement-production-8eb8.up.railway.app/
 
@@ -153,4 +154,5 @@ CSRF_TRUSTED_ORIGINS = [
     "https://mevimanagement.up.railway.app",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
+    'https://mevimanagement.com/'
 ]
