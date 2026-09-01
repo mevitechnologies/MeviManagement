@@ -28,8 +28,9 @@ SECRET_KEY = "django-insecure-c#^mgbgl=#!qat2rw@)@1suoyl(&r=u^-ie1r@i19%v@--z*mg
 DEBUG = False
 ALLOWED_HOSTS = [
     "mevimanagement.up.railway.app",
+       "127.0.0.1",
     "localhost",
-    "127.0.0.1",
+    "[::1]",
     'mevimanagement.com',
         'www.mevimanagement.com',
     'jv91cqsi.up.railway.app',
@@ -155,7 +156,7 @@ LOGIN_REDIRECT_URL = '/'
 
 CSRF_TRUSTED_ORIGINS = [
     "https://mevimanagement.up.railway.app",
-    "http://localhost:8000",
     "http://127.0.0.1:8000",
+    "http://localhost:8000",
     'https://mevimanagement.com',
     'https://www.mevimanagement.com',]

@@ -1,124 +1,946 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% block title %}
+Mevi Portal - Calendar Dashboard
+{% endblock %}
+
 {% block content %}
 
-<!-- FullCalendar CSS + JS -->
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
+<!-- FullCalendar -->
+<link
+    href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css"
+    rel="stylesheet"
+>
+
+<script
+    src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js">
+</script>
 
 <style>
-  :root {
-    --primary-color: #B7B1F2;
-    --accent-color: #FDB7EA;
-    --highlight-color: #FFDCCC;
-    --light-bg: #FBF3B9;
-  }
 
-  .legend-badge {
-    display: inline-block;
-    width: 14px;
-    height: 14px;
-    border-radius: 3px;
-    margin-right: 6px;
-  }
+    /* =====================================================
+       DASHBOARD
+    ===================================================== */
 
-  .kanban-card:hover {
-    transform: scale(1.015);
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
-    transition: all 0.2s ease-in-out;
-    background-color: #fef8e7;
-  }
+    .dashboard-wrapper {
+        max-width: 1500px;
+        margin: auto;
+    }
 
-  .kanban-card h6 {
-    font-size: 1rem;
-    font-weight: 600;
-  }
+    .dashboard-header {
+        background: linear-gradient(
+            135deg,
+            #667eea,
+            #764ba2
+        );
+        color: white;
+        border-radius: 18px;
+        padding: 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 10px 30px rgba(0,0,0,.12);
+    }
 
-  #workshop-calendar {
-    background-color: #fff9e8;
-    border-radius: 10px;
-    padding: 10px;
-  }
+    .dashboard-header h2 {
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .dashboard-header p {
+        margin: 0;
+        opacity: .9;
+    }
+
+
+    /* =====================================================
+       CALENDAR CARD
+    ===================================================== */
+
+    .calendar-card {
+        border: none;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(0,0,0,.08);
+    }
+
+    .calendar-card-header {
+        background: white;
+        padding: 20px 25px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .calendar-card-header h4 {
+        margin: 0;
+        font-weight: 700;
+    }
+
+    .calendar-container {
+        padding: 20px;
+        background: #fff;
+    }
+
+
+    /* =====================================================
+       FULL CALENDAR
+    ===================================================== */
+
+    #master-calendar {
+        background: white;
+        min-height: 700px;
+    }
+
+    .fc {
+        font-family: inherit;
+    }
+
+    .fc-toolbar-title {
+        font-size: 1.35rem !important;
+        font-weight: 700;
+    }
+
+    .fc-button {
+        border-radius: 8px !important;
+        margin: 2px !important;
+    }
+
+    .fc-daygrid-day {
+        cursor: pointer;
+    }
+
+    .fc-daygrid-day:hover {
+        background-color: #f8f9ff;
+    }
+
+    .fc-event {
+        border: none !important;
+        border-radius: 6px !important;
+        padding: 4px 6px !important;
+        font-size: .82rem !important;
+        cursor: pointer;
+    }
+
+    .fc-event-title {
+        font-weight: 600;
+    }
+
+    .fc-day-today {
+        background-color: #f1f5ff !important;
+    }
+
+
+    /* =====================================================
+       LEGEND
+    ===================================================== */
+
+    .calendar-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 20px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 12px;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        font-size: .9rem;
+        font-weight: 500;
+    }
+
+    .legend-dot {
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        margin-right: 7px;
+    }
+
+    .workshop-dot {
+        background: #198754;
+    }
+
+    .office-dot {
+        background: #0d6efd;
+    }
+
+    .meeting-dot {
+        background: #6f42c1;
+    }
+
+    .other-dot {
+        background: #fd7e14;
+    }
+
+
+    /* =====================================================
+       SELECTED DAY PANEL
+    ===================================================== */
+
+    .selected-day-card {
+        border: none;
+        border-radius: 18px;
+        box-shadow: 0 8px 25px rgba(0,0,0,.07);
+        margin-top: 25px;
+    }
+
+    .selected-day-header {
+        background: #212529;
+        color: white;
+        padding: 16px 20px;
+        border-radius: 18px 18px 0 0;
+    }
+
+    .selected-day-header h5 {
+        margin: 0;
+        font-weight: 700;
+    }
+
+    .day-event {
+        border: 1px solid #eee;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 12px;
+        background: white;
+        transition: .2s ease;
+    }
+
+    .day-event:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,.08);
+    }
+
+    .event-title {
+        font-weight: 700;
+        font-size: 1rem;
+    }
+
+    .event-info {
+        font-size: .88rem;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+
+    .event-info i {
+        width: 20px;
+    }
+
+
+    /* =====================================================
+       MOBILE
+    ===================================================== */
+
+    @media (max-width: 768px) {
+
+        .dashboard-wrapper {
+            width: 100%;
+        }
+
+        .dashboard-header {
+            padding: 18px;
+            border-radius: 14px;
+        }
+
+        .dashboard-header h2 {
+            font-size: 1.25rem;
+        }
+
+        .dashboard-header p {
+            font-size: .85rem;
+        }
+
+        .calendar-container {
+            padding: 8px;
+        }
+
+        #master-calendar {
+            min-height: 550px;
+        }
+
+        .fc-toolbar {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .fc-toolbar-chunk {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .fc-toolbar-title {
+            font-size: 1.1rem !important;
+        }
+
+        .fc-button {
+            font-size: .75rem !important;
+            padding: 5px 8px !important;
+        }
+
+        .fc-daygrid-day-number {
+            font-size: .75rem;
+        }
+
+        .fc-event {
+            font-size: .65rem !important;
+            padding: 2px !important;
+        }
+
+        .calendar-legend {
+            gap: 8px;
+            font-size: .75rem;
+        }
+
+        .legend-item {
+            font-size: .75rem;
+        }
+
+        .selected-day-card {
+            margin-top: 15px;
+        }
+    }
+
 </style>
 
-<div class="container mt-4">
 
-  <!-- 🔰 Dashboard Header -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold" style="color: var(--primary-color);">
-      <i class="bi bi-kanban-fill me-2"></i> Workshop Dashboard
-    </h2>
-  </div>
+<div class="container-fluid px-2 px-md-4 mt-3">
 
-  <!-- 🔔 Follow-Up Card -->
-  {% if followups_due %}
-  <div class="row mb-4">
-    <div class="col-md-6">
-      <div class="card shadow border-start border-5" style="border-color: var(--accent-color);">
-        <div class="card-header fw-bold text-dark" style="background-color: var(--accent-color);">
-          <i class="bi bi-bell-fill me-2"></i> Follow-Ups ({{ followups_due.count }})
+    <div class="dashboard-wrapper">
+
+
+        <!-- =================================================
+             HEADER
+        ================================================== -->
+
+        <div class="dashboard-header">
+
+            <h2>
+                <i class="bi bi-calendar3 me-2"></i>
+                Master Calendar
+            </h2>
+
+            <p>
+                Workshops, office trainings, meetings and trainer schedules
+            </p>
+
         </div>
-        <div class="card-body bg-white" style="max-height: 400px; overflow-y: auto;">
-          {% for f in followups_due %}
-          <div class="card mb-3 shadow-sm border-start border-3 kanban-card" style="border-color: var(--accent-color);">
-            <div class="card-body py-2 px-3">
-              <h6 class="mb-1 text-dark">
-                <i class="bi bi-arrow-right-circle text-warning"></i> {{ f.workshop.title }}
-              </h6>
-              <p class="small text-muted mb-2">
-                <i class="bi bi-bell"></i> {{ f.follow_up_type }} on {{ f.due_date }}
-              </p>
-              <a href="{% url 'workshop_detail' f.workshop.pk %}" class="btn btn-sm btn-outline-dark w-100">
-                <i class="bi bi-eye"></i> View Workshop
-              </a>
+
+
+        <!-- =================================================
+             CALENDAR
+        ================================================== -->
+
+        <div class="card calendar-card">
+
+            <div class="calendar-card-header">
+
+                <div class="d-flex
+                            flex-column
+                            flex-md-row
+                            justify-content-between
+                            align-items-md-center
+                            gap-2">
+
+                    <div>
+
+                        <h4>
+                            <i class="bi bi-calendar-week me-2 text-primary"></i>
+                            Schedule
+                        </h4>
+
+                        <small class="text-muted">
+                            Click a day to see its events
+                        </small>
+
+                    </div>
+
+                </div>
+
             </div>
-          </div>
-          {% endfor %}
+
+
+            <div class="calendar-container">
+
+                <div id="master-calendar"></div>
+
+
+                <!-- ===============================
+                     LEGEND
+                ================================ -->
+
+                <div class="calendar-legend">
+
+                    <div class="legend-item">
+                        <span class="legend-dot workshop-dot"></span>
+                        Workshops
+                    </div>
+
+                    <div class="legend-item">
+                        <span class="legend-dot office-dot"></span>
+                        Office Training
+                    </div>
+
+                    <div class="legend-item">
+                        <span class="legend-dot meeting-dot"></span>
+                        Meetings
+                    </div>
+
+                    <div class="legend-item">
+                        <span class="legend-dot other-dot"></span>
+                        Other Events
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
-      </div>
+
+
+        <!-- =================================================
+             SELECTED DAY EVENTS
+        ================================================== -->
+
+        <div class="card selected-day-card">
+
+            <div class="selected-day-header">
+
+                <h5>
+
+                    <i class="bi bi-calendar-day me-2"></i>
+
+                    Events on
+
+                    <span id="selected-date">
+                        Today
+                    </span>
+
+                </h5>
+
+            </div>
+
+
+            <div class="card-body">
+
+                <div id="selected-day-events">
+
+                    <div class="text-center text-muted py-4">
+
+                        <i class="bi bi-calendar-check fs-2 d-block mb-2"></i>
+
+                        Select a date from the calendar
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
     </div>
-  </div>
-  {% endif %}
 
-  <!-- 🗂️ Kanban Status Columns -->
-  <div class="row mb-5">
-    {% for column in status_columns %}
-      {% if column.label != "Cancelled" %}
-      <div class="col-md-6 mb-4">
-        <div class="card border-0 shadow-lg">
-          <div class="card-header fw-bold text-dark"
-               style="background: linear-gradient(45deg, var(--primary-color), #856ef4);">
-            <i class="bi bi-layout-text-sidebar-reverse me-2"></i> {{ column.label }} Workshops
-          </div>
-          <div class="card-body bg-white" style="max-height: 450px; overflow-y: auto;">
-            {% for workshop in column.workshops %}
-            <div class="card mb-3 border-start border-5 kanban-card shadow-sm"
-                 style="border-color: var(--primary-color);">
-              <div class="card-body py-2 px-3">
-                <h6 class="mb-1 text-dark">
-                  <i class="bi bi-bookmark-fill" style="color: var(--primary-color);"></i> {{ workshop.title }}
-                </h6>
-                <p class="small text-secondary mb-2">
-                  <i class="bi bi-building"></i> {{ workshop.college }}<br>
-                  <i class="bi bi-calendar-check"></i> {{ workshop.start_date }} → {{ workshop.end_date }}
-                </p>
-                <a href="{% url 'workshop_detail' workshop.pk %}" class="btn btn-outline-dark btn-sm w-100">
-                  <i class="bi bi-eye-fill"></i> View Details
-                </a>
-              </div>
-            </div>
-            {% empty %}
-            <p class="text-muted">No workshops in this stage.</p>
-            {% endfor %}
-          </div>
-        </div>
-      </div>
-      {% endif %}
-    {% endfor %}
-  </div>
-
-  
 </div>
 
+
+<!-- =====================================================
+     JAVASCRIPT
+====================================================== -->
+
+<script>
+
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+
+        const calendarEl =
+            document.getElementById(
+                'master-calendar'
+            );
+
+
+        /*
+         * EVENTS ARE SENT FROM DJANGO
+         *
+         * Example:
+         *
+         * [
+         *   {
+         *      title: "Python Workshop",
+         *      start: "2026-08-10",
+         *      end: "2026-08-15",
+         *      color: "#198754",
+         *      extendedProps: {
+         *          trainer: "Megha",
+         *          college: "ABC College",
+         *          department: "CSE"
+         *      }
+         *   }
+         * ]
+         */
+
+        const events =
+            {{ events_json|default:"[]"|safe }};
+
+
+        const calendar =
+            new FullCalendar.Calendar(
+                calendarEl,
+                {
+
+                    initialView: 'dayGridMonth',
+
+                    height: 'auto',
+
+                    contentHeight: 650,
+
+                    expandRows: true,
+
+                    dayMaxEvents: 3,
+
+
+                    headerToolbar: {
+
+                        left:
+                            'prev,next today',
+
+                        center:
+                            'title',
+
+                        right:
+                            'dayGridMonth,timeGridWeek,listMonth'
+
+                    },
+
+
+                    buttonText: {
+
+                        today: 'Today',
+
+                        month: 'Month',
+
+                        week: 'Week',
+
+                        list: 'List'
+
+                    },
+
+
+                    events: events,
+
+
+                    /*
+                     * EVENT CLICK
+                     */
+
+                    eventClick: function(info) {
+
+                        info.jsEvent.preventDefault();
+
+
+                        const event =
+                            info.event;
+
+
+                        const props =
+                            event.extendedProps;
+
+
+                        let details = '';
+
+
+                        if (props.trainer) {
+
+                            details +=
+                                `<div>
+                                    <i class="bi bi-person-fill"></i>
+                                    <strong>Trainer:</strong>
+                                    ${props.trainer}
+                                </div>`;
+
+                        }
+
+
+                        if (props.college) {
+
+                            details +=
+                                `<div>
+                                    <i class="bi bi-building"></i>
+                                    <strong>College:</strong>
+                                    ${props.college}
+                                </div>`;
+
+                        }
+
+
+                        if (props.department) {
+
+                            details +=
+                                `<div>
+                                    <i class="bi bi-mortarboard-fill"></i>
+                                    <strong>Department:</strong>
+                                    ${props.department}
+                                </div>`;
+
+                        }
+
+
+                        if (props.event_type) {
+
+                            details +=
+                                `<div>
+                                    <i class="bi bi-tag-fill"></i>
+                                    <strong>Type:</strong>
+                                    ${props.event_type}
+                                </div>`;
+
+                        }
+
+
+                        if (props.description) {
+
+                            details +=
+                                `<div class="mt-2">
+                                    <i class="bi bi-info-circle"></i>
+                                    ${props.description}
+                                </div>`;
+
+                        }
+
+
+                        if (event.url) {
+
+                            window.location.href =
+                                event.url;
+
+                            return;
+
+                        }
+
+
+                        /*
+                         * Bootstrap modal alternative
+                         */
+
+                        alert(
+                            event.title +
+                            "\n\n" +
+                            details
+                                .replace(/<[^>]*>/g, '')
+                        );
+
+                    },
+
+
+                    /*
+                     * DAY CLICK
+                     */
+
+                    dateClick: function(info) {
+
+                        showDayEvents(
+                            info.dateStr,
+                            calendar.getEvents()
+                        );
+
+                    },
+
+
+                    /*
+                     * EVENT RENDER
+                     */
+
+                    eventDidMount:
+                        function(info) {
+
+                            const props =
+                                info.event.extendedProps;
+
+                            let tooltip = '';
+
+                            if (props.trainer) {
+
+                                tooltip +=
+                                    'Trainer: ' +
+                                    props.trainer +
+                                    '\n';
+
+                            }
+
+                            if (props.college) {
+
+                                tooltip +=
+                                    'College: ' +
+                                    props.college +
+                                    '\n';
+
+                            }
+
+                            if (props.department) {
+
+                                tooltip +=
+                                    'Department: ' +
+                                    props.department;
+
+                            }
+
+                            info.el.title =
+                                tooltip;
+
+                        }
+
+                }
+            );
+
+
+        calendar.render();
+
+
+        /*
+         * SHOW TODAY BY DEFAULT
+         */
+
+        const today =
+            new Date();
+
+        const todayString =
+            today.toISOString()
+                 .split('T')[0];
+
+        showDayEvents(
+            todayString,
+            calendar.getEvents()
+        );
+
+
+        /*
+         * SHOW EVENTS FOR SELECTED DAY
+         */
+
+        function showDayEvents(
+            dateString,
+            allEvents
+        ) {
+
+            const container =
+                document.getElementById(
+                    'selected-day-events'
+                );
+
+            const dateLabel =
+                document.getElementById(
+                    'selected-date'
+                );
+
+
+            const selectedDate =
+                new Date(
+                    dateString + 'T00:00:00'
+                );
+
+
+            dateLabel.innerText =
+                selectedDate.toLocaleDateString(
+                    'en-IN',
+                    {
+                        weekday: 'long',
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                    }
+                );
+
+
+            /*
+             * Find events occurring
+             * on selected date
+             */
+
+            const dayEvents =
+                allEvents.filter(
+                    function(event) {
+
+                        const start =
+                            event.startStr;
+
+                        const end =
+                            event.endStr ||
+                            event.startStr;
+
+                        return (
+                            dateString >= start &&
+                            dateString < end
+                        );
+
+                    }
+                );
+
+
+            /*
+             * No events
+             */
+
+            if (
+                dayEvents.length === 0
+            ) {
+
+                container.innerHTML = `
+
+                    <div class="text-center text-muted py-4">
+
+                        <i class="bi bi-calendar-x fs-2 d-block mb-2"></i>
+
+                        <strong>No events</strong>
+
+                        <p class="small mb-0">
+                            Nothing is scheduled for this day.
+                        </p>
+
+                    </div>
+
+                `;
+
+                return;
+
+            }
+
+
+            /*
+             * Events
+             */
+
+            container.innerHTML =
+                dayEvents.map(
+                    function(event) {
+
+                        const props =
+                            event.extendedProps;
+
+
+                        return `
+
+                            <div class="day-event">
+
+                                <div class="event-title">
+
+                                    <i class="bi bi-calendar-event text-primary me-1"></i>
+
+                                    ${event.title}
+
+                                </div>
+
+
+                                ${
+                                    props.trainer
+                                    ?
+                                    `
+                                    <div class="event-info">
+
+                                        <i class="bi bi-person-fill"></i>
+
+                                        <strong>Trainer:</strong>
+
+                                        ${props.trainer}
+
+                                    </div>
+                                    `
+                                    :
+                                    ''
+                                }
+
+
+                                ${
+                                    props.college
+                                    ?
+                                    `
+                                    <div class="event-info">
+
+                                        <i class="bi bi-building"></i>
+
+                                        <strong>College:</strong>
+
+                                        ${props.college}
+
+                                    </div>
+                                    `
+                                    :
+                                    ''
+                                }
+
+
+                                ${
+                                    props.department
+                                    ?
+                                    `
+                                    <div class="event-info">
+
+                                        <i class="bi bi-mortarboard-fill"></i>
+
+                                        <strong>Department:</strong>
+
+                                        ${props.department}
+
+                                    </div>
+                                    `
+                                    :
+                                    ''
+                                }
+
+
+                                ${
+                                    props.event_type
+                                    ?
+                                    `
+                                    <div class="event-info">
+
+                                        <i class="bi bi-tag"></i>
+
+                                        <strong>Type:</strong>
+
+                                        ${props.event_type}
+
+                                    </div>
+                                    `
+                                    :
+                                    ''
+                                }
+
+
+                                ${
+                                    event.url
+                                    ?
+                                    `
+                                    <div class="mt-3">
+
+                                        <a
+                                            href="${event.url}"
+                                            class="btn btn-sm btn-outline-primary">
+
+                                            <i class="bi bi-eye"></i>
+
+                                            View Details
+
+                                        </a>
+
+                                    </div>
+                                    `
+                                    :
+                                    ''
+                                }
+
+                            </div>
+
+                        `;
+
+                    }
+                ).join('');
+
+        }
+
+    }
+);
+
+</script>
 
 {% endblock %}

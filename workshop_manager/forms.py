@@ -4,7 +4,7 @@ from django.utils.safestring import mark_safe
 from .models import FollowUp
 from datetime import datetime
 from .models import OfficeTraining
-from .models import TodoTask, SubTask
+from .models import TodoTask, SubTask,CalendarEvent
 from django.forms import modelformset_factory
 
 
@@ -288,3 +288,114 @@ class MeetingNoteForm(forms.ModelForm):
                 }
             ),
         }
+
+class CalendarEventForm(forms.ModelForm):
+
+    class Meta:
+        model = CalendarEvent
+
+        fields = [
+            "title",
+            "trainers",
+            "event_type",
+            "date",
+            "start_time",
+            "end_time",
+            "workshop",
+            "college",
+            "department",
+            "location",
+            "description",
+        ]
+
+        widgets = {
+
+            "title": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Event title"
+                }
+            ),
+
+            "trainers": forms.SelectMultiple(
+                attrs={
+                    "class": "form-select",
+                    "size": "6"
+                }
+            ),
+
+            "event_type": forms.Select(
+                attrs={
+                    "class": "form-select"
+                }
+            ),
+
+            "date": forms.DateInput(
+                attrs={
+                    "class": "form-control",
+                    "type": "date"
+                }
+            ),
+
+            "start_time": forms.TimeInput(
+                attrs={
+                    "class": "form-control",
+                    "type": "time"
+                }
+            ),
+
+            "end_time": forms.TimeInput(
+                attrs={
+                    "class": "form-control",
+                    "type": "time"
+                }
+            ),
+
+            "workshop": forms.Select(
+                attrs={
+                    "class": "form-select"
+                }
+            ),
+
+            "college": forms.Select(
+                attrs={
+                    "class": "form-select"
+                }
+            ),
+
+            "department": forms.Select(
+                attrs={
+                    "class": "form-select"
+                }
+            ),
+
+            "location": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Room / Hall / Online"
+                }
+            ),
+
+            "description": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 4,
+                    "placeholder": "Event details..."
+                }
+            ),
+        }
+
+    def clean(self):
+
+        cleaned_data = super().clean()
+
+        start = cleaned_data.get("start_time")
+        end = cleaned_data.get("end_time")
+
+        if start and end and start >= end:
+
+            raise forms.ValidationError(
+                "End time must be after start time."
+            )
+
+        return cleaned_data

@@ -8,15 +8,20 @@ from datetime import timedelta, date
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from .models import Workshop, TodoTask,College,MeetingNote
+import json
+import json
 
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.urls import reverse
 from .models import (
     Workshop, Trainer, FollowUp,
-    TodoTask, SubTask, OfficeTraining,College
+    TodoTask, SubTask, OfficeTraining,College,CalendarEvent
 )
 from .forms import (
     WorkshopForm, TrainerForm, FollowUpForm,
     TodoTaskForm, SubTaskForm, SubTaskFormSet,
-    OfficeTrainingForm,CollegeForm,MeetingNoteForm
+    OfficeTrainingForm,CollegeForm,MeetingNoteForm,CalendarEventForm
 )
 
 # =====================================================
@@ -72,42 +77,212 @@ def logout_view(request):
 
 
 @login_required
+@login_required
 def dashboard(request):
+
+    import json
+    from django.urls import reverse
+    from datetime import timedelta
+
     today = timezone.now().date()
 
-    # ===============================
-    # WORKSHOP STATUS COLUMNS
-    # ===============================
-    status_columns = [
-        ("Tentative", "tentative", "warning"),
-        ("Fixed", "fixed", "success"),
-        ("Postponed", "postponed", "info"),
-        ("Cancelled", "cancelled", "secondary"),
-        ("Completed", "completed", "dark"),
-    ]
+    events = []
 
-    columns = []
-    for label, status, color in status_columns:
-        columns.append({
-            "label": label,
-            "color": color,
-            "workshops": Workshop.objects.filter(
-                status=status
-            ).order_by("start_date")
+    # =====================================================
+    # WORKSHOPS
+    # =====================================================
+
+    workshops = Workshop.objects.prefetch_related(
+        "assigned_trainers"
+    ).select_related(
+        "college"
+    )
+
+    for workshop in workshops:
+
+        trainers = ", ".join(
+            trainer.Name
+            for trainer in workshop.assigned_trainers.all()
+        )
+
+        events.append({
+            "title": f"📚 {workshop.title}",
+
+            "start": workshop.start_date.strftime(
+                "%Y-%m-%d"
+            ),
+
+            # FullCalendar end date is exclusive
+            "end": (
+                workshop.end_date +
+                timedelta(days=1)
+            ).strftime("%Y-%m-%d"),
+
+            "color": "#198754",
+
+            "url": reverse(
+                "workshop_detail",
+                args=[workshop.pk]
+            ),
+
+            "extendedProps": {
+
+                "trainer": trainers,
+
+                "college": workshop.college.name,
+
+                "department": workshop.departments,
+
+                "event_type": "Workshop",
+
+                "description":
+                    workshop.remarks or ""
+
+            }
         })
 
-    # ===============================
-    # TODAY TASKS (VISIBLE TO ALL)
-    # ===============================
-    today_tasks = TodoTask.objects.filter(for_date=today).select_related("trainer")
 
-    return render(request, "dashboard.html", {
-        "status_columns": columns,
-        "today": today,
-        "today_tasks": today_tasks,
-    })
+    # =====================================================
+    # OFFICE TRAININGS
+    # =====================================================
+
+    office_trainings = OfficeTraining.objects.prefetch_related(
+        "trainers"
+    )
+
+    for training in office_trainings:
+
+        trainers = ", ".join(
+            trainer.Name
+            for trainer in training.trainers.all()
+        )
+
+        events.append({
+
+            "title":
+                f"🏢 {training.name}",
+
+            "start":
+                training.start_date.strftime(
+                    "%Y-%m-%d"
+                ),
+
+            "end":
+                (
+                    training.end_date +
+                    timedelta(days=1)
+                ).strftime(
+                    "%Y-%m-%d"
+                ),
+
+            "color":
+                "#0d6efd",
+
+            "url":
+                reverse(
+                    "view_office_training",
+                    args=[training.pk]
+                ),
+
+            "extendedProps": {
+
+                "trainer":
+                    trainers,
+
+                "college":
+                    "Mevi Technologies",
+
+                "department":
+                    "",
+
+                "event_type":
+                    "Office Training",
+
+                "description":
+                    f"Batch: {training.batch_id}"
+
+            }
+
+        })
 
 
+    # =====================================================
+    # MEETING NOTES
+    # =====================================================
+
+    meetings = MeetingNote.objects.prefetch_related(
+        "attendees"
+    )
+
+    for meeting in meetings:
+
+        attendees = ", ".join(
+            trainer.Name
+            for trainer in meeting.attendees.all()
+        )
+
+        events.append({
+
+            "title":
+                f"📝 {meeting.title}",
+
+            "start":
+                meeting.meeting_date.strftime(
+                    "%Y-%m-%d"
+                ),
+
+            "color":
+                "#6f42c1",
+
+            "extendedProps": {
+
+                "trainer":
+                    attendees,
+
+                "college":
+                    "",
+
+                "department":
+                    "",
+
+                "event_type":
+                    "Meeting",
+
+                "description":
+                    meeting.discussion_points
+
+            }
+
+        })
+
+
+    # =====================================================
+    # TODAY'S TASKS
+    # =====================================================
+
+    today_tasks = TodoTask.objects.filter(
+        for_date=today
+    ).select_related(
+        "trainer"
+    )
+
+
+    return render(
+        request,
+        "dashboard.html",
+        {
+
+            "events_json":
+                json.dumps(events),
+
+            "today":
+                today,
+
+            "today_tasks":
+                today_tasks,
+
+        }
+    )
 
 # =====================================================
 # WORKSHOPS
@@ -481,45 +656,115 @@ def trainer_dashboard(request):
     })
 
 @login_required
+@login_required
 def trainer_schedule(request):
-    """
-    Shows trainer-wise workshop schedule.
-    View-only for all users.
-    Highlights overlapping workshops.
-    """
-    trainer_workshops = []
 
-    trainers = Trainer.objects.all().order_by("Name")
+    events = CalendarEvent.objects.prefetch_related(
+        "trainers"
+    ).select_related(
+        "college",
+        "workshop"
+    ).order_by(
+        "date",
+        "start_time"
+    )
 
-    for trainer in trainers:
-        workshops = Workshop.objects.filter(
-            assigned_trainers=trainer,
-            status="fixed"
-        ).order_by("start_date")
+    events_json = []
 
-        overlapping_ids = set()
-        workshop_list = list(workshops)
+    for event in events:
 
-        for i in range(len(workshop_list)):
-            for j in range(i + 1, len(workshop_list)):
-                w1 = workshop_list[i]
-                w2 = workshop_list[j]
-                if (
-                    w1.start_date <= w2.end_date
-                    and w2.start_date <= w1.end_date
-                ):
-                    overlapping_ids.add(w1.id)
-                    overlapping_ids.add(w2.id)
+        trainer_names = ", ".join(
+            trainer.Name
+            for trainer in event.trainers.all()
+        )
 
-        trainer_workshops.append({
-            "trainer": trainer,
-            "workshops": workshop_list,
-            "overlapping_ids": overlapping_ids
+        start = None
+        end = None
+
+        if event.start_time:
+
+            start = f"{event.date}T{event.start_time}"
+
+        else:
+
+            start = str(event.date)
+
+        if event.end_time:
+
+            end = f"{event.date}T{event.end_time}"
+
+        event_color = {
+            "workshop": "#198754",
+            "office": "#0d6efd",
+            "meeting": "#6f42c1",
+            "other": "#6c757d",
+        }.get(
+            event.event_type,
+            "#6c757d"
+        )
+
+        events_json.append({
+
+            "id": str(event.id),
+
+            "title": event.title,
+
+            "start": start,
+
+            "end": end,
+
+            "allDay": not bool(event.start_time),
+
+            "backgroundColor": event_color,
+
+            "borderColor": event_color,
+
+            "editable": request.user.is_superuser,
+
+            "durationEditable": request.user.is_superuser,
+
+            "startEditable": request.user.is_superuser,
+
+            "url": reverse(
+                "edit_calendar_event",
+                args=[event.id]
+            ),
+
+            "extendedProps": {
+
+                "trainers": trainer_names,
+
+                "event_type":
+                    event.get_event_type_display(),
+
+                "college":
+                    event.college.name
+                    if event.college
+                    else "",
+
+                "workshop":
+                    event.workshop.title
+                    if event.workshop
+                    else "",
+
+                "department":
+                    event.department,
+
+                "location":
+                    event.location,
+
+                "description":
+                    event.description,
+            }
         })
 
-    return render(request, "trainer_schedule.html", {
-        "trainer_workshops": trainer_workshops
-    })
+    return render(
+        request,
+        "trainer_schedule.html",
+        {
+            "events_json": json.dumps(events_json),
+        }
+    )
 
 @login_required
 def follow_ups(request):
@@ -1066,3 +1311,371 @@ def delete_meeting_note(
     )
 def custom_404(request, exception):
     return render(request, "404.html", status=404)
+
+
+@login_required
+@user_passes_test(is_superuser)
+@login_required
+@user_passes_test(is_superuser)
+def add_calendar_event(request):
+
+    selected_date = request.GET.get("date")
+    selected_time = request.GET.get("time")
+
+    if request.method == "POST":
+
+        form = CalendarEventForm(request.POST)
+
+        if form.is_valid():
+
+            event = form.save(commit=False)
+
+            event.created_by = request.user
+
+            event.save()
+
+            form.save_m2m()
+
+            messages.success(
+                request,
+                "Calendar event added successfully."
+            )
+
+            return redirect(
+                "trainer_schedule"
+            )
+
+    else:
+
+        initial = {}
+
+        if selected_date:
+            initial["date"] = selected_date
+
+        if selected_time:
+            initial["start_time"] = selected_time
+
+        form = CalendarEventForm(
+            initial=initial
+        )
+
+    return render(
+        request,
+        "calendar/add_event.html",
+        {
+            "form": form,
+            "title": "Add Calendar Event",
+        }
+    )
+@login_required
+@user_passes_test(is_superuser)
+def edit_calendar_event(request, pk):
+
+    event = get_object_or_404(
+        CalendarEvent,
+        pk=pk
+    )
+
+    if request.method == "POST":
+
+        form = CalendarEventForm(
+            request.POST,
+            instance=event
+        )
+
+        if form.is_valid():
+
+            form.save()
+
+            messages.success(
+                request,
+                "Calendar event updated successfully."
+            )
+
+            return redirect(
+                "trainer_schedule"
+            )
+
+    else:
+
+        form = CalendarEventForm(
+            instance=event
+        )
+
+    return render(
+        request,
+        "calendar/add_event.html",
+        {
+            "form": form,
+            "event": event,
+            "title": "Edit Calendar Event",
+        }
+    )
+@login_required
+@user_passes_test(is_superuser)
+def delete_calendar_event(request, pk):
+
+    event = get_object_or_404(
+        CalendarEvent,
+        pk=pk
+    )
+
+    event.delete()
+
+    messages.success(
+        request,
+        "Calendar event deleted."
+    )
+
+    return redirect("trainer_schedule")
+
+@login_required
+@user_passes_test(is_superuser)
+def duplicate_calendar_event(request, pk):
+
+    event = get_object_or_404(
+        CalendarEvent,
+        pk=pk
+    )
+
+    new_date = request.GET.get("date")
+
+    if new_date:
+
+        try:
+            new_date = date.fromisoformat(
+                new_date
+            )
+
+        except ValueError:
+
+            messages.error(
+                request,
+                "Invalid date."
+            )
+
+            return redirect(
+                "trainer_schedule"
+            )
+
+    else:
+
+        new_date = event.date + timedelta(
+            days=1
+        )
+
+    new_event = CalendarEvent.objects.create(
+
+        title=event.title,
+
+        date=new_date,
+
+        start_time=event.start_time,
+
+        end_time=event.end_time,
+
+        workshop=event.workshop,
+
+        college=event.college,
+
+        department=event.department,
+
+        event_type=event.event_type,
+
+        location=event.location,
+
+        description=event.description,
+
+        created_by=request.user,
+    )
+
+    new_event.trainers.set(
+        event.trainers.all()
+    )
+
+    messages.success(
+        request,
+        f"Event duplicated to {new_date}."
+    )
+
+    return redirect(
+        "trainer_schedule"
+    )
+
+@login_required
+@user_passes_test(is_superuser)
+def duplicate_calendar_event_next_day(request, pk):
+
+    event = get_object_or_404(
+        CalendarEvent,
+        pk=pk
+    )
+
+    new_event = CalendarEvent.objects.create(
+
+        title=event.title,
+
+        date=event.date + timedelta(days=1),
+
+        start_time=event.start_time,
+
+        end_time=event.end_time,
+
+        workshop=event.workshop,
+
+        college=event.college,
+
+        department=event.department,
+
+        event_type=event.event_type,
+
+        location=event.location,
+
+        description=event.description,
+
+        created_by=request.user,
+    )
+
+    new_event.trainers.set(
+        event.trainers.all()
+    )
+
+    return redirect(
+        "trainer_schedule"
+    )
+
+@login_required
+@user_passes_test(is_superuser)
+def duplicate_calendar_event_next_week(request, pk):
+
+    event = get_object_or_404(
+        CalendarEvent,
+        pk=pk
+    )
+
+    new_event = CalendarEvent.objects.create(
+
+        title=event.title,
+
+        date=event.date + timedelta(days=7),
+
+        start_time=event.start_time,
+
+        end_time=event.end_time,
+
+        workshop=event.workshop,
+
+        college=event.college,
+
+        department=event.department,
+
+        event_type=event.event_type,
+
+        location=event.location,
+
+        description=event.description,
+
+        created_by=request.user,
+    )
+
+    new_event.trainers.set(
+        event.trainers.all()
+    )
+
+    return redirect(
+        "trainer_schedule"
+    )
+
+@login_required
+@user_passes_test(is_superuser)
+@require_POST
+def move_calendar_event(request, pk):
+
+    event = get_object_or_404(
+        CalendarEvent,
+        pk=pk
+    )
+
+    try:
+
+        data = json.loads(
+            request.body
+        )
+
+        new_date = data.get("date")
+
+        if not new_date:
+
+            return JsonResponse(
+                {
+                    "success": False,
+                    "error": "Date is required."
+                },
+                status=400
+            )
+
+        event.date = date.fromisoformat(
+            new_date
+        )
+
+        event.save()
+
+        return JsonResponse(
+            {
+                "success": True
+            }
+        )
+
+    except Exception as e:
+
+        return JsonResponse(
+            {
+                "success": False,
+                "error": str(e)
+            },
+            status=400
+        )
+
+
+@login_required
+@user_passes_test(is_superuser)
+@require_POST
+def resize_calendar_event(request, pk):
+
+    event = get_object_or_404(
+        CalendarEvent,
+        pk=pk
+    )
+
+    try:
+
+        data = json.loads(
+            request.body
+        )
+
+        start = data.get("start")
+        end = data.get("end")
+
+        if start:
+            event.start_time = start
+
+        if end:
+            event.end_time = end
+
+        event.save()
+
+        return JsonResponse(
+            {
+                "success": True
+            }
+        )
+
+    except Exception as e:
+
+        return JsonResponse(
+            {
+                "success": False,
+                "error": str(e)
+            },
+            status=400
+        )

@@ -168,6 +168,84 @@ path(
     views.delete_subtask,
     name="delete_subtask"
 ),
+# ===============================
+# CALENDAR EVENTS
+# ===============================
+
+path(
+    "calendar/events/add/",
+    views.add_calendar_event,
+    name="add_calendar_event"
+),
+
+path(
+    "calendar/events/<int:pk>/edit/",
+    views.edit_calendar_event,
+    name="edit_calendar_event"
+),
+
+path(
+    "calendar/events/<int:pk>/delete/",
+    views.delete_calendar_event,
+    name="delete_calendar_event"
+),
+# =====================================================
+# CALENDAR
+# =====================================================
+
+path(
+    "trainer/schedule/",
+    views.trainer_schedule,
+    name="trainer_schedule"
+),
+
+path(
+    "calendar/event/add/",
+    views.add_calendar_event,
+    name="add_calendar_event"
+),
+
+path(
+    "calendar/event/<int:pk>/edit/",
+    views.edit_calendar_event,
+    name="edit_calendar_event"
+),
+
+path(
+    "calendar/event/<int:pk>/delete/",
+    views.delete_calendar_event,
+    name="delete_calendar_event"
+),
+
+path(
+    "calendar/event/<int:pk>/duplicate/",
+    views.duplicate_calendar_event,
+    name="duplicate_calendar_event"
+),
+
+path(
+    "calendar/event/<int:pk>/duplicate-next-day/",
+    views.duplicate_calendar_event_next_day,
+    name="duplicate_calendar_event_next_day"
+),
+
+path(
+    "calendar/event/<int:pk>/duplicate-next-week/",
+    views.duplicate_calendar_event_next_week,
+    name="duplicate_calendar_event_next_week"
+),
+path(
+    "calendar/event/<int:pk>/move/",
+    views.move_calendar_event,
+    name="move_calendar_event"
+),
+
+path(
+    "calendar/event/<int:pk>/resize/",
+    views.resize_calendar_event,
+    name="resize_calendar_event"
+),
 ]
 
 handler404 = 'workshop_manager.views.custom_404'
+

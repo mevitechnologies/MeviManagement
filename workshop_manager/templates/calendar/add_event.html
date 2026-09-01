@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}
+Calendar Event
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow">
+
+                <div class="card-header bg-primary text-white">
+
+                    <h4 class="mb-0">
+
+                        <i class="bi bi-calendar-plus me-2"></i>
+
+                        {% if event %}
+                            Edit Calendar Event
+                        {% else %}
+                            Add Calendar Event
+                        {% endif %}
+
+                    </h4>
+
+                </div>
+
+                <div class="card-body p-4">
+
+                    <form method="POST">
+
+                        {% csrf_token %}
+
+                        {{ form|crispy }}
+
+                        <div class="d-flex gap-2 mt-4">
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary flex-fill"
+                            >
+
+                                <i class="bi bi-check-circle me-1"></i>
+
+                                Save Event
+
+                            </button>
+
+                            <a
+                                href="{% url 'trainer_schedule' %}"
+                                class="btn btn-outline-secondary flex-fill"
+                            >
+
+                                Cancel
+
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                    {% if event %}
+
+                    <hr>
+
+                    <form
+                        method="POST"
+                        action="{% url 'delete_calendar_event' event.id %}"
+                        onsubmit="return confirm('Delete this event?');"
+                    >
+
+                        {% csrf_token %}
+
+                        <button
+                            class="btn btn-outline-danger w-100"
+                        >
+
+                            <i class="bi bi-trash me-1"></i>
+
+                            Delete Event
+
+                        </button>
+
+                    </form>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
