@@ -78,6 +78,27 @@ Trainer Schedule
 
     .event-modal-card {
         border-radius: 15px;
+        border: 0;
+        overflow: hidden;
+    }
+
+    .calendar-header .btn {
+        border-radius: 10px;
+    }
+
+    @media (max-width: 768px) {
+        #trainer-calendar {
+            min-height: 620px;
+        }
+
+        .fc .fc-toolbar {
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .fc .fc-toolbar-title {
+            font-size: 1.1rem;
+        }
     }
 
 </style>
@@ -123,34 +144,37 @@ Trainer Schedule
             <div class="legend">
 
                 <span class="legend-item">
-                    <span
-                        class="legend-box"
-                        style="background:#198754;"
-                    ></span>
+                    <span class="legend-box" style="background:#198754;"></span>
                     Workshop
                 </span>
 
                 <span class="legend-item">
-                    <span
-                        class="legend-box"
-                        style="background:#0d6efd;"
-                    ></span>
+                    <span class="legend-box" style="background:#dc3545;"></span>
+                    FDP
+                </span>
+
+                <span class="legend-item">
+                    <span class="legend-box" style="background:#20c997;"></span>
+                    Online Workshop
+                </span>
+
+                <span class="legend-item">
+                    <span class="legend-box" style="background:#0d6efd;"></span>
                     Office Training
                 </span>
 
                 <span class="legend-item">
-                    <span
-                        class="legend-box"
-                        style="background:#6f42c1;"
-                    ></span>
+                    <span class="legend-box" style="background:#fd7e14;"></span>
+                    Guest Faculty Training
+                </span>
+
+                <span class="legend-item">
+                    <span class="legend-box" style="background:#6f42c1;"></span>
                     Meeting
                 </span>
 
                 <span class="legend-item">
-                    <span
-                        class="legend-box"
-                        style="background:#6c757d;"
-                    ></span>
+                    <span class="legend-box" style="background:#6c757d;"></span>
                     Other
                 </span>
 
@@ -160,6 +184,24 @@ Trainer Schedule
 
 
         <!-- CALENDAR -->
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+            <div class="text-muted small">
+                <i class="bi bi-info-circle me-1"></i>
+                Click an event to view details.
+                Drag and resize events only when permitted.
+            </div>
+
+            {% if request.user.is_superuser %}
+            <a
+                href="{% url 'add_calendar_event' %}"
+                class="btn btn-primary"
+            >
+                <i class="bi bi-plus-circle me-1"></i>
+                Add Calendar Event
+            </a>
+            {% endif %}
+        </div>
 
         <div id="trainer-calendar"></div>
 
@@ -270,6 +312,21 @@ Trainer Schedule
 
                         <div
                             id="modalDepartment"
+                            class="text-muted"
+                        ></div>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <strong>
+                            <i class="bi bi-person-badge"></i>
+                            Guest Faculty
+                        </strong>
+
+                        <div
+                            id="modalGuestFaculty"
                             class="text-muted"
                         ></div>
 
@@ -517,35 +574,42 @@ document.addEventListener(
                                 'modalCollege'
                             ).innerText =
                                 props.college ||
-                                "";
+                                "—";
 
 
                             document.getElementById(
                                 'modalWorkshop'
                             ).innerText =
                                 props.workshop ||
-                                "";
+                                "—";
 
 
                             document.getElementById(
                                 'modalDepartment'
                             ).innerText =
                                 props.department ||
-                                "";
+                                "—";
+
+
+                            document.getElementById(
+                                'modalGuestFaculty'
+                            ).innerText =
+                                props.guest_faculty ||
+                                "—";
 
 
                             document.getElementById(
                                 'modalLocation'
                             ).innerText =
                                 props.location ||
-                                "";
+                                "—";
 
 
                             document.getElementById(
                                 'modalDescription'
                             ).innerText =
                                 props.description ||
-                                "";
+                                "—";
 
 
                             {% if request.user.is_superuser %}

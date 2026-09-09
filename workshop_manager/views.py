@@ -1,28 +1,44 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth import authenticate, login, logout
-from django.contrib import messages
-from django.utils import timezone
-from django.core.paginator import Paginator
-from datetime import timedelta, date
-from django.utils import timezone
-from django.contrib.auth.decorators import login_required
-from .models import Workshop, TodoTask,College,MeetingNote
-import json
+from datetime import date, timedelta
 import json
 
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.core.paginator import Paginator
 from django.http import JsonResponse
-from django.views.decorators.http import require_POST
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
+from django.utils import timezone
+from django.views.decorators.http import require_POST
+
 from .models import (
-    Workshop, Trainer, FollowUp,
-    TodoTask, SubTask, OfficeTraining,College,CalendarEvent
+    Workshop,
+    Trainer,
+    FollowUp,
+    TodoTask,
+    SubTask,
+    OfficeTraining,
+    College,
+    CalendarEvent,
+    DailyAttendance,
+    MeetingNote,
+    WorkshopRemarks,
 )
+
 from .forms import (
-    WorkshopForm, TrainerForm, FollowUpForm,
-    TodoTaskForm, SubTaskForm, SubTaskFormSet,
-    OfficeTrainingForm,CollegeForm,MeetingNoteForm,CalendarEventForm
+    WorkshopForm,
+    TrainerForm,
+    FollowUpForm,
+    TodoTaskForm,
+    SubTaskForm,
+    SubTaskFormSet,
+    OfficeTrainingForm,
+    CollegeForm,
+    MeetingNoteForm,
+    CalendarEventForm,
+    WorkshopRemarksForm,
 )
+
 
 # =====================================================
 # HELPERS
@@ -39,9 +55,6 @@ def is_staff_or_superuser(user):
 # AUTH
 # =====================================================
 
-from django.contrib.auth import authenticate, login
-from django.contrib import messages
-from django.shortcuts import render, redirect
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -77,141 +90,261 @@ def logout_view(request):
 
 
 @login_required
-@login_required
 def dashboard(request):
 
     import json
-    from django.urls import reverse
     from datetime import timedelta
+    from django.urls import reverse
 
-    today = timezone.now().date()
+    today = timezone.localdate()
+
+    # =====================================================
+    # ALL TRAINERS
+    # =====================================================
+
+    trainers = (
+        Trainer.objects
+        .select_related("user")
+        .order_by("Name")
+    )
+
+    total_trainers = trainers.count()
+
+    # =====================================================
+    # FULL-TIME TRAINERS
+    # ONLY THESE ARE ELIGIBLE FOR CHECK-IN
+    # =====================================================
+
+    full_time_trainers = (
+        Trainer.objects
+        .filter(is_full_time=True)
+        .select_related("user")
+        .order_by("Name")
+    )
+
+    full_time_trainer_count = full_time_trainers.count()
+
+    # =====================================================
+    # TODAY'S ATTENDANCE
+    # FULL-TIME ONLY
+    # =====================================================
+
+    attendance_records = (
+        DailyAttendance.objects
+        .filter(
+            date=today,
+            trainer__is_full_time=True
+        )
+        .select_related("trainer")
+    )
+
+    attendance_map = {
+        attendance.trainer_id: attendance
+        for attendance in attendance_records
+    }
+
+    checked_in_count = sum(
+        1
+        for attendance in attendance_records
+        if attendance.check_in
+    )
+
+    working_count = sum(
+        1
+        for attendance in attendance_records
+        if (
+            attendance.check_in
+            and not attendance.check_out
+        )
+    )
+
+    not_checked_in_count = (
+        full_time_trainer_count - checked_in_count
+    )
+
+    # Prevent negative value
+    if not_checked_in_count < 0:
+        not_checked_in_count = 0
+
+    # =====================================================
+    # TODAY'S TASKS
+    # =====================================================
+
+    today_tasks = (
+        TodoTask.objects
+        .filter(for_date=today)
+        .select_related("trainer")
+        .order_by(
+            "trainer__Name",
+            "-created_on"
+        )
+    )
+
+    # =====================================================
+    # TRAINER STATUS
+    # FULL-TIME TRAINERS ONLY
+    # =====================================================
+
+    trainer_status = []
+
+    for trainer in full_time_trainers:
+
+        attendance = attendance_map.get(
+            trainer.id
+        )
+
+        trainer_tasks = (
+            today_tasks
+            .filter(trainer=trainer)
+            .order_by("-created_on")
+        )
+
+        latest_task = trainer_tasks.first()
+
+        trainer_status.append({
+            "trainer": trainer,
+            "attendance": attendance,
+            "latest_task": latest_task,
+            "tasks": trainer_tasks,
+        })
+
+    # =====================================================
+    # CALENDAR EVENTS
+    # =====================================================
 
     events = []
 
-    # =====================================================
+    # -----------------------------------------------------
     # WORKSHOPS
-    # =====================================================
+    # -----------------------------------------------------
 
-    workshops = Workshop.objects.prefetch_related(
-        "assigned_trainers"
-    ).select_related(
-        "college"
+    workshops = (
+        Workshop.objects
+        .prefetch_related("assigned_trainers")
+        .select_related("college")
+        .all()
     )
 
     for workshop in workshops:
 
-        trainers = ", ".join(
+        trainer_names = ", ".join(
             trainer.Name
             for trainer in workshop.assigned_trainers.all()
         )
 
-        events.append({
+        event = {
             "title": f"📚 {workshop.title}",
 
-            "start": workshop.start_date.strftime(
-                "%Y-%m-%d"
+            "start": (
+                workshop.start_date.strftime("%Y-%m-%d")
+                if workshop.start_date
+                else None
             ),
 
-            # FullCalendar end date is exclusive
             "end": (
-                workshop.end_date +
-                timedelta(days=1)
-            ).strftime("%Y-%m-%d"),
+                (workshop.end_date + timedelta(days=1))
+                .strftime("%Y-%m-%d")
+                if workshop.end_date
+                else None
+            ),
 
             "color": "#198754",
 
-            "url": reverse(
-                "workshop_detail",
-                args=[workshop.pk]
-            ),
-
             "extendedProps": {
+                "trainer": trainer_names,
 
-                "trainer": trainers,
+                "college": (
+                    workshop.college.name
+                    if workshop.college
+                    else ""
+                ),
 
-                "college": workshop.college.name,
-
-                "department": workshop.departments,
+                "department": (
+                    workshop.departments or ""
+                ),
 
                 "event_type": "Workshop",
 
-                "description":
+                "description": (
                     workshop.remarks or ""
-
+                ),
             }
-        })
+        }
 
+        event["url"] = reverse(
+            "workshop_detail",
+            args=[workshop.pk]
+        )
 
-    # =====================================================
-    # OFFICE TRAININGS
-    # =====================================================
+        events.append(event)
 
-    office_trainings = OfficeTraining.objects.prefetch_related(
-        "trainers"
+    # -----------------------------------------------------
+    # OFFICE TRAINING
+    # -----------------------------------------------------
+
+    office_trainings = (
+        OfficeTraining.objects
+        .prefetch_related("trainers")
+        .all()
     )
 
     for training in office_trainings:
 
-        trainers = ", ".join(
+        trainer_names = ", ".join(
             trainer.Name
             for trainer in training.trainers.all()
         )
 
-        events.append({
+        event = {
+            "title": f"🏢 {training.name}",
 
-            "title":
-                f"🏢 {training.name}",
+            "start": (
+                training.start_date.strftime("%Y-%m-%d")
+                if training.start_date
+                else None
+            ),
 
-            "start":
-                training.start_date.strftime(
-                    "%Y-%m-%d"
-                ),
+            "end": (
+                (training.end_date + timedelta(days=1))
+                .strftime("%Y-%m-%d")
+                if training.end_date
+                else None
+            ),
 
-            "end":
-                (
-                    training.end_date +
-                    timedelta(days=1)
-                ).strftime(
-                    "%Y-%m-%d"
-                ),
-
-            "color":
-                "#0d6efd",
-
-            "url":
-                reverse(
-                    "view_office_training",
-                    args=[training.pk]
-                ),
+            "color": "#0d6efd",
 
             "extendedProps": {
+                "trainer": trainer_names,
 
-                "trainer":
-                    trainers,
+                "college": "Mevi Technologies",
 
-                "college":
-                    "Mevi Technologies",
+                "department": "",
 
-                "department":
-                    "",
+                "event_type": "Office Training",
 
-                "event_type":
-                    "Office Training",
-
-                "description":
+                "description": (
                     f"Batch: {training.batch_id}"
-
+                    if training.batch_id
+                    else ""
+                ),
             }
+        }
 
-        })
+        event["url"] = reverse(
+            "view_office_training",
+            args=[training.pk]
+        )
 
+        events.append(event)
 
-    # =====================================================
+    # -----------------------------------------------------
     # MEETING NOTES
-    # =====================================================
+    # -----------------------------------------------------
 
-    meetings = MeetingNote.objects.prefetch_related(
-        "attendees"
+    meetings = (
+        MeetingNote.objects
+        .prefetch_related("attendees")
+        .all()
     )
 
     for meeting in meetings:
@@ -222,65 +355,99 @@ def dashboard(request):
         )
 
         events.append({
+            "title": f"📝 {meeting.title}",
 
-            "title":
-                f"📝 {meeting.title}",
+            "start": (
+                meeting.meeting_date.strftime("%Y-%m-%d")
+                if meeting.meeting_date
+                else None
+            ),
 
-            "start":
-                meeting.meeting_date.strftime(
-                    "%Y-%m-%d"
-                ),
-
-            "color":
-                "#6f42c1",
+            "color": "#6f42c1",
 
             "extendedProps": {
+                "trainer": attendees,
 
-                "trainer":
-                    attendees,
+                "college": "",
 
-                "college":
-                    "",
+                "department": "",
 
-                "department":
-                    "",
+                "event_type": "Meeting",
 
-                "event_type":
-                    "Meeting",
-
-                "description":
-                    meeting.discussion_points
-
+                "description": (
+                    meeting.discussion_points or ""
+                ),
             }
-
         })
 
-
     # =====================================================
-    # TODAY'S TASKS
+    # CURRENT LOGGED-IN TRAINER
     # =====================================================
 
-    today_tasks = TodoTask.objects.filter(
-        for_date=today
-    ).select_related(
-        "trainer"
+    current_trainer = (
+        Trainer.objects
+        .filter(
+            user=request.user
+        )
+        .first()
     )
 
+    # Fallback for existing accounts
+    if not current_trainer:
+
+        current_trainer = (
+            Trainer.objects
+            .filter(
+                email=request.user.email
+            )
+            .first()
+        )
+
+    # =====================================================
+    # RENDER
+    # =====================================================
 
     return render(
         request,
         "dashboard.html",
         {
+            # Calendar
+            "events_json": json.dumps(
+                events,
+                default=str
+            ),
 
-            "events_json":
-                json.dumps(events),
+            # Date
+            "today": today,
 
-            "today":
-                today,
+            # All trainers
+            "trainers": trainers,
 
+            "total_trainers": total_trainers,
+
+            # Full-time / attendance
+            "full_time_trainer_count":
+                full_time_trainer_count,
+
+            "trainer_status":
+                trainer_status,
+
+            "checked_in_count":
+                checked_in_count,
+
+            "working_count":
+                working_count,
+
+            "not_checked_in_count":
+                not_checked_in_count,
+
+            # Current logged-in trainer
+            "current_trainer":
+                current_trainer,
+
+            # Today's tasks
             "today_tasks":
                 today_tasks,
-
         }
     )
 
@@ -643,19 +810,68 @@ def edit_task(request, task_id):
 
 @login_required
 def trainer_dashboard(request):
-    trainer = getattr(request.user, "trainer", None)
+
+    trainer = Trainer.objects.filter(
+        user=request.user
+    ).first()
+
     if not trainer:
-        messages.error(request, "Trainer profile not found")
+        trainer = Trainer.objects.filter(
+            email=request.user.email
+        ).first()
+
+    if not trainer:
+        messages.error(
+            request,
+            "Your account is not linked to a Trainer profile."
+        )
         return redirect("dashboard")
 
-    tasks = TodoTask.objects.filter(trainer=trainer)
+    today = timezone.localdate()
 
-    return render(request, "todo/trainer_dashboard.html", {
-        "trainer": trainer,
-        "tasks": tasks
-    })
+    # Only full-time trainers get attendance record
+    attendance = None
 
-@login_required
+    if trainer.is_full_time:
+
+        attendance, created = (
+            DailyAttendance.objects.get_or_create(
+                trainer=trainer,
+                date=today
+            )
+        )
+
+    # Today's tasks
+    tasks = (
+        TodoTask.objects
+        .filter(
+            trainer=trainer,
+            for_date=today
+        )
+        .order_by("-created_on")
+    )
+
+    workshops = (
+        Workshop.objects
+        .filter(
+            assigned_trainers=trainer
+        )
+        .select_related("college")
+        .order_by("start_date")
+    )
+
+    return render(
+        request,
+        "todo/trainer_dashboard.html",
+        {
+            "trainer": trainer,
+            "today": today,
+            "attendance": attendance,
+            "tasks": tasks,
+            "workshops": workshops,
+            "is_full_time": trainer.is_full_time,
+        }
+    )
 @login_required
 def trainer_schedule(request):
 
@@ -695,7 +911,10 @@ def trainer_schedule(request):
 
         event_color = {
             "workshop": "#198754",
+            "fdp": "#dc3545",
+            "online_workshop": "#20c997",
             "office": "#0d6efd",
+            "guest_training": "#fd7e14",
             "meeting": "#6f42c1",
             "other": "#6c757d",
         }.get(
@@ -752,6 +971,9 @@ def trainer_schedule(request):
 
                 "location":
                     event.location,
+
+                "guest_faculty":
+                    getattr(event, "guest_faculty", ""),
 
                 "description":
                     event.description,
@@ -838,11 +1060,7 @@ def delete_followup(request, pk):
     messages.success(request, "🗑️ Follow-up deleted.")
     return redirect('follow_ups')
 
-import json
-from django.urls import reverse
 
-import json
-from datetime import timedelta
 
 @login_required
 def calendar_view(request):
@@ -878,24 +1096,6 @@ def calendar_view(request):
             "events_json": json.dumps(events)
         }
     )
-
-@login_required
-def trainer_dashboard(request):
-    """
-    Trainer dashboard – view only.
-    """
-    trainer = Trainer.objects.filter(email=request.user.email).first()
-
-    if not trainer:
-        messages.error(request, "Trainer profile not found.")
-        return redirect("dashboard")
-
-    tasks = TodoTask.objects.filter(trainer=trainer).order_by("-for_date")
-
-    return render(request, "todo/trainer_dashboard.html", {
-        "trainer": trainer,
-        "tasks": tasks,
-    })
 
 # =====================================================
 # OFFICE TRAININGS
@@ -964,12 +1164,6 @@ def delete_office_training(request, pk):
     return redirect("office_training_list")
 
 
-@login_required
-def view_office_training(request, pk):
-    training = get_object_or_404(OfficeTraining, pk=pk)
-    return render(request, "office_training/view.html", {
-        "training": training
-    })
 # =====================================================
 # TASK HISTORY (ADMIN ONLY)
 # =====================================================
@@ -1057,8 +1251,6 @@ def delete_college(request, pk):
     messages.success(request, "College deleted")
     return redirect("college_list")
 
-from .models import Workshop, WorkshopRemarks, Trainer
-from .forms import WorkshopRemarksForm
 
 @login_required
 def add_workshop_remark(request, workshop_id):
@@ -1122,8 +1314,6 @@ def add_workshop_remark(request, workshop_id):
             "form": form
         }
     )
-from .models import WorkshopRemarks
-from .forms import WorkshopRemarksForm
 
 
 @login_required
@@ -1315,8 +1505,6 @@ def custom_404(request, exception):
 
 @login_required
 @user_passes_test(is_superuser)
-@login_required
-@user_passes_test(is_superuser)
 def add_calendar_event(request):
 
     selected_date = request.GET.get("date")
@@ -1482,6 +1670,8 @@ def duplicate_calendar_event(request, pk):
 
         event_type=event.event_type,
 
+        guest_faculty=getattr(event, "guest_faculty", ""),
+
         location=event.location,
 
         description=event.description,
@@ -1529,6 +1719,8 @@ def duplicate_calendar_event_next_day(request, pk):
 
         event_type=event.event_type,
 
+        guest_faculty=getattr(event, "guest_faculty", ""),
+
         location=event.location,
 
         description=event.description,
@@ -1570,6 +1762,8 @@ def duplicate_calendar_event_next_week(request, pk):
         department=event.department,
 
         event_type=event.event_type,
+
+        guest_faculty=getattr(event, "guest_faculty", ""),
 
         location=event.location,
 
@@ -1679,3 +1873,343 @@ def resize_calendar_event(request, pk):
             },
             status=400
         )
+
+
+@login_required
+def daily_checkin(request):
+
+    trainer = Trainer.objects.filter(
+        user=request.user
+    ).first()
+
+    if not trainer:
+        trainer = Trainer.objects.filter(
+            email=request.user.email
+        ).first()
+
+    if not trainer:
+        messages.error(
+            request,
+            "Your account is not linked to a Trainer profile."
+        )
+        return redirect("dashboard")
+
+    # =====================================================
+    # ONLY FULL-TIME TRAINERS CAN CHECK IN
+    # =====================================================
+
+    if not trainer.is_full_time:
+        messages.error(
+            request,
+            "Only full-time trainers are allowed to check in."
+        )
+        return redirect("trainer_dashboard")
+
+    today = timezone.localdate()
+
+    attendance, created = DailyAttendance.objects.get_or_create(
+        trainer=trainer,
+        date=today
+    )
+
+    if request.method == "POST":
+
+        action = request.POST.get("action")
+
+        # =================================================
+        # CHECK IN
+        # =================================================
+
+        if action == "check_in":
+
+            if not attendance.check_in:
+
+                attendance.check_in = timezone.now()
+                attendance.check_out = None
+                attendance.save()
+
+                messages.success(
+                    request,
+                    "You have successfully checked in."
+                )
+
+        # =================================================
+        # CHECK OUT
+        # =================================================
+
+        elif action == "check_out":
+
+            if (
+                attendance.check_in
+                and not attendance.check_out
+            ):
+
+                attendance.check_out = timezone.now()
+                attendance.save()
+
+                messages.success(
+                    request,
+                    "You have successfully checked out."
+                )
+
+    return redirect("trainer_dashboard")
+@login_required
+def add_today_task(request):
+
+    trainer = Trainer.objects.filter(
+        user=request.user
+    ).first()
+
+    if not trainer:
+        trainer = Trainer.objects.filter(
+            email=request.user.email
+        ).first()
+
+    if not trainer:
+        messages.error(
+            request,
+            "Your account is not linked to a Trainer profile."
+        )
+        return redirect("dashboard")
+
+    # =====================================================
+    # ONLY FULL-TIME TRAINERS
+    # =====================================================
+
+    if not trainer.is_full_time:
+        messages.error(
+            request,
+            "Only full-time trainers can add daily work updates."
+        )
+        return redirect("trainer_dashboard")
+
+    today = timezone.localdate()
+
+    attendance = DailyAttendance.objects.filter(
+        trainer=trainer,
+        date=today
+    ).first()
+
+    # =====================================================
+    # MUST CHECK IN FIRST
+    # =====================================================
+
+    if not attendance or not attendance.check_in:
+
+        messages.error(
+            request,
+            "Please check in before adding today's work."
+        )
+
+        return redirect("trainer_dashboard")
+
+    # =====================================================
+    # CANNOT ADD AFTER CHECKOUT
+    # =====================================================
+
+    if attendance.check_out:
+
+        messages.error(
+            request,
+            "You have already checked out for today."
+        )
+
+        return redirect("trainer_dashboard")
+
+    if request.method == "POST":
+
+        task_text = request.POST.get(
+            "task",
+            ""
+        ).strip()
+
+        description = request.POST.get(
+            "description",
+            ""
+        ).strip()
+
+        if not task_text:
+
+            messages.error(
+                request,
+                "Please enter what you are working on."
+            )
+
+            return redirect("trainer_dashboard")
+
+        TodoTask.objects.create(
+            trainer=trainer,
+            task=task_text,
+            description=description,
+            for_date=today,
+            status="in_progress",
+            priority="medium",
+            estimated_hours=1.0,
+            is_done=False,
+        )
+
+        messages.success(
+            request,
+            "Today's work was added successfully."
+        )
+
+    return redirect("trainer_dashboard")
+@login_required
+
+@login_required
+def checkin_portal(request):
+    trainers = (
+        Trainer.objects
+        .filter(is_full_time=True)
+        .order_by("Name")
+    )
+
+    today = timezone.localdate()
+
+    attendance_records = (
+        DailyAttendance.objects
+        .filter(
+            date=today,
+            trainer__is_full_time=True
+        )
+        .select_related("trainer")
+        .order_by("trainer__Name")
+    )
+
+    attendance_map = {
+        attendance.trainer_id: attendance
+        for attendance in attendance_records
+    }
+
+    trainer_list = []
+
+    for trainer in trainers:
+        trainer_list.append({
+            "trainer": trainer,
+            "attendance": attendance_map.get(trainer.id),
+        })
+
+    return render(
+        request,
+        "checkin_portal.html",
+        {
+            "trainer_list": trainer_list,
+            "today": today,
+        }
+    )
+
+
+# =====================================================
+# WEEKLY WORK SCHEDULE
+# =====================================================
+
+@login_required
+def weekly_schedule(request):
+
+    today = timezone.localdate()
+
+    week_param = request.GET.get("week")
+
+    if week_param:
+        try:
+            selected_date = date.fromisoformat(week_param)
+        except ValueError:
+            selected_date = today
+    else:
+        selected_date = today
+
+    week_start = (
+        selected_date -
+        timedelta(days=selected_date.weekday())
+    )
+
+    week_days = [
+        week_start + timedelta(days=i)
+        for i in range(7)
+    ]
+
+    week_end = week_days[-1]
+
+    events = (
+        CalendarEvent.objects
+        .filter(
+            date__gte=week_start,
+            date__lte=week_end
+        )
+        .select_related(
+            "college",
+            "workshop"
+        )
+        .prefetch_related(
+            "trainers"
+        )
+        .order_by(
+            "date",
+            "start_time"
+        )
+    )
+
+    schedule = []
+
+    for day in week_days:
+
+        day_events = []
+
+        for event in events:
+
+            if event.date != day:
+                continue
+
+            trainer_names = ", ".join(
+                trainer.Name
+                for trainer in event.trainers.all()
+            )
+
+            day_events.append({
+                "id": event.id,
+                "title": event.title,
+                "start_time": event.start_time,
+                "end_time": event.end_time,
+                "event_type": event.get_event_type_display(),
+                "trainers": trainer_names,
+                "college": (
+                    event.college.name
+                    if event.college
+                    else ""
+                ),
+                "department": event.department,
+                "location": event.location,
+                "description": event.description,
+                "guest_faculty": getattr(
+                    event,
+                    "guest_faculty",
+                    ""
+                ),
+                "workshop": (
+                    event.workshop.title
+                    if event.workshop
+                    else ""
+                ),
+            })
+
+        schedule.append({
+            "date": day,
+            "events": day_events,
+        })
+
+    previous_week = week_start - timedelta(days=7)
+    next_week = week_start + timedelta(days=7)
+
+    return render(
+        request,
+        "calendar/weekly_schedule.html",
+        {
+            "week_days": week_days,
+            "schedule": schedule,
+            "week_start": week_start,
+            "week_end": week_end,
+            "previous_week": previous_week,
+            "next_week": next_week,
+            "today": today,
+        }
+    )

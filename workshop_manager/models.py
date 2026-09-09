@@ -1,171 +1,239 @@
-# workshop_manager/models.py
-
 from django.db import models
 from django.contrib.auth.models import User
-
-
-# models.py
-DEPARTMENT_CHOICES = [
-        ('CSE', 'CSE'),
-        ('ISE', 'ISE'),
-        ('AIML', 'AI & ML'),
-        ('IOT', 'IoT'),
-        ('CYBER', 'Cyber Security'),
-        ('DS', 'Data Science'),
-        ('EC', 'ECE'),
-        ('CIVIL', 'Civil Engineering'),
-        ('MECH', 'Mechanical Engineering'),
-        ('CSA', 'CSA'),
-        ('MCA', 'MCA'),
-        ('BCA', 'BCA'),
-        ('MBA', 'MBA'),
-    ]
 from django.utils import timezone
+
+
+# =========================================================
+# DEPARTMENT CHOICES
+# =========================================================
+
+DEPARTMENT_CHOICES = [
+    ("CSE", "CSE"),
+    ("ISE", "ISE"),
+    ("AIML", "AI & ML"),
+    ("IOT", "IoT"),
+    ("CYBER", "Cyber Security"),
+    ("DS", "Data Science"),
+    ("EC", "ECE"),
+    ("CIVIL", "Civil Engineering"),
+    ("MECH", "Mechanical Engineering"),
+    ("CSA", "CSA"),
+    ("MCA", "MCA"),
+    ("BCA", "BCA"),
+    ("MBA", "MBA"),
+]
+
+
+# =========================================================
+# DEPARTMENT
+# =========================================================
+
 class Department(models.Model):
-    DEPARTMENT_CHOICES = [
-        ('CSE', 'CSE'),
-        ('ISE', 'ISE'),
-        ('AIML', 'AI & ML'),
-        ('IOT', 'IoT'),
-        ('CYBER', 'Cyber Security'),
-        ('DS', 'Data Science'),
-        ('EC', 'ECE'),
-        ('CIVIL', 'Civil Engineering'),
-        ('MECH', 'Mechanical Engineering'),
-        ('CSA', 'CSA'),
-        ('MCA', 'MCA'),
-        ('BCA', 'BCA'),
-        ('MBA', 'MBA'),
-    ]
 
     code = models.CharField(
         max_length=20,
         choices=DEPARTMENT_CHOICES,
-        unique=True
+        unique=True,
     )
 
     def __str__(self):
         return self.get_code_display()
 
 
+# =========================================================
+# COLLEGE
+# =========================================================
+
 class College(models.Model):
-    name = models.CharField(max_length=255)
-    city = models.CharField(max_length=100, blank=True)
-    state = models.CharField(max_length=100, blank=True)
-    contact_person = models.CharField(max_length=100, blank=True)
-    contact_phone = models.CharField(max_length=15, blank=True)
-    contact_email = models.EmailField(blank=True)
+
+    name = models.CharField(
+        max_length=255
+    )
+
+    city = models.CharField(
+        max_length=100,
+        blank=True,
+    )
+
+    state = models.CharField(
+        max_length=100,
+        blank=True,
+    )
+
+    contact_person = models.CharField(
+        max_length=100,
+        blank=True,
+    )
+
+    contact_phone = models.CharField(
+        max_length=15,
+        blank=True,
+    )
+
+    contact_email = models.EmailField(
+        blank=True,
+    )
 
     def __str__(self):
         return self.name
 
+
+# =========================================================
+# TRAINER
+# =========================================================
+
 class Trainer(models.Model):
+
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
         null=True,
-        blank=True
+        blank=True,
     )
 
-    Name = models.CharField(max_length=35)
-    phone = models.CharField(max_length=15)
-    email = models.EmailField()
-    expertise = models.CharField(max_length=200, blank=True)
-    is_available = models.BooleanField(default=True)
-    cv = models.FileField(upload_to='trainer_cvs/', blank=True, null=True)
-    is_full_time = models.BooleanField(default=False)
+    Name = models.CharField(
+        max_length=35,
+    )
 
+    phone = models.CharField(
+        max_length=15,
+    )
+
+    email = models.EmailField()
+
+    expertise = models.CharField(
+        max_length=200,
+        blank=True,
+    )
+
+    is_available = models.BooleanField(
+        default=True,
+    )
+
+    cv = models.FileField(
+        upload_to="trainer_cvs/",
+        blank=True,
+        null=True,
+    )
+
+    # Only full-time trainers can use attendance/check-in
+    is_full_time = models.BooleanField(
+        default=False,
+    )
 
     def __str__(self):
         return self.Name
 
 
+# =========================================================
+# WORKSHOP
+# =========================================================
+
 class Workshop(models.Model):
+
     STATUS_CHOICES = [
-        ('tentative', 'Tentative'),
-        ('fixed', 'Fixed'),
-        ('postponed', 'Postponed'),
-        ('cancelled', 'Cancelled'),
-        ('completed', 'Completed'),
+        ("tentative", "Tentative"),
+        ("fixed", "Fixed"),
+        ("postponed", "Postponed"),
+        ("cancelled", "Cancelled"),
+        ("completed", "Completed"),
     ]
 
-    title = models.CharField(max_length=200)
+    title = models.CharField(
+        max_length=200,
+    )
 
     college = models.ForeignKey(
-        'College',
-        on_delete=models.CASCADE
+        "College",
+        on_delete=models.CASCADE,
     )
 
     departments = models.CharField(
         max_length=50,
         choices=DEPARTMENT_CHOICES,
-        blank=True
+        blank=True,
     )
 
     start_date = models.DateField()
+
     end_date = models.DateField()
 
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
-        default='tentative'
+        default="tentative",
     )
 
-    remarks = models.TextField(blank=True)
+    remarks = models.TextField(
+        blank=True,
+    )
 
     assigned_trainers = models.ManyToManyField(
         Trainer,
-        blank=True
+        blank=True,
     )
 
     report = models.FileField(
-        upload_to='workshop_reports/',
+        upload_to="workshop_reports/",
         blank=True,
-        null=True
+        null=True,
     )
 
-    created_on = models.DateTimeField(auto_now_add=True)
-    updated_on = models.DateTimeField(auto_now=True)
+    created_on = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    updated_on = models.DateTimeField(
+        auto_now=True,
+    )
 
     def __str__(self):
         return f"{self.title} @ {self.college}"
 
 
+# =========================================================
+# FOLLOW UP
+# =========================================================
+
 class FollowUp(models.Model):
+
     college = models.ForeignKey(
-        'College',
-        on_delete=models.CASCADE
+        "College",
+        on_delete=models.CASCADE,
     )
 
     workshop = models.ForeignKey(
-        'Workshop',
+        "Workshop",
         on_delete=models.SET_NULL,
         null=True,
-        blank=True
+        blank=True,
     )
 
     departments = models.ManyToManyField(
         Department,
-        blank=True
+        blank=True,
     )
 
     person_met = models.CharField(
         max_length=100,
-        help_text="HOD / Faculty / Coordinator name"
+        help_text="HOD / Faculty / Coordinator name",
     )
 
     follow_up_type = models.CharField(
         max_length=50,
         choices=[
-            ('proposal', 'Send Proposal'),
-            ('call', 'Follow-up Call'),
-            ('meeting', 'Meeting'),
-        ]
+            ("proposal", "Send Proposal"),
+            ("call", "Follow-up Call"),
+            ("meeting", "Meeting"),
+        ],
     )
 
-    description = models.TextField(blank=True)
+    description = models.TextField(
+        blank=True,
+    )
 
     follow_from = models.DateField()
+
     follow_to = models.DateField()
 
     assigned_to = models.ForeignKey(
@@ -173,301 +241,520 @@ class FollowUp(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        limit_choices_to={'is_full_time': True}
+        limit_choices_to={
+            "is_full_time": True
+        },
     )
 
-    reminder_date = models.DateTimeField(null=True, blank=True)
+    reminder_date = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
 
-    is_completed = models.BooleanField(default=False)
+    is_completed = models.BooleanField(
+        default=False,
+    )
 
     def __str__(self):
         return f"{self.college} - {self.person_met}"
 
 
-class Notification(models.Model):
-    follow_up = models.ForeignKey(FollowUp, on_delete=models.CASCADE)
-    notify_on = models.DateTimeField()
-    sent = models.BooleanField(default=False)
+# =========================================================
+# NOTIFICATION
+# =========================================================
 
+class Notification(models.Model):
+
+    follow_up = models.ForeignKey(
+        FollowUp,
+        on_delete=models.CASCADE,
+    )
+
+    notify_on = models.DateTimeField()
+
+    sent = models.BooleanField(
+        default=False,
+    )
+
+
+# =========================================================
+# OFFICE TRAINING CONSTANTS
+# =========================================================
 
 BATCH_CHOICES = [
-    ('morning', 'Morning'),
-    ('afternoon', 'Afternoon'),
-    ('evening', 'Evening'),
+    ("morning", "Morning"),
+    ("afternoon", "Afternoon"),
+    ("evening", "Evening"),
 ]
 
 MODE_CHOICES = [
-    ('online', 'Online'),
-    ('offline', 'Offline'),
+    ("online", "Online"),
+    ("offline", "Offline"),
 ]
 
 HALL_CHOICES = [
-    ('hall1', 'Hall 1'),
-    ('hall2', 'Hall 2'),
+    ("hall1", "Hall 1"),
+    ("hall2", "Hall 2"),
 ]
 
+
+# =========================================================
+# OFFICE TRAINING
+# =========================================================
+
 class OfficeTraining(models.Model):
-    name = models.CharField(max_length=200)
-    batch_id = models.CharField(max_length=50)
-    batch = models.CharField(max_length=20, choices=BATCH_CHOICES)
-    mode = models.CharField(max_length=10, choices=MODE_CHOICES)
-    hall = models.CharField(max_length=10, choices=HALL_CHOICES, blank=True, null=True)
+
+    name = models.CharField(
+        max_length=200,
+    )
+
+    batch_id = models.CharField(
+        max_length=50,
+    )
+
+    batch = models.CharField(
+        max_length=20,
+        choices=BATCH_CHOICES,
+    )
+
+    mode = models.CharField(
+        max_length=10,
+        choices=MODE_CHOICES,
+    )
+
+    hall = models.CharField(
+        max_length=10,
+        choices=HALL_CHOICES,
+        blank=True,
+        null=True,
+    )
+
     start_date = models.DateField()
+
     end_date = models.DateField()
-    trainers = models.ManyToManyField('Trainer')  # Assuming Trainer model exists
+
+    trainers = models.ManyToManyField(
+        Trainer,
+    )
 
     def __str__(self):
         return f"{self.name} - {self.batch_id}"
-    
 
 
+# =========================================================
+# TODO TASK
+# =========================================================
 
 class TodoTask(models.Model):
+
     STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('in_progress', 'In Progress'),
-        ('completed', 'Completed'),
+        ("pending", "Pending"),
+        ("in_progress", "In Progress"),
+        ("completed", "Completed"),
     ]
 
     PRIORITY_CHOICES = [
-        ('low', 'Low'),
-        ('medium', 'Medium'),
-        ('high', 'High'),
+        ("low", "Low"),
+        ("medium", "Medium"),
+        ("high", "High"),
     ]
 
+    # Only full-time trainers can own daily internal tasks
+    trainer = models.ForeignKey(
+        Trainer,
+        on_delete=models.CASCADE,
+        limit_choices_to={
+            "is_full_time": True
+        },
+    )
 
-    trainer = models.ForeignKey('Trainer',on_delete=models.CASCADE,limit_choices_to={'is_full_time': True})  # ✅ restricts to full-time trainers
-    task = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
-    for_date = models.DateField(default=timezone.now)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
-    estimated_hours = models.DecimalField(max_digits=4, decimal_places=1, default=1.0)
-    is_done = models.BooleanField(default=False)
-    created_on = models.DateTimeField(auto_now_add=True)
+    task = models.CharField(
+        max_length=255,
+    )
+
+    description = models.TextField(
+        blank=True,
+        null=True,
+    )
+
+    for_date = models.DateField(
+        default=timezone.localdate,
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="pending",
+    )
+
+    priority = models.CharField(
+        max_length=10,
+        choices=PRIORITY_CHOICES,
+        default="medium",
+    )
+
+    estimated_hours = models.DecimalField(
+        max_digits=4,
+        decimal_places=1,
+        default=1.0,
+    )
+
+    is_done = models.BooleanField(
+        default=False,
+    )
+
+    created_on = models.DateTimeField(
+        auto_now_add=True,
+    )
 
     def __str__(self):
-        return f"{self.task} - {self.trainer.Name} ({self.for_date})"
+        return (
+            f"{self.task} - "
+            f"{self.trainer.Name} "
+            f"({self.for_date})"
+        )
 
+
+# =========================================================
+# SUB TASK
+# =========================================================
 
 class SubTask(models.Model):
+
     parent_task = models.ForeignKey(
-        'TodoTask',
+        TodoTask,
         on_delete=models.CASCADE,
-        related_name='subtasks'   # ✅ important
+        related_name="subtasks",
     )
-    title = models.CharField(max_length=255)
-    is_completed = models.BooleanField(default=False)
+
+    title = models.CharField(
+        max_length=255,
+    )
+
+    is_completed = models.BooleanField(
+        default=False,
+    )
 
     def __str__(self):
-        return f"{self.title} ({'Done' if self.is_completed else 'Pending'})"
+        status = "Done" if self.is_completed else "Pending"
+        return f"{self.title} ({status})"
+
+
+# =========================================================
+# FOLLOW UP REMINDER
+# =========================================================
 
 class FollowUpReminder(models.Model):
+
     followup = models.ForeignKey(
         FollowUp,
         on_delete=models.CASCADE,
-        related_name="reminders"
+        related_name="reminders",
     )
+
     remind_at = models.DateTimeField()
-    message = models.CharField(max_length=255, blank=True)
-    is_sent = models.BooleanField(default=False)
+
+    message = models.CharField(
+        max_length=255,
+        blank=True,
+    )
+
+    is_sent = models.BooleanField(
+        default=False,
+    )
 
     def __str__(self):
         return f"Reminder for {self.followup}"
-    
+
+
+# =========================================================
+# WORKSHOP REMARKS / TRAINER REPORT
+# =========================================================
+
 class WorkshopRemarks(models.Model):
+
     workshop = models.ForeignKey(
         Workshop,
         on_delete=models.CASCADE,
-        related_name="trainer_reports"
+        related_name="trainer_reports",
     )
 
     trainer = models.ForeignKey(
         Trainer,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
 
     topics_covered = models.TextField(
-        help_text="Topics covered during workshop"
+        help_text="Topics covered during workshop",
     )
 
     activities_conducted = models.TextField(
         blank=True,
-        help_text="Hands-on sessions, quizzes, projects etc."
+        help_text="Hands-on sessions, quizzes, projects etc.",
     )
 
     blockers_faced = models.TextField(
         blank=True,
-        help_text="Challenges faced during workshop"
+        help_text="Challenges faced during workshop",
     )
 
     learning_outcomes = models.TextField(
         blank=True,
-        help_text="What trainer learned from this workshop"
+        help_text="What trainer learned from this workshop",
     )
 
     innovation_added = models.TextField(
         blank=True,
-        help_text="Unique teaching methods, demos, activities"
+        help_text="Unique teaching methods, demos, activities",
     )
 
-    notes_prepared = models.BooleanField(default=False)
+    notes_prepared = models.BooleanField(
+        default=False,
+    )
 
     notes_link = models.URLField(
         blank=True,
-        null=True
+        null=True,
     )
 
-    student_feedback = models.TextField(blank=True)
+    student_feedback = models.TextField(
+        blank=True,
+    )
 
-    improvement_suggestions = models.TextField(blank=True)
+    improvement_suggestions = models.TextField(
+        blank=True,
+    )
 
     overall_rating = models.IntegerField(
-        default=5
+        default=5,
     )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
 
     def __str__(self):
-        return f"{self.workshop.title} - {self.trainer.Name}"
-    
+        return (
+            f"{self.workshop.title} - "
+            f"{self.trainer.Name}"
+        )
+
+
+# =========================================================
+# MEETING NOTE
+# =========================================================
 
 class MeetingNote(models.Model):
 
     meeting_date = models.DateField()
 
     title = models.CharField(
-        max_length=200
+        max_length=200,
     )
 
     attendees = models.ManyToManyField(
         Trainer,
-        blank=True
+        blank=True,
     )
 
     discussion_points = models.TextField()
 
     decisions_taken = models.TextField(
-        blank=True
+        blank=True,
     )
 
     blockers = models.TextField(
-        blank=True
+        blank=True,
     )
 
     action_items = models.TextField(
-        blank=True
+        blank=True,
     )
 
     next_steps = models.TextField(
-        blank=True
+        blank=True,
     )
 
     attachment = models.FileField(
         upload_to="meeting_notes/",
         blank=True,
-        null=True
+        null=True,
     )
 
     created_by = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
-        null=True
+        null=True,
     )
 
     created_at = models.DateTimeField(
-        auto_now_add=True
+        auto_now_add=True,
     )
 
     updated_at = models.DateTimeField(
-        auto_now=True
+        auto_now=True,
     )
 
     def __str__(self):
         return f"{self.title} ({self.meeting_date})"
 
+
+# =========================================================
+# CALENDAR EVENT
+# ONLY ONE CALENDAR EVENT MODEL
+# =========================================================
+
 class CalendarEvent(models.Model):
 
     EVENT_TYPES = [
         ("workshop", "Workshop"),
+        ("fdp", "FDP"),
+        ("online_workshop", "Online Workshop"),
         ("office", "Office Training"),
+        ("guest_training", "Guest Faculty Training"),
         ("meeting", "Meeting"),
         ("other", "Other"),
     ]
 
-    title = models.CharField(max_length=200)
+    title = models.CharField(
+        max_length=200,
+    )
 
     date = models.DateField()
 
     start_time = models.TimeField(
         null=True,
-        blank=True
+        blank=True,
     )
 
     end_time = models.TimeField(
         null=True,
-        blank=True
+        blank=True,
     )
 
-    # ONE EVENT CAN HAVE MULTIPLE TRAINERS
+    # One event can have multiple trainers
     trainers = models.ManyToManyField(
         Trainer,
         blank=True,
-        related_name="calendar_events"
+        related_name="calendar_events",
     )
 
-    # Optional link to existing workshop
+    # Optional connection to workshop
     workshop = models.ForeignKey(
         Workshop,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="calendar_events"
+        related_name="calendar_events",
     )
 
+    # Optional college
     college = models.ForeignKey(
         College,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="calendar_events"
+        related_name="calendar_events",
     )
 
     department = models.CharField(
         max_length=50,
         choices=DEPARTMENT_CHOICES,
-        blank=True
+        blank=True,
     )
 
     event_type = models.CharField(
-        max_length=20,
+        max_length=30,
         choices=EVENT_TYPES,
-        default="other"
+        default="other",
+    )
+
+    # Used especially for Guest Faculty Training
+    guest_faculty = models.CharField(
+        max_length=200,
+        blank=True,
     )
 
     location = models.CharField(
         max_length=255,
-        blank=True
+        blank=True,
     )
 
     description = models.TextField(
-        blank=True
+        blank=True,
     )
 
     created_by = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
-        blank=True
+        blank=True,
     )
 
     created_at = models.DateTimeField(
-        auto_now_add=True
+        auto_now_add=True,
     )
 
     updated_at = models.DateTimeField(
-        auto_now=True
+        auto_now=True,
     )
 
     def __str__(self):
         return self.title
+
+
+# =========================================================
+# DAILY ATTENDANCE
+# FULL-TIME TRAINERS ONLY AT VIEW LEVEL
+# =========================================================
+
+class DailyAttendance(models.Model):
+
+    trainer = models.ForeignKey(
+        Trainer,
+        on_delete=models.CASCADE,
+        related_name="attendance_records",
+    )
+
+    date = models.DateField(
+        default=timezone.localdate,
+    )
+
+    check_in = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
+
+    check_out = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
+
+    class Meta:
+        ordering = [
+            "-date",
+            "-check_in",
+        ]
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=[
+                    "trainer",
+                    "date",
+                ],
+                name="unique_trainer_attendance_per_day",
+            )
+        ]
+
+    def __str__(self):
+        return (
+            f"{self.trainer.Name} - "
+            f"{self.date}"
+        )
+
+    @property
+    def is_working(self):
+        return (
+            self.check_in is not None
+            and self.check_out is None
+        )

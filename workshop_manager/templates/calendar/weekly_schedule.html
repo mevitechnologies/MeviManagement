@@ -1,0 +1,738 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Weekly Work Schedule
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+    .weekly-wrapper {
+        max-width: 1600px;
+        margin: auto;
+    }
+
+    .weekly-header {
+        background: linear-gradient(
+            135deg,
+            #667eea,
+            #764ba2
+        );
+
+        color: white;
+
+        border-radius: 18px;
+
+        padding: 25px;
+
+        margin-bottom: 25px;
+
+        box-shadow:
+            0 10px 30px rgba(0,0,0,.12);
+    }
+
+    .week-navigation {
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        gap: 15px;
+
+        flex-wrap: wrap;
+
+        margin-top: 20px;
+    }
+
+    .week-title {
+        font-size: 1.4rem;
+
+        font-weight: 700;
+
+        margin: 0;
+    }
+
+    .schedule-card {
+        border: none;
+
+        border-radius: 18px;
+
+        overflow: hidden;
+
+        box-shadow:
+            0 8px 30px rgba(0,0,0,.08);
+    }
+
+    .schedule-header {
+        background: white;
+
+        border-bottom: 1px solid #eee;
+
+        padding: 20px 25px;
+    }
+
+    .schedule-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .schedule-table {
+        width: 100%;
+
+        min-width: 1100px;
+
+        border-collapse: collapse;
+    }
+
+    .schedule-table th,
+    .schedule-table td {
+
+        border: 1px solid #e9ecef;
+
+        vertical-align: top;
+    }
+
+    .time-column {
+
+        width: 90px;
+
+        min-width: 90px;
+
+        background: #f8f9fa;
+
+        font-weight: 700;
+
+        text-align: center;
+
+        color: #495057;
+    }
+
+    .day-header {
+
+        padding: 12px;
+
+        text-align: center;
+
+        background: #212529;
+
+        color: white;
+
+        font-weight: 700;
+    }
+
+    .day-header.today {
+
+        background: #0d6efd;
+    }
+
+    .time-slot {
+
+        height: 75px;
+
+        position: relative;
+
+        padding: 5px;
+    }
+
+    .schedule-event {
+
+        border-radius: 10px;
+
+        padding: 9px;
+
+        margin-bottom: 5px;
+
+        color: white;
+
+        font-size: .82rem;
+
+        cursor: pointer;
+
+        box-shadow:
+            0 3px 8px rgba(0,0,0,.10);
+    }
+
+    .schedule-event:hover {
+
+        transform: translateY(-1px);
+
+        box-shadow:
+            0 5px 12px rgba(0,0,0,.15);
+    }
+
+    .event-workshop {
+        background: #198754;
+    }
+
+    .event-fdp {
+        background: #6f42c1;
+    }
+
+    .event-online {
+        background: #0d6efd;
+    }
+
+    .event-office {
+        background: #20c997;
+    }
+
+    .event-guest {
+        background: #fd7e14;
+    }
+
+    .event-meeting {
+        background: #dc3545;
+    }
+
+    .event-other {
+        background: #6c757d;
+    }
+
+    .event-title {
+
+        font-weight: 700;
+
+        line-height: 1.3;
+    }
+
+    .event-time {
+
+        font-size: .75rem;
+
+        margin-top: 4px;
+
+        opacity: .9;
+    }
+
+    .event-meta {
+
+        font-size: .72rem;
+
+        margin-top: 5px;
+
+        line-height: 1.4;
+    }
+
+    .empty-event {
+
+        color: #adb5bd;
+
+        font-size: .78rem;
+
+        text-align: center;
+
+        padding-top: 25px;
+    }
+
+    .legend {
+
+        display: flex;
+
+        flex-wrap: wrap;
+
+        gap: 15px;
+
+        padding: 20px;
+
+        background: #f8f9fa;
+    }
+
+    .legend-item {
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 7px;
+
+        font-size: .85rem;
+
+        font-weight: 500;
+    }
+
+    .legend-dot {
+
+        width: 12px;
+
+        height: 12px;
+
+        border-radius: 50%;
+    }
+
+    .guest-info {
+
+        margin-top: 5px;
+
+        font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+
+        .weekly-header {
+
+            padding: 18px;
+
+            border-radius: 14px;
+        }
+
+        .week-title {
+
+            font-size: 1.1rem;
+        }
+
+        .schedule-table {
+
+            min-width: 950px;
+        }
+    }
+
+</style>
+
+
+<div class="container-fluid px-2 px-md-4 py-3">
+
+<div class="weekly-wrapper">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="weekly-header">
+
+        <div>
+
+            <h2 class="fw-bold mb-1">
+
+                <i class="bi bi-calendar-week me-2"></i>
+
+                Weekly Work Schedule
+
+            </h2>
+
+            <p class="mb-0">
+
+                Hour-by-hour schedule for workshops,
+                FDPs, guest faculty and other work
+
+            </p>
+
+        </div>
+
+
+        <!-- NAVIGATION -->
+
+        <div class="week-navigation">
+
+            <a
+                href="?week={{ previous_week|date:'Y-m-d' }}"
+                class="btn btn-light"
+            >
+
+                <i class="bi bi-chevron-left me-1"></i>
+
+                Previous Week
+
+            </a>
+
+
+            <div class="text-center">
+
+                <div class="week-title">
+
+                    {{ week_start|date:"d M Y" }}
+
+                    -
+
+                    {{ week_end|date:"d M Y" }}
+
+                </div>
+
+            </div>
+
+
+            <div class="d-flex gap-2">
+
+                <a
+                    href="?week={{ today|date:'Y-m-d' }}"
+                    class="btn btn-warning"
+                >
+
+                    Today
+
+                </a>
+
+
+                <a
+                    href="?week={{ next_week|date:'Y-m-d' }}"
+                    class="btn btn-light"
+                >
+
+                    Next Week
+
+                    <i class="bi bi-chevron-right ms-1"></i>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SCHEDULE
+    ====================================================== -->
+
+    <div class="card schedule-card">
+
+
+        <div class="schedule-header">
+
+            <div class="d-flex
+                        flex-column
+                        flex-md-row
+                        justify-content-between
+                        align-items-md-center
+                        gap-2">
+
+                <div>
+
+                    <h4 class="fw-bold mb-1">
+
+                        <i class="bi bi-clock me-2 text-primary"></i>
+
+                        Work Schedule
+
+                    </h4>
+
+                    <small class="text-muted">
+
+                        Scheduled activities for the selected week
+
+                    </small>
+
+                </div>
+
+
+                {% if request.user.is_superuser %}
+
+                    <a
+                        href="{% url 'add_calendar_event' %}"
+                        class="btn btn-primary"
+                    >
+
+                        <i class="bi bi-plus-lg me-1"></i>
+
+                        Add Schedule
+
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <div class="schedule-table-wrapper">
+
+            <table class="schedule-table">
+
+
+                <!-- =================================================
+                     DAYS
+                ================================================== -->
+
+                <thead>
+
+                    <tr>
+
+                        <th class="time-column">
+
+                            Time
+
+                        </th>
+
+
+                        {% for day_offset in "0123456" %}
+
+                            {% with current_day=week_start|add:day_offset %}
+
+                            <th>
+
+                                <div class="day-header">
+
+                                    {{ current_day|date:"D" }}
+
+                                    <br>
+
+                                    <small>
+
+                                        {{ current_day|date:"d M" }}
+
+                                    </small>
+
+                                </div>
+
+                            </th>
+
+                            {% endwith %}
+
+                        {% endfor %}
+
+                    </tr>
+
+                </thead>
+
+
+                <!-- =================================================
+                     TIME GRID
+                ================================================== -->
+
+                <tbody>
+
+
+                    {% for hour in "678910111213141516171819202122" %}
+
+
+                    <tr>
+
+
+                        <td class="time-column">
+
+                            {{ hour }}:00
+
+                        </td>
+
+
+                        {% for day_offset in "0123456" %}
+
+
+                            <td class="time-slot">
+
+                                {% for event in weekly_events %}
+
+                                    {% if event.date|date:"N" == forloop.parentloop.counter %}
+
+                                        {% if event.start_time %}
+
+                                            {% if event.start_time.hour|stringformat:"s" == hour %}
+
+                                                <div
+                                                    class="
+                                                        schedule-event
+
+                                                        {% if event.event_type == 'Workshop' %}
+                                                            event-workshop
+
+                                                        {% elif event.event_type == 'FDP' %}
+                                                            event-fdp
+
+                                                        {% elif event.event_type == 'Online Workshop' %}
+                                                            event-online
+
+                                                        {% elif event.event_type == 'Office Training' %}
+                                                            event-office
+
+                                                        {% elif event.event_type == 'Guest Faculty Training' %}
+                                                            event-guest
+
+                                                        {% elif event.event_type == 'Meeting' %}
+                                                            event-meeting
+
+                                                        {% else %}
+                                                            event-other
+                                                        {% endif %}
+                                                    "
+                                                >
+
+                                                    <div class="event-title">
+
+                                                        {{ event.title }}
+
+                                                    </div>
+
+
+                                                    <div class="event-time">
+
+                                                        {{ event.start_time|time:"g:i A" }}
+
+                                                        {% if event.end_time %}
+
+                                                            -
+
+                                                            {{ event.end_time|time:"g:i A" }}
+
+                                                        {% endif %}
+
+                                                    </div>
+
+
+                                                    {% if event.guest_faculty %}
+
+                                                        <div class="event-meta guest-info">
+
+                                                            <i class="bi bi-person-badge me-1"></i>
+
+                                                            {{ event.guest_faculty }}
+
+                                                        </div>
+
+                                                    {% endif %}
+
+
+                                                    {% if event.trainers %}
+
+                                                        <div class="event-meta">
+
+                                                            <i class="bi bi-person me-1"></i>
+
+                                                            {{ event.trainers }}
+
+                                                        </div>
+
+                                                    {% endif %}
+
+
+                                                    {% if event.college %}
+
+                                                        <div class="event-meta">
+
+                                                            <i class="bi bi-building me-1"></i>
+
+                                                            {{ event.college }}
+
+                                                        </div>
+
+                                                    {% endif %}
+
+
+                                                    {% if event.location %}
+
+                                                        <div class="event-meta">
+
+                                                            <i class="bi bi-geo-alt me-1"></i>
+
+                                                            {{ event.location }}
+
+                                                        </div>
+
+                                                    {% endif %}
+
+                                                </div>
+
+                                            {% endif %}
+
+                                        {% endif %}
+
+                                    {% endif %}
+
+                                {% empty %}
+
+                                    <div class="empty-event">
+
+                                        -
+
+                                    </div>
+
+                                {% endfor %}
+
+                            </td>
+
+                        {% endfor %}
+
+                    </tr>
+
+
+                    {% endfor %}
+
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- =====================================================
+             LEGEND
+        ====================================================== -->
+
+        <div class="legend">
+
+            <div class="legend-item">
+
+                <span class="legend-dot event-workshop"></span>
+
+                Workshop
+
+            </div>
+
+
+            <div class="legend-item">
+
+                <span class="legend-dot event-fdp"></span>
+
+                FDP
+
+            </div>
+
+
+            <div class="legend-item">
+
+                <span class="legend-dot event-online"></span>
+
+                Online Workshop
+
+            </div>
+
+
+            <div class="legend-item">
+
+                <span class="legend-dot event-office"></span>
+
+                Office Training
+
+            </div>
+
+
+            <div class="legend-item">
+
+                <span class="legend-dot event-guest"></span>
+
+                Guest Faculty
+
+            </div>
+
+
+            <div class="legend-item">
+
+                <span class="legend-dot event-meeting"></span>
+
+                Meeting
+
+            </div>
+
+
+            <div class="legend-item">
+
+                <span class="legend-dot event-other"></span>
+
+                Other
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+</div>
+
+{% endblock %}

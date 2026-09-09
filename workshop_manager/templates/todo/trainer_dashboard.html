@@ -1,49 +1,611 @@
 {% extends 'base.html' %}
-{% load crispy_forms_tags %}
+
+{% block title %}
+Trainer Dashboard
+{% endblock %}
+
 {% block content %}
 
-<div class="container mt-4">
-  <h3 class="fw-bold mb-4">👨‍🏫 {{ trainer.Name }}’s Task Board</h3>
+<div class="container-fluid py-4">
 
-  {% for task in tasks %}
-    <div class="card shadow-sm mb-3">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center">
-          <h5>{{ task.task }}</h5>
-          <span class="badge bg-{% if task.status == 'completed' %}success{% elif task.status == 'in_progress' %}info{% else %}warning{% endif %}">
-            {{ task.get_status_display }}
-          </span>
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <div class="d-flex
+                        flex-column
+                        flex-md-row
+                        justify-content-between
+                        align-items-md-center
+                        gap-3">
+
+                <div>
+
+                    <h2 class="fw-bold mb-1">
+                        Good Morning, 👋
+                    </h2>
+
+                    <p class="text-muted mb-0">
+
+                        {{ trainer.Name }}
+
+                        ·
+
+                        {{ today|date:"l, d F Y" }}
+
+                    </p>
+
+                </div>
+
+
+                <!-- ==========================================
+                     CHECK IN / CHECK OUT
+                =========================================== -->
+
+                <div>
+
+                    {% if attendance.check_in and not attendance.check_out %}
+
+                        <div class="d-flex align-items-center gap-2">
+
+                            <span class="badge bg-success p-2">
+
+                                <i class="bi bi-check-circle me-1"></i>
+
+                                Checked In
+
+                                {{ attendance.check_in|date:"g:i A" }}
+
+                            </span>
+
+
+                            <form
+                                method="POST"
+                                action="{% url 'daily_checkin' %}"
+                            >
+
+                                {% csrf_token %}
+
+                                <input
+                                    type="hidden"
+                                    name="action"
+                                    value="check_out"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-outline-danger"
+                                >
+
+                                    <i class="bi bi-box-arrow-right me-1"></i>
+
+                                    Check Out
+
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    {% elif attendance.check_out %}
+
+                        <span class="badge bg-secondary p-2">
+
+                            <i class="bi bi-check-all me-1"></i>
+
+                            Checked Out
+
+                            {{ attendance.check_out|date:"g:i A" }}
+
+                        </span>
+
+                    {% else %}
+
+                        <form
+                            method="POST"
+                            action="{% url 'daily_checkin' %}"
+                        >
+
+                            {% csrf_token %}
+
+                            <input
+                                type="hidden"
+                                name="action"
+                                value="check_in"
+                            >
+
+                            <button
+                                type="submit"
+                                class="btn btn-success px-4"
+                            >
+
+                                <i class="bi bi-fingerprint me-2"></i>
+
+                                Check In
+
+                            </button>
+
+                        </form>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
         </div>
-        <p class="text-muted mb-2"><i class="bi bi-calendar"></i> {{ task.for_date }}</p>
 
-        <!-- Subtasks -->
-        {% if task.subtasks.all %}
-          <ul class="list-group mb-2">
-            {% for sub in task.subtasks.all %}
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                {{ sub.title }}
-                {% if sub.is_completed %}
-                  <span class="badge bg-success">Done</span>
-                {% else %}
-                  <a href="{% url 'toggle_subtask_done' trainer.id sub.id %}" class="badge bg-secondary text-decoration-none">Mark Done</a>
-                {% endif %}
-              </li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-
-        <!-- Add Subtask -->
-        <form method="POST" class="d-flex mt-2">
-          {% csrf_token %}
-          <input type="hidden" name="parent_task_id" value="{{ task.id }}">
-          {{ form.title|as_crispy_field }}
-          <button type="submit" name="add_subtask" class="btn btn-sm btn-outline-primary ms-2">➕ Add</button>
-        </form>
-      </div>
     </div>
-  {% empty %}
-    <p class="text-muted">No tasks assigned yet.</p>
-  {% endfor %}
+
+
+    <!-- =====================================================
+         TODAY'S ACTIVITY
+    ====================================================== -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-header bg-white py-3">
+
+            <div class="d-flex
+                        justify-content-between
+                        align-items-center">
+
+                <div>
+
+                    <h4 class="fw-bold mb-1">
+
+                        <i class="bi bi-clock-history
+                                  text-primary
+                                  me-2"></i>
+
+                        Today's Activity
+
+                    </h4>
+
+                    <small class="text-muted">
+
+                        Keep your current work updated
+
+                    </small>
+
+                </div>
+
+
+                {% if attendance.check_in and not attendance.check_out %}
+
+                    <span class="badge bg-success">
+
+                        Working
+
+                    </span>
+
+                {% elif attendance.check_out %}
+
+                    <span class="badge bg-secondary">
+
+                        Day Completed
+
+                    </span>
+
+                {% else %}
+
+                    <span class="badge bg-warning text-dark">
+
+                        Not Checked In
+
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <div class="card-body">
+
+            <!-- ==============================================
+                 NOT CHECKED IN
+            =============================================== -->
+
+            {% if not attendance.check_in %}
+
+                <div class="text-center py-4">
+
+                    <i
+                        class="bi bi-person-check text-primary"
+                        style="font-size:3rem;"
+                    ></i>
+
+                    <h4 class="fw-bold mt-3">
+
+                        Start your day
+
+                    </h4>
+
+                    <p class="text-muted">
+
+                        Check in before adding what you are working on.
+
+                    </p>
+
+
+                    <form
+                        method="POST"
+                        action="{% url 'daily_checkin' %}"
+                    >
+
+                        {% csrf_token %}
+
+                        <input
+                            type="hidden"
+                            name="action"
+                            value="check_in"
+                        >
+
+                        <button
+                            type="submit"
+                            class="btn btn-success px-5"
+                        >
+
+                            <i class="bi bi-box-arrow-in-right me-2"></i>
+
+                            Check In
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+
+            <!-- ==============================================
+                 CHECKED IN
+            =============================================== -->
+
+            {% elif not attendance.check_out %}
+
+                <div class="p-3
+                            border
+                            rounded-3
+                            bg-light">
+
+                    <h5 class="fw-bold mb-3">
+
+                        What are you doing right now?
+
+                    </h5>
+
+
+                    <form
+                        method="POST"
+                        action="{% url 'add_today_task' %}"
+                    >
+
+                        {% csrf_token %}
+
+
+                        <div class="mb-3">
+
+                            <label class="form-label fw-semibold">
+
+                                Current Work
+
+                            </label>
+
+                            <input
+                                type="text"
+                                name="task"
+                                class="form-control form-control-lg"
+                                placeholder="Example: Preparing Python workshop material"
+                                required
+                                autocomplete="off"
+                            >
+
+                        </div>
+
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Details
+                                <span class="text-muted">
+                                    (optional)
+                                </span>
+
+                            </label>
+
+                            <textarea
+                                name="description"
+                                class="form-control"
+                                rows="3"
+                                placeholder="Add some details about this work..."
+                            ></textarea>
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                        >
+
+                            <i class="bi bi-plus-circle me-1"></i>
+
+                            Add Today's Work
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+
+            <!-- ==============================================
+                 CHECKED OUT
+            =============================================== -->
+
+            {% else %}
+
+                <div class="text-center py-4">
+
+                    <i
+                        class="bi bi-check-circle text-success"
+                        style="font-size:3rem;"
+                    ></i>
+
+                    <h4 class="fw-bold mt-3">
+
+                        Your workday is complete
+
+                    </h4>
+
+                    <p class="text-muted">
+
+                        You checked out at
+                        <strong>
+                            {{ attendance.check_out|date:"g:i A" }}
+                        </strong>
+
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MY TASKS
+    ====================================================== -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-header bg-white py-3">
+
+            <div class="d-flex
+                        justify-content-between
+                        align-items-center">
+
+                <div>
+
+                    <h4 class="fw-bold mb-1">
+
+                        <i class="bi bi-list-check
+                                  text-primary
+                                  me-2"></i>
+
+                        My Tasks
+
+                    </h4>
+
+                    <small class="text-muted">
+
+                        Your work for today
+
+                    </small>
+
+                </div>
+
+
+                <span class="badge bg-primary">
+
+                    {{ tasks|length }}
+
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="card-body">
+
+            {% for task in tasks %}
+
+                <div class="border rounded-3 p-3 mb-3">
+
+                    <div class="d-flex
+                                flex-column
+                                flex-md-row
+                                justify-content-between
+                                gap-2">
+
+                        <div>
+
+                            <h5 class="fw-semibold mb-1">
+
+                                {{ task.task }}
+
+                            </h5>
+
+
+                            {% if task.description %}
+
+                                <p class="text-muted mb-2">
+
+                                    {{ task.description }}
+
+                                </p>
+
+                            {% endif %}
+
+
+                            <small class="text-muted">
+
+                                <i class="bi bi-clock me-1"></i>
+
+                                Added
+                                {{ task.created_on|date:"g:i A" }}
+
+                            </small>
+
+                        </div>
+
+
+                        <div>
+
+                            {% if task.status == "completed" %}
+
+                                <span class="badge bg-success">
+
+                                    Completed
+
+                                </span>
+
+                            {% elif task.status == "in_progress" %}
+
+                                <span class="badge bg-primary">
+
+                                    In Progress
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-warning text-dark">
+
+                                    Pending
+
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% empty %}
+
+                <div class="text-center py-5 text-muted">
+
+                    <i
+                        class="bi bi-clipboard-x"
+                        style="font-size:3rem;"
+                    ></i>
+
+                    <h5 class="mt-3">
+
+                        No work added today
+
+                    </h5>
+
+                    <p class="mb-0">
+
+                        Add your current work above.
+
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MY WORKSHOPS
+    ====================================================== -->
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-white py-3">
+
+            <h4 class="fw-bold mb-0">
+
+                <i class="bi bi-easel2
+                          text-primary
+                          me-2"></i>
+
+                My Workshops
+
+            </h4>
+
+        </div>
+
+
+        <div class="card-body">
+
+            {% for workshop in workshops %}
+
+                <div class="border rounded-3 p-3 mb-3">
+
+                    <h5 class="fw-bold mb-2">
+
+                        {{ workshop.title }}
+
+                    </h5>
+
+
+                    <div class="text-muted mb-1">
+
+                        <i class="bi bi-building me-1"></i>
+
+                        {{ workshop.college.name }}
+
+                    </div>
+
+
+                    <div class="text-muted">
+
+                        <i class="bi bi-calendar me-1"></i>
+
+                        {{ workshop.start_date }}
+
+                        -
+
+                        {{ workshop.end_date }}
+
+                    </div>
+
+                </div>
+
+            {% empty %}
+
+                <p class="text-muted mb-0">
+
+                    No workshops assigned.
+
+                </p>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
 </div>
 
 {% endblock %}

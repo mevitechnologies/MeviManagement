@@ -1,251 +1,427 @@
 from django.urls import path
 from . import views
-from django.conf.urls import handler404
 
 
 urlpatterns = [
 
-    # ===============================
+    # =====================================================
     # AUTH
-    # ===============================
-    path("login/", views.login_view, name="login"),
-    path("logout/", views.logout_view, name="logout"),
+    # =====================================================
 
-    # ===============================
-    # DASHBOARD
-    # ===============================
-    path("", views.dashboard, name="dashboard"),
+    path(
+        "login/",
+        views.login_view,
+        name="login",
+    ),
 
-    # ===============================
+    path(
+        "logout/",
+        views.logout_view,
+        name="logout",
+    ),
+
+    # =====================================================
+    # MAIN DASHBOARD
+    # =====================================================
+
+    path(
+        "",
+        views.dashboard,
+        name="dashboard",
+    ),
+
+    # =====================================================
     # WORKSHOPS
-    # ===============================
-    path("workshops/", views.workshop_list, name="workshop_list"),
-    path("workshop/<int:pk>/", views.workshop_detail, name="workshop_detail"),
-    path("workshop/add/", views.add_workshop, name="add_workshop"),
-    path("workshop/<int:pk>/edit/", views.edit_workshop, name="edit_workshop"),
-    path("workshop/<int:pk>/delete/", views.delete_workshop, name="delete_workshop"),
+    # =====================================================
+
+    path(
+        "workshops/",
+        views.workshop_list,
+        name="workshop_list",
+    ),
+
+    path(
+        "workshops/completed/",
+        views.completed_workshops,
+        name="completed_workshops",
+    ),
+
+    path(
+        "workshop/add/",
+        views.add_workshop,
+        name="add_workshop",
+    ),
+
+    path(
+        "workshop/<int:pk>/",
+        views.workshop_detail,
+        name="workshop_detail",
+    ),
+
+    path(
+        "workshop/<int:pk>/edit/",
+        views.edit_workshop,
+        name="edit_workshop",
+    ),
+
+    path(
+        "workshop/<int:pk>/delete/",
+        views.delete_workshop,
+        name="delete_workshop",
+    ),
+
     path(
         "workshop/<int:pk>/status/<str:status>/",
         views.update_workshop_status,
-        name="update_workshop_status"
+        name="update_workshop_status",
     ),
 
-    # ===============================
-    # TRAINERS (ADMIN)
-    # ===============================
-    path("trainers/", views.trainer_list, name="trainer_list"),
-    path("trainer/add/", views.add_trainer, name="add_trainer"),
-    path("trainer/<int:pk>/edit/", views.edit_trainer, name="edit_trainer"),
-    path("trainer/<int:pk>/delete/", views.delete_trainer, name="delete_trainer"),
+    # =====================================================
+    # TRAINERS
+    # =====================================================
 
-    # ===============================
-    # TRAINER DASHBOARD & SCHEDULE
-    # ===============================
-    path("trainer/dashboard/", views.trainer_dashboard, name="trainer_dashboard"),
-    path("trainer/schedule/", views.trainer_schedule, name="trainer_schedule"),
+    path(
+        "trainers/",
+        views.trainer_list,
+        name="trainer_list",
+    ),
 
-    # ===============================
-    # TASKS – ADMIN
-    # ===============================
-    path("admin/tasks/", views.admin_task_dashboard, name="admin_task_dashboard"),
-    path("admin/tasks/add/", views.add_task_page, name="add_task_page"),
-    path("task/<int:task_id>/delete/", views.delete_task, name="delete_task"),
+    path(
+        "trainer/add/",
+        views.add_trainer,
+        name="add_trainer",
+    ),
 
-    # ===============================
-    # TASK DETAILS & SUBTASKS
-    # ===============================
-    path("task/<int:task_id>/", views.task_detail, name="task_detail"),
+    path(
+        "trainer/<int:pk>/edit/",
+        views.edit_trainer,
+        name="edit_trainer",
+    ),
+
+    path(
+        "trainer/<int:pk>/delete/",
+        views.delete_trainer,
+        name="delete_trainer",
+    ),
+
+    # =====================================================
+    # TRAINER DASHBOARD
+    # =====================================================
+
+    path(
+        "trainer/dashboard/",
+        views.trainer_dashboard,
+        name="trainer_dashboard",
+    ),
+
+    path(
+        "trainer/schedule/",
+        views.trainer_schedule,
+        name="trainer_schedule",
+    ),
+
+    # =====================================================
+    # TRAINER CHECK-IN
+    # =====================================================
+
+    path(
+        "checkin/",
+        views.checkin_portal,
+        name="checkin_portal",
+    ),
+
+    path(
+        "trainer/checkin/",
+        views.daily_checkin,
+        name="daily_checkin",
+    ),
+
+    path(
+        "trainer/today-task/",
+        views.add_today_task,
+        name="add_today_task",
+    ),
+
+    # =====================================================
+    # TASKS
+    # =====================================================
+
+    path(
+        "tasks/",
+        views.admin_task_dashboard,
+        name="admin_task_dashboard",
+    ),
+
+    path(
+        "tasks/add/",
+        views.add_task_page,
+        name="add_task_page",
+    ),
+
+    path(
+        "tasks/history/",
+        views.task_history,
+        name="task_history",
+    ),
+
+    path(
+        "task/<int:task_id>/",
+        views.task_detail,
+        name="task_detail",
+    ),
+
+    path(
+        "task/<int:task_id>/edit/",
+        views.edit_task,
+        name="edit_task",
+    ),
+
+    path(
+        "task/<int:task_id>/delete/",
+        views.delete_task,
+        name="delete_task",
+    ),
+
+    path(
+        "task/<int:task_id>/change-status/",
+        views.change_task_status,
+        name="change_task_status",
+    ),
+
+    path(
+        "task/<int:task_id>/subtask/add/",
+        views.add_subtask,
+        name="add_subtask",
+    ),
+
     path(
         "task/<int:task_id>/subtask/<int:subtask_id>/toggle/",
         views.toggle_subtask_done,
-        name="toggle_subtask_done"
+        name="toggle_subtask_done",
     ),
 
-    # ===============================
-    # FOLLOW-UPS
-    # ===============================
-    path("followups/", views.follow_ups, name="follow_ups"),
-    path("followup/add/", views.add_followup, name="add_followup"),
-    path("followup/<int:pk>/edit/", views.edit_followup, name="edit_followup"),
-    path("followup/<int:pk>/delete/", views.delete_followup, name="delete_followup"),
+    # =====================================================
+    # SUBTASKS
+    # =====================================================
 
-    # ===============================
-    # ===============================
-# ===============================
-# OFFICE TRAININGS
-# ===============================
-path("office-trainings/", views.office_training_list, name="office_training_list"),
-path("office-training/add/", views.add_office_training, name="add_office_training"),
-path("office-training/<int:pk>/edit/", views.edit_office_training, name="edit_office_training"),
-path("office-training/<int:pk>/delete/", views.delete_office_training, name="delete_office_training"),
-path("office-training/<int:pk>/view/", views.view_office_training, name="view_office_training"),
-path(
-    "office-training/<int:pk>/",
-    views.view_office_training,
-    name="view_office_training"
-),
+    path(
+        "subtask/<int:subtask_id>/edit/",
+        views.edit_subtask,
+        name="edit_subtask",
+    ),
 
-# ===============================
-# TASKS
-# ===============================
- path('tasks/', views.admin_task_dashboard, name='admin_task_dashboard'),
- path(
-    "task/<int:task_id>/subtask/add/",
-    views.add_subtask,
-    name="add_subtask"
-),
-    path('tasks/add/', views.add_task_page, name='add_task_page'),
-    path('tasks/history/', views.task_history, name='task_history'),
-    path('task/<int:task_id>/', views.task_detail, name='task_detail'),
-    path('task/<int:task_id>/delete/', views.delete_task, name='delete_task'),
-    path('task/<int:task_id>/subtask/<int:subtask_id>/toggle/', views.toggle_subtask_done, name='toggle_subtask_done'),
-path(
-    "task/<int:task_id>/change-status/",
-    views.change_task_status,
-    name="change_task_status"
-),
-path(
-    "task/<int:task_id>/edit/",
-    views.edit_task,
-    name="edit_task"
-),
+    path(
+        "subtask/<int:subtask_id>/delete/",
+        views.delete_subtask,
+        name="delete_subtask",
+    ),
 
-# ===============================
-# CALENDAR
-# ===============================
-path("calendar/", views.calendar_view, name="calendar_view"),
-path('workshops/completed/', views.completed_workshops, name='completed_workshops'),
-# Colleges
-path("colleges/", views.college_list, name="college_list"),
-path("colleges/add/", views.add_college, name="add_college"),
-path("colleges/<int:pk>/edit/", views.edit_college, name="edit_college"),
-path("colleges/<int:pk>/delete/", views.delete_college, name="delete_college"),
-path(
-    "workshop/<int:workshop_id>/remark/add/",
-    views.add_workshop_remark,
-    name="add_workshop_remark"
-),
-path(
-    "remark/<int:remark_id>/edit/",
-    views.edit_workshop_remark,
-    name="edit_workshop_remark"
-),
+    # =====================================================
+    # FOLLOW UPS
+    # =====================================================
 
-# ===============================
-# MEETING NOTES
-# ===============================
+    path(
+        "followups/",
+        views.follow_ups,
+        name="follow_ups",
+    ),
 
-path(
-    "meeting-notes/",
-    views.meeting_notes,
-    name="meeting_notes"
-),
+    path(
+        "followup/add/",
+        views.add_followup,
+        name="add_followup",
+    ),
 
-path(
-    "meeting-notes/add/",
-    views.add_meeting_note,
-    name="add_meeting_note"
-),
+    path(
+        "followup/<int:pk>/edit/",
+        views.edit_followup,
+        name="edit_followup",
+    ),
 
-path(
-    "meeting-notes/<int:pk>/edit/",
-    views.edit_meeting_note,
-    name="edit_meeting_note"
-),
+    path(
+        "followup/<int:pk>/delete/",
+        views.delete_followup,
+        name="delete_followup",
+    ),
 
-path(
-    "meeting-notes/<int:pk>/delete/",
-    views.delete_meeting_note,
-    name="delete_meeting_note"
-),
-path(
-    "subtask/<int:subtask_id>/edit/",
-    views.edit_subtask,
-    name="edit_subtask"
-),
-path(
-    "subtask/<int:subtask_id>/delete/",
-    views.delete_subtask,
-    name="delete_subtask"
-),
-# ===============================
-# CALENDAR EVENTS
-# ===============================
+    # =====================================================
+    # OFFICE TRAINING
+    # =====================================================
 
-path(
-    "calendar/events/add/",
-    views.add_calendar_event,
-    name="add_calendar_event"
-),
+    path(
+        "office-trainings/",
+        views.office_training_list,
+        name="office_training_list",
+    ),
 
-path(
-    "calendar/events/<int:pk>/edit/",
-    views.edit_calendar_event,
-    name="edit_calendar_event"
-),
+    path(
+        "office-training/add/",
+        views.add_office_training,
+        name="add_office_training",
+    ),
 
-path(
-    "calendar/events/<int:pk>/delete/",
-    views.delete_calendar_event,
-    name="delete_calendar_event"
-),
-# =====================================================
-# CALENDAR
-# =====================================================
+    path(
+        "office-training/<int:pk>/",
+        views.view_office_training,
+        name="view_office_training",
+    ),
 
-path(
-    "trainer/schedule/",
-    views.trainer_schedule,
-    name="trainer_schedule"
-),
+    path(
+        "office-training/<int:pk>/edit/",
+        views.edit_office_training,
+        name="edit_office_training",
+    ),
 
-path(
-    "calendar/event/add/",
-    views.add_calendar_event,
-    name="add_calendar_event"
-),
+    path(
+        "office-training/<int:pk>/delete/",
+        views.delete_office_training,
+        name="delete_office_training",
+    ),
 
-path(
-    "calendar/event/<int:pk>/edit/",
-    views.edit_calendar_event,
-    name="edit_calendar_event"
-),
+    # =====================================================
+    # CALENDAR
+    # =====================================================
 
-path(
-    "calendar/event/<int:pk>/delete/",
-    views.delete_calendar_event,
-    name="delete_calendar_event"
-),
+    path(
+        "calendar/",
+        views.calendar_view,
+        name="calendar_view",
+    ),
 
-path(
-    "calendar/event/<int:pk>/duplicate/",
-    views.duplicate_calendar_event,
-    name="duplicate_calendar_event"
-),
+    path(
+        "calendar/weekly/",
+        views.weekly_schedule,
+        name="weekly_schedule",
+    ),
 
-path(
-    "calendar/event/<int:pk>/duplicate-next-day/",
-    views.duplicate_calendar_event_next_day,
-    name="duplicate_calendar_event_next_day"
-),
+    # =====================================================
+    # CALENDAR EVENTS
+    # =====================================================
 
-path(
-    "calendar/event/<int:pk>/duplicate-next-week/",
-    views.duplicate_calendar_event_next_week,
-    name="duplicate_calendar_event_next_week"
-),
-path(
-    "calendar/event/<int:pk>/move/",
-    views.move_calendar_event,
-    name="move_calendar_event"
-),
+    path(
+        "calendar/events/add/",
+        views.add_calendar_event,
+        name="add_calendar_event",
+    ),
 
-path(
-    "calendar/event/<int:pk>/resize/",
-    views.resize_calendar_event,
-    name="resize_calendar_event"
-),
+    path(
+        "calendar/events/<int:pk>/edit/",
+        views.edit_calendar_event,
+        name="edit_calendar_event",
+    ),
+
+    path(
+        "calendar/events/<int:pk>/delete/",
+        views.delete_calendar_event,
+        name="delete_calendar_event",
+    ),
+
+    path(
+        "calendar/events/<int:pk>/duplicate/",
+        views.duplicate_calendar_event,
+        name="duplicate_calendar_event",
+    ),
+
+    path(
+        "calendar/events/<int:pk>/duplicate-next-day/",
+        views.duplicate_calendar_event_next_day,
+        name="duplicate_calendar_event_next_day",
+    ),
+
+    path(
+        "calendar/events/<int:pk>/duplicate-next-week/",
+        views.duplicate_calendar_event_next_week,
+        name="duplicate_calendar_event_next_week",
+    ),
+
+    path(
+        "calendar/events/<int:pk>/move/",
+        views.move_calendar_event,
+        name="move_calendar_event",
+    ),
+
+    path(
+        "calendar/events/<int:pk>/resize/",
+        views.resize_calendar_event,
+        name="resize_calendar_event",
+    ),
+
+    # =====================================================
+    # COLLEGES
+    # =====================================================
+
+    path(
+        "colleges/",
+        views.college_list,
+        name="college_list",
+    ),
+
+    path(
+        "colleges/add/",
+        views.add_college,
+        name="add_college",
+    ),
+
+    path(
+        "colleges/<int:pk>/edit/",
+        views.edit_college,
+        name="edit_college",
+    ),
+
+    path(
+        "colleges/<int:pk>/delete/",
+        views.delete_college,
+        name="delete_college",
+    ),
+
+    # =====================================================
+    # WORKSHOP REMARKS
+    # =====================================================
+
+    path(
+        "workshop/<int:workshop_id>/remark/add/",
+        views.add_workshop_remark,
+        name="add_workshop_remark",
+    ),
+
+    path(
+        "remark/<int:remark_id>/edit/",
+        views.edit_workshop_remark,
+        name="edit_workshop_remark",
+    ),
+
+    # =====================================================
+    # MEETING NOTES
+    # =====================================================
+
+    path(
+        "meeting-notes/",
+        views.meeting_notes,
+        name="meeting_notes",
+    ),
+
+    path(
+        "meeting-notes/add/",
+        views.add_meeting_note,
+        name="add_meeting_note",
+    ),
+
+    path(
+        "meeting-notes/<int:pk>/edit/",
+        views.edit_meeting_note,
+        name="edit_meeting_note",
+    ),
+
+    path(
+        "meeting-notes/<int:pk>/delete/",
+        views.delete_meeting_note,
+        name="delete_meeting_note",
+    ),
 ]
 
-handler404 = 'workshop_manager.views.custom_404'
 
+# =========================================================
+# CUSTOM 404
+# =========================================================
+
+handler404 = "workshop_manager.views.custom_404"
