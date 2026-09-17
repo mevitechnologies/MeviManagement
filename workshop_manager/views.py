@@ -91,12 +91,45 @@ def logout_view(request):
 
 @login_required
 def dashboard(request):
-
+    
     import json
     from datetime import timedelta
     from django.urls import reverse
 
     today = timezone.localdate()
+    DAILY_THOUGHTS = [
+    "A great trainer doesn't just teach a skill — they inspire someone to believe they can master it.",
+    "The best trainers never stop being learners.",
+    "Knowledge becomes powerful when it is shared.",
+    "Every learner you teach today carries a possibility you may never fully see. Teach with purpose.",
+    "Teaching is not about having all the answers. It is about creating an environment where people love discovering them.",
+    "Learn something new. Teach something useful. Inspire someone. Repeat.",
+    "One hour of teaching can create an impact that lasts for years.",
+    "Your passion for learning can become someone else's motivation to grow.",
+    "Don't just complete a training session. Create a learning experience.",
+    "Every question from a student is an opportunity to make your teaching better.",
+    "Great teaching begins with curiosity and grows through patience.",
+    "Train minds. Build skills. Create confidence.",
+    "The goal isn't simply to finish the syllabus. The goal is to create understanding.",
+    "Keep learning, keep teaching, keep improving.",
+    "Behind every skilled professional is someone who once took the time to teach them.",
+    ]
+
+    daily_thought = DAILY_THOUGHTS[
+        today.toordinal() % len(DAILY_THOUGHTS)
+    ]
+
+    hour = timezone.localtime().hour
+
+    if hour < 12:
+        greeting = "Good Morning"
+        greeting_icon = "🌅"
+    elif hour < 17:
+        greeting = "Good Afternoon"
+        greeting_icon = "☀️"
+    else:
+        greeting = "Good Evening"
+        greeting_icon = "🌙"
 
     # =====================================================
     # ALL TRAINERS
@@ -448,6 +481,9 @@ def dashboard(request):
             # Today's tasks
             "today_tasks":
                 today_tasks,
+            "daily_thought": daily_thought,
+            "greeting": greeting,
+            "greeting_icon": greeting_icon,
         }
     )
 

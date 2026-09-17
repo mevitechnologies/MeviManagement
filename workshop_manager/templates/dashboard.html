@@ -2,10 +2,14 @@
 {% load static %}
 
 {% block title %}
-Mevi Portal - Dashboard
+Mevi Management Dashboard
 {% endblock %}
 
 {% block content %}
+
+<!-- =========================================================
+     FULLCALENDAR
+========================================================= -->
 
 <link
     href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css"
@@ -19,862 +23,1878 @@ Mevi Portal - Dashboard
 
 <style>
 
-/* =====================================================
-   GENERAL
-===================================================== */
+/* =========================================================
+   GLOBAL
+========================================================= */
 
-.dashboard-wrapper {
-    max-width: 1500px;
-    margin: auto;
+.dashboard-page {
+    max-width: 1700px;
+    margin: 0 auto;
+    padding: 18px 12px 60px;
+}
+
+.dashboard-page * {
+    box-sizing: border-box;
+}
+
+body {
+    background: #f5f7fb;
+}
+
+.text-small {
+    font-size: 12px;
+}
+
+.muted {
+    color: #64748b;
 }
 
 
-/* =====================================================
-   HEADER
-===================================================== */
+/* =========================================================
+   WELCOME HERO
+========================================================= */
 
-.dashboard-header {
+.welcome-hero {
+    position: relative;
+    overflow: hidden;
 
-    background: linear-gradient(
-        135deg,
-        #667eea,
-        #764ba2
-    );
+    background:
+        linear-gradient(
+            135deg,
+            #172554 0%,
+            #1e3a8a 45%,
+            #4338ca 100%
+        );
 
     color: white;
+    border-radius: 26px;
 
-    border-radius: 18px;
-
-    padding: 25px;
-
-    margin-bottom: 25px;
+    padding: 30px 32px;
+    margin-bottom: 20px;
 
     box-shadow:
-        0 10px 30px rgba(0,0,0,.12);
+        0 15px 45px rgba(30,58,138,.22);
 }
 
-.dashboard-header h2 {
+.welcome-hero::before {
+    content: "";
+    position: absolute;
 
-    font-weight: 700;
+    width: 260px;
+    height: 260px;
 
+    border-radius: 50%;
+
+    background: rgba(255,255,255,.07);
+
+    right: -80px;
+    top: -110px;
+}
+
+.welcome-hero::after {
+    content: "";
+    position: absolute;
+
+    width: 200px;
+    height: 200px;
+
+    border-radius: 50%;
+
+    background: rgba(255,255,255,.05);
+
+    right: 180px;
+    bottom: -120px;
+}
+
+.welcome-content {
+    position: relative;
+    z-index: 2;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 25px;
+}
+
+.welcome-left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.welcome-avatar {
+    width: 70px;
+    height: 70px;
+
+    border-radius: 21px;
+
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.20);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 31px;
+
+    backdrop-filter: blur(10px);
+}
+
+.welcome-date {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: .75;
     margin-bottom: 5px;
 }
 
-.dashboard-header p {
-
+.welcome-title {
+    font-size: 30px;
+    font-weight: 800;
     margin: 0;
+    letter-spacing: -.5px;
+}
 
-    opacity: .9;
+.welcome-subtitle {
+    margin: 6px 0 0;
+    font-size: 14px;
+    opacity: .82;
+}
+
+.thought-box {
+    position: relative;
+    z-index: 2;
+
+    min-width: 390px;
+    max-width: 520px;
+
+    background: rgba(255,255,255,.11);
+    border: 1px solid rgba(255,255,255,.18);
+
+    border-radius: 18px;
+
+    padding: 18px 20px;
+
+    backdrop-filter: blur(12px);
+}
+
+.thought-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    color: #bfdbfe;
+    margin-bottom: 7px;
+}
+
+.thought-text {
+    font-size: 15px;
+    line-height: 1.55;
+    font-weight: 500;
+}
+
+.thought-footer {
+    margin-top: 10px;
+    font-size: 11px;
+    opacity: .65;
 }
 
 
-/* =====================================================
-   DASHBOARD ACTIONS
-===================================================== */
+/* =========================================================
+   QUICK ACTIONS
+========================================================= */
 
-.dashboard-actions {
+.quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-bottom: 22px;
+}
 
+.quick-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 11px 16px;
+
+    border-radius: 11px;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    text-decoration: none;
+
+    border: 1px solid #e5e7eb;
+
+    background: white;
+    color: #334155;
+
+    transition: .2s ease;
+}
+
+.quick-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 20px rgba(15,23,42,.10);
+    color: #1e3a8a;
+}
+
+.quick-action.primary {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+}
+
+.quick-action.success {
+    background: #059669;
+    color: white;
+    border-color: #059669;
+}
+
+.quick-action.dark {
+    background: #172033;
+    color: white;
+    border-color: #172033;
+}
+
+.quick-action.warning {
+    background: #ea580c;
+    color: white;
+    border-color: #ea580c;
+}
+
+
+/* =========================================================
+   SECTION HEADERS
+========================================================= */
+
+.section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+
+    margin-bottom: 14px;
+}
+
+.section-heading h4 {
+    font-size: 18px;
+    font-weight: 800;
+    color: #172033;
+    margin: 0;
+}
+
+.section-heading p {
+    font-size: 12px;
+    color: #64748b;
+    margin: 4px 0 0;
+}
+
+
+/* =========================================================
+   SNAPSHOT
+========================================================= */
+
+.snapshot-card {
+    position: relative;
+
+    background: white;
+
+    border: 1px solid #e7ebf1;
+    border-radius: 18px;
+
+    padding: 19px;
+
+    height: 100%;
+
+    box-shadow:
+        0 5px 22px rgba(15,23,42,.055);
+
+    transition: .2s ease;
+
+    overflow: hidden;
+}
+
+.snapshot-card:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 12px 30px rgba(15,23,42,.09);
+}
+
+.snapshot-card::after {
+    content: "";
+
+    position: absolute;
+
+    width: 80px;
+    height: 80px;
+
+    border-radius: 50%;
+
+    right: -30px;
+    bottom: -30px;
+
+    background: rgba(37,99,235,.035);
+}
+
+.snapshot-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.snapshot-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+}
+
+.snapshot-number {
+    font-size: 28px;
+    font-weight: 850;
+    color: #172033;
+    margin-top: 4px;
+}
+
+.snapshot-description {
+    font-size: 10px;
+    color: #94a3b8;
+    margin-top: 3px;
+}
+
+.snapshot-icon {
+    width: 46px;
+    height: 46px;
+
+    border-radius: 13px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 20px;
+}
+
+.snapshot-blue {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.snapshot-green {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.snapshot-orange {
+    background: #ffedd5;
+    color: #ea580c;
+}
+
+.snapshot-purple {
+    background: #ede9fe;
+    color: #7c3aed;
+}
+
+.snapshot-red {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.snapshot-teal {
+    background: #ccfbf1;
+    color: #0f766e;
+}
+
+.snapshot-yellow {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.snapshot-slate {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+
+/* =========================================================
+   COMMON CARD
+========================================================= */
+
+.dashboard-card {
+    background: white;
+
+    border: 1px solid #e7ebf1;
+    border-radius: 20px;
+
+    box-shadow:
+        0 6px 25px rgba(15,23,42,.055);
+
+    overflow: hidden;
+}
+
+.dashboard-card-header {
+    padding: 17px 20px;
+
+    border-bottom: 1px solid #edf0f5;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 12px;
+}
+
+.dashboard-card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dashboard-card-title-icon {
+    width: 38px;
+    height: 38px;
+
+    border-radius: 11px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.dashboard-card-title h5 {
+    margin: 0;
+
+    font-size: 16px;
+    font-weight: 800;
+
+    color: #172033;
+}
+
+.dashboard-card-title small {
+    display: block;
+
+    color: #64748b;
+
+    font-size: 10px;
+
+    margin-top: 2px;
+}
+
+
+/* =========================================================
+   TEAM STATUS
+========================================================= */
+
+.team-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.team-filter button {
+    border: 1px solid #e2e8f0;
+
+    background: white;
+    color: #64748b;
+
+    border-radius: 20px;
+
+    padding: 5px 10px;
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.team-filter button.active {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: white;
+}
+
+.team-table {
+    width: 100%;
+    margin: 0;
+}
+
+.team-table th {
+    background: #f8fafc;
+
+    color: #64748b;
+
+    font-size: 10px;
+
+    text-transform: uppercase;
+    letter-spacing: .4px;
+
+    padding: 11px 13px;
+
+    white-space: nowrap;
+}
+
+.team-table td {
+    padding: 12px 13px;
+
+    vertical-align: middle;
+
+    font-size: 12px;
+
+    border-color: #edf0f4;
+}
+
+.team-person {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.team-avatar {
+    width: 35px;
+    height: 35px;
+
+    min-width: 35px;
+
+    border-radius: 10px;
+
+    background: #eef2ff;
+    color: #4338ca;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.team-name {
+    font-size: 12px;
+    font-weight: 750;
+    color: #172033;
+}
+
+.team-email {
+    font-size: 9px;
+    color: #94a3b8;
+
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    padding: 5px 8px;
+
+    border-radius: 20px;
+
+    font-size: 9px;
+    font-weight: 750;
+
+    white-space: nowrap;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.status-working {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.status-working .status-dot {
+    background: #10b981;
+}
+
+.status-out {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.status-out .status-dot {
+    background: #94a3b8;
+}
+
+.status-not {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.status-not .status-dot {
+    background: #ef4444;
+}
+
+.work-text {
+    max-width: 190px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    font-size: 11px;
+    color: #334155;
+}
+
+
+/* =========================================================
+   TODAY SCHEDULE
+========================================================= */
+
+.today-schedule {
+    padding: 8px 18px 18px;
+}
+
+.timeline-item {
+    position: relative;
+
+    display: flex;
+
+    gap: 12px;
+
+    padding: 12px 0;
+
+    border-bottom: 1px solid #eef1f5;
+}
+
+.timeline-item:last-child {
+    border-bottom: 0;
+}
+
+.timeline-time {
+    min-width: 64px;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    color: #2563eb;
+
+    padding-top: 2px;
+}
+
+.timeline-line {
+    position: relative;
+
+    width: 10px;
+    min-width: 10px;
+}
+
+.timeline-line::before {
+    content: "";
+
+    position: absolute;
+
+    width: 9px;
+    height: 9px;
+
+    border-radius: 50%;
+
+    background: #2563eb;
+
+    top: 4px;
+    left: 0;
+}
+
+.timeline-line::after {
+    content: "";
+
+    position: absolute;
+
+    width: 1px;
+
+    background: #dbeafe;
+
+    top: 14px;
+    bottom: -16px;
+
+    left: 4px;
+}
+
+.timeline-item:last-child .timeline-line::after {
+    display: none;
+}
+
+.timeline-content {
+    min-width: 0;
+}
+
+.timeline-title {
+    font-size: 12px;
+    font-weight: 800;
+    color: #172033;
+}
+
+.timeline-meta {
+    font-size: 10px;
+    color: #64748b;
+
+    margin-top: 4px;
+
+    line-height: 1.5;
+}
+
+.timeline-badge {
+    display: inline-block;
+
+    margin-top: 6px;
+
+    padding: 4px 7px;
+
+    border-radius: 10px;
+
+    font-size: 8px;
+    font-weight: 800;
+
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+
+/* =========================================================
+   NEEDS ATTENTION
+========================================================= */
+
+.attention-list {
+    padding: 6px 18px 18px;
+}
+
+.attention-item {
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 11px;
+
+    padding: 12px 0;
+
+    border-bottom: 1px solid #eef1f5;
+}
+
+.attention-item:last-child {
+    border-bottom: 0;
+}
+
+.attention-icon {
+    width: 34px;
+    height: 34px;
+
+    min-width: 34px;
+
+    border-radius: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 15px;
+}
+
+.attention-red {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.attention-orange {
+    background: #ffedd5;
+    color: #ea580c;
+}
+
+.attention-yellow {
+    background: #fef3c7;
+    color: #a16207;
+}
+
+.attention-blue {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.attention-title {
+    font-size: 11px;
+    font-weight: 750;
+    color: #334155;
+}
+
+.attention-description {
+    font-size: 9px;
+    color: #94a3b8;
+    margin-top: 2px;
+}
+
+
+/* =========================================================
+   UPCOMING
+========================================================= */
+
+.upcoming-list {
+    padding: 5px 18px 18px;
+}
+
+.upcoming-item {
+    display: flex;
+
+    gap: 12px;
+
+    padding: 12px 0;
+
+    border-bottom: 1px solid #eef1f5;
+}
+
+.upcoming-item:last-child {
+    border-bottom: 0;
+}
+
+.upcoming-date {
+    width: 48px;
+    min-width: 48px;
+
+    border-radius: 11px;
+
+    background: #eff6ff;
+
+    text-align: center;
+
+    padding: 6px 4px;
+}
+
+.upcoming-day {
+    display: block;
+
+    font-size: 16px;
+    font-weight: 850;
+
+    color: #2563eb;
+
+    line-height: 1;
+}
+
+.upcoming-month {
+    display: block;
+
+    margin-top: 3px;
+
+    font-size: 8px;
+    font-weight: 800;
+
+    color: #64748b;
+
+    text-transform: uppercase;
+}
+
+.upcoming-content {
+    min-width: 0;
+}
+
+.upcoming-title {
+    font-size: 11px;
+    font-weight: 800;
+
+    color: #172033;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.upcoming-meta {
+    margin-top: 4px;
+
+    font-size: 9px;
+    color: #64748b;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   PIPELINE
+========================================================= */
+
+.pipeline-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 10px;
+
+    padding: 18px;
+}
+
+.pipeline-card {
+    border-radius: 14px;
+
+    padding: 15px;
+
+    text-align: center;
+
+    border: 1px solid #edf0f4;
+
+    background: #f8fafc;
+}
+
+.pipeline-number {
+    font-size: 25px;
+    font-weight: 850;
+}
+
+.pipeline-label {
+    font-size: 10px;
+    font-weight: 700;
+
+    color: #64748b;
+
+    margin-top: 2px;
+}
+
+.pipeline-tentative {
+    color: #d97706;
+    background: #fffbeb;
+}
+
+.pipeline-fixed {
+    color: #2563eb;
+    background: #eff6ff;
+}
+
+.pipeline-ongoing {
+    color: #059669;
+    background: #ecfdf5;
+}
+
+.pipeline-completed {
+    color: #64748b;
+    background: #f1f5f9;
+}
+
+
+/* =========================================================
+   CALENDAR
+========================================================= */
+
+.calendar-wrapper {
+    margin-top: 22px;
+
+    background: white;
+
+    border: 1px solid #e5eaf1;
+
+    border-radius: 22px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 8px 30px rgba(15,23,42,.07);
+}
+
+.calendar-header {
+    padding: 18px 22px;
+
+    border-bottom: 1px solid #edf0f5;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 15px;
+}
+
+.calendar-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.calendar-title-icon {
+    width: 44px;
+    height: 44px;
+
+    border-radius: 13px;
+
+    background: #eff6ff;
+    color: #2563eb;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 20px;
+}
+
+.calendar-title h3 {
+    font-size: 18px;
+    font-weight: 800;
+
+    margin: 0;
+
+    color: #172033;
+}
+
+.calendar-title p {
+    font-size: 10px;
+
+    color: #64748b;
+
+    margin: 3px 0 0;
+}
+
+.add-event-btn {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 11px 17px;
+
+    background: #2563eb;
+
+    color: white;
+
+    border-radius: 11px;
+
+    text-decoration: none;
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    transition: .2s ease;
+}
+
+.add-event-btn:hover {
+    background: #1d4ed8;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.calendar-body {
+    padding: 18px;
+}
+
+
+/* =========================================================
+   CALENDAR FILTERS
+========================================================= */
+
+.calendar-filters {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 12px;
+
+    margin-bottom: 14px;
+
+    background: #f8fafc;
+
+    border: 1px solid #edf0f4;
+
+    border-radius: 13px;
+}
+
+.calendar-filter-label {
+    font-size: 10px;
+
+    font-weight: 800;
+
+    color: #64748b;
+
+    margin-right: 3px;
+}
+
+.calendar-filter {
+    border: 1px solid #e2e8f0;
+
+    background: white;
+
+    color: #475569;
+
+    border-radius: 9px;
+
+    padding: 7px 10px;
+
+    font-size: 10px;
+
+    font-weight: 700;
+}
+
+.calendar-filter:focus {
+    outline: none;
+
+    border-color: #93c5fd;
+
+    box-shadow: 0 0 0 3px rgba(37,99,235,.08);
+}
+
+
+/* =========================================================
+   FULLCALENDAR
+========================================================= */
+
+.fc {
+    font-family: inherit;
+}
+
+.fc .fc-toolbar-title {
+    font-size: 20px !important;
+
+    font-weight: 800;
+
+    color: #172033;
+}
+
+.fc .fc-button {
+    background: #f8fafc !important;
+
+    border: 1px solid #e2e8f0 !important;
+
+    color: #334155 !important;
+
+    border-radius: 9px !important;
+
+    font-size: 11px !important;
+
+    font-weight: 700 !important;
+
+    padding: 7px 11px !important;
+
+    box-shadow: none !important;
+}
+
+.fc .fc-button:hover {
+    background: #eff6ff !important;
+    color: #2563eb !important;
+}
+
+.fc .fc-button-active {
+    background: #2563eb !important;
+    color: white !important;
+    border-color: #2563eb !important;
+}
+
+.fc .fc-col-header-cell {
+    background: #f8fafc;
+}
+
+.fc .fc-col-header-cell-cushion {
+    color: #475569;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    text-transform: uppercase;
+
+    text-decoration: none;
+
+    padding: 10px 4px;
+}
+
+.fc .fc-daygrid-day-number {
+    color: #475569;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    text-decoration: none;
+}
+
+.fc .fc-day-today {
+    background: #eff6ff !important;
+}
+
+.fc .fc-daygrid-day:hover {
+    background: #f8fbff;
+}
+
+.fc-event {
+    border: 0 !important;
+
+    border-radius: 6px !important;
+
+    padding: 4px 6px !important;
+
+    font-size: 10px !important;
+
+    font-weight: 650;
+
+    cursor: pointer;
+}
+
+.fc-event-title {
+    font-weight: 700;
+}
+
+.fc .fc-list-event:hover td {
+    background: #f8fafc;
+}
+
+
+/* =========================================================
+   CALENDAR LEGEND
+========================================================= */
+
+.calendar-legend {
     display: flex;
 
     flex-wrap: wrap;
 
     gap: 10px;
 
-    margin-top: 20px;
-}
-
-.dashboard-actions .btn {
-
-    border-radius: 10px;
-
-    font-weight: 600;
-
-    padding: 10px 17px;
-}
-
-
-/* =====================================================
-   STAT CARDS
-===================================================== */
-
-.stat-card {
-
-    border: none;
-
-    border-radius: 16px;
-
-    box-shadow:
-        0 7px 25px rgba(0,0,0,.07);
-
-    height: 100%;
-}
-
-.stat-icon {
-
-    width: 48px;
-
-    height: 48px;
-
-    border-radius: 12px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    font-size: 1.3rem;
-}
-
-
-/* =====================================================
-   TEAM ACTIVITY
-===================================================== */
-
-.activity-card {
-
-    border: none;
-
-    border-radius: 18px;
-
-    box-shadow:
-        0 8px 30px rgba(0,0,0,.08);
-
-    overflow: hidden;
-}
-
-.activity-card-header {
-
-    background: white;
-
-    padding: 20px 25px;
-
-    border-bottom: 1px solid #eee;
-}
-
-.activity-card-header h4 {
-
-    margin: 0;
-
-    font-weight: 700;
-}
-
-.trainer-activity-card {
-
-    border: 1px solid #e9ecef;
-
-    border-radius: 14px;
-
-    height: 100%;
-
-    transition: .2s ease;
-
-    background: white;
-}
-
-.trainer-activity-card:hover {
-
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 7px 20px rgba(0,0,0,.08);
-}
-
-.trainer-avatar {
-
-    width: 44px;
-
-    height: 44px;
-
-    min-width: 44px;
-
-    border-radius: 50%;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    background: #eef2ff;
-
-    color: #4f46e5;
-
-    font-weight: 700;
-}
-
-
-/* =====================================================
-   STATUS DOTS
-===================================================== */
-
-.working-dot,
-.checkedout-dot,
-.notchecked-dot {
-
-    width: 9px;
-
-    height: 9px;
-
-    border-radius: 50%;
-
-    display: inline-block;
-
-    margin-right: 5px;
-}
-
-.working-dot {
-    background: #198754;
-}
-
-.checkedout-dot {
-    background: #6c757d;
-}
-
-.notchecked-dot {
-    background: #dc3545;
-}
-
-
-/* =====================================================
-   CURRENT WORK
-===================================================== */
-
-.current-activity {
-
-    background: #f8f9fa;
-
-    border-radius: 12px;
-
-    padding: 13px;
-
     margin-top: 15px;
-}
 
-.current-activity-label {
+    padding: 12px 14px;
 
-    font-size: .75rem;
+    background: #f8fafc;
 
-    color: #6c757d;
-
-    text-transform: uppercase;
-
-    letter-spacing: .4px;
-
-    font-weight: 600;
-}
-
-.current-activity-text {
-
-    font-weight: 600;
-
-    margin-top: 4px;
-
-    line-height: 1.4;
-}
-
-.activity-time {
-
-    font-size: .78rem;
-
-    color: #6c757d;
-}
-
-
-/* =====================================================
-   CALENDAR
-===================================================== */
-
-.calendar-card {
-
-    border: none;
-
-    border-radius: 18px;
-
-    overflow: hidden;
-
-    box-shadow:
-        0 8px 30px rgba(0,0,0,.08);
-}
-
-.calendar-card-header {
-
-    background: white;
-
-    padding: 20px 25px;
-
-    border-bottom: 1px solid #eee;
-}
-
-.calendar-card-header h4 {
-
-    margin: 0;
-
-    font-weight: 700;
-}
-
-.calendar-container {
-
-    padding: 20px;
-
-    background: #fff;
-}
-
-#master-calendar {
-
-    background: white;
-
-    min-height: 700px;
-}
-
-.fc {
-    font-family: inherit;
-}
-
-.fc-toolbar-title {
-
-    font-size: 1.35rem !important;
-
-    font-weight: 700;
-}
-
-.fc-button {
-
-    border-radius: 8px !important;
-
-    margin: 2px !important;
-}
-
-.fc-daygrid-day {
-
-    cursor: pointer;
-}
-
-.fc-daygrid-day:hover {
-
-    background-color: #f8f9ff;
-}
-
-.fc-event {
-
-    border: none !important;
-
-    border-radius: 6px !important;
-
-    padding: 4px 6px !important;
-
-    font-size: .82rem !important;
-
-    cursor: pointer;
-}
-
-.fc-event-title {
-
-    font-weight: 600;
-}
-
-.fc-day-today {
-
-    background-color: #f1f5ff !important;
-}
-
-
-/* =====================================================
-   LEGEND
-===================================================== */
-
-.calendar-legend {
-
-    display: flex;
-
-    flex-wrap: wrap;
-
-    gap: 15px;
-
-    margin-top: 20px;
-
-    padding: 15px;
-
-    background: #f8f9fa;
+    border: 1px solid #edf0f4;
 
     border-radius: 12px;
 }
 
 .legend-item {
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    font-size: 10px;
+
+    font-weight: 650;
+
+    color: #475569;
+}
+
+.legend-dot {
+    width: 9px;
+    height: 9px;
+
+    border-radius: 50%;
+}
+
+.legend-workshop {
+    background: #16a34a;
+}
+
+.legend-fdp {
+    background: #dc2626;
+}
+
+.legend-online {
+    background: #0d9488;
+}
+
+.legend-office {
+    background: #2563eb;
+}
+
+.legend-guest {
+    background: #ea580c;
+}
+
+.legend-meeting {
+    background: #7c3aed;
+}
+
+.legend-other {
+    background: #64748b;
+}
+
+
+/* =========================================================
+   SELECTED DAY
+========================================================= */
+
+.selected-day {
+    margin-top: 18px;
+
+    background: #f8fafc;
+
+    border: 1px solid #e5eaf1;
+
+    border-radius: 17px;
+
+    overflow: hidden;
+}
+
+.selected-header {
+    padding: 13px 18px;
+
+    background: #172033;
+
+    color: white;
 
     display: flex;
 
     align-items: center;
 
-    font-size: .9rem;
-
-    font-weight: 500;
+    gap: 8px;
 }
 
-.legend-dot {
-
-    width: 13px;
-
-    height: 13px;
-
-    border-radius: 50%;
-
-    margin-right: 7px;
-}
-
-.workshop-dot {
-    background: #198754;
-}
-
-.office-dot {
-    background: #0d6efd;
-}
-
-.meeting-dot {
-    background: #6f42c1;
-}
-
-.other-dot {
-    background: #fd7e14;
-}
-
-
-/* =====================================================
-   SELECTED DAY
-===================================================== */
-
-.selected-day-card {
-
-    border: none;
-
-    border-radius: 18px;
-
-    box-shadow:
-        0 8px 25px rgba(0,0,0,.07);
-
-    margin-top: 25px;
-}
-
-.selected-day-header {
-
-    background: #212529;
-
-    color: white;
-
-    padding: 16px 20px;
-
-    border-radius: 18px 18px 0 0;
-}
-
-.selected-day-header h5 {
-
+.selected-header h5 {
     margin: 0;
 
-    font-weight: 700;
+    font-size: 13px;
+
+    font-weight: 750;
+}
+
+.selected-body {
+    padding: 15px;
 }
 
 .day-event {
+    background: white;
 
-    border: 1px solid #eee;
+    border: 1px solid #e8edf3;
 
     border-radius: 12px;
 
-    padding: 15px;
+    padding: 12px;
 
-    margin-bottom: 12px;
-
-    background: white;
+    margin-bottom: 9px;
 
     transition: .2s ease;
 }
 
 .day-event:hover {
-
-    transform: translateY(-2px);
+    transform: translateY(-1px);
 
     box-shadow:
-        0 5px 15px rgba(0,0,0,.08);
+        0 5px 18px rgba(15,23,42,.07);
 }
 
 .event-title {
+    font-size: 12px;
 
-    font-weight: 700;
+    font-weight: 750;
 
-    font-size: 1rem;
+    color: #172033;
 }
 
 .event-info {
+    font-size: 10px;
 
-    font-size: .88rem;
-
-    color: #6c757d;
+    color: #64748b;
 
     margin-top: 5px;
+
+    line-height: 1.5;
 }
 
 .event-info i {
-
-    width: 20px;
+    width: 17px;
+    color: #64748b;
 }
 
 
-/* =====================================================
-   EMPTY STATE
-===================================================== */
+/* =========================================================
+   EMPTY STATES
+========================================================= */
 
 .empty-state {
-
-    padding: 55px 20px;
+    padding: 38px 20px;
 
     text-align: center;
 
-    color: #6c757d;
+    color: #94a3b8;
 }
 
-.empty-state-icon {
+.empty-state i {
+    font-size: 34px;
 
-    font-size: 3rem;
+    display: block;
 
-    margin-bottom: 15px;
+    margin-bottom: 9px;
+}
+
+.empty-state strong {
+    color: #64748b;
 }
 
 
-/* =====================================================
-   MOBILE
-===================================================== */
+/* =========================================================
+   MINI BADGES
+========================================================= */
+
+.type-badge {
+    display: inline-block;
+
+    padding: 4px 7px;
+
+    border-radius: 9px;
+
+    font-size: 8px;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+}
+
+.type-workshop {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.type-fdp {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.type-online {
+    background: #ccfbf1;
+    color: #0f766e;
+}
+
+.type-office {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.type-guest {
+    background: #ffedd5;
+    color: #c2410c;
+}
+
+.type-meeting {
+    background: #ede9fe;
+    color: #6d28d9;
+}
+
+.type-other {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+
+/* =========================================================
+   ANIMATION
+========================================================= */
+
+@keyframes fadeUp {
+
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.welcome-hero,
+.snapshot-card,
+.dashboard-card,
+.calendar-wrapper {
+    animation: fadeUp .4s ease both;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .welcome-content {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .thought-box {
+        min-width: 0;
+        max-width: none;
+    }
+}
+
 
 @media (max-width: 768px) {
 
-    .dashboard-wrapper {
-        width: 100%;
+    .dashboard-page {
+        padding: 8px 6px 35px;
     }
 
-    .dashboard-header {
-
-        padding: 18px;
-
-        border-radius: 14px;
+    .welcome-hero {
+        padding: 22px;
+        border-radius: 20px;
     }
 
-    .dashboard-header h2 {
-
-        font-size: 1.25rem;
+    .welcome-left {
+        align-items: flex-start;
     }
 
-    .dashboard-header p {
-
-        font-size: .85rem;
+    .welcome-title {
+        font-size: 23px;
     }
 
-    .dashboard-actions {
-
-        margin-top: 15px;
+    .welcome-avatar {
+        width: 52px;
+        height: 52px;
+        font-size: 23px;
     }
 
-    .dashboard-actions .btn {
-
-        width: 100%;
+    .thought-box {
+        padding: 15px;
     }
 
-    .calendar-container {
-
-        padding: 8px;
-    }
-
-    #master-calendar {
-
-        min-height: 550px;
-    }
-
-    .fc-toolbar {
-
-        flex-direction: column;
-
-        gap: 8px;
-    }
-
-    .fc-toolbar-chunk {
-
-        width: 100%;
-
-        display: flex;
-
+    .quick-action {
+        flex: 1;
         justify-content: center;
     }
 
-    .fc-toolbar-title {
-
-        font-size: 1.1rem !important;
+    .dashboard-card-header {
+        align-items: flex-start;
+        flex-direction: column;
     }
 
-    .fc-button {
-
-        font-size: .75rem !important;
-
-        padding: 5px 8px !important;
+    .team-filter {
+        width: 100%;
     }
 
-    .fc-daygrid-day-number {
-
-        font-size: .75rem;
+    .team-filter button {
+        flex: 1;
     }
 
-    .fc-event {
-
-        font-size: .65rem !important;
-
-        padding: 2px !important;
+    .calendar-header {
+        flex-direction: column;
+        align-items: stretch;
     }
 
-    .calendar-legend {
-
-        gap: 8px;
+    .add-event-btn {
+        justify-content: center;
     }
 
-    .legend-item {
-
-        font-size: .75rem;
+    .calendar-body {
+        padding: 8px;
     }
 
-    .selected-day-card {
+    .fc .fc-toolbar {
+        flex-direction: column;
+        gap: 7px;
+    }
 
-        margin-top: 15px;
+    .fc .fc-toolbar-chunk {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 17px !important;
+    }
+
+    .fc .fc-button {
+        padding: 6px 8px !important;
+        font-size: 9px !important;
+    }
+
+    .pipeline-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .team-table {
+        min-width: 760px;
+    }
+
+}
+
+
+/* =========================================================
+   PRINT
+========================================================= */
+
+@media print {
+
+    .quick-actions,
+    .calendar-filters,
+    .add-event-btn,
+    .fc-toolbar {
+        display: none !important;
+    }
+
+    .dashboard-page {
+        max-width: 100%;
+    }
+
+    .dashboard-card,
+    .snapshot-card,
+    .calendar-wrapper {
+        box-shadow: none;
     }
 }
 
 </style>
 
 
-<div class="container-fluid px-2 px-md-4 mt-3">
-
-<div class="dashboard-wrapper">
+<div class="dashboard-page">
 
 
-<!-- =====================================================
-     HEADER
-===================================================== -->
+<!-- =========================================================
+     WELCOME HERO
+========================================================= -->
 
-<div class="dashboard-header">
+<div class="welcome-hero">
 
-    <div class="d-flex
-                flex-column
-                flex-lg-row
-                justify-content-between
-                align-items-lg-center
-                gap-3">
+    <div class="welcome-content">
 
-        <div>
+        <div class="welcome-left">
 
-            <h2>
+            <div class="welcome-avatar">
+                {{ greeting_icon|default:"👋" }}
+            </div>
 
-                <i class="bi bi-speedometer2 me-2"></i>
+            <div>
 
-                Mevi Management Dashboard
+                <div class="welcome-date">
+                    {{ today|date:"l, d F Y" }}
+                </div>
 
-            </h2>
+                <h1 class="welcome-title">
 
-            <p>
+                    {{ greeting|default:"Welcome" }},
 
-                Team activity, attendance, workshops and schedules
+                    {% if current_trainer %}
+                        {{ current_trainer.Name }}
+                    {% elif request.user.first_name %}
+                        {{ request.user.first_name }}
+                    {% else %}
+                        {{ request.user.username }}
+                    {% endif %}
 
-            </p>
+                    👋
+
+                </h1>
+
+                <p class="welcome-subtitle">
+
+                    Mevi Management Command Center
+
+                    <br>
+
+                    Monitor people, training operations, schedules and today's activities.
+
+                </p>
+
+            </div>
 
         </div>
 
-    </div>
 
+        <div class="thought-box">
 
-    <!-- QUICK ACTIONS -->
+            <div class="thought-label">
+                ✨ THOUGHT FOR THE DAY
+            </div>
 
-    <div class="dashboard-actions">
+            <div class="thought-text">
+                “{{ daily_thought|default:"Small improvements every day create meaningful results." }}”
+            </div>
 
+            <div class="thought-footer">
+                Teach • Learn • Inspire • Grow
+            </div>
 
-        <!-- ONLY FULL-TIME TRAINER -->
-
-        {% if current_trainer and current_trainer.is_full_time %}
-
-            <a
-                href="{% url 'trainer_dashboard' %}"
-                class="btn btn-light"
-            >
-
-                <i class="bi bi-person-workspace me-1"></i>
-
-                My Trainer Dashboard
-
-            </a>
-
-
-            <a
-                href="{% url 'daily_checkin' %}"
-                class="btn btn-warning"
-            >
-
-                <i class="bi bi-fingerprint me-1"></i>
-
-                Check In
-
-            </a>
-
-        {% endif %}
-
-
-        <!-- STAFF -->
-
-        {% if request.user.is_staff %}
-
-            <a
-                href="{% url 'trainer_list' %}"
-                class="btn btn-outline-light"
-            >
-
-                <i class="bi bi-people me-1"></i>
-
-                Trainer List
-
-            </a>
-
-        {% endif %}
-
+        </div>
 
     </div>
 
 </div>
 
 
-<!-- =====================================================
-     QUICK STATS
-===================================================== -->
+
+<!-- =========================================================
+     QUICK ACTIONS
+========================================================= -->
+
+<div class="quick-actions">
+
+
+    {% if request.user.is_staff %}
+
+        <a
+            href="{% url 'workshop_list' %}"
+            class="quick-action primary"
+        >
+            <i class="bi bi-mortarboard-fill"></i>
+            Workshops
+        </a>
+
+        <a
+            href="{% url 'trainer_list' %}"
+            class="quick-action"
+        >
+            <i class="bi bi-people-fill"></i>
+            Trainers
+        </a>
+
+    {% endif %}
+
+
+    {% if request.user.is_superuser %}
+
+        <a
+            href="{% url 'add_calendar_event' %}"
+            class="quick-action dark"
+        >
+            <i class="bi bi-calendar-plus"></i>
+            Add Event
+        </a>
+
+    {% endif %}
+
+
+    {% if current_trainer and current_trainer.is_full_time %}
+
+        <a
+            href="{% url 'trainer_dashboard' %}"
+            class="quick-action primary"
+        >
+            <i class="bi bi-person-workspace"></i>
+            My Trainer Dashboard
+        </a>
+
+
+        {% if not attendance or not attendance.check_in %}
+
+            <form
+                method="POST"
+                action="{% url 'daily_checkin' %}"
+                style="display:inline;"
+            >
+
+                {% csrf_token %}
+
+                <input
+                    type="hidden"
+                    name="action"
+                    value="check_in"
+                >
+
+                <button
+                    type="submit"
+                    class="quick-action success"
+                    style="cursor:pointer;"
+                >
+                    <i class="bi bi-fingerprint"></i>
+                    Check In
+                </button>
+
+            </form>
+
+        {% elif attendance.check_in and not attendance.check_out %}
+
+            <form
+                method="POST"
+                action="{% url 'daily_checkin' %}"
+                style="display:inline;"
+            >
+
+                {% csrf_token %}
+
+                <input
+                    type="hidden"
+                    name="action"
+                    value="check_out"
+                >
+
+                <button
+                    type="submit"
+                    class="quick-action warning"
+                    style="cursor:pointer;"
+                >
+                    <i class="bi bi-box-arrow-right"></i>
+                    Check Out
+                </button>
+
+            </form>
+
+        {% endif %}
+
+    {% endif %}
+
+
+    <a
+        href="{% url 'calendar_view' %}"
+        class="quick-action"
+    >
+        <i class="bi bi-calendar3"></i>
+        Calendar
+    </a>
+
+</div>
+
+
+
+<!-- =========================================================
+     TODAY'S SNAPSHOT
+========================================================= -->
+
+<div class="section-heading">
+
+    <div>
+
+        <h4>
+            <i class="bi bi-speedometer2 text-primary me-2"></i>
+            Today's Snapshot
+        </h4>
+
+        <p>
+            Quick operational overview for today
+        </p>
+
+    </div>
+
+</div>
+
 
 <div class="row g-3 mb-4">
 
 
-    <!-- TOTAL TRAINERS -->
+    <!-- TRAINERS -->
 
-    <div class="col-6 col-lg-3">
+    <div class="col-6 col-xl-3">
 
-        <div class="card stat-card">
+        <div class="snapshot-card">
 
-            <div class="card-body">
+            <div class="snapshot-top">
 
-                <div class="d-flex
-                            justify-content-between
-                            align-items-center">
+                <div>
 
-                    <div>
-
-                        <small class="text-muted">
-
-                            Total Trainers
-
-                        </small>
-
-                        <h3 class="fw-bold mb-0">
-
-                            {{ total_trainers|default:"0" }}
-
-                        </h3>
-
+                    <div class="snapshot-label">
+                        Total Trainers
                     </div>
 
-                    <div class="stat-icon
-                                bg-primary-subtle
-                                text-primary">
+                    <div class="snapshot-number">
+                        {{ total_trainers|default:"0" }}
+                    </div>
 
-                        <i class="bi bi-people-fill"></i>
-
+                    <div class="snapshot-description">
+                        Trainer profiles
                     </div>
 
                 </div>
 
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- CHECKED IN -->
-
-    <div class="col-6 col-lg-3">
-
-        <div class="card stat-card">
-
-            <div class="card-body">
-
-                <div class="d-flex
-                            justify-content-between
-                            align-items-center">
-
-                    <div>
-
-                        <small class="text-muted">
-
-                            Full-Time Checked In
-
-                        </small>
-
-                        <h3 class="fw-bold mb-0">
-
-                            {{ checked_in_count|default:"0" }}
-
-                        </h3>
-
-                    </div>
-
-                    <div class="stat-icon
-                                bg-success-subtle
-                                text-success">
-
-                        <i class="bi bi-person-check-fill"></i>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- NOT CHECKED IN -->
-
-    <div class="col-6 col-lg-3">
-
-        <div class="card stat-card">
-
-            <div class="card-body">
-
-                <div class="d-flex
-                            justify-content-between
-                            align-items-center">
-
-                    <div>
-
-                        <small class="text-muted">
-
-                            Full-Time Not Checked In
-
-                        </small>
-
-                        <h3 class="fw-bold mb-0">
-
-                            {{ not_checked_in_count|default:"0" }}
-
-                        </h3>
-
-                    </div>
-
-                    <div class="stat-icon
-                                bg-warning-subtle
-                                text-warning">
-
-                        <i class="bi bi-person-x-fill"></i>
-
-                    </div>
-
+                <div class="snapshot-icon snapshot-blue">
+                    <i class="bi bi-people-fill"></i>
                 </div>
 
             </div>
@@ -886,40 +1906,30 @@ Mevi Portal - Dashboard
 
     <!-- WORKING -->
 
-    <div class="col-6 col-lg-3">
+    <div class="col-6 col-xl-3">
 
-        <div class="card stat-card">
+        <div class="snapshot-card">
 
-            <div class="card-body">
+            <div class="snapshot-top">
 
-                <div class="d-flex
-                            justify-content-between
-                            align-items-center">
+                <div>
 
-                    <div>
-
-                        <small class="text-muted">
-
-                            Currently Working
-
-                        </small>
-
-                        <h3 class="fw-bold mb-0">
-
-                            {{ working_count|default:"0" }}
-
-                        </h3>
-
+                    <div class="snapshot-label">
+                        Currently Working
                     </div>
 
-                    <div class="stat-icon
-                                bg-info-subtle
-                                text-info">
-
-                        <i class="bi bi-activity"></i>
-
+                    <div class="snapshot-number">
+                        {{ working_count|default:"0" }}
                     </div>
 
+                    <div class="snapshot-description">
+                        Checked in and active
+                    </div>
+
+                </div>
+
+                <div class="snapshot-icon snapshot-green">
+                    <i class="bi bi-person-check-fill"></i>
                 </div>
 
             </div>
@@ -929,301 +1939,943 @@ Mevi Portal - Dashboard
     </div>
 
 
+    <!-- NOT IN -->
+
+    <div class="col-6 col-xl-3">
+
+        <div class="snapshot-card">
+
+            <div class="snapshot-top">
+
+                <div>
+
+                    <div class="snapshot-label">
+                        Not Checked In
+                    </div>
+
+                    <div class="snapshot-number">
+                        {{ not_checked_in_count|default:"0" }}
+                    </div>
+
+                    <div class="snapshot-description">
+                        Full-time trainers
+                    </div>
+
+                </div>
+
+                <div class="snapshot-icon snapshot-orange">
+                    <i class="bi bi-person-x-fill"></i>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- CHECKED IN -->
+
+    <div class="col-6 col-xl-3">
+
+        <div class="snapshot-card">
+
+            <div class="snapshot-top">
+
+                <div>
+
+                    <div class="snapshot-label">
+                        Full-Time Checked In
+                    </div>
+
+                    <div class="snapshot-number">
+                        {{ checked_in_count|default:"0" }}
+                    </div>
+
+                    <div class="snapshot-description">
+                        Today's attendance
+                    </div>
+
+                </div>
+
+                <div class="snapshot-icon snapshot-purple">
+                    <i class="bi bi-fingerprint"></i>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- EVENTS TODAY -->
+
+    <div class="col-6 col-xl-3">
+
+        <div class="snapshot-card">
+
+            <div class="snapshot-top">
+
+                <div>
+
+                    <div class="snapshot-label">
+                        Events Today
+                    </div>
+
+                    <div
+                        class="snapshot-number"
+                        id="eventsTodayCount"
+                    >
+                        0
+                    </div>
+
+                    <div class="snapshot-description">
+                        Calendar activities
+                    </div>
+
+                </div>
+
+                <div class="snapshot-icon snapshot-teal">
+                    <i class="bi bi-calendar-event"></i>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- WORKSHOPS -->
+
+    <div class="col-6 col-xl-3">
+
+        <div class="snapshot-card">
+
+            <div class="snapshot-top">
+
+                <div>
+
+                    <div class="snapshot-label">
+                        Workshops Today
+                    </div>
+
+                    <div
+                        class="snapshot-number"
+                        id="workshopsTodayCount"
+                    >
+                        0
+                    </div>
+
+                    <div class="snapshot-description">
+                        Workshop activities
+                    </div>
+
+                </div>
+
+                <div class="snapshot-icon snapshot-green">
+                    <i class="bi bi-mortarboard-fill"></i>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ONLINE/FDP -->
+
+    <div class="col-6 col-xl-3">
+
+        <div class="snapshot-card">
+
+            <div class="snapshot-top">
+
+                <div>
+
+                    <div class="snapshot-label">
+                        FDP / Online Today
+                    </div>
+
+                    <div
+                        class="snapshot-number"
+                        id="onlineTodayCount"
+                    >
+                        0
+                    </div>
+
+                    <div class="snapshot-description">
+                        Online programs
+                    </div>
+
+                </div>
+
+                <div class="snapshot-icon snapshot-red">
+                    <i class="bi bi-broadcast"></i>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- WEEK -->
+
+    <div class="col-6 col-xl-3">
+
+        <div class="snapshot-card">
+
+            <div class="snapshot-top">
+
+                <div>
+
+                    <div class="snapshot-label">
+                        This Week
+                    </div>
+
+                    <div
+                        class="snapshot-number"
+                        id="weekEventsCount"
+                    >
+                        0
+                    </div>
+
+                    <div class="snapshot-description">
+                        Scheduled activities
+                    </div>
+
+                </div>
+
+                <div class="snapshot-icon snapshot-yellow">
+                    <i class="bi bi-calendar-week"></i>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
 
 
-<!-- =====================================================
-     TEAM ACTIVITY
-===================================================== -->
 
-<div class="card activity-card mb-4">
+<!-- =========================================================
+     TEAM + TODAY
+========================================================= -->
+
+<div class="row g-4 mb-4">
 
 
-    <div class="activity-card-header">
+    <!-- LIVE TEAM -->
 
-        <div class="d-flex
-                    flex-column
-                    flex-md-row
-                    justify-content-between
-                    align-items-md-center
-                    gap-2">
+    <div class="col-xl-7">
+
+        <div class="dashboard-card h-100">
+
+            <div class="dashboard-card-header">
+
+                <div class="dashboard-card-title">
+
+                    <div class="dashboard-card-title-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+
+                    <div>
+
+                        <h5>
+                            Live Team Status
+                        </h5>
+
+                        <small>
+                            Full-time trainer attendance and work updates
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="team-filter">
+
+                    <button
+                        type="button"
+                        class="active"
+                        data-team-filter="all"
+                    >
+                        All
+                    </button>
+
+                    <button
+                        type="button"
+                        data-team-filter="working"
+                    >
+                        Working
+                    </button>
+
+                    <button
+                        type="button"
+                        data-team-filter="not-in"
+                    >
+                        Not In
+                    </button>
+
+                    <button
+                        type="button"
+                        data-team-filter="out"
+                    >
+                        Checked Out
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-responsive">
+
+                <table class="table team-table align-middle">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Trainer
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Check In
+                            </th>
+
+                            <th>
+                                Current Work
+                            </th>
+
+                            <th>
+                                Tasks
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="teamStatusBody">
+
+
+                    {% for item in trainer_status %}
+
+                        <tr
+                            data-team-status="
+                            {% if item.attendance and item.attendance.check_in %}
+                                {% if item.attendance.check_out %}
+                                    out
+                                {% else %}
+                                    working
+                                {% endif %}
+                            {% else %}
+                                not-in
+                            {% endif %}
+                            "
+                        >
+
+                            <td>
+
+                                <div class="team-person">
+
+                                    <div class="team-avatar">
+                                        {{ item.trainer.Name|first|upper }}
+                                    </div>
+
+                                    <div>
+
+                                        <div class="team-name">
+                                            {{ item.trainer.Name }}
+                                        </div>
+
+                                        <div class="team-email">
+                                            {{ item.trainer.email }}
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                {% if item.attendance and item.attendance.check_in %}
+
+                                    {% if item.attendance.check_out %}
+
+                                        <span class="status-pill status-out">
+
+                                            <span class="status-dot"></span>
+
+                                            Checked Out
+
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="status-pill status-working">
+
+                                            <span class="status-dot"></span>
+
+                                            Working
+
+                                        </span>
+
+                                    {% endif %}
+
+                                {% else %}
+
+                                    <span class="status-pill status-not">
+
+                                        <span class="status-dot"></span>
+
+                                        Not In
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                {% if item.attendance and item.attendance.check_in %}
+
+                                    <span class="text-small">
+
+                                        {{ item.attendance.check_in|date:"h:i A" }}
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="muted">
+                                        —
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                {% if item.latest_task %}
+
+                                    <div
+                                        class="work-text"
+                                        title="{{ item.latest_task.task }}"
+                                    >
+                                        {{ item.latest_task.task }}
+                                    </div>
+
+                                    <div
+                                        class="text-muted"
+                                        style="font-size:9px;"
+                                    >
+                                        Updated
+                                        {{ item.latest_task.created_on|date:"h:i A" }}
+                                    </div>
+
+                                {% else %}
+
+                                    <span class="muted">
+                                        No update yet
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="badge bg-light text-dark border">
+
+                                    {{ item.tasks|length }}
+
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+
+                            <td
+                                colspan="5"
+                                class="text-center py-5"
+                            >
+
+                                <div class="empty-state">
+
+                                    <i class="bi bi-people"></i>
+
+                                    <strong>
+                                        No full-time trainers found
+                                    </strong>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- TODAY SCHEDULE -->
+
+    <div class="col-xl-5">
+
+        <div class="dashboard-card h-100">
+
+            <div class="dashboard-card-header">
+
+                <div class="dashboard-card-title">
+
+                    <div class="dashboard-card-title-icon">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+
+                    <div>
+
+                        <h5>
+                            Today's Schedule
+                        </h5>
+
+                        <small>
+                            What is happening today
+                        </small>
+
+                    </div>
+
+                </div>
+
+                <span
+                    class="badge bg-light text-dark border"
+                    id="todayScheduleBadge"
+                >
+                    0 Events
+                </span>
+
+            </div>
+
+
+            <div
+                class="today-schedule"
+                id="todaySchedule"
+            >
+
+                <div class="empty-state">
+
+                    <i class="bi bi-calendar-check"></i>
+
+                    <strong>
+                        Loading today's schedule...
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     NEEDS ATTENTION + UPCOMING
+========================================================= -->
+
+<div class="row g-4 mb-4">
+
+
+    <!-- NEEDS ATTENTION -->
+
+    <div class="col-xl-5">
+
+        <div class="dashboard-card h-100">
+
+            <div class="dashboard-card-header">
+
+                <div class="dashboard-card-title">
+
+                    <div class="dashboard-card-title-icon"
+                         style="background:#fff7ed;color:#ea580c;">
+
+                        <i class="bi bi-exclamation-triangle"></i>
+
+                    </div>
+
+                    <div>
+
+                        <h5>
+                            Needs Attention
+                        </h5>
+
+                        <small>
+                            Items that may require management action
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="attention-list">
+
+
+                {% if not_checked_in_count %}
+
+                    <div class="attention-item">
+
+                        <div class="attention-icon attention-red">
+                            <i class="bi bi-person-x"></i>
+                        </div>
+
+                        <div>
+
+                            <div class="attention-title">
+
+                                {{ not_checked_in_count }}
+                                full-time trainer{{ not_checked_in_count|pluralize }}
+                                not checked in
+
+                            </div>
+
+                            <div class="attention-description">
+                                Review today's attendance status.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+
+                <div
+                    class="attention-item"
+                    id="attentionUpcoming"
+                >
+
+                    <div class="attention-icon attention-blue">
+                        <i class="bi bi-calendar-event"></i>
+                    </div>
+
+                    <div>
+
+                        <div class="attention-title">
+                            Upcoming activities
+                        </div>
+
+                        <div
+                            class="attention-description"
+                            id="attentionUpcomingText"
+                        >
+                            Reviewing the next scheduled activities.
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="attention-item"
+                    id="attentionToday"
+                >
+
+                    <div class="attention-icon attention-orange">
+                        <i class="bi bi-calendar-day"></i>
+                    </div>
+
+                    <div>
+
+                        <div class="attention-title">
+                            Today's operations
+                        </div>
+
+                        <div
+                            class="attention-description"
+                            id="attentionTodayText"
+                        >
+                            Reviewing today's schedule.
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="attention-item">
+
+                    <div class="attention-icon attention-yellow">
+                        <i class="bi bi-info-circle"></i>
+                    </div>
+
+                    <div>
+
+                        <div class="attention-title">
+                            Keep schedules updated
+                        </div>
+
+                        <div class="attention-description">
+                            Use the calendar to maintain current FDP,
+                            workshop, office and guest faculty schedules.
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                {% if not not_checked_in_count %}
+
+                    <div class="attention-item">
+
+                        <div class="attention-icon attention-blue">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+
+                        <div>
+
+                            <div class="attention-title">
+                                Attendance looks clear
+                            </div>
+
+                            <div class="attention-description">
+                                No full-time trainer is currently flagged
+                                as not checked in.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- UPCOMING -->
+
+    <div class="col-xl-7">
+
+        <div class="dashboard-card h-100">
+
+            <div class="dashboard-card-header">
+
+                <div class="dashboard-card-title">
+
+                    <div
+                        class="dashboard-card-title-icon"
+                        style="background:#ecfdf5;color:#059669;"
+                    >
+                        <i class="bi bi-calendar2-week"></i>
+                    </div>
+
+                    <div>
+
+                        <h5>
+                            Upcoming 7 Days
+                        </h5>
+
+                        <small>
+                            Scheduled programs and operational activities
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <a
+                    href="{% url 'calendar_view' %}"
+                    class="btn btn-sm btn-outline-primary"
+                >
+                    View Calendar
+                </a>
+
+            </div>
+
+
+            <div
+                class="upcoming-list"
+                id="upcomingList"
+            >
+
+                <div class="empty-state">
+
+                    <i class="bi bi-calendar2"></i>
+
+                    <strong>
+                        Loading upcoming activities...
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     TRAINING PIPELINE
+========================================================= -->
+
+<div class="dashboard-card mb-4">
+
+    <div class="dashboard-card-header">
+
+        <div class="dashboard-card-title">
+
+            <div
+                class="dashboard-card-title-icon"
+                style="background:#f5f3ff;color:#7c3aed;"
+            >
+                <i class="bi bi-kanban-fill"></i>
+            </div>
 
             <div>
 
-                <h4>
+                <h5>
+                    Training Pipeline
+                </h5>
 
-                    <i class="bi bi-people
-                              me-2
-                              text-primary"></i>
-
-                    Today's Full-Time Team Activity
-
-                </h4>
-
-                <small class="text-muted">
-
-                    Only full-time trainers are included
-                    in attendance and check-in tracking.
-
+                <small>
+                    Workshop activity by current status
                 </small>
 
             </div>
 
-
-            <span class="badge bg-light text-dark">
-
-                {{ full_time_trainer_count }}
-
-                full-time trainers
-
-            </span>
-
         </div>
+
+
+        {% if request.user.is_staff %}
+
+            <a
+                href="{% url 'workshop_list' %}"
+                class="btn btn-sm btn-outline-primary"
+            >
+                View Workshops
+            </a>
+
+        {% endif %}
 
     </div>
 
 
-    <div class="card-body">
-
-        <div class="row g-3">
-
-
-            {% for item in trainer_status %}
-
-
-            <div class="col-md-6 col-xl-4">
-
-
-                <div class="trainer-activity-card">
-
-
-                    <div class="card-body">
-
-
-                        <!-- TRAINER -->
-
-                        <div class="d-flex align-items-center">
-
-
-                            <div class="trainer-avatar me-3">
-
-                                {{ item.trainer.Name|first|upper }}
-
-                            </div>
-
-
-                            <div class="flex-grow-1">
-
-
-                                <div class="fw-bold">
-
-                                    {{ item.trainer.Name }}
-
-                                </div>
-
-
-                                <small class="text-muted">
-
-                                    {{ item.trainer.email }}
-
-                                </small>
-
-
-                                <div class="mt-1">
-
-
-                                    {% if item.attendance and item.attendance.check_in %}
-
-
-                                        {% if item.attendance.check_out %}
-
-                                            <small class="text-muted">
-
-                                                <span class="checkedout-dot"></span>
-
-                                                Checked Out
-
-                                            </small>
-
-                                        {% else %}
-
-                                            <small class="text-success">
-
-                                                <span class="working-dot"></span>
-
-                                                Currently Working
-
-                                            </small>
-
-                                        {% endif %}
-
-
-                                    {% else %}
-
-                                        <small class="text-danger">
-
-                                            <span class="notchecked-dot"></span>
-
-                                            Not Checked In
-
-                                        </small>
-
-                                    {% endif %}
-
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- CHECK-IN -->
-
-                        {% if item.attendance and item.attendance.check_in %}
-
-                            <div class="mt-3">
-
-                                <small class="text-muted">
-
-                                    <i class="bi bi-clock me-1"></i>
-
-                                    Checked in
-
-                                </small>
-
-                                <div class="fw-semibold">
-
-                                    {{ item.attendance.check_in|date:"h:i A" }}
-
-                                </div>
-
-
-                                {% if item.attendance.check_out %}
-
-                                    <small class="text-muted">
-
-                                        Checked out:
-
-                                        {{ item.attendance.check_out|date:"h:i A" }}
-
-                                    </small>
-
-                                {% endif %}
-
-                            </div>
-
-                        {% endif %}
-
-
-                        <!-- CURRENT WORK -->
-
-                        {% if item.latest_task %}
-
-                            <div class="current-activity">
-
-                                <div class="current-activity-label">
-
-                                    Current Work
-
-                                </div>
-
-                                <div class="current-activity-text">
-
-                                    {{ item.latest_task.task }}
-
-                                </div>
-
-                                <div class="activity-time mt-1">
-
-                                    Updated
-
-                                    {{ item.latest_task.created_on|date:"h:i A" }}
-
-                                </div>
-
-                            </div>
-
-                        {% else %}
-
-                            <div class="current-activity">
-
-                                <div class="current-activity-label">
-
-                                    Current Work
-
-                                </div>
-
-                                <div class="text-muted small mt-1">
-
-                                    No work update yet.
-
-                                </div>
-
-                            </div>
-
-                        {% endif %}
-
-
-                        <!-- TASK COUNT -->
-
-                        <div class="mt-3">
-
-                            <small class="text-muted">
-
-                                <i class="bi bi-list-check me-1"></i>
-
-                                Today's tasks:
-
-                                <strong>
-
-                                    {{ item.tasks|length }}
-
-                                </strong>
-
-                            </small>
-
-                        </div>
-
-
-                    </div>
-
-                </div>
-
+    <div class="pipeline-grid">
+
+        <div class="pipeline-card pipeline-tentative">
+
+            <div
+                class="pipeline-number"
+                id="pipelineTentative"
+            >
+                0
             </div>
 
-
-            {% empty %}
-
-
-            <div class="col-12">
-
-                <div class="empty-state">
-
-                    <i class="bi bi-person-x
-                              empty-state-icon
-                              d-block"></i>
-
-                    <h5>
-
-                        No full-time trainers found
-
-                    </h5>
-
-                    <p class="mb-0">
-
-                        Trainers marked as full-time will
-                        appear here for daily check-in tracking.
-
-                    </p>
-
-                </div>
-
+            <div class="pipeline-label">
+                Tentative
             </div>
 
+        </div>
 
-            {% endfor %}
 
+        <div class="pipeline-card pipeline-fixed">
+
+            <div
+                class="pipeline-number"
+                id="pipelineFixed"
+            >
+                0
+            </div>
+
+            <div class="pipeline-label">
+                Fixed
+            </div>
+
+        </div>
+
+
+        <div class="pipeline-card pipeline-ongoing">
+
+            <div
+                class="pipeline-number"
+                id="pipelineOngoing"
+            >
+                0
+            </div>
+
+            <div class="pipeline-label">
+                Ongoing
+            </div>
+
+        </div>
+
+
+        <div class="pipeline-card pipeline-completed">
+
+            <div
+                class="pipeline-number"
+                id="pipelineCompleted"
+            >
+                0
+            </div>
+
+            <div class="pipeline-label">
+                Completed
+            </div>
 
         </div>
 
@@ -1232,198 +2884,223 @@ Mevi Portal - Dashboard
 </div>
 
 
-<!-- =====================================================
-     DAILY WORK QUICK ACTION
-===================================================== -->
 
-{% if current_trainer and current_trainer.is_full_time %}
+<!-- =========================================================
+     MASTER CALENDAR
+========================================================= -->
 
-
-<div class="card border-0 shadow-sm mb-4">
+<div class="calendar-wrapper">
 
 
-    <div class="card-body">
+    <div class="calendar-header">
 
+        <div class="calendar-title">
 
-        <div class="d-flex
-                    flex-column
-                    flex-md-row
-                    justify-content-between
-                    align-items-md-center
-                    gap-3">
-
+            <div class="calendar-title-icon">
+                <i class="bi bi-calendar3"></i>
+            </div>
 
             <div>
 
-                <h5 class="fw-bold mb-1">
+                <h3>
+                    Master Calendar
+                </h3>
 
-                    <i class="bi bi-check2-square
-                              text-primary
-                              me-2"></i>
-
-                    Daily Work Update
-
-                </h5>
-
-                <p class="text-muted mb-0">
-
-                    Check in and record what you are
-                    working on today.
-
+                <p>
+                    Workshops • FDPs • Online Workshops •
+                    Office Training • Guest Faculty • Meetings
                 </p>
 
             </div>
 
-
-            <div class="d-flex
-                        flex-wrap
-                        gap-2">
-
-
-                <a
-                    href="{% url 'trainer_dashboard' %}"
-                    class="btn btn-primary"
-                >
-
-                    <i class="bi bi-person-workspace me-1"></i>
-
-                    My Dashboard
-
-                </a>
-
-
-                <a
-                    href="{% url 'daily_checkin' %}"
-                    class="btn btn-outline-success"
-                >
-
-                    <i class="bi bi-fingerprint me-1"></i>
-
-                    Check In
-
-                </a>
-
-
-            </div>
-
-
         </div>
 
-    </div>
 
-</div>
+        {% if request.user.is_superuser %}
 
+            <a
+                href="{% url 'add_calendar_event' %}"
+                class="add-event-btn"
+            >
 
-{% endif %}
+                <i class="bi bi-plus-circle-fill"></i>
 
+                Add New Event
 
-<!-- =====================================================
-     MASTER CALENDAR
-===================================================== -->
+            </a>
 
-<div class="card calendar-card">
-
-
-    <div class="calendar-card-header">
-
-
-        <div class="d-flex
-                    flex-column
-                    flex-md-row
-                    justify-content-between
-                    align-items-md-center
-                    gap-2">
-
-
-            <div>
-
-                <h4>
-
-                    <i class="bi bi-calendar-week
-                              me-2
-                              text-primary"></i>
-
-                    Master Calendar
-
-                </h4>
-
-                <small class="text-muted">
-
-                    Workshops, office trainings,
-                    meetings and schedules
-
-                </small>
-
-            </div>
-
-
-            {% if request.user.is_superuser %}
-
-                <a
-                    href="{% url 'add_calendar_event' %}"
-                    class="btn btn-primary"
-                >
-
-                    <i class="bi bi-plus-lg me-1"></i>
-
-                    Add Event
-
-                </a>
-
-            {% endif %}
-
-
-        </div>
+        {% endif %}
 
     </div>
 
 
-    <div class="calendar-container">
 
+    <div class="calendar-body">
+
+
+        <!-- FILTERS -->
+
+        <div class="calendar-filters">
+
+            <span class="calendar-filter-label">
+                FILTER:
+            </span>
+
+
+            <select
+                id="calendarTypeFilter"
+                class="calendar-filter"
+            >
+
+                <option value="all">
+                    All Event Types
+                </option>
+
+                <option value="workshop">
+                    Workshop
+                </option>
+
+                <option value="fdp">
+                    FDP
+                </option>
+
+                <option value="online_workshop">
+                    Online Workshop
+                </option>
+
+                <option value="office">
+                    Office Training
+                </option>
+
+                <option value="guest_training">
+                    Guest Faculty Training
+                </option>
+
+                <option value="meeting">
+                    Meeting
+                </option>
+
+                <option value="other">
+                    Other
+                </option>
+
+            </select>
+
+
+            <button
+                type="button"
+                class="calendar-filter"
+                id="calendarTodayBtn"
+            >
+                <i class="bi bi-calendar-day"></i>
+                Today
+            </button>
+
+
+            <button
+                type="button"
+                class="calendar-filter"
+                id="calendarClearFilter"
+            >
+                Clear Filter
+            </button>
+
+        </div>
+
+
+
+        <!-- CALENDAR -->
 
         <div id="master-calendar"></div>
+
 
 
         <!-- LEGEND -->
 
         <div class="calendar-legend">
 
-
             <div class="legend-item">
-
-                <span class="legend-dot workshop-dot"></span>
-
-                Workshops
-
+                <span class="legend-dot legend-workshop"></span>
+                Workshop
             </div>
 
+            <div class="legend-item">
+                <span class="legend-dot legend-fdp"></span>
+                FDP
+            </div>
 
             <div class="legend-item">
+                <span class="legend-dot legend-online"></span>
+                Online Workshop
+            </div>
 
-                <span class="legend-dot office-dot"></span>
-
+            <div class="legend-item">
+                <span class="legend-dot legend-office"></span>
                 Office Training
-
             </div>
-
 
             <div class="legend-item">
-
-                <span class="legend-dot meeting-dot"></span>
-
-                Meetings
-
+                <span class="legend-dot legend-guest"></span>
+                Guest Faculty
             </div>
-
 
             <div class="legend-item">
+                <span class="legend-dot legend-meeting"></span>
+                Meeting
+            </div>
 
-                <span class="legend-dot other-dot"></span>
+            <div class="legend-item">
+                <span class="legend-dot legend-other"></span>
+                Other
+            </div>
 
-                Other Events
+        </div>
+
+
+
+        <!-- SELECTED DAY -->
+
+        <div class="selected-day">
+
+            <div class="selected-header">
+
+                <i class="bi bi-calendar-day"></i>
+
+                <h5>
+
+                    Schedule for
+
+                    <span id="selected-date">
+                        Today
+                    </span>
+
+                </h5>
 
             </div>
 
+
+            <div class="selected-body">
+
+                <div id="selected-day-events">
+
+                    <div class="empty-state">
+
+                        <i class="bi bi-calendar-check"></i>
+
+                        <strong>
+                            Select a date
+                        </strong>
+
+                        <div class="small">
+                            Click a date in the calendar to see
+                            its detailed schedule.
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
 
         </div>
 
@@ -1433,573 +3110,1490 @@ Mevi Portal - Dashboard
 </div>
 
 
-<!-- =====================================================
-     SELECTED DAY
-===================================================== -->
-
-<div class="card selected-day-card">
-
-
-    <div class="selected-day-header">
-
-        <h5>
-
-            <i class="bi bi-calendar-day me-2"></i>
-
-            Events on
-
-            <span id="selected-date">
-
-                Today
-
-            </span>
-
-        </h5>
-
-    </div>
-
-
-    <div class="card-body">
-
-
-        <div id="selected-day-events">
-
-
-            <div class="text-center text-muted py-4">
-
-                <i class="bi bi-calendar-check
-                          fs-2
-                          d-block
-                          mb-2"></i>
-
-                Select a date from the calendar
-
-            </div>
-
-
-        </div>
-
-
-    </div>
-
 
 </div>
 
 
-</div>
-
-</div>
-
-
-<!-- =====================================================
-     CALENDAR JAVASCRIPT
-===================================================== -->
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
 
 <script>
 
-document.addEventListener(
-    'DOMContentLoaded',
-    function () {
+document.addEventListener("DOMContentLoaded", function () {
 
 
-        const calendarEl =
-            document.getElementById(
-                'master-calendar'
-            );
+    /* =====================================================
+       EVENT DATA
+    ===================================================== */
 
+    let events = {{ events_json|default:"[]"|safe }};
 
-        const events =
-            {{ events_json|default:"[]"|safe }};
+    if (!Array.isArray(events)) {
+        events = [];
+    }
 
 
-        const calendar =
-            new FullCalendar.Calendar(
-                calendarEl,
-                {
+    /* =====================================================
+       HELPERS
+    ===================================================== */
 
-                    initialView:
-                        'dayGridMonth',
+    function safeDate(value) {
 
+        if (!value) {
+            return null;
+        }
 
-                    height:
-                        'auto',
+        const d = new Date(value);
 
+        if (isNaN(d.getTime())) {
+            return null;
+        }
 
-                    contentHeight:
-                        650,
+        return d;
+    }
 
 
-                    expandRows:
-                        true,
+    function dateKey(date) {
 
+        const year = date.getFullYear();
 
-                    dayMaxEvents:
-                        3,
+        const month = String(
+            date.getMonth() + 1
+        ).padStart(2, "0");
 
+        const day = String(
+            date.getDate()
+        ).padStart(2, "0");
 
-                    headerToolbar: {
+        return `${year}-${month}-${day}`;
+    }
 
-                        left:
-                            'prev,next today',
 
-                        center:
-                            'title',
+    function eventType(event) {
 
-                        right:
-                            'dayGridMonth,timeGridWeek,listMonth'
+        const props = event.extendedProps || {};
 
-                    },
+        return String(
+            props.event_type ||
+            props.type ||
+            event.type ||
+            "other"
+        ).toLowerCase();
 
+    }
 
-                    buttonText: {
 
-                        today:
-                            'Today',
+    function eventTypeLabel(event) {
 
-                        month:
-                            'Month',
+        const type = eventType(event);
 
-                        week:
-                            'Week',
+        const labels = {
 
-                        list:
-                            'List'
+            workshop: "Workshop",
 
-                    },
+            fdp: "FDP",
 
+            online_workshop: "Online Workshop",
 
-                    events:
-                        events,
+            office: "Office Training",
 
+            guest_training: "Guest Faculty",
 
-                    eventClick:
-                        function(info) {
+            meeting: "Meeting",
 
-                            info.jsEvent
-                                .preventDefault();
+            other: "Other"
 
+        };
 
-                            const event =
-                                info.event;
+        return labels[type] || "Other";
 
+    }
 
-                            const props =
-                                event.extendedProps;
 
+    function eventProps(event) {
 
-                            let details = '';
+        return event.extendedProps || {};
 
+    }
 
-                            if (props.trainer) {
 
-                                details +=
-                                    `Trainer: ${props.trainer}\n`;
+    function eventCollege(event) {
 
-                            }
+        const p = eventProps(event);
 
+        return (
+            p.college ||
+            p.college_name ||
+            ""
+        );
 
-                            if (props.college) {
+    }
 
-                                details +=
-                                    `College: ${props.college}\n`;
 
-                            }
+    function eventLocation(event) {
 
+        const p = eventProps(event);
 
-                            if (props.department) {
+        return (
+            p.location ||
+            ""
+        );
 
-                                details +=
-                                    `Department: ${props.department}\n`;
+    }
 
-                            }
 
+    function eventTrainer(event) {
 
-                            if (props.event_type) {
+        const p = eventProps(event);
 
-                                details +=
-                                    `Type: ${props.event_type}\n`;
+        return (
+            p.trainer ||
+            p.trainer_name ||
+            p.trainers ||
+            ""
+        );
 
-                            }
+    }
 
 
-                            if (props.description) {
+    function eventStatus(event) {
 
-                                details +=
-                                    `\n${props.description}`;
+        const p = eventProps(event);
 
-                            }
+        return (
+            p.status ||
+            ""
+        );
 
+    }
 
-                            if (event.url) {
 
-                                window.location.href =
-                                    event.url;
+    function eventTime(event) {
 
-                                return;
+        if (!event.start) {
+            return "";
+        }
 
-                            }
+        const start = safeDate(event.start);
 
+        if (!start) {
+            return "";
+        }
 
-                            alert(
-                                event.title +
-                                "\n\n" +
-                                details
-                            );
+        if (event.allDay) {
+            return "All Day";
+        }
 
-                        },
+        let result = start.toLocaleTimeString(
+            [],
+            {
+                hour: "2-digit",
+                minute: "2-digit"
+            }
+        );
 
+        if (event.end) {
 
-                    dateClick:
-                        function(info) {
+            const end = safeDate(event.end);
 
-                            showDayEvents(
-                                info.dateStr,
-                                calendar.getEvents()
-                            );
+            if (end) {
 
-                        },
-
-
-                    eventDidMount:
-                        function(info) {
-
-                            const props =
-                                info.event.extendedProps;
-
-
-                            let tooltip = '';
-
-
-                            if (props.trainer) {
-
-                                tooltip +=
-                                    'Trainer: ' +
-                                    props.trainer +
-                                    '\n';
-
-                            }
-
-
-                            if (props.college) {
-
-                                tooltip +=
-                                    'College: ' +
-                                    props.college +
-                                    '\n';
-
-                            }
-
-
-                            if (props.department) {
-
-                                tooltip +=
-                                    'Department: ' +
-                                    props.department;
-
-                            }
-
-
-                            if (tooltip) {
-
-                                info.el.title =
-                                    tooltip;
-
-                            }
-
+                result +=
+                    " – " +
+                    end.toLocaleTimeString(
+                        [],
+                        {
+                            hour: "2-digit",
+                            minute: "2-digit"
                         }
+                    );
 
-                }
+            }
+
+        }
+
+        return result;
+    }
+
+
+    function escapeHtml(value) {
+
+        if (value === null || value === undefined) {
+            return "";
+        }
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    }
+
+
+    /* =====================================================
+       COLOR EVENTS
+    ===================================================== */
+
+    function eventColor(type) {
+
+        const colors = {
+
+            workshop: "#16a34a",
+
+            fdp: "#dc2626",
+
+            online_workshop: "#0d9488",
+
+            office: "#2563eb",
+
+            guest_training: "#ea580c",
+
+            meeting: "#7c3aed",
+
+            other: "#64748b"
+
+        };
+
+        return colors[type] || colors.other;
+
+    }
+
+
+    events.forEach(function (event) {
+
+        const type = eventType(event);
+
+        event.backgroundColor =
+            event.backgroundColor ||
+            eventColor(type);
+
+        event.borderColor =
+            event.borderColor ||
+            eventColor(type);
+
+    });
+
+
+
+    /* =====================================================
+       TODAY SNAPSHOT
+    ===================================================== */
+
+    const now = new Date();
+
+    const todayKey = dateKey(now);
+
+
+    const todayEvents = events.filter(function (event) {
+
+        const start = safeDate(event.start);
+
+        if (!start) {
+            return false;
+        }
+
+        return dateKey(start) === todayKey;
+
+    });
+
+
+    const weekEnd = new Date(now);
+
+    weekEnd.setDate(
+        now.getDate() + 6
+    );
+
+
+    const weekEvents = events.filter(function (event) {
+
+        const start = safeDate(event.start);
+
+        if (!start) {
+            return false;
+        }
+
+        return (
+            start >= new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate()
+            )
+            &&
+            start <= new Date(
+                weekEnd.getFullYear(),
+                weekEnd.getMonth(),
+                weekEnd.getDate(),
+                23,
+                59,
+                59
+            )
+        );
+
+    });
+
+
+    const workshopsToday =
+        todayEvents.filter(function (event) {
+
+            return eventType(event) === "workshop";
+
+        }).length;
+
+
+    const onlineToday =
+        todayEvents.filter(function (event) {
+
+            const type = eventType(event);
+
+            return (
+                type === "fdp" ||
+                type === "online_workshop"
             );
 
-
-        calendar.render();
-
-
-        /* =====================================
-           TODAY
-        ====================================== */
-
-        const today =
-            new Date();
+        }).length;
 
 
-        const todayString =
-            today.toISOString()
-                .split('T')[0];
+    const eventsTodayElement =
+        document.getElementById(
+            "eventsTodayCount"
+        );
 
+    const workshopsTodayElement =
+        document.getElementById(
+            "workshopsTodayCount"
+        );
 
-        showDayEvents(
-            todayString,
-            calendar.getEvents()
+    const onlineTodayElement =
+        document.getElementById(
+            "onlineTodayCount"
+        );
+
+    const weekEventsElement =
+        document.getElementById(
+            "weekEventsCount"
         );
 
 
-        /* =====================================
-           SHOW DAY EVENTS
-        ====================================== */
-
-        function showDayEvents(
-            dateString,
-            allEvents
-        ) {
+    if (eventsTodayElement) {
+        eventsTodayElement.textContent =
+            todayEvents.length;
+    }
 
 
-            const container =
-                document.getElementById(
-                    'selected-day-events'
-                );
+    if (workshopsTodayElement) {
+        workshopsTodayElement.textContent =
+            workshopsToday;
+    }
 
 
-            const dateLabel =
-                document.getElementById(
-                    'selected-date'
-                );
+    if (onlineTodayElement) {
+        onlineTodayElement.textContent =
+            onlineToday;
+    }
 
 
-            const selectedDate =
-                new Date(
-                    dateString +
-                    'T00:00:00'
-                );
+    if (weekEventsElement) {
+        weekEventsElement.textContent =
+            weekEvents.length;
+    }
 
 
-            dateLabel.innerText =
-                selectedDate.toLocaleDateString(
-                    'en-IN',
-                    {
-                        weekday:
-                            'long',
 
-                        day:
-                            'numeric',
+    /* =====================================================
+       TODAY'S SCHEDULE
+    ===================================================== */
 
-                        month:
-                            'long',
-
-                        year:
-                            'numeric'
-                    }
-                );
+    const todaySchedule =
+        document.getElementById(
+            "todaySchedule"
+        );
 
 
-            const dayEvents =
-                allEvents.filter(
-                    function(event) {
-
-                        const start =
-                            event.startStr;
-
-                        const end =
-                            event.endStr;
+    const todayScheduleBadge =
+        document.getElementById(
+            "todayScheduleBadge"
+        );
 
 
-                        if (!end) {
+    if (todayScheduleBadge) {
 
-                            return (
-                                dateString ===
-                                start
-                            );
+        todayScheduleBadge.textContent =
+            todayEvents.length +
+            (
+                todayEvents.length === 1
+                    ? " Event"
+                    : " Events"
+            );
 
-                        }
+    }
 
+
+    if (todaySchedule) {
+
+        if (!todayEvents.length) {
+
+            todaySchedule.innerHTML = `
+
+                <div class="empty-state">
+
+                    <i class="bi bi-calendar-x"></i>
+
+                    <strong>
+                        No events scheduled today
+                    </strong>
+
+                    <div class="small mt-1">
+                        Your calendar is clear for today.
+                    </div>
+
+                </div>
+
+            `;
+
+        } else {
+
+            const sortedToday =
+                [...todayEvents].sort(
+                    function (a, b) {
 
                         return (
-                            dateString >= start &&
-                            dateString < end
+                            new Date(a.start) -
+                            new Date(b.start)
                         );
 
                     }
                 );
 
 
-            if (
-                dayEvents.length === 0
-            ) {
+            todaySchedule.innerHTML =
+                sortedToday
+                .slice(0, 8)
+                .map(function (event) {
 
-                container.innerHTML = `
+                    const type =
+                        eventType(event);
 
-                    <div class="text-center text-muted py-4">
+                    const label =
+                        eventTypeLabel(event);
 
-                        <i class="bi bi-calendar-x
-                                  fs-2
-                                  d-block
-                                  mb-2"></i>
+                    const college =
+                        eventCollege(event);
 
-                        <strong>No events</strong>
+                    const location =
+                        eventLocation(event);
 
-                        <p class="small mb-0">
+                    const trainer =
+                        eventTrainer(event);
 
-                            Nothing is scheduled
-                            for this day.
+                    let meta = "";
 
-                        </p>
+                    if (college) {
+                        meta +=
+                            "🏫 " +
+                            escapeHtml(college);
+                    }
+
+                    if (trainer) {
+
+                        if (meta) {
+                            meta += " • ";
+                        }
+
+                        meta +=
+                            "👤 " +
+                            escapeHtml(trainer);
+
+                    }
+
+                    if (location) {
+
+                        if (meta) {
+                            meta += " • ";
+                        }
+
+                        meta +=
+                            "📍 " +
+                            escapeHtml(location);
+
+                    }
+
+
+                    return `
+
+                        <div class="timeline-item">
+
+                            <div class="timeline-time">
+                                ${escapeHtml(
+                                    eventTime(event)
+                                )}
+                            </div>
+
+                            <div class="timeline-line"></div>
+
+                            <div class="timeline-content">
+
+                                <div class="timeline-title">
+                                    ${escapeHtml(
+                                        event.title ||
+                                        "Untitled Event"
+                                    )}
+                                </div>
+
+                                <div class="timeline-meta">
+                                    ${meta || "No additional details"}
+                                </div>
+
+                                <span
+                                    class="timeline-badge"
+                                    style="
+                                        background:
+                                        ${eventColor(type)}15;
+                                        color:
+                                        ${eventColor(type)};
+                                    "
+                                >
+                                    ${escapeHtml(label)}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                })
+                .join("");
+
+        }
+
+    }
+
+
+
+    /* =====================================================
+       UPCOMING 7 DAYS
+    ===================================================== */
+
+    const upcomingList =
+        document.getElementById(
+            "upcomingList"
+        );
+
+
+    if (upcomingList) {
+
+        const upcoming =
+            weekEvents
+            .filter(function (event) {
+
+                const start =
+                    safeDate(event.start);
+
+                return start &&
+                       dateKey(start) !== todayKey;
+
+            })
+            .sort(function (a, b) {
+
+                return (
+                    new Date(a.start) -
+                    new Date(b.start)
+                );
+
+            });
+
+
+        if (!upcoming.length) {
+
+            upcomingList.innerHTML = `
+
+                <div class="empty-state">
+
+                    <i class="bi bi-calendar-check"></i>
+
+                    <strong>
+                        No upcoming activities
+                    </strong>
+
+                    <div class="small mt-1">
+                        No additional events are scheduled
+                        in the next 7 days.
+                    </div>
+
+                </div>
+
+            `;
+
+        } else {
+
+            upcomingList.innerHTML =
+                upcoming
+                .slice(0, 8)
+                .map(function (event) {
+
+                    const d =
+                        safeDate(event.start);
+
+                    const label =
+                        eventTypeLabel(event);
+
+                    const college =
+                        eventCollege(event);
+
+                    const location =
+                        eventLocation(event);
+
+                    return `
+
+                        <div class="upcoming-item">
+
+                            <div class="upcoming-date">
+
+                                <span class="upcoming-day">
+                                    ${d.getDate()}
+                                </span>
+
+                                <span class="upcoming-month">
+                                    ${d.toLocaleString(
+                                        "en",
+                                        {
+                                            month: "short"
+                                        }
+                                    )}
+                                </span>
+
+                            </div>
+
+
+                            <div class="upcoming-content">
+
+                                <div class="upcoming-title">
+                                    ${escapeHtml(
+                                        event.title ||
+                                        "Untitled Event"
+                                    )}
+                                </div>
+
+                                <div class="upcoming-meta">
+
+                                    ${escapeHtml(label)}
+
+                                    ${college
+                                        ? " • 🏫 " +
+                                          escapeHtml(college)
+                                        : ""}
+
+                                    ${location
+                                        ? " • 📍 " +
+                                          escapeHtml(location)
+                                        : ""}
+
+                                    ${eventTime(event)
+                                        ? " • 🕐 " +
+                                          escapeHtml(
+                                              eventTime(event)
+                                          )
+                                        : ""}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                })
+                .join("");
+
+        }
+
+    }
+
+
+
+    /* =====================================================
+       NEEDS ATTENTION TEXT
+    ===================================================== */
+
+    const attentionTodayText =
+        document.getElementById(
+            "attentionTodayText"
+        );
+
+    if (attentionTodayText) {
+
+        if (todayEvents.length) {
+
+            attentionTodayText.textContent =
+                todayEvents.length +
+                (
+                    todayEvents.length === 1
+                        ? " activity is"
+                        : " activities are"
+                ) +
+                " scheduled today.";
+
+        } else {
+
+            attentionTodayText.textContent =
+                "No calendar activities are scheduled today.";
+
+        }
+
+    }
+
+
+    const attentionUpcomingText =
+        document.getElementById(
+            "attentionUpcomingText"
+        );
+
+    if (attentionUpcomingText) {
+
+        if (upcomingList && weekEvents.length) {
+
+            attentionUpcomingText.textContent =
+                weekEvents.length +
+                " scheduled activities are visible for the current week.";
+
+        } else {
+
+            attentionUpcomingText.textContent =
+                "No upcoming calendar activities were found.";
+
+        }
+
+    }
+
+
+
+    /* =====================================================
+       TRAINING PIPELINE
+       
+       Uses event data when status is supplied through
+       extendedProps. This does not require new context.
+    ===================================================== */
+
+    let tentative = 0;
+    let fixed = 0;
+    let ongoing = 0;
+    let completed = 0;
+
+
+    events.forEach(function (event) {
+
+        const status =
+            eventStatus(event)
+            .toLowerCase()
+            .replace(/[\s-]+/g, "_");
+
+
+        if (
+            status.includes("tentative")
+        ) {
+            tentative++;
+        }
+
+        else if (
+            status.includes("fixed")
+        ) {
+            fixed++;
+        }
+
+        else if (
+            status.includes("ongoing") ||
+            status.includes("in_progress") ||
+            status.includes("inprogress")
+        ) {
+            ongoing++;
+        }
+
+        else if (
+            status.includes("completed") ||
+            status.includes("complete")
+        ) {
+            completed++;
+        }
+
+    });
+
+
+    document.getElementById(
+        "pipelineTentative"
+    ).textContent = tentative;
+
+
+    document.getElementById(
+        "pipelineFixed"
+    ).textContent = fixed;
+
+
+    document.getElementById(
+        "pipelineOngoing"
+    ).textContent = ongoing;
+
+
+    document.getElementById(
+        "pipelineCompleted"
+    ).textContent = completed;
+
+
+
+    /* =====================================================
+       TEAM FILTER
+    ===================================================== */
+
+    const teamButtons =
+        document.querySelectorAll(
+            "[data-team-filter]"
+        );
+
+
+    teamButtons.forEach(function (button) {
+
+        button.addEventListener(
+            "click",
+            function () {
+
+                teamButtons.forEach(
+                    function (btn) {
+                        btn.classList.remove(
+                            "active"
+                        );
+                    }
+                );
+
+                button.classList.add(
+                    "active"
+                );
+
+
+                const filter =
+                    button.dataset.teamFilter;
+
+
+                const rows =
+                    document.querySelectorAll(
+                        "#teamStatusBody tr[data-team-status]"
+                    );
+
+
+                rows.forEach(function (row) {
+
+                    const status =
+                        row.dataset.teamStatus
+                        .trim();
+
+
+                    if (
+                        filter === "all" ||
+                        filter === status
+                    ) {
+
+                        row.style.display = "";
+
+                    } else {
+
+                        row.style.display =
+                            "none";
+
+                    }
+
+                });
+
+            }
+        );
+
+    });
+
+
+
+    /* =====================================================
+       CALENDAR
+    ===================================================== */
+
+    const calendarEl =
+        document.getElementById(
+            "master-calendar"
+        );
+
+
+    if (!calendarEl) {
+        return;
+    }
+
+
+    let selectedType =
+        "all";
+
+
+    const calendar =
+        new FullCalendar.Calendar(
+            calendarEl,
+            {
+
+                initialView:
+                    "dayGridMonth",
+
+
+                height:
+                    "auto",
+
+
+                contentHeight:
+                    650,
+
+
+                expandRows:
+                    true,
+
+
+                dayMaxEvents:
+                    4,
+
+
+                nowIndicator:
+                    true,
+
+
+                navLinks:
+                    true,
+
+
+                headerToolbar: {
+
+                    left:
+                        "prev,next today",
+
+                    center:
+                        "title",
+
+                    right:
+                        "dayGridMonth,timeGridWeek,timeGridDay,listMonth"
+
+                },
+
+
+                buttonText: {
+
+                    today:
+                        "Today",
+
+                    month:
+                        "Month",
+
+                    week:
+                        "Week",
+
+                    day:
+                        "Day",
+
+                    list:
+                        "List"
+
+                },
+
+
+                events:
+                    events,
+
+
+                eventTimeFormat: {
+
+                    hour:
+                        "2-digit",
+
+                    minute:
+                        "2-digit",
+
+                    meridiem:
+                        "short"
+
+                },
+
+
+                eventClick:
+                    function(info) {
+
+                        info.jsEvent
+                            .preventDefault();
+
+
+                        if (
+                            info.event.url
+                        ) {
+
+                            window.location.href =
+                                info.event.url;
+
+                        }
+
+                    },
+
+
+                dateClick:
+                    function(info) {
+
+                        showDayEvents(
+                            info.dateStr
+                        );
+
+                    },
+
+
+                eventDidMount:
+                    function(info) {
+
+                        const type =
+                            eventType(
+                                info.event
+                            );
+
+                        const label =
+                            eventTypeLabel(
+                                info.event
+                            );
+
+                        const college =
+                            eventCollege(
+                                info.event
+                            );
+
+                        const location =
+                            eventLocation(
+                                info.event
+                            );
+
+                        let tooltip =
+                            label +
+                            ": " +
+                            (
+                                info.event.title ||
+                                ""
+                            );
+
+                        if (college) {
+                            tooltip +=
+                                " | " +
+                                college;
+                        }
+
+                        if (location) {
+                            tooltip +=
+                                " | " +
+                                location;
+                        }
+
+                        info.el.title =
+                            tooltip;
+
+                        info.el.style.backgroundColor =
+                            eventColor(type);
+
+                    }
+
+            }
+        );
+
+
+    calendar.render();
+
+
+
+    /* =====================================================
+       CALENDAR FILTER
+    ===================================================== */
+
+    const typeFilter =
+        document.getElementById(
+            "calendarTypeFilter"
+        );
+
+
+    if (typeFilter) {
+
+        typeFilter.addEventListener(
+            "change",
+            function () {
+
+                selectedType =
+                    this.value;
+
+
+                calendar.removeAllEventSources();
+
+
+                let filtered =
+                    events;
+
+
+                if (
+                    selectedType !== "all"
+                ) {
+
+                    filtered =
+                        events.filter(
+                            function (event) {
+
+                                return (
+                                    eventType(event) ===
+                                    selectedType
+                                );
+
+                            }
+                        );
+
+                }
+
+
+                calendar.addEventSource(
+                    filtered
+                );
+
+            }
+        );
+
+    }
+
+
+
+    /* =====================================================
+       TODAY BUTTON
+    ===================================================== */
+
+    const todayButton =
+        document.getElementById(
+            "calendarTodayBtn"
+        );
+
+
+    if (todayButton) {
+
+        todayButton.addEventListener(
+            "click",
+            function () {
+
+                calendar.today();
+
+            }
+        );
+
+    }
+
+
+
+    /* =====================================================
+       CLEAR FILTER
+    ===================================================== */
+
+    const clearFilter =
+        document.getElementById(
+            "calendarClearFilter"
+        );
+
+
+    if (clearFilter) {
+
+        clearFilter.addEventListener(
+            "click",
+            function () {
+
+                selectedType =
+                    "all";
+
+
+                if (typeFilter) {
+
+                    typeFilter.value =
+                        "all";
+
+                }
+
+
+                calendar.removeAllEventSources();
+
+                calendar.addEventSource(
+                    events
+                );
+
+            }
+        );
+
+    }
+
+
+
+    /* =====================================================
+       SELECTED DAY
+    ===================================================== */
+
+    function showDayEvents(dateString) {
+
+        const selectedDate =
+            document.getElementById(
+                "selected-date"
+            );
+
+
+        const container =
+            document.getElementById(
+                "selected-day-events"
+            );
+
+
+        if (!selectedDate || !container) {
+            return;
+        }
+
+
+        const selected =
+            new Date(
+                dateString + "T00:00:00"
+            );
+
+
+        selectedDate.textContent =
+            selected.toLocaleDateString(
+                "en-IN",
+                {
+                    weekday: "long",
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric"
+                }
+            );
+
+
+        let dayEvents =
+            events.filter(
+                function (event) {
+
+                    const start =
+                        safeDate(
+                            event.start
+                        );
+
+                    if (!start) {
+                        return false;
+                    }
+
+                    return (
+                        dateKey(start) ===
+                        dateString
+                    );
+
+                }
+            );
+
+
+        if (
+            selectedType !== "all"
+        ) {
+
+            dayEvents =
+                dayEvents.filter(
+                    function (event) {
+
+                        return (
+                            eventType(event) ===
+                            selectedType
+                        );
+
+                    }
+                );
+
+        }
+
+
+        dayEvents.sort(
+            function (a, b) {
+
+                return (
+                    new Date(a.start) -
+                    new Date(b.start)
+                );
+
+            }
+        );
+
+
+        if (!dayEvents.length) {
+
+            container.innerHTML = `
+
+                <div class="empty-state">
+
+                    <i class="bi bi-calendar-x"></i>
+
+                    <strong>
+                        No events on this date
+                    </strong>
+
+                    <div class="small">
+                        There are no matching scheduled activities.
+                    </div>
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        container.innerHTML =
+            dayEvents
+            .map(function (event) {
+
+                const type =
+                    eventType(event);
+
+                const label =
+                    eventTypeLabel(event);
+
+                const college =
+                    eventCollege(event);
+
+                const location =
+                    eventLocation(event);
+
+                const trainer =
+                    eventTrainer(event);
+
+                const status =
+                    eventStatus(event);
+
+
+                return `
+
+                    <div class="day-event">
+
+                        <div class="d-flex justify-content-between gap-2">
+
+                            <div class="event-title">
+
+                                ${escapeHtml(
+                                    event.title ||
+                                    "Untitled Event"
+                                )}
+
+                            </div>
+
+                            <span
+                                class="type-badge"
+                                style="
+                                    background:
+                                    ${eventColor(type)}18;
+                                    color:
+                                    ${eventColor(type)};
+                                "
+                            >
+                                ${escapeHtml(label)}
+                            </span>
+
+                        </div>
+
+
+                        <div class="event-info">
+
+                            ${
+                                eventTime(event)
+                                ? `
+                                    <div>
+                                        <i class="bi bi-clock"></i>
+                                        ${escapeHtml(
+                                            eventTime(event)
+                                        )}
+                                    </div>
+                                `
+                                : ""
+                            }
+
+
+                            ${
+                                college
+                                ? `
+                                    <div>
+                                        <i class="bi bi-building"></i>
+                                        ${escapeHtml(
+                                            college
+                                        )}
+                                    </div>
+                                `
+                                : ""
+                            }
+
+
+                            ${
+                                trainer
+                                ? `
+                                    <div>
+                                        <i class="bi bi-person"></i>
+                                        ${escapeHtml(
+                                            trainer
+                                        )}
+                                    </div>
+                                `
+                                : ""
+                            }
+
+
+                            ${
+                                location
+                                ? `
+                                    <div>
+                                        <i class="bi bi-geo-alt"></i>
+                                        ${escapeHtml(
+                                            location
+                                        )}
+                                    </div>
+                                `
+                                : ""
+                            }
+
+
+                            ${
+                                status
+                                ? `
+                                    <div>
+                                        <i class="bi bi-info-circle"></i>
+                                        ${escapeHtml(
+                                            status
+                                        )}
+                                    </div>
+                                `
+                                : ""
+                            }
+
+                        </div>
 
                     </div>
 
                 `;
 
-                return;
-
-            }
-
-
-            container.innerHTML =
-                dayEvents.map(
-                    function(event) {
-
-
-                        const props =
-                            event.extendedProps;
-
-
-                        return `
-
-                            <div class="day-event">
-
-                                <div class="event-title">
-
-                                    <i class="bi bi-calendar-event
-                                              text-primary
-                                              me-1"></i>
-
-                                    ${escapeHtml(event.title)}
-
-                                </div>
-
-
-                                ${
-                                    props.trainer
-                                    ?
-                                    `
-                                    <div class="event-info">
-
-                                        <i class="bi bi-person-fill"></i>
-
-                                        <strong>Trainer:</strong>
-
-                                        ${escapeHtml(props.trainer)}
-
-                                    </div>
-                                    `
-                                    :
-                                    ''
-                                }
-
-
-                                ${
-                                    props.college
-                                    ?
-                                    `
-                                    <div class="event-info">
-
-                                        <i class="bi bi-building"></i>
-
-                                        <strong>College:</strong>
-
-                                        ${escapeHtml(props.college)}
-
-                                    </div>
-                                    `
-                                    :
-                                    ''
-                                }
-
-
-                                ${
-                                    props.department
-                                    ?
-                                    `
-                                    <div class="event-info">
-
-                                        <i class="bi bi-mortarboard-fill"></i>
-
-                                        <strong>Department:</strong>
-
-                                        ${escapeHtml(props.department)}
-
-                                    </div>
-                                    `
-                                    :
-                                    ''
-                                }
-
-
-                                ${
-                                    props.event_type
-                                    ?
-                                    `
-                                    <div class="event-info">
-
-                                        <i class="bi bi-tag"></i>
-
-                                        <strong>Type:</strong>
-
-                                        ${escapeHtml(props.event_type)}
-
-                                    </div>
-                                    `
-                                    :
-                                    ''
-                                }
-
-
-                                ${
-                                    event.url
-                                    ?
-                                    `
-                                    <div class="mt-3">
-
-                                        <a
-                                            href="${event.url}"
-                                            class="btn btn-sm btn-outline-primary"
-                                        >
-
-                                            <i class="bi bi-eye me-1"></i>
-
-                                            View Details
-
-                                        </a>
-
-                                    </div>
-                                    `
-                                    :
-                                    ''
-                                }
-
-                            </div>
-
-                        `;
-
-                    }
-                ).join('');
-
-        }
-
-
-        /* =====================================
-           ESCAPE HTML
-        ====================================== */
-
-        function escapeHtml(value) {
-
-            if (!value) {
-
-                return '';
-
-            }
-
-            return String(value)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-
-        }
+            })
+            .join("");
 
     }
-);
+
+
+    /* =====================================================
+       SHOW TODAY INITIALLY
+    ===================================================== */
+
+    showDayEvents(
+        todayKey
+    );
+
+
+});
 
 </script>
+
 
 {% endblock %}
