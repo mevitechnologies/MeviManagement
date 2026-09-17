@@ -758,3 +758,38 @@ class DailyAttendance(models.Model):
             self.check_in is not None
             and self.check_out is None
         )
+
+class DailyLearning(models.Model):
+    trainer = models.ForeignKey(
+        'Trainer',
+        on_delete=models.CASCADE,
+        related_name='daily_learnings'
+    )
+
+    date = models.DateField(
+        default=timezone.localdate
+    )
+
+    learning = models.TextField(
+        help_text="What did you learn today?"
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    class Meta:
+        ordering = ['-date', '-updated_at']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['trainer', 'date'],
+                name='unique_trainer_daily_learning'
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.trainer.Name} - {self.date}"

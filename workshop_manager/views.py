@@ -808,17 +808,29 @@ def edit_task(request, task_id):
 # TRAINER DASHBOARD
 # =====================================================
 
+# =====================================================
+# TRAINER DASHBOARD
+# =====================================================
+
 @login_required
 def trainer_dashboard(request):
 
-    trainer = Trainer.objects.filter(
-        user=request.user
-    ).first()
+    # -------------------------------------------------
+    # FIND TRAINER
+    # -------------------------------------------------
+
+    trainer = (
+        Trainer.objects
+        .filter(user=request.user)
+        .first()
+    )
 
     if not trainer:
-        trainer = Trainer.objects.filter(
-            email=request.user.email
-        ).first()
+        trainer = (
+            Trainer.objects
+            .filter(email=request.user.email)
+            .first()
+        )
 
     if not trainer:
         messages.error(
@@ -829,7 +841,11 @@ def trainer_dashboard(request):
 
     today = timezone.localdate()
 
-    # Only full-time trainers get attendance record
+    # -------------------------------------------------
+    # ATTENDANCE
+    # ONLY FULL-TIME TRAINERS
+    # -------------------------------------------------
+
     attendance = None
 
     if trainer.is_full_time:
@@ -841,8 +857,11 @@ def trainer_dashboard(request):
             )
         )
 
-    # Today's tasks
-    tasks = (
+    # -------------------------------------------------
+    # TODAY'S WORK
+    # -------------------------------------------------
+
+    today_tasks = (
         TodoTask.objects
         .filter(
             trainer=trainer,
@@ -850,6 +869,24 @@ def trainer_dashboard(request):
         )
         .order_by("-created_on")
     )
+
+    # -------------------------------------------------
+    # TODAY'S LEARNING
+    # ALL TRAINERS CAN ADD LEARNING
+    # -------------------------------------------------
+
+    daily_learning = (
+        DailyLearning.objects
+        .filter(
+            trainer=trainer,
+            date=today
+        )
+        .first()
+    )
+
+    # -------------------------------------------------
+    # ASSIGNED WORKSHOPS
+    # -------------------------------------------------
 
     workshops = (
         Workshop.objects
@@ -860,16 +897,187 @@ def trainer_dashboard(request):
         .order_by("start_date")
     )
 
+    # -------------------------------------------------
+    # THIS WEEK
+    # -------------------------------------------------
+
+    week_start = (
+        today -
+        timedelta(days=today.weekday())
+    )
+
+    week_end = week_start + timedelta(days=6)
+
+    # -------------------------------------------------
+    # WORKSHOPS FOR THIS TRAINER
+    # -------------------------------------------------
+
+    weekly_workshops = (
+        Workshop.objects
+        .filter(
+            assigned_trainers=trainer,
+            start_date__lte=week_end,
+            end_date__gte=week_start
+        )
+        .select_related("college")
+        .order_by("start_date")
+    )
+
+    # -------------------------------------------------
+    # CALENDAR EVENTS
+    # FDP / ONLINE WORKSHOP /
+    # GUEST FACULTY / MEETINGS ETC.
+    # -------------------------------------------------
+
+    weekly_events = (
+        CalendarEvent.objects
+        .filter(
+            trainers=trainer,
+            date__gte=week_start,
+            date__lte=week_end
+        )
+        .select_related(
+            "college",
+            "workshop"
+        )
+        .order_by(
+            "date",
+            "start_time"
+        )
+    )
+
+    # -------------------------------------------------
+    # WEEKLY SCHEDULE
+    # -------------------------------------------------
+
+    schedule = []
+
+    for day_offset in range(7):
+
+        current_day = (
+            week_start +
+            timedelta(days=day_offset)
+        )
+
+        day_items = []
+
+        # ---------------------------------------------
+        # WORKSHOPS
+        # ---------------------------------------------
+
+        for workshop in weekly_workshops:
+
+            if (
+                workshop.start_date <= current_day
+                <= workshop.end_date
+            ):
+
+                day_items.append({
+                    "date": current_day,
+                    "title": workshop.title,
+                    "type": "Workshop",
+                    "college": (
+                        workshop.college.name
+                        if workshop.college
+                        else "-"
+                    ),
+                    "time": "-",
+                    "location": "-",
+                    "status": workshop.get_status_display(),
+                })
+
+        # ---------------------------------------------
+        # CALENDAR EVENTS
+        # ---------------------------------------------
+
+        for event in weekly_events:
+
+            if event.date != current_day:
+                continue
+
+            # If event is linked to workshop,
+            # workshop is already shown above.
+            if (
+                event.workshop
+                and event.event_type == "workshop"
+            ):
+                continue
+
+            time_text = "-"
+
+            if event.start_time and event.end_time:
+                time_text = (
+                    f"{event.start_time.strftime('%I:%M %p')}"
+                    f" - "
+                    f"{event.end_time.strftime('%I:%M %p')}"
+                )
+
+            elif event.start_time:
+                time_text = (
+                    event.start_time.strftime("%I:%M %p")
+                )
+
+            day_items.append({
+                "date": current_day,
+                "title": event.title,
+                "type": event.get_event_type_display(),
+                "college": (
+                    event.college.name
+                    if event.college
+                    else "-"
+                ),
+                "time": time_text,
+                "location": event.location or "-",
+                "status": "Scheduled",
+            })
+
+        # Sort day's activities
+
+        day_items.sort(
+            key=lambda x: (
+                x["date"],
+                x["time"]
+            )
+        )
+
+        schedule.extend(day_items)
+
+    # -------------------------------------------------
+    # RENDER
+    # -------------------------------------------------
+
     return render(
         request,
         "todo/trainer_dashboard.html",
         {
             "trainer": trainer,
             "today": today,
+
             "attendance": attendance,
-            "tasks": tasks,
-            "workshops": workshops,
-            "is_full_time": trainer.is_full_time,
+
+            "is_full_time":
+                trainer.is_full_time,
+
+            "today_tasks":
+                today_tasks,
+
+            "tasks":
+                today_tasks,
+
+            "daily_learning":
+                daily_learning,
+
+            "workshops":
+                workshops,
+
+            "weekly_schedule":
+                schedule,
+
+            "week_start":
+                week_start,
+
+            "week_end":
+                week_end,
         }
     )
 @login_required
@@ -2211,5 +2419,402 @@ def weekly_schedule(request):
             "previous_week": previous_week,
             "next_week": next_week,
             "today": today,
+        }
+    )
+from .models import DailyLearning
+from .forms import DailyLearningForm
+@login_required
+def add_daily_learning(request):
+
+    trainer = (
+        Trainer.objects
+        .filter(user=request.user)
+        .first()
+    )
+
+    if not trainer:
+        trainer = (
+            Trainer.objects
+            .filter(email=request.user.email)
+            .first()
+        )
+
+    if not trainer:
+        messages.error(
+            request,
+            "Your account is not linked to a Trainer profile."
+        )
+        return redirect("dashboard")
+
+    today = timezone.localdate()
+
+    learning, created = DailyLearning.objects.get_or_create(
+        trainer=trainer,
+        date=today,
+        defaults={
+            "learning": ""
+        }
+    )
+
+    if request.method == "POST":
+
+        form = DailyLearningForm(
+            request.POST,
+            instance=learning
+        )
+
+        if form.is_valid():
+
+            form.save()
+
+            messages.success(
+                request,
+                "Today's learning has been saved successfully."
+            )
+
+            return redirect("trainer_dashboard")
+
+    else:
+
+        form = DailyLearningForm(
+            instance=learning
+        )
+
+    return render(
+        request,
+        "todo/daily_learning.html",
+        {
+            "trainer": trainer,
+            "today": today,
+            "form": form,
+            "learning": learning,
+        }
+    )
+
+@login_required
+def my_learning_history(request):
+
+    trainer = (
+        Trainer.objects
+        .filter(user=request.user)
+        .first()
+    )
+
+    if not trainer:
+        trainer = (
+            Trainer.objects
+            .filter(email=request.user.email)
+            .first()
+        )
+
+    if not trainer:
+        messages.error(
+            request,
+            "Your account is not linked to a Trainer profile."
+        )
+        return redirect("dashboard")
+
+    learnings = (
+        DailyLearning.objects
+        .filter(trainer=trainer)
+        .order_by("-date")
+    )
+
+    return render(
+        request,
+        "todo/my_learning_history.html",
+        {
+            "trainer": trainer,
+            "learnings": learnings,
+        }
+    )
+
+# =====================================================
+# FULL-TIME TRAINER WEEKLY WORK LIST
+# =====================================================
+
+@login_required
+def full_time_work_list(request):
+
+    today = timezone.localdate()
+
+    # -------------------------------------------------
+    # SELECT WEEK
+    # -------------------------------------------------
+
+    week_param = request.GET.get("week")
+
+    if week_param:
+        try:
+            selected_date = date.fromisoformat(
+                week_param
+            )
+        except ValueError:
+            selected_date = today
+    else:
+        selected_date = today
+
+    week_start = (
+        selected_date -
+        timedelta(days=selected_date.weekday())
+    )
+
+    week_end = week_start + timedelta(days=6)
+
+    # -------------------------------------------------
+    # FULL-TIME TRAINERS
+    # -------------------------------------------------
+
+    trainers = (
+        Trainer.objects
+        .filter(is_full_time=True)
+        .order_by("Name")
+    )
+
+    # -------------------------------------------------
+    # OPTIONAL TRAINER FILTER
+    # -------------------------------------------------
+
+    trainer_id = request.GET.get("trainer")
+
+    # -------------------------------------------------
+    # WORKSHOPS
+    # SOURCE: WORKSHOP LIST
+    # -------------------------------------------------
+
+    workshops = (
+        Workshop.objects
+        .filter(
+            assigned_trainers__is_full_time=True,
+            start_date__lte=week_end,
+            end_date__gte=week_start
+        )
+        .select_related("college")
+        .prefetch_related("assigned_trainers")
+        .distinct()
+        .order_by(
+            "start_date",
+            "title"
+        )
+    )
+
+    if trainer_id:
+        workshops = workshops.filter(
+            assigned_trainers__id=trainer_id
+        )
+
+    # -------------------------------------------------
+    # CALENDAR EVENTS
+    # FDP / ONLINE WORKSHOP /
+    # GUEST FACULTY / MEETING / OTHER
+    # -------------------------------------------------
+
+    events = (
+        CalendarEvent.objects
+        .filter(
+            trainers__is_full_time=True,
+            date__gte=week_start,
+            date__lte=week_end
+        )
+        .select_related(
+            "college",
+            "workshop"
+        )
+        .prefetch_related("trainers")
+        .distinct()
+        .order_by(
+            "date",
+            "start_time"
+        )
+    )
+
+    if trainer_id:
+        events = events.filter(
+            trainers__id=trainer_id
+        )
+
+    # -------------------------------------------------
+    # BUILD TABLE ROWS
+    # -------------------------------------------------
+
+    schedule = []
+
+    # =================================================
+    # WORKSHOPS
+    # =================================================
+
+    for workshop in workshops:
+
+        current_day = max(
+            workshop.start_date,
+            week_start
+        )
+
+        final_day = min(
+            workshop.end_date,
+            week_end
+        )
+
+        while current_day <= final_day:
+
+            assigned_trainers = [
+                trainer
+                for trainer
+                in workshop.assigned_trainers.all()
+                if trainer.is_full_time
+            ]
+
+            if trainer_id:
+
+                assigned_trainers = [
+                    trainer
+                    for trainer
+                    in assigned_trainers
+                    if str(trainer.id) == str(trainer_id)
+                ]
+
+            for trainer in assigned_trainers:
+
+                schedule.append({
+                    "date": current_day,
+                    "trainer": trainer,
+                    "title": workshop.title,
+                    "type": "Workshop",
+                    "college": (
+                        workshop.college.name
+                        if workshop.college
+                        else "-"
+                    ),
+                    "time": "-",
+                    "location": (
+                        workshop.college.name
+                        if workshop.college
+                        else "-"
+                    ),
+                    "status": workshop.get_status_display(),
+                    "source": "Workshop",
+                    "source_id": workshop.id,
+                })
+
+            current_day += timedelta(days=1)
+
+    # =================================================
+    # CALENDAR EVENTS
+    # =================================================
+
+    for event in events:
+
+        # Avoid duplicating normal workshop events
+        # that are already coming from Workshop List.
+
+        if (
+            event.event_type == "workshop"
+            and event.workshop
+        ):
+            continue
+
+        time_text = "-"
+
+        if event.start_time and event.end_time:
+
+            time_text = (
+                f"{event.start_time.strftime('%I:%M %p')}"
+                f" - "
+                f"{event.end_time.strftime('%I:%M %p')}"
+            )
+
+        elif event.start_time:
+
+            time_text = (
+                event.start_time.strftime("%I:%M %p")
+            )
+
+        event_trainers = [
+            trainer
+            for trainer in event.trainers.all()
+            if trainer.is_full_time
+        ]
+
+        if trainer_id:
+
+            event_trainers = [
+                trainer
+                for trainer in event_trainers
+                if str(trainer.id) == str(trainer_id)
+            ]
+
+        for trainer in event_trainers:
+
+            schedule.append({
+                "date": event.date,
+                "trainer": trainer,
+                "title": event.title,
+                "type": event.get_event_type_display(),
+                "college": (
+                    event.college.name
+                    if event.college
+                    else "-"
+                ),
+                "time": time_text,
+                "location": event.location or "-",
+                "status": "Scheduled",
+                "source": "Calendar",
+                "source_id": event.id,
+            })
+
+    # -------------------------------------------------
+    # SORT
+    # -------------------------------------------------
+
+    schedule.sort(
+        key=lambda item: (
+            item["date"],
+            item["trainer"].Name.lower(),
+            item["time"]
+        )
+    )
+
+    # -------------------------------------------------
+    # WEEK NAVIGATION
+    # -------------------------------------------------
+
+    previous_week = (
+        week_start -
+        timedelta(days=7)
+    )
+
+    next_week = (
+        week_start +
+        timedelta(days=7)
+    )
+
+    # -------------------------------------------------
+    # RENDER
+    # -------------------------------------------------
+
+    return render(
+        request,
+        "todo/full_time_work_list.html",
+        {
+            "schedule": schedule,
+            "trainers": trainers,
+
+            "selected_trainer":
+                trainer_id,
+
+            "week_start":
+                week_start,
+
+            "week_end":
+                week_end,
+
+            "previous_week":
+                previous_week,
+
+            "next_week":
+                next_week,
+
+            "today":
+                today,
         }
     )

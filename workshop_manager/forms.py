@@ -807,3 +807,19 @@ class CalendarEventForm(forms.ModelForm):
             )
 
         return cleaned_data
+    
+from .models import DailyLearning
+
+class DailyLearningForm(forms.ModelForm):
+
+    class Meta:
+        model = DailyLearning
+        fields = ['learning']
+
+        widgets = {
+            'learning': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 5,
+                'placeholder': 'What did you learn today?'
+            }),
+        }

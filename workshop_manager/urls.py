@@ -417,6 +417,45 @@ urlpatterns = [
         views.delete_meeting_note,
         name="delete_meeting_note",
     ),
+    path(
+    "trainer/full-time-work/",
+    views.full_time_work_list,
+    name="full_time_work_list"
+),path(
+    "trainer/dashboard/",
+    views.trainer_dashboard,
+    name="trainer_dashboard"
+),
+
+path(
+    "trainer/checkin/",
+    views.daily_checkin,
+    name="daily_checkin"
+),
+
+path(
+    "trainer/today-task/",
+    views.add_today_task,
+    name="add_today_task"
+),
+
+path(
+    "trainer/daily-learning/",
+    views.add_daily_learning,
+    name="add_daily_learning"
+),
+
+path(
+    "trainer/learning-history/",
+    views.my_learning_history,
+    name="my_learning_history"
+),
+
+path(
+    "trainer/full-time-work/",
+    views.full_time_work_list,
+    name="full_time_work_list"
+),
 ]
 
 
