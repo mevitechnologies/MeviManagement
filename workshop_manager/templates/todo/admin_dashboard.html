@@ -1,435 +1,3046 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
+
 {% block content %}
 
 <style>
 
-body{
-    background:#f4f7fc;
+/* =========================================================
+   MEVI TASK MANAGEMENT
+========================================================= */
+
+:root {
+
+    --mevi-primary: #5B4BDB;
+    --mevi-primary-dark: #4338CA;
+    --mevi-secondary: #7C3AED;
+    --mevi-pink: #EC4899;
+
+    --pending: #EF4444;
+    --pending-soft: #FEF2F2;
+
+    --progress: #F59E0B;
+    --progress-soft: #FFFBEB;
+
+    --completed: #16A34A;
+    --completed-soft: #F0FDF4;
+
+    --blue: #2563EB;
+    --blue-soft: #EFF6FF;
+
+    --dark: #172033;
+    --dark-soft: #344054;
+
+    --muted: #667085;
+    --muted-light: #98A2B3;
+
+    --border: #EAECF0;
+
+    --page-bg: #F6F7FB;
+
+    --white: #FFFFFF;
+
+    --radius-sm: 10px;
+    --radius-md: 15px;
+    --radius-lg: 20px;
+    --radius-xl: 26px;
+
+    --shadow:
+        0 7px 25px rgba(16,24,40,.055);
+
+    --shadow-hover:
+        0 15px 35px rgba(16,24,40,.11);
 }
 
-.board-title{
-    font-weight:700;
-    color:#1f3c88;
+
+body {
+
+    background:
+        var(--page-bg);
+
 }
 
-.stats-card{
-    border:none;
-    border-radius:18px;
-    overflow:hidden;
-    transition:.3s;
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.task-page {
+
+    max-width: 1600px;
+
+    margin:
+        0 auto;
+
+    padding:
+        26px
+        26px
+        50px;
+
 }
 
-.stats-card:hover{
-    transform:translateY(-4px);
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.page-header {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        20px;
+
+    margin-bottom:
+        24px;
+
 }
 
-.scrum-column{
-    min-height:700px;
-    border-radius:18px;
-    padding:18px;
-    background:#ffffff;
-    box-shadow:0 10px 30px rgba(0,0,0,.06);
+
+.page-header-left {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        14px;
+
 }
 
-.column-header{
-    font-weight:700;
-    font-size:1.05rem;
-    margin-bottom:18px;
-    padding-bottom:10px;
-    border-bottom:2px solid #f0f0f0;
+
+.page-icon {
+
+    width:
+        52px;
+
+    height:
+        52px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    border-radius:
+        16px;
+
+    color:
+        white;
+
+    font-size:
+        22px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--mevi-primary),
+            var(--mevi-secondary)
+        );
+
+    box-shadow:
+        0 10px 22px
+        rgba(91,75,219,.20);
+
 }
 
-.pending-header{
-    color:#dc3545;
+
+.page-title {
+
+    margin:
+        0;
+
+    color:
+        var(--dark);
+
+    font-size:
+        26px;
+
+    font-weight:
+        850;
+
+    letter-spacing:
+        -.5px;
+
 }
 
-.progress-header{
-    color:#fd7e14;
+
+.page-subtitle {
+
+    margin:
+        4px
+        0
+        0;
+
+    color:
+        var(--muted);
+
+    font-size:
+        12px;
+
 }
 
-.completed-header{
-    color:#198754;
+
+.page-actions {
+
+    display:
+        flex;
+
+    flex-wrap:
+        wrap;
+
+    gap:
+        8px;
+
 }
 
-.task-card{
-    border:none;
-    border-radius:16px;
-    background:#fff;
-    padding:16px;
-    margin-bottom:16px;
-    box-shadow:0 5px 15px rgba(0,0,0,.05);
-    transition:.25s;
+
+.page-action {
+
+    min-height:
+        40px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        7px;
+
+    padding:
+        0
+        14px;
+
+    border-radius:
+        10px;
+
+    text-decoration:
+        none;
+
+    font-size:
+        11px;
+
+    font-weight:
+        750;
+
+    transition:
+        .2s ease;
+
 }
 
-.task-card:hover{
-    transform:translateY(-5px);
-    box-shadow:0 15px 35px rgba(0,0,0,.12);
+
+.page-action.primary {
+
+    color:
+        white;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--mevi-primary),
+            var(--mevi-secondary)
+        );
+
+    box-shadow:
+        0 7px 18px
+        rgba(91,75,219,.18);
+
 }
 
-.task-title{
-    font-weight:700;
-    font-size:1rem;
+
+.page-action.secondary {
+
+    color:
+        var(--dark-soft);
+
+    background:
+        white;
+
+    border:
+        1px solid
+        var(--border);
+
 }
 
-.progress{
-    height:10px;
-    border-radius:10px;
+
+.page-action:hover {
+
+    transform:
+        translateY(-2px);
+
 }
 
-.priority-badge{
-    font-size:.75rem;
-    border-radius:50px;
-    padding:6px 12px;
+
+/* =========================================================
+   WELCOME STRIP
+========================================================= */
+
+.team-strip {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        15px;
+
+    padding:
+        13px
+        17px;
+
+    margin-bottom:
+        22px;
+
+    border-radius:
+        14px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #F4F1FF,
+            #FFF4FA
+        );
+
+    border:
+        1px solid
+        #E9E4FF;
+
 }
 
-.task-meta{
-    font-size:.85rem;
+
+.team-strip-text {
+
+    color:
+        var(--dark-soft);
+
+    font-size:
+        11px;
+
+    line-height:
+        1.5;
+
 }
 
-.action-btn{
-    width:36px;
-    height:36px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+
+.team-strip-text strong {
+
+    color:
+        var(--mevi-primary);
+
 }
 
-.empty-box{
-    padding:60px 10px;
-    text-align:center;
-    color:#999;
+
+.team-strip-date {
+
+    white-space:
+        nowrap;
+
+    color:
+        var(--muted);
+
+    font-size:
+        10px;
+
+    font-weight:
+        700;
+
 }
 
-.view-only{
-    text-align:center;
-    color:#6c757d;
-    font-size:.8rem;
-    margin-top:8px;
+
+/* =========================================================
+   STATS
+========================================================= */
+
+.stats-grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap:
+        13px;
+
+    margin-bottom:
+        26px;
+
+}
+
+
+.stat-card {
+
+    position:
+        relative;
+
+    overflow:
+        hidden;
+
+    padding:
+        18px;
+
+    min-height:
+        122px;
+
+    border-radius:
+        17px;
+
+    background:
+        white;
+
+    border:
+        1px solid
+        var(--border);
+
+    box-shadow:
+        var(--shadow);
+
+    transition:
+        .2s ease;
+
+}
+
+
+.stat-card:hover {
+
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        var(--shadow-hover);
+
+}
+
+
+.stat-card::after {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    width:
+        80px;
+
+    height:
+        80px;
+
+    border-radius:
+        50%;
+
+    right:
+        -30px;
+
+    bottom:
+        -30px;
+
+    background:
+        rgba(91,75,219,.045);
+
+}
+
+
+.stat-top {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+}
+
+
+.stat-icon {
+
+    width:
+        37px;
+
+    height:
+        37px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    border-radius:
+        11px;
+
+    font-size:
+        16px;
+
+}
+
+
+.stat-total .stat-icon {
+
+    background:
+        #F0EDFF;
+
+    color:
+        var(--mevi-primary);
+
+}
+
+
+.stat-pending .stat-icon {
+
+    background:
+        var(--pending-soft);
+
+    color:
+        var(--pending);
+
+}
+
+
+.stat-progress .stat-icon {
+
+    background:
+        var(--progress-soft);
+
+    color:
+        var(--progress);
+
+}
+
+
+.stat-completed .stat-icon {
+
+    background:
+        var(--completed-soft);
+
+    color:
+        var(--completed);
+
+}
+
+
+.stat-number {
+
+    margin-top:
+        14px;
+
+    color:
+        var(--dark);
+
+    font-size:
+        27px;
+
+    line-height:
+        1;
+
+    font-weight:
+        850;
+
+}
+
+
+.stat-label {
+
+    margin-top:
+        5px;
+
+    color:
+        var(--muted);
+
+    font-size:
+        10px;
+
+    font-weight:
+        650;
+
+}
+
+
+/* =========================================================
+   BOARD TOOLBAR
+========================================================= */
+
+.board-toolbar {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        12px;
+
+    margin-bottom:
+        14px;
+
+}
+
+
+.board-heading {
+
+    color:
+        var(--dark);
+
+    font-size:
+        17px;
+
+    font-weight:
+        850;
+
+}
+
+
+.board-description {
+
+    margin-top:
+        3px;
+
+    color:
+        var(--muted);
+
+    font-size:
+        10px;
+
+}
+
+
+.search-box {
+
+    position:
+        relative;
+
+    width:
+        240px;
+
+}
+
+
+.search-box i {
+
+    position:
+        absolute;
+
+    left:
+        11px;
+
+    top:
+        50%;
+
+    transform:
+        translateY(-50%);
+
+    color:
+        var(--muted-light);
+
+    font-size:
+        12px;
+
+}
+
+
+.search-box input {
+
+    width:
+        100%;
+
+    height:
+        38px;
+
+    padding:
+        0
+        12px
+        0
+        32px;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:
+        10px;
+
+    outline:
+        none;
+
+    background:
+        white;
+
+    color:
+        var(--dark);
+
+    font-size:
+        10px;
+
+}
+
+
+.search-box input:focus {
+
+    border-color:
+        #C9C2FF;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(91,75,219,.07);
+
+}
+
+
+/* =========================================================
+   KANBAN BOARD
+========================================================= */
+
+.kanban-board {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap:
+        16px;
+
+    align-items:
+        start;
+
+}
+
+
+/* =========================================================
+   COLUMN
+========================================================= */
+
+.kanban-column {
+
+    min-width:
+        0;
+
+    min-height:
+        600px;
+
+    padding:
+        14px;
+
+    border-radius:
+        20px;
+
+    background:
+        #EEF1F6;
+
+    border:
+        1px solid
+        #E5E7EB;
+
+}
+
+
+/* =========================================================
+   COLUMN HEADER
+========================================================= */
+
+.column-header {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    padding:
+        7px
+        4px
+        13px;
+
+    margin-bottom:
+        7px;
+
+}
+
+
+.column-title-wrap {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        9px;
+
+}
+
+
+.column-dot {
+
+    width:
+        10px;
+
+    height:
+        10px;
+
+    border-radius:
+        50%;
+
+}
+
+
+.pending-dot {
+
+    background:
+        var(--pending);
+
+    box-shadow:
+        0 0 0 4px
+        rgba(239,68,68,.10);
+
+}
+
+
+.progress-dot {
+
+    background:
+        var(--progress);
+
+    box-shadow:
+        0 0 0 4px
+        rgba(245,158,11,.10);
+
+}
+
+
+.completed-dot {
+
+    background:
+        var(--completed);
+
+    box-shadow:
+        0 0 0 4px
+        rgba(22,163,74,.10);
+
+}
+
+
+.column-title {
+
+    color:
+        var(--dark);
+
+    font-size:
+        13px;
+
+    font-weight:
+        850;
+
+}
+
+
+.column-count {
+
+    min-width:
+        27px;
+
+    height:
+        25px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        0
+        7px;
+
+    border-radius:
+        8px;
+
+    font-size:
+        10px;
+
+    font-weight:
+        850;
+
+}
+
+
+.pending-count {
+
+    color:
+        #B91C1C;
+
+    background:
+        #FEE2E2;
+
+}
+
+
+.progress-count {
+
+    color:
+        #B45309;
+
+    background:
+        #FEF3C7;
+
+}
+
+
+.completed-count {
+
+    color:
+        #15803D;
+
+    background:
+        #DCFCE7;
+
+}
+
+
+/* =========================================================
+   TASK CARD
+========================================================= */
+
+.task-card {
+
+    position:
+        relative;
+
+    padding:
+        15px;
+
+    margin-bottom:
+        11px;
+
+    border-radius:
+        15px;
+
+    background:
+        white;
+
+    border:
+        1px solid
+        #E8EAF0;
+
+    box-shadow:
+        0 4px 14px
+        rgba(16,24,40,.045);
+
+    transition:
+        .22s ease;
+
+}
+
+
+.task-card:hover {
+
+    transform:
+        translateY(-3px);
+
+    border-color:
+        #DDD9FF;
+
+    box-shadow:
+        0 12px 25px
+        rgba(16,24,40,.09);
+
+}
+
+
+.task-top {
+
+    display:
+        flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        flex-start;
+
+    gap:
+        10px;
+
+}
+
+
+.task-title-wrap {
+
+    min-width:
+        0;
+
+}
+
+
+.task-title {
+
+    color:
+        var(--dark);
+
+    font-size:
+        12px;
+
+    line-height:
+        1.45;
+
+    font-weight:
+        800;
+
+}
+
+
+.task-id {
+
+    display:
+        block;
+
+    margin-top:
+        3px;
+
+    color:
+        var(--muted-light);
+
+    font-size:
+        8px;
+
+}
+
+
+/* =========================================================
+   PRIORITY
+========================================================= */
+
+.priority {
+
+    flex:
+        0 0 auto;
+
+    padding:
+        5px
+        8px;
+
+    border-radius:
+        7px;
+
+    font-size:
+        8px;
+
+    font-weight:
+        800;
+
+}
+
+
+.priority-high {
+
+    color:
+        #B91C1C;
+
+    background:
+        #FEE2E2;
+
+}
+
+
+.priority-medium {
+
+    color:
+        #A16207;
+
+    background:
+        #FEF3C7;
+
+}
+
+
+.priority-low {
+
+    color:
+        #15803D;
+
+    background:
+        #DCFCE7;
+
+}
+
+
+/* =========================================================
+   TASK META
+========================================================= */
+
+.task-meta {
+
+    display:
+        flex;
+
+    flex-wrap:
+        wrap;
+
+    gap:
+        7px;
+
+    margin-top:
+        13px;
+
+}
+
+
+.meta-item {
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        5px;
+
+    padding:
+        5px
+        7px;
+
+    border-radius:
+        7px;
+
+    background:
+        #F8F9FB;
+
+    color:
+        var(--muted);
+
+    font-size:
+        8px;
+
+    font-weight:
+        650;
+
+}
+
+
+.meta-item i {
+
+    color:
+        var(--mevi-primary);
+
+}
+
+
+/* =========================================================
+   TRAINER
+========================================================= */
+
+.trainer-row {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        8px;
+
+    margin-top:
+        13px;
+
+    padding-top:
+        11px;
+
+    border-top:
+        1px solid
+        #F1F2F4;
+
+}
+
+
+.trainer-avatar {
+
+    width:
+        27px;
+
+    height:
+        27px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    border-radius:
+        50%;
+
+    color:
+        var(--mevi-primary);
+
+    background:
+        #F0EDFF;
+
+    font-size:
+        10px;
+
+    font-weight:
+        850;
+
+}
+
+
+.trainer-info {
+
+    min-width:
+        0;
+
+}
+
+
+.trainer-name {
+
+    color:
+        var(--dark-soft);
+
+    font-size:
+        9px;
+
+    font-weight:
+        800;
+
+}
+
+
+.trainer-label {
+
+    color:
+        var(--muted-light);
+
+    font-size:
+        7px;
+
+}
+
+
+/* =========================================================
+   PROGRESS
+========================================================= */
+
+.task-progress {
+
+    margin-top:
+        13px;
+
+}
+
+
+.progress-head {
+
+    display:
+        flex;
+
+    justify-content:
+        space-between;
+
+    margin-bottom:
+        6px;
+
+}
+
+
+.progress-label {
+
+    color:
+        var(--muted);
+
+    font-size:
+        8px;
+
+}
+
+
+.progress-value {
+
+    color:
+        var(--dark-soft);
+
+    font-size:
+        8px;
+
+    font-weight:
+        800;
+
+}
+
+
+.progress-track {
+
+    width:
+        100%;
+
+    height:
+        6px;
+
+    overflow:
+        hidden;
+
+    border-radius:
+        20px;
+
+    background:
+        #ECEEF2;
+
+}
+
+
+.progress-fill {
+
+    height:
+        100%;
+
+    border-radius:
+        20px;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--mevi-primary),
+            var(--mevi-pink)
+        );
+
+}
+
+
+.progress-fill.complete {
+
+    background:
+        linear-gradient(
+            90deg,
+            #16A34A,
+            #22C55E
+        );
+/* =========================================================
+   MEVI UI — LARGER & MORE READABLE TYPOGRAPHY
+   ========================================================= */
+
+/* Main page */
+body {
+    font-size: 16px;
+}
+
+/* Page heading */
+.page-title,
+.header-title {
+    font-size: 28px !important;
+    font-weight: 800 !important;
+}
+
+.page-subtitle,
+.header-subtitle {
+    font-size: 15px !important;
+}
+
+/* Top action buttons */
+.btn,
+button {
+    font-size: 15px !important;
+    font-weight: 700;
+}
+
+.btn i,
+button i {
+    font-size: 15px;
+}
+
+/* Team strip / information banner */
+.team-strip {
+    font-size: 15px !important;
+}
+
+.team-strip strong {
+    font-size: 16px !important;
+}
+
+/* Statistics */
+.stat-card .stat-value,
+.stat-number {
+    font-size: 30px !important;
+    font-weight: 800 !important;
+}
+
+.stat-card .stat-label,
+.stat-label {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+}
+
+/* Board toolbar */
+.board-title,
+.toolbar-title {
+    font-size: 19px !important;
+    font-weight: 800 !important;
+}
+
+.search-input,
+.search-box input {
+    font-size: 15px !important;
+}
+
+/* Kanban column headers */
+.kanban-column-header,
+.column-header {
+    font-size: 17px !important;
+    font-weight: 800 !important;
+}
+
+.kanban-column-header .count,
+.column-count {
+    font-size: 14px !important;
+    font-weight: 800 !important;
+}
+
+/* =========================================================
+   TASK CARDS
+   ========================================================= */
+
+.task-card {
+    padding: 20px !important;
+}
+
+/* Task title — most important */
+.task-card .task-title,
+.task-card h4,
+.task-card h5 {
+    font-size: 17px !important;
+    line-height: 1.45 !important;
+    font-weight: 800 !important;
+}
+
+/* Task description */
+.task-card .task-description {
+    font-size: 14px !important;
+    line-height: 1.55 !important;
+}
+
+/* Task metadata */
+.task-card .task-meta,
+.task-card .meta,
+.task-card .task-info {
+    font-size: 14px !important;
+}
+
+.task-card .task-meta i,
+.task-card .meta i {
+    font-size: 14px !important;
+}
+
+/* Trainer name */
+.task-card .trainer-name,
+.task-card .assignee-name {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+}
+
+/* Trainer role / secondary text */
+.task-card .trainer-role,
+.task-card .assignee-role {
+    font-size: 13px !important;
+}
+
+/* Task ID */
+.task-card .task-id {
+    font-size: 12px !important;
+    font-weight: 700 !important;
+}
+
+/* Priority badge */
+.priority-badge,
+.badge {
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    padding: 6px 10px !important;
+}
+
+/* Date / hours */
+.task-card .date,
+.task-card .hours,
+.task-card .estimated-hours {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+}
+
+/* Progress */
+.progress-label {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+}
+
+.progress-percentage {
+    font-size: 14px !important;
+    font-weight: 800 !important;
+}
+
+/* Action icons */
+.task-actions a,
+.task-actions button {
+    font-size: 15px !important;
+}
+
+/* Empty state */
+.empty-state h4,
+.empty-state h5 {
+    font-size: 17px !important;
+    font-weight: 800 !important;
+}
+
+.empty-state p {
+    font-size: 14px !important;
+}
+
+/* Footer */
+.footer-message {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+}
+
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+
+.modal-title {
+    font-size: 21px !important;
+    font-weight: 800 !important;
+}
+
+.modal-body label {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+}
+
+.modal-body input,
+.modal-body textarea,
+.modal-body select {
+    font-size: 15px !important;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    .page-title,
+    .header-title {
+        font-size: 24px !important;
+    }
+
+    .stat-card .stat-value,
+    .stat-number {
+        font-size: 26px !important;
+    }
+
+    .kanban-column-header,
+    .column-header {
+        font-size: 16px !important;
+    }
+
+    .task-card .task-title,
+    .task-card h4,
+    .task-card h5 {
+        font-size: 16px !important;
+    }
+
+    .task-card .task-meta,
+    .task-card .meta,
+    .task-card .task-info {
+        font-size: 14px !important;
+    }
+}
+}
+
+
+/* =========================================================
+   TASK ACTIONS
+========================================================= */
+
+.task-actions {
+
+    display:
+        flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        center;
+
+    gap:
+        7px;
+
+    margin-top:
+        13px;
+
+}
+
+
+.view-task {
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        5px;
+
+    padding:
+        7px
+        9px;
+
+    border-radius:
+        8px;
+
+    color:
+        var(--mevi-primary);
+
+    background:
+        #F4F2FF;
+
+    text-decoration:
+        none;
+
+    font-size:
+        8px;
+
+    font-weight:
+        800;
+
+}
+
+
+.view-task:hover {
+
+    color:
+        var(--mevi-primary-dark);
+
+    background:
+        #EDE9FE;
+
+}
+
+
+.admin-actions {
+
+    display:
+        flex;
+
+    gap:
+        5px;
+
+}
+
+
+.icon-btn {
+
+    width:
+        29px;
+
+    height:
+        29px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    border-radius:
+        8px;
+
+    background:
+        white;
+
+    border:
+        1px solid
+        var(--border);
+
+    color:
+        var(--muted);
+
+    text-decoration:
+        none;
+
+    font-size:
+        10px;
+
+    transition:
+        .15s ease;
+
+}
+
+
+.icon-btn:hover {
+
+    color:
+        var(--mevi-primary);
+
+    border-color:
+        #CFC9FF;
+
+    background:
+        #F8F7FF;
+
+}
+
+
+.icon-btn.delete:hover {
+
+    color:
+        var(--pending);
+
+    border-color:
+        #FECACA;
+
+    background:
+        #FEF2F2;
+
+}
+
+
+/* =========================================================
+   VIEW ONLY
+========================================================= */
+
+.view-only {
+
+    margin-top:
+        10px;
+
+    padding:
+        6px;
+
+    text-align:
+        center;
+
+    border-radius:
+        7px;
+
+    color:
+        var(--muted-light);
+
+    background:
+        #F8F9FB;
+
+    font-size:
+        7px;
+
+    font-weight:
+        700;
+
+}
+
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.empty-column {
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    min-height:
+        330px;
+
+    color:
+        var(--muted-light);
+
+    text-align:
+        center;
+
+}
+
+
+.empty-icon {
+
+    width:
+        54px;
+
+    height:
+        54px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    margin-bottom:
+        12px;
+
+    border-radius:
+        17px;
+
+    background:
+        rgba(255,255,255,.75);
+
+    font-size:
+        22px;
+
+}
+
+
+.empty-title {
+
+    color:
+        var(--dark-soft);
+
+    font-size:
+        11px;
+
+    font-weight:
+        800;
+
+}
+
+
+.empty-text {
+
+    max-width:
+        170px;
+
+    margin-top:
+        4px;
+
+    color:
+        var(--muted-light);
+
+    font-size:
+        8px;
+
+    line-height:
+        1.5;
+
+}
+
+
+/* =========================================================
+   FOOTER MESSAGE
+========================================================= */
+
+.task-footer {
+
+    margin-top:
+        23px;
+
+    padding:
+        19px;
+
+    text-align:
+        center;
+
+    border-radius:
+        16px;
+
+    border:
+        1px solid
+        #E9E4FF;
+
+    background:
+        linear-gradient(
+            135deg,
+            #F5F3FF,
+            #FFF3F8
+        );
+
+}
+
+
+.task-footer-title {
+
+    color:
+        var(--dark);
+
+    font-size:
+        12px;
+
+    font-weight:
+        850;
+
+}
+
+
+.task-footer-text {
+
+    max-width:
+        700px;
+
+    margin:
+        5px
+        auto
+        0;
+
+    color:
+        var(--muted);
+
+    font-size:
+        9px;
+
+    line-height:
+        1.6;
+
+}
+
+
+.task-footer-highlight {
+
+    color:
+        var(--mevi-primary);
+
+    font-weight:
+        800;
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1200px) {
+
+    .stats-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+    }
+
+    .kanban-board {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+    .kanban-column {
+
+        min-height:
+            auto;
+
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .task-page {
+
+        padding:
+            15px
+            13px
+            35px;
+
+    }
+
+    .page-header {
+
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+
+    }
+
+    .page-title {
+
+        font-size:
+            22px;
+
+    }
+
+    .page-actions {
+
+        width:
+            100%;
+
+    }
+
+    .page-action {
+
+        flex:
+            1;
+
+    }
+
+    .stats-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+        gap:
+            9px;
+
+    }
+
+    .stat-card {
+
+        min-height:
+            105px;
+
+        padding:
+            13px;
+
+    }
+
+    .stat-number {
+
+        font-size:
+            22px;
+
+    }
+
+    .board-toolbar {
+
+        align-items:
+            stretch;
+
+        flex-direction:
+            column;
+
+    }
+
+    .search-box {
+
+        width:
+            100%;
+
+    }
+
+    .team-strip {
+
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+
+    }
+
+}
+
+
+/* =========================================================
+   SEARCH HIDDEN
+========================================================= */
+
+.task-card.hidden {
+
+    display:
+        none;
+
 }
 
 </style>
 
-<div class="container-fluid mt-4">
 
 
-<!-- ================= HEADER ================= -->
+<div class="task-page">
 
-<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
 
-    <div>
-        <h3 class="board-title mb-0">
-            <i class="bi bi-kanban-fill"></i>
-            Task Management Board
-        </h3>
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
 
-        <small class="text-muted">
-            Last 7 Days Overview
-        </small>
-    </div>
+    <div class="page-header">
 
-    {% if request.user.is_superuser %}
-    <div>
 
-        <a href="{% url 'add_task_page' %}"
-           class="btn btn-primary">
+        <div class="page-header-left">
 
-            <i class="bi bi-plus-circle"></i>
-            New Task
+            <div class="page-icon">
 
-        </a>
+                <i class="bi bi-kanban-fill"></i>
 
-        <a href="{% url 'task_history' %}"
-           class="btn btn-outline-secondary">
+            </div>
 
-            <i class="bi bi-clock-history"></i>
-            History
 
-        </a>
+            <div>
 
-    </div>
-    {% endif %}
+                <h1 class="page-title">
 
-</div>
+                    Task Management
 
-<!-- ================= STATS ================= -->
+                </h1>
 
-<div class="row mb-4">
 
-    <div class="col-lg-3 col-md-6 mb-3">
+                <p class="page-subtitle">
 
-        <div class="card stats-card bg-primary text-white shadow">
+                    Plan, track and complete work together —
+                    one task at a time. 🤝
 
-            <div class="card-body">
-
-                <h6>Total Tasks</h6>
-
-                <h2>{{ total_tasks }}</h2>
+                </p>
 
             </div>
 
         </div>
 
+
+
+        {% if request.user.is_superuser %}
+
+        <div class="page-actions">
+
+
+            <a
+                href="{% url 'add_task_page' %}"
+                class="page-action primary"
+            >
+
+                <i class="bi bi-plus-lg"></i>
+
+                New Task
+
+            </a>
+
+
+            <a
+                href="{% url 'task_history' %}"
+                class="page-action secondary"
+            >
+
+                <i class="bi bi-clock-history"></i>
+
+                History
+
+            </a>
+
+
+        </div>
+
+        {% endif %}
+
+
     </div>
 
-    <div class="col-lg-3 col-md-6 mb-3">
 
-        <div class="card stats-card bg-danger text-white shadow">
 
-            <div class="card-body">
+    <!-- =====================================================
+         FRIENDLY STRIP
+    ====================================================== -->
 
-                <h6>Pending</h6>
+    <div class="team-strip">
 
-                <h2>{{ grouped_tasks.pending|length }}</h2>
+
+        <div class="team-strip-text">
+
+            💜
+
+            <strong>
+                Team Mevi,
+            </strong>
+
+            every completed task is one small step forward.
+
+            Swalpa swalpa progress kooda progress ne. 🌱
+
+        </div>
+
+
+        <div class="team-strip-date">
+
+            📅
+            {{ today|default:"Today" }}
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- =====================================================
+         STATISTICS
+    ====================================================== -->
+
+    <div class="stats-grid">
+
+
+        <!-- TOTAL -->
+
+        <div class="stat-card stat-total">
+
+            <div class="stat-top">
+
+                <div class="stat-icon">
+
+                    <i class="bi bi-layers-fill"></i>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-number">
+
+                {{ total_tasks|default:"0" }}
+
+            </div>
+
+
+            <div class="stat-label">
+
+                Total Tasks
 
             </div>
 
         </div>
 
-    </div>
 
-    <div class="col-lg-3 col-md-6 mb-3">
 
-        <div class="card stats-card bg-warning text-dark shadow">
+        <!-- PENDING -->
 
-            <div class="card-body">
+        <div class="stat-card stat-pending">
 
-                <h6>In Progress</h6>
+            <div class="stat-top">
 
-                <h2>{{ grouped_tasks.in_progress|length }}</h2>
+                <div class="stat-icon">
 
-            </div>
-
-        </div>
-
-    </div>
-
-    <div class="col-lg-3 col-md-6 mb-3">
-
-        <div class="card stats-card bg-success text-white shadow">
-
-            <div class="card-body">
-
-                <h6>Completed</h6>
-
-                <h2>{{ grouped_tasks.completed|length }}</h2>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-<!-- ================= KANBAN BOARD ================= -->
-
-<div class="row g-4">
-
-    {% for key, tasks in grouped_tasks.items %}
-
-    <div class="col-lg-4">
-
-        <div class="scrum-column">
-
-            {% if key == "pending" %}
-
-            <div class="column-header pending-header d-flex justify-content-between">
-
-                <span>
                     <i class="bi bi-hourglass-split"></i>
-                    Pending
-                </span>
 
-                <span class="badge bg-danger">
-                    {{ tasks|length }}
-                </span>
+                </div>
 
             </div>
 
-            {% elif key == "in_progress" %}
 
-            <div class="column-header progress-header d-flex justify-content-between">
+            <div class="stat-number">
 
-                <span>
-                    <i class="bi bi-gear-wide-connected"></i>
-                    In Progress
-                </span>
-
-                <span class="badge bg-warning text-dark">
-                    {{ tasks|length }}
-                </span>
+                {{ grouped_tasks.pending|length }}
 
             </div>
 
-            {% else %}
 
-            <div class="column-header completed-header d-flex justify-content-between">
+            <div class="stat-label">
 
-                <span>
+                Waiting to Start
+
+            </div>
+
+        </div>
+
+
+
+        <!-- IN PROGRESS -->
+
+        <div class="stat-card stat-progress">
+
+            <div class="stat-top">
+
+                <div class="stat-icon">
+
+                    <i class="bi bi-lightning-charge-fill"></i>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-number">
+
+                {{ grouped_tasks.in_progress|length }}
+
+            </div>
+
+
+            <div class="stat-label">
+
+                Currently In Progress
+
+            </div>
+
+        </div>
+
+
+
+        <!-- COMPLETED -->
+
+        <div class="stat-card stat-completed">
+
+            <div class="stat-top">
+
+                <div class="stat-icon">
+
                     <i class="bi bi-check2-circle"></i>
-                    Completed
-                </span>
 
-                <span class="badge bg-success">
-                    {{ tasks|length }}
-                </span>
+                </div>
 
             </div>
 
-            {% endif %}
 
-            {% for task in tasks %}
+            <div class="stat-number">
 
-            <div class="task-card">
+                {{ grouped_tasks.completed|length }}
 
-                <div class="d-flex justify-content-between">
+            </div>
 
-                    <div>
 
-                        <div class="task-title">
-                            {{ task.task }}
-                        </div>
+            <div class="stat-label">
 
-                        <small class="text-muted">
-                            Task #{{ task.id }}
-                        </small>
+                Successfully Completed
 
-                    </div>
+            </div>
 
-                    <span class="badge priority-badge
+        </div>
 
-                        {% if task.priority == 'high' %}
-                            bg-danger
-                        {% elif task.priority == 'medium' %}
-                            bg-warning text-dark
-                        {% else %}
-                            bg-success
-                        {% endif %}
 
-                    ">
-                        {{ task.get_priority_display }}
+    </div>
+
+
+
+    <!-- =====================================================
+         BOARD TOOLBAR
+    ====================================================== -->
+
+    <div class="board-toolbar">
+
+
+        <div>
+
+            <div class="board-heading">
+
+                Today's Work Board 📋
+
+            </div>
+
+            <div class="board-description">
+
+                A simple visual view of what is waiting,
+                happening and completed.
+
+            </div>
+
+        </div>
+
+
+        <div class="search-box">
+
+            <i class="bi bi-search"></i>
+
+            <input
+                type="text"
+                id="taskSearch"
+                placeholder="Search tasks or trainers..."
+            >
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- =====================================================
+         KANBAN
+    ====================================================== -->
+
+    <div class="kanban-board">
+
+
+        {% for key, tasks in grouped_tasks.items %}
+
+
+        <!-- =================================================
+             PENDING
+        ================================================== -->
+
+        {% if key == "pending" %}
+
+        <div
+            class="kanban-column"
+            data-column="pending"
+        >
+
+
+            <div class="column-header">
+
+                <div class="column-title-wrap">
+
+                    <span
+                        class="column-dot pending-dot"
+                    ></span>
+
+                    <span class="column-title">
+
+                        Pending
+
                     </span>
 
                 </div>
 
-                <div class="task-meta mt-3">
 
-                    <div class="mb-1">
-                        <i class="bi bi-person-circle"></i>
-                        {{ task.trainer.Name }}
-                    </div>
+                <span
+                    class="
+                        column-count
+                        pending-count
+                    "
+                >
 
-                    <div class="mb-1">
-                        <i class="bi bi-calendar-event"></i>
-                        {{ task.for_date }}
-                    </div>
+                    {{ tasks|length }}
 
-                    <div>
-                        <i class="bi bi-clock-history"></i>
-                        {{ task.estimated_hours }} Hours
-                    </div>
+                </span>
+
+            </div>
+
+
+        {% elif key == "in_progress" %}
+
+
+        <!-- =================================================
+             IN PROGRESS
+        ================================================== -->
+
+        <div
+            class="kanban-column"
+            data-column="in_progress"
+        >
+
+
+            <div class="column-header">
+
+                <div class="column-title-wrap">
+
+                    <span
+                        class="column-dot progress-dot"
+                    ></span>
+
+                    <span class="column-title">
+
+                        In Progress
+
+                    </span>
 
                 </div>
 
-                {% if task.total_subtasks > 0 %}
 
-                <div class="mt-3">
+                <span
+                    class="
+                        column-count
+                        progress-count
+                    "
+                >
 
-                    <div class="progress">
+                    {{ tasks|length }}
 
-                        <div class="progress-bar progress-bar-striped progress-bar-animated
+                </span>
 
-                            {% if task.progress == 100 %}
-                                bg-success
-                            {% elif task.progress > 50 %}
-                                bg-info
+            </div>
+
+
+        {% else %}
+
+
+        <!-- =================================================
+             COMPLETED
+        ================================================== -->
+
+        <div
+            class="kanban-column"
+            data-column="completed"
+        >
+
+
+            <div class="column-header">
+
+                <div class="column-title-wrap">
+
+                    <span
+                        class="column-dot completed-dot"
+                    ></span>
+
+                    <span class="column-title">
+
+                        Completed
+
+                    </span>
+
+                </div>
+
+
+                <span
+                    class="
+                        column-count
+                        completed-count
+                    "
+                >
+
+                    {{ tasks|length }}
+
+                </span>
+
+            </div>
+
+
+        {% endif %}
+
+
+
+            <!-- =============================================
+                 TASKS
+            ============================================== -->
+
+            {% for task in tasks %}
+
+
+            <div
+                class="task-card"
+                data-search="
+                    {{ task.task|lower }}
+                    {{ task.trainer.Name|lower }}
+                    {{ task.id }}
+                "
+            >
+
+
+                <!-- TASK TITLE -->
+
+                <div class="task-top">
+
+
+                    <div class="task-title-wrap">
+
+                        <div class="task-title">
+
+                            {{ task.task }}
+
+                        </div>
+
+
+                        <span class="task-id">
+
+                            Task #{{ task.id }}
+
+                        </span>
+
+                    </div>
+
+
+
+                    <!-- PRIORITY -->
+
+                    <span
+                        class="
+                            priority
+
+                            {% if task.priority == 'high' %}
+                                priority-high
+
+                            {% elif task.priority == 'medium' %}
+                                priority-medium
+
                             {% else %}
-                                bg-warning
+                                priority-low
                             {% endif %}
-
                         "
-                        style="width:{{ task.progress }}%">
+                    >
+
+                        {% if task.priority == "high" %}
+                            🔴
+                        {% elif task.priority == "medium" %}
+                            🟡
+                        {% else %}
+                            🟢
+                        {% endif %}
+
+                        {{ task.get_priority_display }}
+
+                    </span>
+
+
+                </div>
+
+
+
+                <!-- META -->
+
+                <div class="task-meta">
+
+
+                    <div class="meta-item">
+
+                        <i class="bi bi-calendar3"></i>
+
+                        {{ task.for_date }}
+
+                    </div>
+
+
+                    <div class="meta-item">
+
+                        <i class="bi bi-clock"></i>
+
+                        {{ task.estimated_hours }}
+                        hr{{ task.estimated_hours|pluralize }}
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- TRAINER -->
+
+                <div class="trainer-row">
+
+
+                    <div class="trainer-avatar">
+
+                        {{ task.trainer.Name|first|upper }}
+
+                    </div>
+
+
+                    <div class="trainer-info">
+
+                        <div class="trainer-name">
+
+                            {{ task.trainer.Name }}
+
+                        </div>
+
+                        <div class="trainer-label">
+
+                            Assigned Trainer
 
                         </div>
 
                     </div>
 
-                    <small class="text-muted">
-                        {{ task.completed_subtasks }}/{{ task.total_subtasks }}
-                        completed
-                    </small>
 
                 </div>
 
-                {% else %}
 
-                <small class="text-muted mt-2 d-block">
-                    No subtasks available
-                </small>
+
+                <!-- SUBTASK PROGRESS -->
+
+                {% if task.total_subtasks > 0 %}
+
+                <div class="task-progress">
+
+
+                    <div class="progress-head">
+
+                        <span class="progress-label">
+
+                            Subtask Progress
+
+                        </span>
+
+
+                        <span class="progress-value">
+
+                            {{ task.progress }}%
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="progress-track">
+
+                        <div
+                            class="
+                                progress-fill
+
+                                {% if task.progress == 100 %}
+                                    complete
+                                {% endif %}
+                            "
+                            style="
+                                width:{{ task.progress }}%;
+                            "
+                        ></div>
+
+                    </div>
+
+
+                    <div
+                        style="
+                            margin-top:5px;
+                            color:#98A2B3;
+                            font-size:8px;
+                        "
+                    >
+
+                        {{ task.completed_subtasks }}
+                        /
+                        {{ task.total_subtasks }}
+
+                        subtasks completed
+
+                    </div>
+
+
+                </div>
 
                 {% endif %}
 
-                <div class="d-flex justify-content-between mt-3">
 
-                    <a href="{% url 'task_detail' task.id %}"
-                       class="btn btn-outline-dark btn-sm action-btn">
+
+                <!-- ACTIONS -->
+
+                <div class="task-actions">
+
+
+                    <a
+                        href="{% url 'task_detail' task.id %}"
+                        class="view-task"
+                    >
+
                         <i class="bi bi-eye"></i>
+
+                        View Task
+
                     </a>
+
+
 
                     {% if request.user.is_superuser %}
 
-                    <a href="{% url 'edit_task' task.id %}"
-                       class="btn btn-outline-warning btn-sm action-btn">
-                        <i class="bi bi-pencil-square"></i>
-                    </a>
+                    <div class="admin-actions">
 
-                    <a href="{% url 'change_task_status' task.id %}"
-                       class="btn btn-outline-primary btn-sm action-btn">
-                        <i class="bi bi-arrow-repeat"></i>
-                    </a>
 
-                    <a href="{% url 'delete_task' task.id %}"
-                       onclick="return confirm('Delete this task?')"
-                       class="btn btn-outline-danger btn-sm action-btn">
-                        <i class="bi bi-trash"></i>
-                    </a>
+                        <a
+                            href="{% url 'edit_task' task.id %}"
+                            class="icon-btn"
+                            title="Edit Task"
+                        >
+
+                            <i
+                                class="bi bi-pencil"
+                            ></i>
+
+                        </a>
+
+
+                        <a
+                            href="{% url 'change_task_status' task.id %}"
+                            class="icon-btn"
+                            title="Change Status"
+                        >
+
+                            <i
+                                class="bi bi-arrow-repeat"
+                            ></i>
+
+                        </a>
+
+
+                        <a
+                            href="{% url 'delete_task' task.id %}"
+                            class="
+                                icon-btn
+                                delete
+                            "
+                            title="Delete Task"
+                            onclick="
+                                return confirm(
+                                    'Delete this task?'
+                                );
+                            "
+                        >
+
+                            <i
+                                class="bi bi-trash3"
+                            ></i>
+
+                        </a>
+
+
+                    </div>
+
+                    {% endif %}
+
+
+                </div>
+
+
+
+                {% if not request.user.is_superuser %}
+
+                <div class="view-only">
+
+                    <i class="bi bi-eye"></i>
+
+                    View Only Access
+
+                </div>
+
+                {% endif %}
+
+
+            </div>
+
+
+            {% empty %}
+
+
+            <!-- EMPTY -->
+
+            <div class="empty-column">
+
+
+                <div class="empty-icon">
+
+                    {% if key == "pending" %}
+
+                        🌱
+
+                    {% elif key == "in_progress" %}
+
+                        ⚡
+
+                    {% else %}
+
+                        🎉
 
                     {% endif %}
 
                 </div>
 
-                {% if not request.user.is_superuser %}
-                <div class="view-only">
-                    View Only Access
+
+                <div class="empty-title">
+
+                    {% if key == "pending" %}
+
+                        No pending tasks
+
+                    {% elif key == "in_progress" %}
+
+                        Nothing in progress
+
+                    {% else %}
+
+                        No completed tasks yet
+
+                    {% endif %}
+
                 </div>
-                {% endif %}
+
+
+                <div class="empty-text">
+
+                    {% if key == "pending" %}
+
+                        Everything is clear here.
+                        Nice! 🌱
+
+                    {% elif key == "in_progress" %}
+
+                        Once work starts,
+                        it will appear here.
+
+                    {% else %}
+
+                        Every completed task
+                        becomes a small win. ❤️
+
+                    {% endif %}
+
+                </div>
+
 
             </div>
 
-            {% empty %}
-
-            <div class="empty-box">
-
-                <i class="bi bi-inbox fs-1"></i>
-
-                <h6 class="mt-3">
-                    No Tasks
-                </h6>
-
-            </div>
 
             {% endfor %}
 
+
         </div>
+
+
+        {% endfor %}
+
 
     </div>
 
-    {% endfor %}
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <div class="task-footer">
+
+
+        <div class="task-footer-title">
+
+            💜 One Task. One Step. One Team.
+
+        </div>
+
+
+        <div class="task-footer-text">
+
+            Great work doesn't always happen in big moments.
+
+            Sometimes it is simply one task completed,
+            one problem solved,
+            one person helped.
+
+            <span class="task-footer-highlight">
+
+                Swalpa swalpa mundhe hogona —
+                together. 🌱
+
+            </span>
+
+        </div>
+
+
+    </div>
+
 
 </div>
 
 
-</div>
+
+<!-- =========================================================
+     SEARCH
+========================================================= -->
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        const search =
+            document.getElementById(
+                "taskSearch"
+            );
+
+
+        if (!search) {
+
+            return;
+
+        }
+
+
+        search.addEventListener(
+            "input",
+            function () {
+
+
+                const query =
+                    this.value
+                        .toLowerCase()
+                        .trim();
+
+
+                const cards =
+                    document.querySelectorAll(
+                        ".task-card"
+                    );
+
+
+                cards.forEach(
+                    function(card) {
+
+
+                        const content =
+                            (
+                                card.dataset.search ||
+                                ""
+                            ).toLowerCase();
+
+
+                        if (
+                            !query ||
+                            content.includes(query)
+                        ) {
+
+                            card.classList.remove(
+                                "hidden"
+                            );
+
+                        } else {
+
+                            card.classList.add(
+                                "hidden"
+                            );
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+    }
+);
+
+</script>
+
 
 {% endblock %}

@@ -88,48 +88,222 @@ def logout_view(request):
 # =====================================================
 
 
+# =====================================================
+# MAIN DASHBOARD
+# =====================================================
 
 @login_required
 def dashboard(request):
-    
-    import json
-    from datetime import timedelta
-    from django.urls import reverse
 
     today = timezone.localdate()
+
+    # =====================================================
+    # GREETINGS
+    # =====================================================
+
+    greetings = {
+        "morning": [
+            (
+                "Good Morning, Mevi Family! 🌻",
+                "Nenne enaythu anta worry beda… ivattu namma fresh start. "
+                "Ondu small step, ondu good thought, ondu happy smile — "
+                "let's make today meaningful. ❤️"
+            ),
+            (
+                "Namaskara, Team Mevi! ☀️",
+                "Coffee ready aa? 😄 "
+                "Let's learn something, finish something, help someone "
+                "and make the day count."
+            ),
+            (
+                "Good Morning, Wonderful People! 🌱",
+                "Perfect day bekagilla… swalpa progress saaku. "
+                "Let's move forward together."
+            ),
+            (
+                "Good Morning, Mevi Family! 💜",
+                "Every new day gives us one more chance to learn, improve "
+                "and make someone's journey a little easier."
+            ),
+            (
+                "Namaskara! A New Day, A New Beginning. 🌸",
+                "Namma work just tasks alla — every small effort "
+                "contributes to something bigger."
+            ),
+        ],
+
+        "afternoon": [
+            (
+                "Good Afternoon, Mevi Family! ☀️",
+                "Half day done! 😄 "
+                "Swalpa energy recharge madi, let's finish the day strong."
+            ),
+            (
+                "Hello Team Mevi! 🌻",
+                "Ivattu perfect agirbeku anta illa. "
+                "Just keep moving, keep helping and keep learning."
+            ),
+            (
+                "Good Afternoon, Wonderful Team! 💜",
+                "One task completed, one student helped, one problem solved — "
+                "small wins become big journeys."
+            ),
+            (
+                "Namaskara Mevi Family! 🌱",
+                "Work pressure irbahudu… but together handle madidre "
+                "everything becomes a little lighter. 🤝"
+            ),
+        ],
+
+        "evening": [
+            (
+                "Good Evening, Mevi Family! 🌙",
+                "Before the day ends, remember — "
+                "today's small efforts may become tomorrow's big achievements."
+            ),
+            (
+                "Hello Team! 🌸",
+                "Ivattu enu complete madidru, be proud of the progress. "
+                "Tomorrow is another beautiful opportunity."
+            ),
+            (
+                "Good Evening, Wonderful People! 💜",
+                "Work is important, but the people we work with make "
+                "the journey special. Thank you for being a team."
+            ),
+        ],
+    }
+
+    hour = timezone.localtime().hour
+
+    if hour < 12:
+        greeting_period = "morning"
+        greeting_icon = "🌅"
+
+    elif hour < 17:
+        greeting_period = "afternoon"
+        greeting_icon = "☀️"
+
+    else:
+        greeting_period = "evening"
+        greeting_icon = "🌙"
+
+    greeting_index = today.toordinal() % len(
+        greetings[greeting_period]
+    )
+
+    greeting, greeting_message = greetings[
+        greeting_period
+    ][greeting_index]
+
+    # =====================================================
+    # THOUGHT OF THE DAY
+    # =====================================================
+
     DAILY_THOUGHTS = [
-    "A great trainer doesn't just teach a skill — they inspire someone to believe they can master it.",
-    "The best trainers never stop being learners.",
-    "Knowledge becomes powerful when it is shared.",
-    "Every learner you teach today carries a possibility you may never fully see. Teach with purpose.",
-    "Teaching is not about having all the answers. It is about creating an environment where people love discovering them.",
-    "Learn something new. Teach something useful. Inspire someone. Repeat.",
-    "One hour of teaching can create an impact that lasts for years.",
-    "Your passion for learning can become someone else's motivation to grow.",
-    "Don't just complete a training session. Create a learning experience.",
-    "Every question from a student is an opportunity to make your teaching better.",
-    "Great teaching begins with curiosity and grows through patience.",
-    "Train minds. Build skills. Create confidence.",
-    "The goal isn't simply to finish the syllabus. The goal is to create understanding.",
-    "Keep learning, keep teaching, keep improving.",
-    "Behind every skilled professional is someone who once took the time to teach them.",
+
+        (
+            "A great trainer doesn't just teach a skill — "
+            "they inspire someone to believe they can master it."
+        ),
+
+        (
+            "Knowledge becomes powerful when it is shared."
+        ),
+
+        (
+            "The best trainers never stop being learners."
+        ),
+
+        (
+            "Every learner you teach today carries a possibility "
+            "you may never fully see. Teach with purpose."
+        ),
+
+        (
+            "Teaching is not about having all the answers. "
+            "It is about creating an environment where people "
+            "love discovering them."
+        ),
+
+        (
+            "Learn something new. Teach something useful. "
+            "Inspire someone. Repeat."
+        ),
+
+        (
+            "One hour of teaching can create an impact "
+            "that lasts for years."
+        ),
+
+        (
+            "Your passion for learning can become "
+            "someone else's motivation to grow."
+        ),
+
+        (
+            "Don't just complete a training session. "
+            "Create a learning experience."
+        ),
+
+        (
+            "Every question from a student is an opportunity "
+            "to make your teaching better."
+        ),
+
+        (
+            "Great teaching begins with curiosity "
+            "and grows through patience."
+        ),
+
+        (
+            "Train minds. Build skills. Create confidence."
+        ),
+
+        (
+            "The goal isn't simply to finish the syllabus. "
+            "The goal is to create understanding."
+        ),
+
+        (
+            "Keep learning, keep teaching, keep improving."
+        ),
+
+        (
+            "Behind every skilled professional is someone "
+            "who once took the time to teach them."
+        ),
+
+        (
+            "Ondu dina perfect agiralla. "
+            "But every day has something beautiful to teach us."
+        ),
+
+        (
+            "Swalpa swalpa progress kooda progress ne. "
+            "Never underestimate small steps."
+        ),
+
+        (
+            "Namma journey nammade. "
+            "Compare beda. Just keep growing."
+        ),
+
+        (
+            "Someone may remember your lesson, "
+            "but they will definitely remember how you made them feel."
+        ),
+
+        (
+            "Ondu helping hand, ondu kind word, "
+            "ondu little appreciation — it can change someone's day."
+        ),
+
     ]
 
     daily_thought = DAILY_THOUGHTS[
         today.toordinal() % len(DAILY_THOUGHTS)
     ]
-
-    hour = timezone.localtime().hour
-
-    if hour < 12:
-        greeting = "Good Morning"
-        greeting_icon = "🌅"
-    elif hour < 17:
-        greeting = "Good Afternoon"
-        greeting_icon = "☀️"
-    else:
-        greeting = "Good Evening"
-        greeting_icon = "🌙"
 
     # =====================================================
     # ALL TRAINERS
@@ -145,7 +319,6 @@ def dashboard(request):
 
     # =====================================================
     # FULL-TIME TRAINERS
-    # ONLY THESE ARE ELIGIBLE FOR CHECK-IN
     # =====================================================
 
     full_time_trainers = (
@@ -158,8 +331,7 @@ def dashboard(request):
     full_time_trainer_count = full_time_trainers.count()
 
     # =====================================================
-    # TODAY'S ATTENDANCE
-    # FULL-TIME ONLY
+    # TODAY ATTENDANCE
     # =====================================================
 
     attendance_records = (
@@ -191,13 +363,19 @@ def dashboard(request):
         )
     )
 
-    not_checked_in_count = (
-        full_time_trainer_count - checked_in_count
+    checked_out_count = sum(
+        1
+        for attendance in attendance_records
+        if (
+            attendance.check_in
+            and attendance.check_out
+        )
     )
 
-    # Prevent negative value
-    if not_checked_in_count < 0:
-        not_checked_in_count = 0
+    not_checked_in_count = max(
+        full_time_trainer_count - checked_in_count,
+        0
+    )
 
     # =====================================================
     # TODAY'S TASKS
@@ -215,7 +393,7 @@ def dashboard(request):
 
     # =====================================================
     # TRAINER STATUS
-    # FULL-TIME TRAINERS ONLY
+    # WITH ACTIVITY COUNT
     # =====================================================
 
     trainer_status = []
@@ -226,23 +404,272 @@ def dashboard(request):
             trainer.id
         )
 
-        trainer_tasks = (
-            today_tasks
-            .filter(trainer=trainer)
-            .order_by("-created_on")
+        trainer_tasks = today_tasks.filter(
+            trainer=trainer
         )
+
+        activity_count = trainer_tasks.count()
+
+        completed_activity_count = trainer_tasks.filter(
+            status="completed"
+        ).count()
+
+        working_activity_count = trainer_tasks.exclude(
+            status="completed"
+        ).count()
 
         latest_task = trainer_tasks.first()
 
+        if attendance and attendance.check_out:
+            status = "checked_out"
+
+        elif attendance and attendance.check_in:
+            status = "working"
+
+        else:
+            status = "not_checked_in"
+
         trainer_status.append({
+
             "trainer": trainer,
+
             "attendance": attendance,
-            "latest_task": latest_task,
-            "tasks": trainer_tasks,
+
+            "status": status,
+
+            "activity_count":
+                activity_count,
+
+            "completed_activity_count":
+                completed_activity_count,
+
+            "working_activity_count":
+                working_activity_count,
+
+            "latest_task":
+                latest_task,
+
+            "tasks":
+                trainer_tasks,
+
         })
 
     # =====================================================
+    # UPCOMING WORKSHOPS
+    # =====================================================
+
+    upcoming_workshops = (
+        Workshop.objects
+        .filter(
+            start_date__gte=today
+        )
+        .exclude(
+            status="cancelled"
+        )
+        .select_related("college")
+        .prefetch_related("assigned_trainers")
+        .order_by("start_date")[:6]
+    )
+
+    # =====================================================
+    # UPCOMING 7 DAYS
+    # =====================================================
+
+    next_seven_days = today + timedelta(days=7)
+
+    upcoming_schedule = []
+
+    # -----------------------------------------------------
+    # WORKSHOPS
+    # -----------------------------------------------------
+
+    upcoming_workshops_schedule = (
+        Workshop.objects
+        .filter(
+            start_date__lte=next_seven_days,
+            end_date__gte=today
+        )
+        .exclude(status="cancelled")
+        .select_related("college")
+        .prefetch_related("assigned_trainers")
+        .order_by(
+            "start_date",
+            "title"
+        )
+    )
+
+    for workshop in upcoming_workshops_schedule:
+
+        trainer_names = ", ".join(
+            trainer.Name
+            for trainer
+            in workshop.assigned_trainers.all()
+        )
+
+        upcoming_schedule.append({
+
+            "date":
+                workshop.start_date,
+
+            "end_date":
+                workshop.end_date,
+
+            "title":
+                workshop.title,
+
+            "type":
+                "Workshop",
+
+            "college":
+                workshop.college.name
+                if workshop.college
+                else "—",
+
+            "trainer":
+                trainer_names
+                if trainer_names
+                else "—",
+
+            "time":
+                "As scheduled",
+
+            "location":
+                workshop.college.name
+                if workshop.college
+                else "—",
+
+            "status":
+                workshop.get_status_display(),
+
+        })
+
+    # -----------------------------------------------------
     # CALENDAR EVENTS
+    # -----------------------------------------------------
+
+    calendar_schedule_events = (
+        CalendarEvent.objects
+        .filter(
+            date__gte=today,
+            date__lte=next_seven_days
+        )
+        .exclude(
+            event_type="workshop",
+            workshop__isnull=False
+        )
+        .select_related(
+            "college",
+            "workshop"
+        )
+        .prefetch_related(
+            "trainers"
+        )
+        .order_by(
+            "date",
+            "start_time"
+        )
+    )
+
+    for event in calendar_schedule_events:
+
+        trainer_names = ", ".join(
+            trainer.Name
+            for trainer in event.trainers.all()
+        )
+
+        if event.start_time and event.end_time:
+
+            time_text = (
+                f"{event.start_time.strftime('%I:%M %p')}"
+                f" – "
+                f"{event.end_time.strftime('%I:%M %p')}"
+            )
+
+        elif event.start_time:
+
+            time_text = event.start_time.strftime(
+                "%I:%M %p"
+            )
+
+        else:
+
+            time_text = "—"
+
+        upcoming_schedule.append({
+
+            "date":
+                event.date,
+
+            "end_date":
+                event.date,
+
+            "title":
+                event.title,
+
+            "type":
+                event.get_event_type_display(),
+
+            "college":
+                event.college.name
+                if event.college
+                else "—",
+
+            "trainer":
+                trainer_names
+                if trainer_names
+                else "—",
+
+            "time":
+                time_text,
+
+            "location":
+                event.location
+                if event.location
+                else "—",
+
+            "status":
+                "Scheduled",
+
+        })
+
+    upcoming_schedule.sort(
+        key=lambda item: (
+            item["date"],
+            item["title"].lower()
+        )
+    )
+
+    # =====================================================
+    # NEEDS ATTENTION
+    # =====================================================
+
+    pending_workshops_count = (
+        Workshop.objects
+        .filter(
+            start_date__gte=today
+        )
+        .filter(
+            status="tentative"
+        )
+        .count()
+    )
+
+    pending_reports_count = (
+        Workshop.objects
+        .filter(
+            end_date__lt=today
+        )
+        .exclude(
+            status__in=[
+                "completed",
+                "cancelled"
+            ]
+        )
+        .count()
+    )
+
+    # =====================================================
+    # CALENDAR EVENTS FOR MASTER CALENDAR
     # =====================================================
 
     events = []
@@ -262,54 +689,66 @@ def dashboard(request):
 
         trainer_names = ", ".join(
             trainer.Name
-            for trainer in workshop.assigned_trainers.all()
+            for trainer
+            in workshop.assigned_trainers.all()
         )
 
-        event = {
-            "title": f"📚 {workshop.title}",
+        events.append({
 
-            "start": (
-                workshop.start_date.strftime("%Y-%m-%d")
+            "id":
+                f"workshop-{workshop.pk}",
+
+            "title":
+                f"📚 {workshop.title}",
+
+            "start":
+                workshop.start_date.strftime(
+                    "%Y-%m-%d"
+                )
                 if workshop.start_date
-                else None
-            ),
+                else None,
 
-            "end": (
-                (workshop.end_date + timedelta(days=1))
-                .strftime("%Y-%m-%d")
+            "end":
+                (
+                    workshop.end_date +
+                    timedelta(days=1)
+                ).strftime("%Y-%m-%d")
                 if workshop.end_date
-                else None
-            ),
+                else None,
 
-            "color": "#198754",
+            "color":
+                "#5B4BDB",
+
+            "url":
+                reverse(
+                    "workshop_detail",
+                    args=[workshop.pk]
+                ),
 
             "extendedProps": {
-                "trainer": trainer_names,
 
-                "college": (
+                "trainer":
+                    trainer_names,
+
+                "college":
                     workshop.college.name
                     if workshop.college
-                    else ""
-                ),
+                    else "",
 
-                "department": (
-                    workshop.departments or ""
-                ),
+                "department":
+                    workshop.departments or "",
 
-                "event_type": "Workshop",
+                "event_type":
+                    "Workshop",
 
-                "description": (
-                    workshop.remarks or ""
-                ),
+                "status":
+                    workshop.get_status_display(),
+
+                "description":
+                    workshop.remarks or "",
+
             }
-        }
-
-        event["url"] = reverse(
-            "workshop_detail",
-            args=[workshop.pk]
-        )
-
-        events.append(event)
+        })
 
     # -----------------------------------------------------
     # OFFICE TRAINING
@@ -325,116 +764,213 @@ def dashboard(request):
 
         trainer_names = ", ".join(
             trainer.Name
-            for trainer in training.trainers.all()
-        )
-
-        event = {
-            "title": f"🏢 {training.name}",
-
-            "start": (
-                training.start_date.strftime("%Y-%m-%d")
-                if training.start_date
-                else None
-            ),
-
-            "end": (
-                (training.end_date + timedelta(days=1))
-                .strftime("%Y-%m-%d")
-                if training.end_date
-                else None
-            ),
-
-            "color": "#0d6efd",
-
-            "extendedProps": {
-                "trainer": trainer_names,
-
-                "college": "Mevi Technologies",
-
-                "department": "",
-
-                "event_type": "Office Training",
-
-                "description": (
-                    f"Batch: {training.batch_id}"
-                    if training.batch_id
-                    else ""
-                ),
-            }
-        }
-
-        event["url"] = reverse(
-            "view_office_training",
-            args=[training.pk]
-        )
-
-        events.append(event)
-
-    # -----------------------------------------------------
-    # MEETING NOTES
-    # -----------------------------------------------------
-
-    meetings = (
-        MeetingNote.objects
-        .prefetch_related("attendees")
-        .all()
-    )
-
-    for meeting in meetings:
-
-        attendees = ", ".join(
-            trainer.Name
-            for trainer in meeting.attendees.all()
+            for trainer
+            in training.trainers.all()
         )
 
         events.append({
-            "title": f"📝 {meeting.title}",
 
-            "start": (
-                meeting.meeting_date.strftime("%Y-%m-%d")
-                if meeting.meeting_date
-                else None
-            ),
+            "id":
+                f"office-{training.pk}",
 
-            "color": "#6f42c1",
+            "title":
+                f"🏢 {training.name}",
+
+            "start":
+                training.start_date.strftime(
+                    "%Y-%m-%d"
+                )
+                if training.start_date
+                else None,
+
+            "end":
+                (
+                    training.end_date +
+                    timedelta(days=1)
+                ).strftime("%Y-%m-%d")
+                if training.end_date
+                else None,
+
+            "color":
+                "#2563EB",
+
+            "url":
+                reverse(
+                    "view_office_training",
+                    args=[training.pk]
+                ),
 
             "extendedProps": {
-                "trainer": attendees,
 
-                "college": "",
+                "trainer":
+                    trainer_names,
 
-                "department": "",
+                "college":
+                    "Mevi Technologies",
 
-                "event_type": "Meeting",
+                "department":
+                    "",
 
-                "description": (
-                    meeting.discussion_points or ""
-                ),
+                "event_type":
+                    "Office Training",
+
+                "status":
+                    "Scheduled",
+
+                "description":
+                    (
+                        f"Batch: {training.batch_id}"
+                        if training.batch_id
+                        else ""
+                    ),
+
             }
         })
 
-    # =====================================================
-    # CURRENT LOGGED-IN TRAINER
-    # =====================================================
+    # -----------------------------------------------------
+    # CALENDAR EVENTS
+    # -----------------------------------------------------
 
-    current_trainer = (
-        Trainer.objects
-        .filter(
-            user=request.user
+    calendar_events = (
+        CalendarEvent.objects
+        .select_related(
+            "college",
+            "workshop"
         )
-        .first()
+        .prefetch_related(
+            "trainers"
+        )
+        .all()
     )
 
-    # Fallback for existing accounts
-    if not current_trainer:
+    event_colors = {
 
-        current_trainer = (
-            Trainer.objects
-            .filter(
-                email=request.user.email
-            )
-            .first()
+        "workshop":
+            "#5B4BDB",
+
+        "fdp":
+            "#EC4899",
+
+        "online_workshop":
+            "#2563EB",
+
+        "office":
+            "#16A34A",
+
+        "guest_training":
+            "#F59E0B",
+
+        "meeting":
+            "#7C3AED",
+
+        "other":
+            "#64748B",
+
+    }
+
+    for event in calendar_events:
+
+        trainer_names = ", ".join(
+            trainer.Name
+            for trainer
+            in event.trainers.all()
         )
+
+        start = str(event.date)
+
+        end = None
+
+        if event.start_time:
+
+            start = (
+                f"{event.date}T"
+                f"{event.start_time}"
+            )
+
+        if event.end_time:
+
+            end = (
+                f"{event.date}T"
+                f"{event.end_time}"
+            )
+
+        event_type_key = (
+            event.event_type
+            if event.event_type
+            else "other"
+        )
+
+        events.append({
+
+            "id":
+                f"event-{event.pk}",
+
+            "title":
+                event.title,
+
+            "start":
+                start,
+
+            "end":
+                end,
+
+            "allDay":
+                not bool(event.start_time),
+
+            "color":
+                event_colors.get(
+                    event_type_key,
+                    "#64748B"
+                ),
+
+            "borderColor":
+                event_colors.get(
+                    event_type_key,
+                    "#64748B"
+                ),
+
+            "url":
+                reverse(
+                    "edit_calendar_event",
+                    args=[event.pk]
+                )
+                if request.user.is_superuser
+                else None,
+
+            "extendedProps": {
+
+                "trainer":
+                    trainer_names,
+
+                "college":
+                    event.college.name
+                    if event.college
+                    else "",
+
+                "department":
+                    event.department or "",
+
+                "event_type":
+                    event.get_event_type_display(),
+
+                "status":
+                    "Scheduled",
+
+                "location":
+                    event.location or "",
+
+                "guest_faculty":
+                    getattr(
+                        event,
+                        "guest_faculty",
+                        ""
+                    ),
+
+                "description":
+                    event.description or "",
+
+            }
+        })
 
     # =====================================================
     # RENDER
@@ -444,24 +980,33 @@ def dashboard(request):
         request,
         "dashboard.html",
         {
-            # Calendar
-            "events_json": json.dumps(
-                events,
-                default=str
-            ),
 
-            # Date
-            "today": today,
+            "today":
+                today,
 
-            # All trainers
-            "trainers": trainers,
+            "greeting":
+                greeting,
 
-            "total_trainers": total_trainers,
+            "greeting_message":
+                greeting_message,
 
-            # Full-time / attendance
+            "greeting_icon":
+                greeting_icon,
+
+            "daily_thought":
+                daily_thought,
+
+            # Trainers
+            "trainers":
+                trainers,
+
+            "total_trainers":
+                total_trainers,
+
             "full_time_trainer_count":
                 full_time_trainer_count,
 
+            # Attendance
             "trainer_status":
                 trainer_status,
 
@@ -471,22 +1016,39 @@ def dashboard(request):
             "working_count":
                 working_count,
 
+            "checked_out_count":
+                checked_out_count,
+
             "not_checked_in_count":
                 not_checked_in_count,
 
-            # Current logged-in trainer
-            "current_trainer":
-                current_trainer,
-
-            # Today's tasks
+            # Work
             "today_tasks":
                 today_tasks,
-            "daily_thought": daily_thought,
-            "greeting": greeting,
-            "greeting_icon": greeting_icon,
+
+            # Workshops
+            "upcoming_workshops":
+                upcoming_workshops,
+
+            "upcoming_schedule":
+                upcoming_schedule,
+
+            # Attention
+            "pending_workshops_count":
+                pending_workshops_count,
+
+            "pending_reports_count":
+                pending_reports_count,
+
+            # Calendar
+            "events_json":
+                json.dumps(
+                    events,
+                    default=str
+                ),
+
         }
     )
-
 # =====================================================
 # WORKSHOPS
 # =====================================================
