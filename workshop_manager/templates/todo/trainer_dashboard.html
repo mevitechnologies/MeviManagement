@@ -2,186 +2,521 @@
 
 {% block content %}
 
+<style>
+    .dashboard-wrapper {
+        background: #f6f8fb;
+        min-height: calc(100vh - 70px);
+    }
+
+    .welcome-card {
+        border: 0;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #ffffff, #f1f5ff);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+    }
+
+    .stat-card {
+        border: 0;
+        border-radius: 16px;
+        transition: all 0.2s ease;
+        box-shadow: 0 5px 18px rgba(0, 0, 0, 0.05);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+    }
+
+    .section-card {
+        border: 0;
+        border-radius: 16px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+
+    .section-header {
+        background: #fff;
+        border-bottom: 1px solid #eef0f4;
+        padding: 18px 20px;
+    }
+
+    .work-item {
+        border: 1px solid #edf0f4;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 10px;
+        background: #fff;
+        transition: 0.2s;
+    }
+
+    .work-item:hover {
+        border-color: #d7dce5;
+        transform: translateX(2px);
+    }
+
+    .learning-box {
+        background: linear-gradient(135deg, #f1fff6, #ffffff);
+        border: 1px solid #dcefe3;
+        border-radius: 14px;
+        padding: 20px;
+        min-height: 150px;
+    }
+
+    .schedule-table th {
+        white-space: nowrap;
+        font-size: 13px;
+        color: #667085;
+        background: #f8f9fb;
+    }
+
+    .schedule-table td {
+        font-size: 14px;
+        vertical-align: middle;
+    }
+
+    .schedule-table tr:hover {
+        background: #fafbfc;
+    }
+
+    .type-badge {
+        border-radius: 20px;
+        padding: 6px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .badge-workshop {
+        background: #e8f1ff;
+        color: #1456b8;
+    }
+
+    .badge-fdp {
+        background: #f0e8ff;
+        color: #6637a6;
+    }
+
+    .badge-online {
+        background: #e7f8ff;
+        color: #087a9c;
+    }
+
+    .badge-office {
+        background: #fff4dd;
+        color: #9a6500;
+    }
+
+    .badge-guest {
+        background: #e9f8ef;
+        color: #18733b;
+    }
+
+    .badge-meeting {
+        background: #f2f2f2;
+        color: #555;
+    }
+
+    .badge-other {
+        background: #eeeeee;
+        color: #555;
+    }
+
+    .attendance-status {
+        border-radius: 10px;
+        padding: 12px;
+    }
+
+    .attendance-working {
+        background: #eaf8ef;
+        color: #18733b;
+    }
+
+    .attendance-out {
+        background: #f0f2f5;
+        color: #5f6368;
+    }
+
+    .attendance-not {
+        background: #fff0f0;
+        color: #b42318;
+    }
+
+    .workshop-card {
+        border: 1px solid #edf0f4;
+        border-radius: 14px;
+        transition: 0.2s;
+        background: #fff;
+    }
+
+    .workshop-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+    }
+
+    .empty-state {
+        padding: 45px 20px;
+        text-align: center;
+        color: #8a919d;
+    }
+
+    .empty-icon {
+        font-size: 42px;
+        margin-bottom: 12px;
+    }
+
+    .btn-action {
+        border-radius: 10px;
+        font-weight: 600;
+    }
+
+    .today-label {
+        font-size: 12px;
+        color: #667085;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+
+    @media (max-width: 768px) {
+        .schedule-table {
+            min-width: 950px;
+        }
+
+        .welcome-actions {
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .welcome-actions form,
+        .welcome-actions a {
+            width: 100%;
+        }
+    }
+</style>
+
+
+<div class="dashboard-wrapper">
+
 <div class="container-fluid py-4">
 
-    <!-- ========================================= -->
-    <!-- HEADER -->
-    <!-- ========================================= -->
+    <!-- ===================================================== -->
+    <!-- WELCOME HEADER -->
+    <!-- ===================================================== -->
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="card welcome-card mb-4">
 
-        <div>
-            <h2 class="fw-bold mb-1">
-                👋 Welcome, {{ trainer.Name }}
-            </h2>
+        <div class="card-body p-4">
 
-            <p class="text-muted mb-0">
-                {{ today|date:"l, d F Y" }}
-            </p>
-        </div>
+            <div class="row align-items-center">
 
-        <div class="d-flex gap-2">
+                <div class="col-lg-7">
 
-            {% if is_full_time %}
+                    <div class="today-label mb-2">
+                        TRAINER DASHBOARD
+                    </div>
 
-                {% if attendance and not attendance.check_in %}
+                    <h2 class="fw-bold mb-2">
+                        👋 Welcome, {{ trainer.Name }}
+                    </h2>
 
-                    <a href="{% url 'daily_checkin' %}"
-                       class="btn btn-success">
-                        🟢 Check In
-                    </a>
+                    <p class="text-muted mb-0">
+                        {{ today|date:"l, d F Y" }}
+                    </p>
 
-                {% elif attendance and attendance.check_in and not attendance.check_out %}
+                </div>
 
-                    <a href="{% url 'daily_checkin' %}"
-                       class="btn btn-warning">
-                        🟡 Check Out
-                    </a>
 
-                {% endif %}
+                <div class="col-lg-5">
 
-            {% endif %}
+                    <div class="d-flex justify-content-lg-end flex-wrap gap-2 welcome-actions">
 
-            <a href="{% url 'add_daily_learning' %}"
-               class="btn btn-outline-success">
-                📚 Today's Learning
-            </a>
+                        {% if is_full_time %}
+
+                            {% if attendance and not attendance.check_in %}
+
+                                <!-- FIXED CHECK IN: POST -->
+                                <form method="POST"
+                                      action="{% url 'daily_checkin' %}"
+                                      class="d-inline">
+
+                                    {% csrf_token %}
+
+                                    <input type="hidden"
+                                           name="action"
+                                           value="check_in">
+
+                                    <button type="submit"
+                                            class="btn btn-success btn-action px-4">
+
+                                        🟢 Check In
+
+                                    </button>
+
+                                </form>
+
+
+                            {% elif attendance and attendance.check_in and not attendance.check_out %}
+
+                                <!-- FIXED CHECK OUT: POST -->
+                                <form method="POST"
+                                      action="{% url 'daily_checkin' %}"
+                                      class="d-inline">
+
+                                    {% csrf_token %}
+
+                                    <input type="hidden"
+                                           name="action"
+                                           value="check_out">
+
+                                    <button type="submit"
+                                            class="btn btn-warning btn-action px-4">
+
+                                        🟡 Check Out
+
+                                    </button>
+
+                                </form>
+
+                            {% endif %}
+
+                        {% endif %}
+
+
+                        <a href="{% url 'add_daily_learning' %}"
+                           class="btn btn-outline-success btn-action">
+
+                            📚 Today's Learning
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
 
         </div>
 
     </div>
 
 
-    <!-- ========================================= -->
+
+    <!-- ===================================================== -->
     <!-- STATUS CARDS -->
-    <!-- ========================================= -->
+    <!-- ===================================================== -->
 
     <div class="row g-3 mb-4">
 
-        <div class="col-md-3">
 
-            <div class="card shadow-sm border-0 h-100">
+        <!-- TRAINER -->
+        <div class="col-xl-3 col-md-6">
 
-                <div class="card-body">
-
-                    <small class="text-muted">
-                        Trainer
-                    </small>
-
-                    <h5 class="fw-bold mt-2">
-                        {{ trainer.Name }}
-                    </h5>
-
-                    {% if is_full_time %}
-                        <span class="badge bg-success">
-                            Full-Time Trainer
-                        </span>
-                    {% else %}
-                        <span class="badge bg-secondary">
-                            Trainer
-                        </span>
-                    {% endif %}
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="col-md-3">
-
-            <div class="card shadow-sm border-0 h-100">
+            <div class="card stat-card h-100">
 
                 <div class="card-body">
 
-                    <small class="text-muted">
-                        Today's Work
-                    </small>
+                    <div class="d-flex justify-content-between align-items-start">
 
-                    <h2 class="fw-bold mt-2">
-                        {{ today_tasks|length }}
-                    </h2>
+                        <div>
 
-                    <span class="text-muted">
-                        Work updates
-                    </span>
+                            <small class="text-muted">
+                                Trainer
+                            </small>
 
-                </div>
+                            <h5 class="fw-bold mt-2 mb-2">
+                                {{ trainer.Name }}
+                            </h5>
 
-            </div>
+                            {% if is_full_time %}
 
-        </div>
-
-
-        <div class="col-md-3">
-
-            <div class="card shadow-sm border-0 h-100">
-
-                <div class="card-body">
-
-                    <small class="text-muted">
-                        Weekly Activities
-                    </small>
-
-                    <h2 class="fw-bold mt-2">
-                        {{ weekly_schedule|length }}
-                    </h2>
-
-                    <span class="text-muted">
-                        Scheduled activities
-                    </span>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="col-md-3">
-
-            <div class="card shadow-sm border-0 h-100">
-
-                <div class="card-body">
-
-                    <small class="text-muted">
-                        Today's Attendance
-                    </small>
-
-                    {% if is_full_time %}
-
-                        {% if attendance and attendance.check_in %}
-
-                            {% if attendance.check_out %}
-
-                                <h5 class="fw-bold text-secondary mt-2">
-                                    Checked Out
-                                </h5>
+                                <span class="badge bg-success">
+                                    Full-Time Trainer
+                                </span>
 
                             {% else %}
 
-                                <h5 class="fw-bold text-success mt-2">
-                                    Working
+                                <span class="badge bg-secondary">
+                                    Trainer
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="stat-icon bg-light">
+                            👨‍🏫
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- TODAY WORK -->
+        <div class="col-xl-3 col-md-6">
+
+            <div class="card stat-card h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-start">
+
+                        <div>
+
+                            <small class="text-muted">
+                                Today's Work
+                            </small>
+
+                            <h2 class="fw-bold mt-2 mb-1">
+                                {{ today_tasks|length }}
+                            </h2>
+
+                            <span class="text-muted small">
+                                Work updates
+                            </span>
+
+                        </div>
+
+
+                        <div class="stat-icon bg-primary bg-opacity-10">
+                            💼
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- WEEKLY ACTIVITIES -->
+        <div class="col-xl-3 col-md-6">
+
+            <div class="card stat-card h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-start">
+
+                        <div>
+
+                            <small class="text-muted">
+                                Weekly Activities
+                            </small>
+
+                            <h2 class="fw-bold mt-2 mb-1">
+                                {{ weekly_schedule|length }}
+                            </h2>
+
+                            <span class="text-muted small">
+                                Scheduled activities
+                            </span>
+
+                        </div>
+
+
+                        <div class="stat-icon bg-info bg-opacity-10">
+                            📅
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ATTENDANCE -->
+        <div class="col-xl-3 col-md-6">
+
+            <div class="card stat-card h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-start">
+
+                        <div>
+
+                            <small class="text-muted">
+                                Today's Attendance
+                            </small>
+
+
+                            {% if is_full_time %}
+
+                                {% if attendance and attendance.check_in %}
+
+                                    {% if attendance.check_out %}
+
+                                        <h5 class="fw-bold text-secondary mt-2 mb-1">
+                                            Checked Out
+                                        </h5>
+
+                                        <small class="text-muted">
+                                            Attendance completed
+                                        </small>
+
+                                    {% else %}
+
+                                        <h5 class="fw-bold text-success mt-2 mb-1">
+                                            Working
+                                        </h5>
+
+                                        <small class="text-success">
+                                            Currently checked in
+                                        </small>
+
+                                    {% endif %}
+
+                                {% else %}
+
+                                    <h5 class="fw-bold text-danger mt-2 mb-1">
+                                        Not Checked In
+                                    </h5>
+
+                                    <small class="text-danger">
+                                        Check in to start your work
+                                    </small>
+
+                                {% endif %}
+
+                            {% else %}
+
+                                <h5 class="fw-bold text-muted mt-2">
+                                    Not Applicable
                                 </h5>
 
                             {% endif %}
 
-                        {% else %}
+                        </div>
 
-                            <h5 class="fw-bold text-danger mt-2">
-                                Not Checked In
-                            </h5>
 
-                        {% endif %}
+                        <div class="stat-icon bg-success bg-opacity-10">
+                            ⏱️
+                        </div>
 
-                    {% else %}
-
-                        <h5 class="fw-bold text-muted mt-2">
-                            Not Applicable
-                        </h5>
-
-                    {% endif %}
+                    </div>
 
                 </div>
 
@@ -192,31 +527,43 @@
     </div>
 
 
-    <!-- ========================================= -->
+
+    <!-- ===================================================== -->
     <!-- TODAY WORK + LEARNING -->
-    <!-- ========================================= -->
+    <!-- ===================================================== -->
 
     <div class="row g-4 mb-4">
 
-        <!-- TODAY'S WORK -->
 
-        <div class="col-lg-6">
+        <!-- TODAY WORK -->
+        <div class="col-xl-6">
 
-            <div class="card shadow-sm border-0 h-100">
+            <div class="card section-card h-100">
 
-                <div class="card-header bg-white">
+                <div class="section-header">
 
-                    <div class="d-flex justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center">
 
-                        <h5 class="fw-bold mb-0">
-                            💼 Today's Work
-                        </h5>
+                        <div>
+
+                            <h5 class="fw-bold mb-1">
+                                💼 Today's Work
+                            </h5>
+
+                            <small class="text-muted">
+                                Record what you are working on today
+                            </small>
+
+                        </div>
+
 
                         {% if is_full_time %}
 
                             <a href="{% url 'add_today_task' %}"
-                               class="btn btn-sm btn-primary">
+                               class="btn btn-sm btn-primary btn-action">
+
                                 + Add Work
+
                             </a>
 
                         {% endif %}
@@ -225,47 +572,57 @@
 
                 </div>
 
+
                 <div class="card-body">
 
                     {% if today_tasks %}
 
                         {% for task in today_tasks %}
 
-                            <div class="border rounded p-3 mb-2">
+                            <div class="work-item">
 
-                                <div class="fw-semibold">
-                                    {{ task.task }}
-                                </div>
+                                <div class="d-flex justify-content-between gap-3">
 
-                                {% if task.description %}
+                                    <div>
 
-                                    <div class="small text-muted mt-1">
-                                        {{ task.description }}
+                                        <div class="fw-semibold">
+                                            {{ task.task }}
+                                        </div>
+
+                                        {% if task.description %}
+
+                                            <div class="small text-muted mt-1">
+                                                {{ task.description }}
+                                            </div>
+
+                                        {% endif %}
+
                                     </div>
 
-                                {% endif %}
 
-                                <div class="mt-2">
+                                    <div>
 
-                                    {% if task.status == "completed" %}
+                                        {% if task.status == "completed" %}
 
-                                        <span class="badge bg-success">
-                                            Completed
-                                        </span>
+                                            <span class="badge bg-success">
+                                                Completed
+                                            </span>
 
-                                    {% elif task.status == "in_progress" %}
+                                        {% elif task.status == "in_progress" %}
 
-                                        <span class="badge bg-warning text-dark">
-                                            In Progress
-                                        </span>
+                                            <span class="badge bg-warning text-dark">
+                                                In Progress
+                                            </span>
 
-                                    {% else %}
+                                        {% else %}
 
-                                        <span class="badge bg-secondary">
-                                            Pending
-                                        </span>
+                                            <span class="badge bg-secondary">
+                                                Pending
+                                            </span>
 
-                                    {% endif %}
+                                        {% endif %}
+
+                                    </div>
 
                                 </div>
 
@@ -275,21 +632,28 @@
 
                     {% else %}
 
-                        <div class="text-center py-4 text-muted">
+                        <div class="empty-state">
 
-                            <div style="font-size:40px;">
+                            <div class="empty-icon">
                                 📝
                             </div>
 
-                            <p class="mb-0">
-                                No work update added today.
-                            </p>
+                            <h6 class="fw-semibold">
+                                No work update added today
+                            </h6>
 
                             {% if is_full_time %}
 
-                                <small>
+                                <p class="small mb-3">
                                     Check in and add what you are working on.
-                                </small>
+                                </p>
+
+                                <a href="{% url 'add_today_task' %}"
+                                   class="btn btn-sm btn-primary btn-action">
+
+                                    + Add Today's Work
+
+                                </a>
 
                             {% endif %}
 
@@ -304,61 +668,85 @@
         </div>
 
 
-        <!-- TODAY'S LEARNING -->
 
-        <div class="col-lg-6">
+        <!-- TODAY LEARNING -->
+        <div class="col-xl-6">
 
-            <div class="card shadow-sm border-0 h-100">
+            <div class="card section-card h-100">
 
-                <div class="card-header bg-white">
+                <div class="section-header">
 
-                    <div class="d-flex justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center">
 
-                        <h5 class="fw-bold mb-0">
-                            📚 Today's Learning
-                        </h5>
+                        <div>
+
+                            <h5 class="fw-bold mb-1">
+                                📚 Today's Learning
+                            </h5>
+
+                            <small class="text-muted">
+                                Maintain your daily learning record
+                            </small>
+
+                        </div>
+
 
                         <a href="{% url 'add_daily_learning' %}"
-                           class="btn btn-sm btn-outline-success">
+                           class="btn btn-sm btn-outline-success btn-action">
+
                             {% if daily_learning %}
                                 Edit
                             {% else %}
                                 Add Learning
                             {% endif %}
+
                         </a>
 
                     </div>
 
                 </div>
 
+
                 <div class="card-body">
 
                     {% if daily_learning and daily_learning.learning %}
 
-                        <div class="bg-light rounded p-4">
+                        <div class="learning-box">
+
+                            <div class="small text-success fw-semibold mb-2">
+                                📖 LEARNING UPDATE
+                            </div>
 
                             <p class="mb-0"
                                style="white-space: pre-line;">
+
                                 {{ daily_learning.learning }}
+
                             </p>
 
                         </div>
 
                     {% else %}
 
-                        <div class="text-center py-4 text-muted">
+                        <div class="empty-state">
 
-                            <div style="font-size:40px;">
+                            <div class="empty-icon">
                                 📖
                             </div>
 
-                            <p class="mb-2">
-                                You haven't added today's learning yet.
+                            <h6 class="fw-semibold">
+                                No learning update yet
+                            </h6>
+
+                            <p class="small mb-3">
+                                Record what you learned or practiced today.
                             </p>
 
                             <a href="{% url 'add_daily_learning' %}"
-                               class="btn btn-success">
-                                Add Today's Learning
+                               class="btn btn-sm btn-success btn-action">
+
+                                + Add Today's Learning
+
                             </a>
 
                         </div>
@@ -374,13 +762,14 @@
     </div>
 
 
-    <!-- ========================================= -->
+
+    <!-- ===================================================== -->
     <!-- WEEKLY SCHEDULE -->
-    <!-- ========================================= -->
+    <!-- ===================================================== -->
 
-    <div class="card shadow-sm border-0 mb-4">
+    <div class="card section-card mb-4">
 
-        <div class="card-header bg-white">
+        <div class="section-header">
 
             <div class="d-flex justify-content-between align-items-center">
 
@@ -391,16 +780,21 @@
                     </h5>
 
                     <small class="text-muted">
+
                         {{ week_start|date:"d M Y" }}
                         -
                         {{ week_end|date:"d M Y" }}
+
                     </small>
 
                 </div>
 
+
                 <a href="{% url 'full_time_work_list' %}"
-                   class="btn btn-primary btn-sm">
+                   class="btn btn-primary btn-sm btn-action">
+
                     View Full Schedule
+
                 </a>
 
             </div>
@@ -414,24 +808,48 @@
 
                 <div class="table-responsive">
 
-                    <table class="table table-hover align-middle mb-0">
+                    <table class="table table-hover align-middle mb-0 schedule-table">
 
-                        <thead class="table-light">
+                        <thead>
 
                             <tr>
 
-                                <th>Date</th>
-                                <th>Day</th>
-                                <th>Work / Program</th>
-                                <th>Type</th>
-                                <th>College</th>
-                                <th>Time</th>
-                                <th>Location</th>
-                                <th>Status</th>
+                                <th class="px-3">
+                                    Date
+                                </th>
+
+                                <th>
+                                    Day
+                                </th>
+
+                                <th>
+                                    Work / Program
+                                </th>
+
+                                <th>
+                                    Type
+                                </th>
+
+                                <th>
+                                    College
+                                </th>
+
+                                <th>
+                                    Time
+                                </th>
+
+                                <th>
+                                    Location
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
 
                             </tr>
 
                         </thead>
+
 
                         <tbody>
 
@@ -439,42 +857,147 @@
 
                                 <tr>
 
-                                    <td>
-                                        {{ item.date|date:"d M Y" }}
+                                    <td class="px-3">
+
+                                        <strong>
+                                            {{ item.date|date:"d M Y" }}
+                                        </strong>
+
                                     </td>
 
+
                                     <td>
+
                                         {{ item.date|date:"D" }}
+
                                     </td>
 
+
                                     <td>
+
                                         <strong>
                                             {{ item.title }}
                                         </strong>
-                                    </td>
-
-                                    <td>
-
-                                        <span class="badge bg-primary">
-                                            {{ item.type }}
-                                        </span>
 
                                     </td>
 
-                                    <td>
-                                        {{ item.college }}
-                                    </td>
 
                                     <td>
-                                        {{ item.time }}
+
+                                        {% if item.type == "Workshop" %}
+
+                                            <span class="type-badge badge-workshop">
+                                                Workshop
+                                            </span>
+
+                                        {% elif item.type == "FDP" %}
+
+                                            <span class="type-badge badge-fdp">
+                                                FDP
+                                            </span>
+
+                                        {% elif item.type == "Online Workshop" %}
+
+                                            <span class="type-badge badge-online">
+                                                Online Workshop
+                                            </span>
+
+                                        {% elif item.type == "Office Training" %}
+
+                                            <span class="type-badge badge-office">
+                                                Office Training
+                                            </span>
+
+                                        {% elif item.type == "Guest Faculty Training" %}
+
+                                            <span class="type-badge badge-guest">
+                                                Guest Faculty
+                                            </span>
+
+                                        {% elif item.type == "Meeting" %}
+
+                                            <span class="type-badge badge-meeting">
+                                                Meeting
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="type-badge badge-other">
+                                                {{ item.type }}
+                                            </span>
+
+                                        {% endif %}
+
                                     </td>
 
-                                    <td>
-                                        {{ item.location }}
-                                    </td>
 
                                     <td>
-                                        {{ item.status }}
+
+                                        {% if item.college %}
+
+                                            🏫 {{ item.college }}
+
+                                        {% else %}
+
+                                            <span class="text-muted">
+                                                —
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {% if item.time %}
+
+                                            🕐 {{ item.time }}
+
+                                        {% else %}
+
+                                            <span class="text-muted">
+                                                —
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {% if item.location %}
+
+                                            📍 {{ item.location }}
+
+                                        {% else %}
+
+                                            <span class="text-muted">
+                                                —
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {% if item.status %}
+
+                                            <span class="badge bg-light text-dark border">
+                                                {{ item.status }}
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="text-muted">
+                                                —
+                                            </span>
+
+                                        {% endif %}
+
                                     </td>
 
                                 </tr>
@@ -489,15 +1012,20 @@
 
             {% else %}
 
-                <div class="text-center py-5 text-muted">
+                <div class="empty-state">
 
-                    <div style="font-size:45px;">
+                    <div class="empty-icon">
                         📅
                     </div>
 
-                    <h6 class="mt-3">
+                    <h6 class="fw-semibold">
                         No scheduled work this week
                     </h6>
+
+                    <p class="small mb-0">
+                        Your workshops, FDPs, online workshops,
+                        guest faculty training and meetings will appear here.
+                    </p>
 
                 </div>
 
@@ -508,19 +1036,33 @@
     </div>
 
 
-    <!-- ========================================= -->
+
+    <!-- ===================================================== -->
     <!-- ASSIGNED WORKSHOPS -->
-    <!-- ========================================= -->
+    <!-- ===================================================== -->
 
-    <div class="card shadow-sm border-0">
+    <div class="card section-card">
 
-        <div class="card-header bg-white">
+        <div class="section-header">
 
-            <h5 class="fw-bold mb-0">
-                🎓 My Assigned Workshops
-            </h5>
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+
+                    <h5 class="fw-bold mb-1">
+                        🎓 My Assigned Workshops
+                    </h5>
+
+                    <small class="text-muted">
+                        Workshops currently assigned to you
+                    </small>
+
+                </div>
+
+            </div>
 
         </div>
+
 
         <div class="card-body">
 
@@ -532,23 +1074,37 @@
 
                         <div class="col-md-6 col-xl-4">
 
-                            <div class="border rounded p-3 h-100">
+                            <div class="workshop-card p-3 h-100">
 
-                                <h6 class="fw-bold">
-                                    {{ workshop.title }}
-                                </h6>
+                                <div class="d-flex justify-content-between align-items-start gap-2">
 
-                                <div class="small text-muted mb-2">
+                                    <h6 class="fw-bold mb-2">
+                                        {{ workshop.title }}
+                                    </h6>
 
-                                    {% if workshop.college %}
-                                        🏫 {{ workshop.college.name }}
-                                    {% endif %}
+                                    <span class="badge bg-secondary">
+                                        {{ workshop.get_status_display }}
+                                    </span>
 
                                 </div>
 
-                                <div class="small">
+
+                                {% if workshop.college %}
+
+                                    <div class="small text-muted mb-2">
+
+                                        🏫
+                                        {{ workshop.college.name }}
+
+                                    </div>
+
+                                {% endif %}
+
+
+                                <div class="small text-muted mb-2">
 
                                     📅
+
                                     {{ workshop.start_date|date:"d M Y" }}
 
                                     -
@@ -557,19 +1113,26 @@
 
                                 </div>
 
-                                <div class="mt-2">
 
-                                    <span class="badge bg-secondary">
-                                        {{ workshop.get_status_display }}
-                                    </span>
+                                {% if workshop.departments %}
 
-                                </div>
+                                    <div class="small text-muted mb-2">
+
+                                        🏢
+                                        {{ workshop.departments }}
+
+                                    </div>
+
+                                {% endif %}
+
 
                                 <div class="mt-3">
 
                                     <a href="{% url 'workshop_detail' workshop.pk %}"
-                                       class="btn btn-sm btn-outline-primary">
+                                       class="btn btn-sm btn-outline-primary btn-action">
+
                                         View Workshop
+
                                     </a>
 
                                 </div>
@@ -584,15 +1147,30 @@
 
             {% else %}
 
-                <p class="text-muted mb-0">
-                    No workshops assigned.
-                </p>
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        🎓
+                    </div>
+
+                    <h6 class="fw-semibold">
+                        No workshops assigned
+                    </h6>
+
+                    <p class="small mb-0">
+                        Assigned workshops will appear here automatically.
+                    </p>
+
+                </div>
 
             {% endif %}
 
         </div>
 
     </div>
+
+
+</div>
 
 </div>
 
