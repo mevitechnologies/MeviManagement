@@ -3,34 +3,48 @@
 {% block content %}
 
 <style>
-    .dashboard-wrapper {
-        background: #f6f8fb;
-        min-height: calc(100vh - 70px);
+    body {
+        background: #f5f7fb;
     }
 
-    .welcome-card {
+    .trainer-dashboard {
+        padding: 25px 0 50px;
+    }
+
+    .hero-card {
         border: 0;
-        border-radius: 18px;
-        background: linear-gradient(135deg, #ffffff, #f1f5ff);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+        border-radius: 20px;
+        background: linear-gradient(135deg, #ffffff, #f2f6ff);
+        box-shadow: 0 8px 30px rgba(0,0,0,.06);
+        overflow: hidden;
+    }
+
+    .hero-title {
+        font-size: 28px;
+        font-weight: 750;
+    }
+
+    .hero-subtitle {
+        color: #6c757d;
     }
 
     .stat-card {
         border: 0;
-        border-radius: 16px;
-        transition: all 0.2s ease;
-        box-shadow: 0 5px 18px rgba(0, 0, 0, 0.05);
+        border-radius: 17px;
+        box-shadow: 0 5px 20px rgba(0,0,0,.05);
+        transition: .2s;
+        height: 100%;
     }
 
     .stat-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 10px 28px rgba(0,0,0,.08);
     }
 
     .stat-icon {
         width: 48px;
         height: 48px;
-        border-radius: 12px;
+        border-radius: 13px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -39,58 +53,58 @@
 
     .section-card {
         border: 0;
-        border-radius: 16px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        border-radius: 18px;
+        box-shadow: 0 5px 22px rgba(0,0,0,.05);
         overflow: hidden;
     }
 
     .section-header {
-        background: #fff;
-        border-bottom: 1px solid #eef0f4;
         padding: 18px 20px;
-    }
-
-    .work-item {
-        border: 1px solid #edf0f4;
-        border-radius: 12px;
-        padding: 15px;
-        margin-bottom: 10px;
         background: #fff;
-        transition: 0.2s;
+        border-bottom: 1px solid #edf0f4;
     }
 
-    .work-item:hover {
-        border-color: #d7dce5;
+    .work-card {
+        border: 1px solid #edf0f4;
+        border-radius: 13px;
+        padding: 15px;
+        background: #fff;
+        margin-bottom: 10px;
+        transition: .2s;
+    }
+
+    .work-card:hover {
+        border-color: #d9dee7;
         transform: translateX(2px);
     }
 
     .learning-box {
-        background: linear-gradient(135deg, #f1fff6, #ffffff);
+        background: linear-gradient(135deg,#effbf3,#ffffff);
         border: 1px solid #dcefe3;
         border-radius: 14px;
         padding: 20px;
-        min-height: 150px;
+    }
+
+    .schedule-table {
+        min-width: 950px;
     }
 
     .schedule-table th {
-        white-space: nowrap;
-        font-size: 13px;
-        color: #667085;
         background: #f8f9fb;
+        color: #667085;
+        font-size: 12px;
+        text-transform: uppercase;
+        white-space: nowrap;
     }
 
     .schedule-table td {
-        font-size: 14px;
+        font-size: 13px;
         vertical-align: middle;
     }
 
-    .schedule-table tr:hover {
-        background: #fafbfc;
-    }
-
     .type-badge {
-        border-radius: 20px;
         padding: 6px 10px;
+        border-radius: 20px;
         font-size: 11px;
         font-weight: 600;
         white-space: nowrap;
@@ -98,11 +112,11 @@
 
     .badge-workshop {
         background: #e8f1ff;
-        color: #1456b8;
+        color: #1555a6;
     }
 
     .badge-fdp {
-        background: #f0e8ff;
+        background: #f1e8ff;
         color: #6637a6;
     }
 
@@ -113,27 +127,28 @@
 
     .badge-office {
         background: #fff4dd;
-        color: #9a6500;
+        color: #946200;
     }
 
     .badge-guest {
-        background: #e9f8ef;
+        background: #e8f8ed;
         color: #18733b;
     }
 
     .badge-meeting {
-        background: #f2f2f2;
-        color: #555;
-    }
-
-    .badge-other {
         background: #eeeeee;
         color: #555;
     }
 
-    .attendance-status {
-        border-radius: 10px;
-        padding: 12px;
+    .badge-other {
+        background: #f1f1f1;
+        color: #555;
+    }
+
+    .attendance-box {
+        border-radius: 12px;
+        padding: 12px 15px;
+        margin-top: 15px;
     }
 
     .attendance-working {
@@ -153,66 +168,75 @@
 
     .workshop-card {
         border: 1px solid #edf0f4;
-        border-radius: 14px;
-        transition: 0.2s;
+        border-radius: 15px;
         background: #fff;
+        transition: .2s;
     }
 
     .workshop-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+        box-shadow: 0 8px 22px rgba(0,0,0,.07);
     }
 
     .empty-state {
-        padding: 45px 20px;
         text-align: center;
+        padding: 45px 20px;
         color: #8a919d;
     }
 
     .empty-icon {
         font-size: 42px;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
     }
 
-    .btn-action {
+    .action-btn {
         border-radius: 10px;
         font-weight: 600;
     }
 
-    .today-label {
-        font-size: 12px;
-        color: #667085;
-        text-transform: uppercase;
-        letter-spacing: .5px;
+    .modal-content {
+        border: 0;
+        border-radius: 18px;
+        box-shadow: 0 20px 60px rgba(0,0,0,.18);
     }
 
-    @media (max-width: 768px) {
+    .modal-header {
+        border-bottom: 1px solid #edf0f4;
+    }
+
+    .modal-footer {
+        border-top: 1px solid #edf0f4;
+    }
+
+    .form-control {
+        border-radius: 10px;
+        padding: 11px 13px;
+    }
+
+    .form-control:focus {
+        box-shadow: 0 0 0 .2rem rgba(13,110,253,.10);
+    }
+
+    @media(max-width:768px) {
+
+        .hero-title {
+            font-size: 23px;
+        }
+
         .schedule-table {
             min-width: 950px;
-        }
-
-        .welcome-actions {
-            margin-top: 15px;
-            width: 100%;
-        }
-
-        .welcome-actions form,
-        .welcome-actions a {
-            width: 100%;
         }
     }
 </style>
 
 
-<div class="dashboard-wrapper">
+<div class="container-fluid trainer-dashboard">
 
-<div class="container-fluid py-4">
+    <!-- ================================================= -->
+    <!-- WELCOME / HEADER -->
+    <!-- ================================================= -->
 
-    <!-- ===================================================== -->
-    <!-- WELCOME HEADER -->
-    <!-- ===================================================== -->
-
-    <div class="card welcome-card mb-4">
+    <div class="card hero-card mb-4">
 
         <div class="card-body p-4">
 
@@ -220,33 +244,73 @@
 
                 <div class="col-lg-7">
 
-                    <div class="today-label mb-2">
-                        TRAINER DASHBOARD
+                    <div class="small text-primary fw-bold mb-2">
+                        TRAINER WORKSPACE
                     </div>
 
-                    <h2 class="fw-bold mb-2">
+                    <div class="hero-title mb-2">
                         👋 Welcome, {{ trainer.Name }}
-                    </h2>
+                    </div>
 
-                    <p class="text-muted mb-0">
+                    <div class="hero-subtitle">
                         {{ today|date:"l, d F Y" }}
-                    </p>
+                    </div>
+
+                    {% if is_full_time %}
+
+                        {% if attendance and attendance.check_in and not attendance.check_out %}
+
+                            <div class="attendance-box attendance-working">
+                                🟢 <strong>You are currently working</strong>
+                                <br>
+                                <small>
+                                    Checked in at
+                                    {{ attendance.check_in|date:"h:i A" }}
+                                </small>
+                            </div>
+
+                        {% elif attendance and attendance.check_out %}
+
+                            <div class="attendance-box attendance-out">
+                                ⚪ <strong>Today's attendance completed</strong>
+                                <br>
+                                <small>
+                                    Checked out at
+                                    {{ attendance.check_out|date:"h:i A" }}
+                                </small>
+                            </div>
+
+                        {% else %}
+
+                            <div class="attendance-box attendance-not">
+                                🔴 <strong>You are not checked in</strong>
+                                <br>
+                                <small>
+                                    Check in before adding today's work.
+                                </small>
+                            </div>
+
+                        {% endif %}
+
+                    {% endif %}
 
                 </div>
 
 
-                <div class="col-lg-5">
+                <!-- ACTIONS -->
 
-                    <div class="d-flex justify-content-lg-end flex-wrap gap-2 welcome-actions">
+                <div class="col-lg-5 mt-3 mt-lg-0">
+
+                    <div class="d-flex justify-content-lg-end flex-wrap gap-2">
+
 
                         {% if is_full_time %}
 
-                            {% if attendance and not attendance.check_in %}
+                            {% if not attendance or not attendance.check_in %}
 
-                                <!-- FIXED CHECK IN: POST -->
+                                <!-- CHECK IN -->
                                 <form method="POST"
-                                      action="{% url 'daily_checkin' %}"
-                                      class="d-inline">
+                                      action="{% url 'daily_checkin' %}">
 
                                     {% csrf_token %}
 
@@ -255,7 +319,7 @@
                                            value="check_in">
 
                                     <button type="submit"
-                                            class="btn btn-success btn-action px-4">
+                                            class="btn btn-success action-btn px-4">
 
                                         🟢 Check In
 
@@ -264,12 +328,11 @@
                                 </form>
 
 
-                            {% elif attendance and attendance.check_in and not attendance.check_out %}
+                            {% elif attendance.check_in and not attendance.check_out %}
 
-                                <!-- FIXED CHECK OUT: POST -->
+                                <!-- CHECK OUT -->
                                 <form method="POST"
-                                      action="{% url 'daily_checkin' %}"
-                                      class="d-inline">
+                                      action="{% url 'daily_checkin' %}">
 
                                     {% csrf_token %}
 
@@ -278,7 +341,7 @@
                                            value="check_out">
 
                                     <button type="submit"
-                                            class="btn btn-warning btn-action px-4">
+                                            class="btn btn-warning action-btn px-4">
 
                                         🟡 Check Out
 
@@ -288,13 +351,40 @@
 
                             {% endif %}
 
+
+                            <!-- ADD WORK -->
+
+                            {% if attendance and attendance.check_in and not attendance.check_out %}
+
+                                <button type="button"
+                                        class="btn btn-primary action-btn px-4"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#addWorkModal">
+
+                                    ➕ Add Work
+
+                                </button>
+
+                            {% else %}
+
+                                <button type="button"
+                                        class="btn btn-primary action-btn px-4"
+                                        disabled
+                                        title="Check in first">
+
+                                    🔒 Add Work
+
+                                </button>
+
+                            {% endif %}
+
                         {% endif %}
 
 
                         <a href="{% url 'add_daily_learning' %}"
-                           class="btn btn-outline-success btn-action">
+                           class="btn btn-outline-success action-btn">
 
-                            📚 Today's Learning
+                            📚 Learning
 
                         </a>
 
@@ -310,21 +400,22 @@
 
 
 
-    <!-- ===================================================== -->
-    <!-- STATUS CARDS -->
-    <!-- ===================================================== -->
+    <!-- ================================================= -->
+    <!-- STATISTICS -->
+    <!-- ================================================= -->
 
     <div class="row g-3 mb-4">
 
 
         <!-- TRAINER -->
+
         <div class="col-xl-3 col-md-6">
 
-            <div class="card stat-card h-100">
+            <div class="card stat-card">
 
                 <div class="card-body">
 
-                    <div class="d-flex justify-content-between align-items-start">
+                    <div class="d-flex justify-content-between">
 
                         <div>
 
@@ -332,14 +423,14 @@
                                 Trainer
                             </small>
 
-                            <h5 class="fw-bold mt-2 mb-2">
+                            <h5 class="fw-bold mt-2">
                                 {{ trainer.Name }}
                             </h5>
 
                             {% if is_full_time %}
 
                                 <span class="badge bg-success">
-                                    Full-Time Trainer
+                                    Full-Time
                                 </span>
 
                             {% else %}
@@ -352,8 +443,7 @@
 
                         </div>
 
-
-                        <div class="stat-icon bg-light">
+                        <div class="stat-icon bg-primary bg-opacity-10">
                             👨‍🏫
                         </div>
 
@@ -366,15 +456,15 @@
         </div>
 
 
+        <!-- WORK -->
 
-        <!-- TODAY WORK -->
         <div class="col-xl-3 col-md-6">
 
-            <div class="card stat-card h-100">
+            <div class="card stat-card">
 
                 <div class="card-body">
 
-                    <div class="d-flex justify-content-between align-items-start">
+                    <div class="d-flex justify-content-between">
 
                         <div>
 
@@ -382,18 +472,17 @@
                                 Today's Work
                             </small>
 
-                            <h2 class="fw-bold mt-2 mb-1">
+                            <h2 class="fw-bold mt-2">
                                 {{ today_tasks|length }}
                             </h2>
 
-                            <span class="text-muted small">
-                                Work updates
-                            </span>
+                            <small class="text-muted">
+                                Updates recorded
+                            </small>
 
                         </div>
 
-
-                        <div class="stat-icon bg-primary bg-opacity-10">
+                        <div class="stat-icon bg-success bg-opacity-10">
                             💼
                         </div>
 
@@ -406,32 +495,31 @@
         </div>
 
 
+        <!-- WEEKLY -->
 
-        <!-- WEEKLY ACTIVITIES -->
         <div class="col-xl-3 col-md-6">
 
-            <div class="card stat-card h-100">
+            <div class="card stat-card">
 
                 <div class="card-body">
 
-                    <div class="d-flex justify-content-between align-items-start">
+                    <div class="d-flex justify-content-between">
 
                         <div>
 
                             <small class="text-muted">
-                                Weekly Activities
+                                Weekly Schedule
                             </small>
 
-                            <h2 class="fw-bold mt-2 mb-1">
+                            <h2 class="fw-bold mt-2">
                                 {{ weekly_schedule|length }}
                             </h2>
 
-                            <span class="text-muted small">
-                                Scheduled activities
-                            </span>
+                            <small class="text-muted">
+                                Activities
+                            </small>
 
                         </div>
-
 
                         <div class="stat-icon bg-info bg-opacity-10">
                             📅
@@ -446,22 +534,21 @@
         </div>
 
 
-
         <!-- ATTENDANCE -->
+
         <div class="col-xl-3 col-md-6">
 
-            <div class="card stat-card h-100">
+            <div class="card stat-card">
 
                 <div class="card-body">
 
-                    <div class="d-flex justify-content-between align-items-start">
+                    <div class="d-flex justify-content-between">
 
                         <div>
 
                             <small class="text-muted">
-                                Today's Attendance
+                                Attendance
                             </small>
-
 
                             {% if is_full_time %}
 
@@ -469,35 +556,23 @@
 
                                     {% if attendance.check_out %}
 
-                                        <h5 class="fw-bold text-secondary mt-2 mb-1">
+                                        <h5 class="fw-bold text-secondary mt-2">
                                             Checked Out
                                         </h5>
 
-                                        <small class="text-muted">
-                                            Attendance completed
-                                        </small>
-
                                     {% else %}
 
-                                        <h5 class="fw-bold text-success mt-2 mb-1">
+                                        <h5 class="fw-bold text-success mt-2">
                                             Working
                                         </h5>
-
-                                        <small class="text-success">
-                                            Currently checked in
-                                        </small>
 
                                     {% endif %}
 
                                 {% else %}
 
-                                    <h5 class="fw-bold text-danger mt-2 mb-1">
+                                    <h5 class="fw-bold text-danger mt-2">
                                         Not Checked In
                                     </h5>
-
-                                    <small class="text-danger">
-                                        Check in to start your work
-                                    </small>
 
                                 {% endif %}
 
@@ -511,8 +586,7 @@
 
                         </div>
 
-
-                        <div class="stat-icon bg-success bg-opacity-10">
+                        <div class="stat-icon bg-warning bg-opacity-10">
                             ⏱️
                         </div>
 
@@ -528,14 +602,15 @@
 
 
 
-    <!-- ===================================================== -->
+    <!-- ================================================= -->
     <!-- TODAY WORK + LEARNING -->
-    <!-- ===================================================== -->
+    <!-- ================================================= -->
 
     <div class="row g-4 mb-4">
 
 
-        <!-- TODAY WORK -->
+        <!-- TODAY'S WORK -->
+
         <div class="col-xl-6">
 
             <div class="card section-card h-100">
@@ -551,7 +626,7 @@
                             </h5>
 
                             <small class="text-muted">
-                                Record what you are working on today
+                                What are you working on today?
                             </small>
 
                         </div>
@@ -559,12 +634,18 @@
 
                         {% if is_full_time %}
 
-                            <a href="{% url 'add_today_task' %}"
-                               class="btn btn-sm btn-primary btn-action">
+                            {% if attendance and attendance.check_in and not attendance.check_out %}
 
-                                + Add Work
+                                <button type="button"
+                                        class="btn btn-sm btn-primary action-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#addWorkModal">
 
-                            </a>
+                                    + Add Work
+
+                                </button>
+
+                            {% endif %}
 
                         {% endif %}
 
@@ -579,20 +660,33 @@
 
                         {% for task in today_tasks %}
 
-                            <div class="work-item">
+                            <div class="work-card">
 
                                 <div class="d-flex justify-content-between gap-3">
 
                                     <div>
 
-                                        <div class="fw-semibold">
+                                        <div class="fw-bold">
                                             {{ task.task }}
                                         </div>
 
                                         {% if task.description %}
 
                                             <div class="small text-muted mt-1">
+
                                                 {{ task.description }}
+
+                                            </div>
+
+                                        {% endif %}
+
+                                        {% if task.created_on %}
+
+                                            <div class="small text-muted mt-2">
+
+                                                Added:
+                                                {{ task.created_on|date:"h:i A" }}
+
                                             </div>
 
                                         {% endif %}
@@ -638,22 +732,36 @@
                                 📝
                             </div>
 
-                            <h6 class="fw-semibold">
-                                No work update added today
+                            <h6 class="fw-bold">
+                                No work added today
                             </h6>
 
                             {% if is_full_time %}
 
-                                <p class="small mb-3">
-                                    Check in and add what you are working on.
-                                </p>
+                                {% if attendance and attendance.check_in and not attendance.check_out %}
 
-                                <a href="{% url 'add_today_task' %}"
-                                   class="btn btn-sm btn-primary btn-action">
+                                    <p class="small text-muted">
+                                        Add your current training,
+                                        preparation, development,
+                                        meeting or other work.
+                                    </p>
 
-                                    + Add Today's Work
+                                    <button type="button"
+                                            class="btn btn-primary action-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#addWorkModal">
 
-                                </a>
+                                        ➕ Add Today's Work
+
+                                    </button>
+
+                                {% else %}
+
+                                    <p class="small text-danger">
+                                        Please check in first.
+                                    </p>
+
+                                {% endif %}
 
                             {% endif %}
 
@@ -670,6 +778,7 @@
 
 
         <!-- TODAY LEARNING -->
+
         <div class="col-xl-6">
 
             <div class="card section-card h-100">
@@ -685,19 +794,18 @@
                             </h5>
 
                             <small class="text-muted">
-                                Maintain your daily learning record
+                                Record your learning and improvement
                             </small>
 
                         </div>
 
-
                         <a href="{% url 'add_daily_learning' %}"
-                           class="btn btn-sm btn-outline-success btn-action">
+                           class="btn btn-sm btn-outline-success action-btn">
 
                             {% if daily_learning %}
                                 Edit
                             {% else %}
-                                Add Learning
+                                Add
                             {% endif %}
 
                         </a>
@@ -713,16 +821,13 @@
 
                         <div class="learning-box">
 
-                            <div class="small text-success fw-semibold mb-2">
-                                📖 LEARNING UPDATE
+                            <div class="fw-bold text-success mb-2">
+                                📖 Learning Update
                             </div>
 
-                            <p class="mb-0"
-                               style="white-space: pre-line;">
-
+                            <div style="white-space:pre-line;">
                                 {{ daily_learning.learning }}
-
-                            </p>
+                            </div>
 
                         </div>
 
@@ -734,18 +839,18 @@
                                 📖
                             </div>
 
-                            <h6 class="fw-semibold">
+                            <h6 class="fw-bold">
                                 No learning update yet
                             </h6>
 
-                            <p class="small mb-3">
-                                Record what you learned or practiced today.
+                            <p class="small">
+                                Add what you learned or practiced today.
                             </p>
 
                             <a href="{% url 'add_daily_learning' %}"
-                               class="btn btn-sm btn-success btn-action">
+                               class="btn btn-success action-btn">
 
-                                + Add Today's Learning
+                                + Add Learning
 
                             </a>
 
@@ -763,9 +868,9 @@
 
 
 
-    <!-- ===================================================== -->
+    <!-- ================================================= -->
     <!-- WEEKLY SCHEDULE -->
-    <!-- ===================================================== -->
+    <!-- ================================================= -->
 
     <div class="card section-card mb-4">
 
@@ -776,7 +881,7 @@
                 <div>
 
                     <h5 class="fw-bold mb-1">
-                        📅 My Weekly Work Schedule
+                        📅 Weekly Work Schedule
                     </h5>
 
                     <small class="text-muted">
@@ -791,7 +896,7 @@
 
 
                 <a href="{% url 'full_time_work_list' %}"
-                   class="btn btn-primary btn-sm btn-action">
+                   class="btn btn-primary btn-sm action-btn">
 
                     View Full Schedule
 
@@ -814,37 +919,14 @@
 
                             <tr>
 
-                                <th class="px-3">
-                                    Date
-                                </th>
-
-                                <th>
-                                    Day
-                                </th>
-
-                                <th>
-                                    Work / Program
-                                </th>
-
-                                <th>
-                                    Type
-                                </th>
-
-                                <th>
-                                    College
-                                </th>
-
-                                <th>
-                                    Time
-                                </th>
-
-                                <th>
-                                    Location
-                                </th>
-
-                                <th>
-                                    Status
-                                </th>
+                                <th class="px-3">Date</th>
+                                <th>Day</th>
+                                <th>Work / Program</th>
+                                <th>Type</th>
+                                <th>College</th>
+                                <th>Time</th>
+                                <th>Location</th>
+                                <th>Status</th>
 
                             </tr>
 
@@ -857,28 +939,18 @@
 
                                 <tr>
 
-                                    <td class="px-3">
-
-                                        <strong>
-                                            {{ item.date|date:"d M Y" }}
-                                        </strong>
-
+                                    <td class="px-3 fw-semibold">
+                                        {{ item.date|date:"d M Y" }}
                                     </td>
 
-
                                     <td>
-
                                         {{ item.date|date:"D" }}
-
                                     </td>
 
-
                                     <td>
-
                                         <strong>
                                             {{ item.title }}
                                         </strong>
-
                                     </td>
 
 
@@ -939,9 +1011,7 @@
 
                                         {% else %}
 
-                                            <span class="text-muted">
-                                                —
-                                            </span>
+                                            —
 
                                         {% endif %}
 
@@ -956,9 +1026,7 @@
 
                                         {% else %}
 
-                                            <span class="text-muted">
-                                                —
-                                            </span>
+                                            —
 
                                         {% endif %}
 
@@ -973,9 +1041,7 @@
 
                                         {% else %}
 
-                                            <span class="text-muted">
-                                                —
-                                            </span>
+                                            —
 
                                         {% endif %}
 
@@ -987,14 +1053,14 @@
                                         {% if item.status %}
 
                                             <span class="badge bg-light text-dark border">
+
                                                 {{ item.status }}
+
                                             </span>
 
                                         {% else %}
 
-                                            <span class="text-muted">
-                                                —
-                                            </span>
+                                            —
 
                                         {% endif %}
 
@@ -1018,12 +1084,12 @@
                         📅
                     </div>
 
-                    <h6 class="fw-semibold">
-                        No scheduled work this week
+                    <h6 class="fw-bold">
+                        No scheduled activities this week
                     </h6>
 
                     <p class="small mb-0">
-                        Your workshops, FDPs, online workshops,
+                        Workshops, FDPs, online workshops,
                         guest faculty training and meetings will appear here.
                     </p>
 
@@ -1037,29 +1103,21 @@
 
 
 
-    <!-- ===================================================== -->
+    <!-- ================================================= -->
     <!-- ASSIGNED WORKSHOPS -->
-    <!-- ===================================================== -->
+    <!-- ================================================= -->
 
     <div class="card section-card">
 
         <div class="section-header">
 
-            <div class="d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold mb-1">
+                🎓 My Assigned Workshops
+            </h5>
 
-                <div>
-
-                    <h5 class="fw-bold mb-1">
-                        🎓 My Assigned Workshops
-                    </h5>
-
-                    <small class="text-muted">
-                        Workshops currently assigned to you
-                    </small>
-
-                </div>
-
-            </div>
+            <small class="text-muted">
+                Workshops assigned to you
+            </small>
 
         </div>
 
@@ -1076,14 +1134,16 @@
 
                             <div class="workshop-card p-3 h-100">
 
-                                <div class="d-flex justify-content-between align-items-start gap-2">
+                                <div class="d-flex justify-content-between gap-2">
 
-                                    <h6 class="fw-bold mb-2">
+                                    <h6 class="fw-bold">
                                         {{ workshop.title }}
                                     </h6>
 
                                     <span class="badge bg-secondary">
+
                                         {{ workshop.get_status_display }}
+
                                     </span>
 
                                 </div>
@@ -1093,15 +1153,14 @@
 
                                     <div class="small text-muted mb-2">
 
-                                        🏫
-                                        {{ workshop.college.name }}
+                                        🏫 {{ workshop.college.name }}
 
                                     </div>
 
                                 {% endif %}
 
 
-                                <div class="small text-muted mb-2">
+                                <div class="small text-muted">
 
                                     📅
 
@@ -1116,10 +1175,9 @@
 
                                 {% if workshop.departments %}
 
-                                    <div class="small text-muted mb-2">
+                                    <div class="small text-muted mt-2">
 
-                                        🏢
-                                        {{ workshop.departments }}
+                                        🏢 {{ workshop.departments }}
 
                                     </div>
 
@@ -1129,7 +1187,7 @@
                                 <div class="mt-3">
 
                                     <a href="{% url 'workshop_detail' workshop.pk %}"
-                                       class="btn btn-sm btn-outline-primary btn-action">
+                                       class="btn btn-sm btn-outline-primary action-btn">
 
                                         View Workshop
 
@@ -1153,12 +1211,12 @@
                         🎓
                     </div>
 
-                    <h6 class="fw-semibold">
+                    <h6 class="fw-bold">
                         No workshops assigned
                     </h6>
 
                     <p class="small mb-0">
-                        Assigned workshops will appear here automatically.
+                        Assigned workshops will appear here.
                     </p>
 
                 </div>
@@ -1169,9 +1227,136 @@
 
     </div>
 
+</div>
+
+
+
+<!-- ===================================================== -->
+<!-- ADD TODAY'S WORK MODAL -->
+<!-- ===================================================== -->
+
+<div class="modal fade"
+     id="addWorkModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+
+            <form method="POST"
+                  action="{% url 'add_today_task' %}">
+
+                {% csrf_token %}
+
+
+                <div class="modal-header">
+
+                    <div>
+
+                        <h5 class="modal-title fw-bold">
+                            ➕ Add Today's Work
+                        </h5>
+
+                        <small class="text-muted">
+                            Record what you are working on today.
+                        </small>
+
+                    </div>
+
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal">
+                    </button>
+
+                </div>
+
+
+                <div class="modal-body">
+
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-semibold">
+
+                            What are you working on?
+
+                        </label>
+
+                        <input type="text"
+                               name="task"
+                               class="form-control"
+                               placeholder="Example: Preparing Python training material"
+                               required
+                               autofocus>
+
+                    </div>
+
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-semibold">
+
+                            Description
+
+                            <span class="text-muted fw-normal">
+                                (Optional)
+                            </span>
+
+                        </label>
+
+                        <textarea name="description"
+                                  class="form-control"
+                                  rows="4"
+                                  placeholder="Add details about today's work..."></textarea>
+
+                    </div>
+
+
+                    <div class="alert alert-light border small mb-0">
+
+                        📌 This work update will be recorded for
+
+                        <strong>
+                            {{ today|date:"d M Y" }}
+                        </strong>
+
+                        under your trainer profile.
+
+                    </div>
+
+                </div>
+
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-light action-btn"
+                            data-bs-dismiss="modal">
+
+                        Cancel
+
+                    </button>
+
+
+                    <button type="submit"
+                            class="btn btn-primary action-btn px-4">
+
+                        💾 Save Work
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
 
 </div>
 
-</div>
 
 {% endblock %}
