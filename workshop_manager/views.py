@@ -1052,7 +1052,41 @@ def dashboard(request):
 # =====================================================
 # WORKSHOPS
 # =====================================================
+@login_required
+def delete_workshop(request, pk):
 
+    workshop = get_object_or_404(
+        Workshop,
+        pk=pk
+    )
+
+    if not request.user.is_staff and not request.user.is_superuser:
+        messages.error(
+            request,
+            "You do not have permission to delete workshops."
+        )
+        return redirect("workshop_list")
+
+    if request.method == "POST":
+
+        title = workshop.title
+
+        workshop.delete()
+
+        messages.success(
+            request,
+            f'Workshop "{title}" was deleted successfully.'
+        )
+
+        return redirect("workshop_list")
+
+    return render(
+        request,
+        "workshop/delete_workshop.html",
+        {
+            "workshop": workshop
+        }
+    )
 @login_required
 def workshop_list(request):
     today = timezone.now().date()
@@ -1311,19 +1345,85 @@ def delete_task(request, task_id):
     return redirect("task_history")
 
 @login_required
-@user_passes_test(is_superuser)
+@require_POST
 def change_task_status(request, task_id):
-    task = get_object_or_404(TodoTask, id=task_id)
 
-    if task.status == "pending":
-        task.status = "in_progress"
-    elif task.status == "in_progress":
-        task.status = "completed"
+    task = get_object_or_404(
+        TodoTask,
+        id=task_id
+    )
+
+    trainer = Trainer.objects.filter(
+        user=request.user
+    ).first()
+
+    if not trainer:
+        trainer = Trainer.objects.filter(
+            email=request.user.email
+        ).first()
+
+    if not trainer:
+        messages.error(
+            request,
+            "Your account is not linked to a Trainer profile."
+        )
+        return redirect("dashboard")
+
+    # Trainer can modify only their own tasks
+    if not request.user.is_superuser and task.trainer_id != trainer.id:
+        messages.error(
+            request,
+            "You can update only your own work."
+        )
+        return redirect("trainer_dashboard")
+
+    new_status = request.POST.get("status")
+
+    allowed_statuses = [
+        "pending",
+        "in_progress",
+        "completed",
+    ]
+
+    if new_status not in allowed_statuses:
+        messages.error(
+            request,
+            "Invalid task status."
+        )
+        return redirect("trainer_dashboard")
+
+    task.status = new_status
+    task.is_done = (
+        new_status == "completed"
+    )
+
+    task.save(
+        update_fields=[
+            "status",
+            "is_done",
+        ]
+    )
+
+    if new_status == "completed":
+        messages.success(
+            request,
+            "Work marked as completed."
+        )
+
+    elif new_status == "in_progress":
+        messages.success(
+            request,
+            "Work moved to In Progress."
+        )
+
     else:
-        task.status = "pending"   # optional reset
+        messages.success(
+            request,
+            "Work moved to Pending."
+        )
 
-    task.save()
-    return redirect("admin_task_dashboard")
+    return redirect("trainer_dashboard")
+
 
 @login_required
 @user_passes_test(is_superuser)
@@ -1410,12 +1510,16 @@ def edit_task(request, task_id):
 # TRAINER DASHBOARD
 # =====================================================
 
+# =====================================================
+# TRAINER DASHBOARD
+# =====================================================
+
 @login_required
 def trainer_dashboard(request):
 
-    # -------------------------------------------------
+    # =================================================
     # FIND TRAINER
-    # -------------------------------------------------
+    # =================================================
 
     trainer = (
         Trainer.objects
@@ -1423,6 +1527,7 @@ def trainer_dashboard(request):
         .first()
     )
 
+    # Fallback: match by email
     if not trainer:
         trainer = (
             Trainer.objects
@@ -1430,19 +1535,26 @@ def trainer_dashboard(request):
             .first()
         )
 
+    # Trainer profile not found
     if not trainer:
+
         messages.error(
             request,
             "Your account is not linked to a Trainer profile."
         )
+
         return redirect("dashboard")
+
+    # =================================================
+    # TODAY
+    # =================================================
 
     today = timezone.localdate()
 
-    # -------------------------------------------------
+    # =================================================
     # ATTENDANCE
     # ONLY FULL-TIME TRAINERS
-    # -------------------------------------------------
+    # =================================================
 
     attendance = None
 
@@ -1455,9 +1567,9 @@ def trainer_dashboard(request):
             )
         )
 
-    # -------------------------------------------------
+    # =================================================
     # TODAY'S WORK
-    # -------------------------------------------------
+    # =================================================
 
     today_tasks = (
         TodoTask.objects
@@ -1465,13 +1577,153 @@ def trainer_dashboard(request):
             trainer=trainer,
             for_date=today
         )
-        .order_by("-created_on")
+        .order_by(
+            "-created_on"
+        )
     )
 
-    # -------------------------------------------------
+    # =================================================
+    # TODAY'S TASK COUNTS
+    # =================================================
+
+    today_total_count = today_tasks.count()
+
+    today_completed_count = (
+        today_tasks
+        .filter(status="completed")
+        .count()
+    )
+
+    today_in_progress_count = (
+        today_tasks
+        .filter(status="in_progress")
+        .count()
+    )
+
+    today_pending_count = (
+        today_tasks
+        .filter(status="pending")
+        .count()
+    )
+
+    # =================================================
+    # TODAY'S PROGRESS
+    # =================================================
+
+    if today_total_count > 0:
+
+        completed_percentage = round(
+            (
+                today_completed_count
+                / today_total_count
+            ) * 100
+        )
+
+    else:
+
+        completed_percentage = 0
+
+    # =================================================
+    # PREVIOUS 7 DAYS
+    #
+    # Example:
+    # Today = 19 Sep
+    #
+    # Previous 7 days:
+    # 12 Sep - 18 Sep
+    #
+    # Today itself is NOT included.
+    # =================================================
+
+    previous_7_days_start = (
+        today - timedelta(days=7)
+    )
+
+    previous_tasks = (
+        TodoTask.objects
+        .filter(
+            trainer=trainer,
+            for_date__gte=previous_7_days_start,
+            for_date__lt=today
+        )
+        .order_by(
+            "-for_date",
+            "-created_on"
+        )
+    )
+
+    # =================================================
+    # PREVIOUS 7 DAYS COUNTS
+    # =================================================
+
+    previous_total_count = (
+        previous_tasks.count()
+    )
+
+    previous_completed_count = (
+        previous_tasks
+        .filter(status="completed")
+        .count()
+    )
+
+    previous_in_progress_count = (
+        previous_tasks
+        .filter(status="in_progress")
+        .count()
+    )
+
+    previous_pending_count = (
+        previous_tasks
+        .filter(status="pending")
+        .count()
+    )
+
+    # =================================================
+    # PREVIOUS 7 DAYS UNFINISHED WORK
+    # =================================================
+
+    previous_pending_tasks = (
+        previous_tasks
+        .filter(
+            status__in=[
+                "pending",
+                "in_progress"
+            ]
+        )
+        .order_by(
+            "for_date",
+            "created_on"
+        )
+    )
+
+    # =================================================
+    # OVERDUE / UNFINISHED WORK
+    #
+    # Any task before today which is not completed.
+    # =================================================
+
+    overdue_tasks = (
+        TodoTask.objects
+        .filter(
+            trainer=trainer,
+            for_date__lt=today,
+            status__in=[
+                "pending",
+                "in_progress"
+            ]
+        )
+        .order_by(
+            "for_date",
+            "created_on"
+        )
+    )
+
+    overdue_count = overdue_tasks.count()
+
+    # =================================================
     # TODAY'S LEARNING
     # ALL TRAINERS CAN ADD LEARNING
-    # -------------------------------------------------
+    # =================================================
 
     daily_learning = (
         DailyLearning.objects
@@ -1482,33 +1734,44 @@ def trainer_dashboard(request):
         .first()
     )
 
-    # -------------------------------------------------
+    # =================================================
     # ASSIGNED WORKSHOPS
-    # -------------------------------------------------
+    # =================================================
 
     workshops = (
         Workshop.objects
         .filter(
             assigned_trainers=trainer
         )
-        .select_related("college")
-        .order_by("start_date")
+        .select_related(
+            "college"
+        )
+        .order_by(
+            "start_date"
+        )
     )
 
-    # -------------------------------------------------
-    # THIS WEEK
-    # -------------------------------------------------
+    # =================================================
+    # CURRENT WEEK
+    # MONDAY -> SUNDAY
+    # =================================================
 
     week_start = (
         today -
-        timedelta(days=today.weekday())
+        timedelta(
+            days=today.weekday()
+        )
     )
 
-    week_end = week_start + timedelta(days=6)
+    week_end = (
+        week_start +
+        timedelta(days=6)
+    )
 
-    # -------------------------------------------------
+    # =================================================
     # WORKSHOPS FOR THIS TRAINER
-    # -------------------------------------------------
+    # THAT OVERLAP CURRENT WEEK
+    # =================================================
 
     weekly_workshops = (
         Workshop.objects
@@ -1517,15 +1780,25 @@ def trainer_dashboard(request):
             start_date__lte=week_end,
             end_date__gte=week_start
         )
-        .select_related("college")
-        .order_by("start_date")
+        .select_related(
+            "college"
+        )
+        .order_by(
+            "start_date",
+            "title"
+        )
     )
 
-    # -------------------------------------------------
+    # =================================================
     # CALENDAR EVENTS
-    # FDP / ONLINE WORKSHOP /
-    # GUEST FACULTY / MEETINGS ETC.
-    # -------------------------------------------------
+    #
+    # FDP
+    # ONLINE WORKSHOP
+    # OFFICE
+    # GUEST FACULTY
+    # MEETING
+    # OTHER
+    # =================================================
 
     weekly_events = (
         CalendarEvent.objects
@@ -1544,9 +1817,9 @@ def trainer_dashboard(request):
         )
     )
 
-    # -------------------------------------------------
+    # =================================================
     # WEEKLY SCHEDULE
-    # -------------------------------------------------
+    # =================================================
 
     schedule = []
 
@@ -1554,56 +1827,87 @@ def trainer_dashboard(request):
 
         current_day = (
             week_start +
-            timedelta(days=day_offset)
+            timedelta(
+                days=day_offset
+            )
         )
 
         day_items = []
 
-        # ---------------------------------------------
+        # =================================================
         # WORKSHOPS
-        # ---------------------------------------------
+        # =================================================
 
         for workshop in weekly_workshops:
 
             if (
-                workshop.start_date <= current_day
+                workshop.start_date
+                <= current_day
                 <= workshop.end_date
             ):
 
                 day_items.append({
-                    "date": current_day,
-                    "title": workshop.title,
-                    "type": "Workshop",
-                    "college": (
-                        workshop.college.name
-                        if workshop.college
-                        else "-"
-                    ),
-                    "time": "-",
-                    "location": "-",
-                    "status": workshop.get_status_display(),
+
+                    "date":
+                        current_day,
+
+                    "title":
+                        workshop.title,
+
+                    "type":
+                        "Workshop",
+
+                    "college":
+                        (
+                            workshop.college.name
+                            if workshop.college
+                            else "-"
+                        ),
+
+                    "time":
+                        "-",
+
+                    "location":
+                        "-",
+
+                    "status":
+                        workshop.get_status_display(),
+
+                    "object":
+                        workshop,
+
                 })
 
-        # ---------------------------------------------
+        # =================================================
         # CALENDAR EVENTS
-        # ---------------------------------------------
+        # =================================================
 
         for event in weekly_events:
 
             if event.date != current_day:
                 continue
 
-            # If event is linked to workshop,
-            # workshop is already shown above.
+            # ---------------------------------------------
+            # Avoid duplicate workshop
+            # ---------------------------------------------
+
             if (
                 event.workshop
                 and event.event_type == "workshop"
             ):
                 continue
 
+            # ---------------------------------------------
+            # TIME
+            # ---------------------------------------------
+
             time_text = "-"
 
-            if event.start_time and event.end_time:
+            if (
+                event.start_time
+                and event.end_time
+            ):
+
                 time_text = (
                     f"{event.start_time.strftime('%I:%M %p')}"
                     f" - "
@@ -1611,50 +1915,162 @@ def trainer_dashboard(request):
                 )
 
             elif event.start_time:
+
                 time_text = (
-                    event.start_time.strftime("%I:%M %p")
+                    event.start_time.strftime(
+                        "%I:%M %p"
+                    )
                 )
 
+            # ---------------------------------------------
+            # ADD EVENT
+            # ---------------------------------------------
+
             day_items.append({
-                "date": current_day,
-                "title": event.title,
-                "type": event.get_event_type_display(),
-                "college": (
-                    event.college.name
-                    if event.college
-                    else "-"
-                ),
-                "time": time_text,
-                "location": event.location or "-",
-                "status": "Scheduled",
+
+                "date":
+                    current_day,
+
+                "title":
+                    event.title,
+
+                "type":
+                    event.get_event_type_display(),
+
+                "college":
+                    (
+                        event.college.name
+                        if event.college
+                        else "-"
+                    ),
+
+                "time":
+                    time_text,
+
+                "location":
+                    event.location or "-",
+
+                "status":
+                    "Scheduled",
+
+                "object":
+                    event,
+
             })
 
-        # Sort day's activities
+        # =================================================
+        # SORT DAY
+        # =================================================
+
+        def schedule_sort_key(item):
+
+            time_value = item.get(
+                "time",
+                "-"
+            )
+
+            # Items without a time go last
+            if time_value == "-":
+                return "99:99"
+
+            return time_value
 
         day_items.sort(
-            key=lambda x: (
-                x["date"],
-                x["time"]
-            )
+            key=schedule_sort_key
         )
 
-        schedule.extend(day_items)
+        schedule.extend(
+            day_items
+        )
 
-    # -------------------------------------------------
+    # =================================================
+    # WEEKLY SCHEDULE COUNTS
+    # =================================================
+
+    weekly_schedule_count = len(
+        schedule
+    )
+
+    # =================================================
+    # TODAY'S SCHEDULE
+    # =================================================
+
+    today_schedule = [
+        item
+        for item in schedule
+        if item["date"] == today
+    ]
+
+    # =================================================
+    # UPCOMING SCHEDULE
+    #
+    # From tomorrow until end of current week
+    # =================================================
+
+    upcoming_schedule = [
+        item
+        for item in schedule
+        if item["date"] > today
+    ]
+
+    # =================================================
+    # WORKSHOP COUNTS
+    # =================================================
+
+    assigned_workshop_count = (
+        workshops.count()
+    )
+
+    current_week_workshop_count = (
+        weekly_workshops.count()
+    )
+
+    # =================================================
+    # ACTIVE WORKSHOPS
+    # =================================================
+
+    active_workshops = (
+        workshops
+        .filter(
+            status__in=[
+                "fixed",
+                "tentative"
+            ]
+        )
+    )
+
+    # =================================================
     # RENDER
-    # -------------------------------------------------
+    # =================================================
 
     return render(
         request,
         "todo/trainer_dashboard.html",
         {
-            "trainer": trainer,
-            "today": today,
 
-            "attendance": attendance,
+            # ---------------------------------------------
+            # TRAINER
+            # ---------------------------------------------
+
+            "trainer":
+                trainer,
+
+            "today":
+                today,
 
             "is_full_time":
                 trainer.is_full_time,
+
+            # ---------------------------------------------
+            # ATTENDANCE
+            # ---------------------------------------------
+
+            "attendance":
+                attendance,
+
+            # ---------------------------------------------
+            # TODAY'S WORK
+            # ---------------------------------------------
 
             "today_tasks":
                 today_tasks,
@@ -1662,20 +2078,104 @@ def trainer_dashboard(request):
             "tasks":
                 today_tasks,
 
+            "today_total_count":
+                today_total_count,
+
+            "today_completed_count":
+                today_completed_count,
+
+            "today_in_progress_count":
+                today_in_progress_count,
+
+            "today_pending_count":
+                today_pending_count,
+
+            "completed_tasks_count":
+                today_completed_count,
+
+            "completed_percentage":
+                completed_percentage,
+
+            # ---------------------------------------------
+            # PREVIOUS 7 DAYS
+            # ---------------------------------------------
+
+            "previous_tasks":
+                previous_tasks,
+
+            "previous_pending_tasks":
+                previous_pending_tasks,
+
+            "previous_total_count":
+                previous_total_count,
+
+            "previous_completed_count":
+                previous_completed_count,
+
+            "previous_in_progress_count":
+                previous_in_progress_count,
+
+            "previous_pending_count":
+                previous_pending_count,
+
+            # ---------------------------------------------
+            # OVERDUE WORK
+            # ---------------------------------------------
+
+            "overdue_tasks":
+                overdue_tasks,
+
+            "overdue_count":
+                overdue_count,
+
+            # ---------------------------------------------
+            # LEARNING
+            # ---------------------------------------------
+
             "daily_learning":
                 daily_learning,
+
+            # ---------------------------------------------
+            # WORKSHOPS
+            # ---------------------------------------------
 
             "workshops":
                 workshops,
 
-            "weekly_schedule":
-                schedule,
+            "active_workshops":
+                active_workshops,
+
+            "assigned_workshop_count":
+                assigned_workshop_count,
+
+            "current_week_workshop_count":
+                current_week_workshop_count,
+
+            # ---------------------------------------------
+            # WEEK
+            # ---------------------------------------------
 
             "week_start":
                 week_start,
 
             "week_end":
                 week_end,
+
+            # ---------------------------------------------
+            # SCHEDULE
+            # ---------------------------------------------
+
+            "weekly_schedule":
+                schedule,
+
+            "weekly_schedule_count":
+                weekly_schedule_count,
+
+            "today_schedule":
+                today_schedule,
+
+            "upcoming_schedule":
+                upcoming_schedule,
         }
     )
 @login_required

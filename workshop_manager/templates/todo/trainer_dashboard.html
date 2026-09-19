@@ -1,1227 +1,1318 @@
 {% extends "base.html" %}
 
+{% block title %}Trainer Dashboard | Mevi Portal{% endblock %}
+
 {% block content %}
 
 <style>
-    body {
-        background: #f5f7fb;
-    }
+
+/* =========================================================
+   MEVI TRAINER DASHBOARD
+========================================================= */
+
+.trainer-dashboard {
+    padding: 24px 0 60px;
+    color: #172033;
+}
+
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+.trainer-dashboard h1,
+.trainer-dashboard h2,
+.trainer-dashboard h3,
+.trainer-dashboard h4,
+.trainer-dashboard h5,
+.trainer-dashboard h6 {
+    color: #172033;
+}
+
+.trainer-dashboard .text-muted {
+    color: #667085 !important;
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero-card {
+    border: 0;
+    border-radius: 22px;
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff 0%,
+            #f5f3ff 55%,
+            #eef4ff 100%
+        );
+
+    box-shadow:
+        0 12px 35px rgba(15,23,42,.07);
+}
+
+
+.hero-card .card-body {
+    padding: 30px;
+}
+
+
+.hero-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 7px 12px;
+
+    border-radius: 30px;
+
+    background: #ede9fe;
+
+    color: #5b4bdb;
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    letter-spacing: .7px;
+}
+
+
+.hero-title {
+    margin-top: 15px;
+
+    font-size: 31px;
+
+    line-height: 1.25;
+
+    font-weight: 800;
+
+    letter-spacing: -.7px;
+}
+
+
+.hero-subtitle {
+    margin-top: 7px;
+
+    color: #667085;
+
+    font-size: 15px;
+
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   ATTENDANCE STATUS
+========================================================= */
+
+.attendance-box {
+    margin-top: 20px;
+
+    border-radius: 14px;
+
+    padding: 14px 17px;
+
+    display: inline-block;
+
+    min-width: 280px;
+
+    font-size: 14px;
+}
+
+
+.attendance-box small {
+    font-size: 13px;
+}
+
+
+.attendance-working {
+    background: #eaf8ef;
+
+    border: 1px solid #cdebd7;
+
+    color: #18733b;
+}
+
+
+.attendance-out {
+    background: #f1f3f5;
+
+    border: 1px solid #dfe3e8;
+
+    color: #5f6368;
+}
+
+
+.attendance-not {
+    background: #fff0f0;
+
+    border: 1px solid #ffd4d4;
+
+    color: #b42318;
+}
+
+
+/* =========================================================
+   ACTION BUTTONS
+========================================================= */
+
+.action-btn {
+    border-radius: 10px;
+
+    padding: 10px 16px;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+
+
+.action-btn:hover {
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   STATISTICS
+========================================================= */
+
+.stat-card {
+    height: 100%;
+
+    border: 1px solid #e8ebf0;
+
+    border-radius: 17px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 5px 20px rgba(15,23,42,.05);
+
+    transition: .2s;
+}
+
+
+.stat-card:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 12px 28px rgba(15,23,42,.09);
+}
+
+
+.stat-card .card-body {
+    padding: 21px;
+}
+
+
+.stat-label {
+    font-size: 13px;
+
+    color: #667085;
+
+    font-weight: 600;
+}
+
+
+.stat-value {
+    font-size: 27px;
+
+    line-height: 1.2;
+
+    font-weight: 800;
+
+    margin-top: 8px;
+}
+
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+
+    border-radius: 14px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 22px;
+}
+
+
+/* =========================================================
+   SECTION CARDS
+========================================================= */
+
+.section-card {
+    border: 1px solid #e7eaf0;
+
+    border-radius: 19px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 6px 24px rgba(15,23,42,.05);
+
+    overflow: hidden;
+}
+
+
+.section-header {
+    padding: 20px 22px;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #edf0f4;
+}
+
+
+.section-title {
+    font-size: 18px;
+
+    font-weight: 800;
+
+    margin: 0;
+}
+
+
+.section-subtitle {
+    font-size: 13px;
+
+    color: #667085;
+
+    margin-top: 5px;
+}
+
+
+/* =========================================================
+   TODAY'S WORK SUMMARY
+========================================================= */
+
+.work-summary {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+
+.work-summary-number {
+    font-size: 16px;
+
+    font-weight: 800;
+
+    color: #5b4bdb;
+}
+
+
+.work-summary-label {
+    color: #667085;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   PROGRESS
+========================================================= */
+
+.progress-wrapper {
+    padding: 16px 22px;
+
+    background: #fafbff;
+
+    border-bottom: 1px solid #edf0f4;
+}
+
+
+.progress-info {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 8px;
+}
+
+
+.progress-info span {
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+
+.work-progress {
+    height: 9px;
+
+    border-radius: 20px;
+
+    background: #e9e7f8;
+
+    overflow: hidden;
+}
+
+
+.work-progress .progress-bar {
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #5b4bdb,
+            #7c3aed
+        );
+}
+
+
+/* =========================================================
+   WORK CARD
+========================================================= */
+
+.work-card {
+    position: relative;
+
+    border: 1px solid #e8ebf0;
+
+    border-radius: 14px;
+
+    padding: 17px;
+
+    background: #ffffff;
+
+    margin-bottom: 12px;
+
+    transition:
+        border .2s ease,
+        box-shadow .2s ease,
+        transform .2s ease;
+}
+
+
+.work-card:hover {
+    border-color: #d7d3f7;
+
+    box-shadow:
+        0 7px 20px rgba(15,23,42,.06);
+
+    transform: translateY(-1px);
+}
+
+
+.work-card:last-child {
+    margin-bottom: 0;
+}
+
+
+.work-card.completed {
+    background: #fbfefc;
+
+    border-color: #d5eadc;
+}
+
+
+.work-card.pending {
+    border-left: 4px solid #94a3b8;
+}
+
+
+.work-card.in-progress {
+    border-left: 4px solid #f59e0b;
+}
+
+
+.work-card.completed {
+    border-left: 4px solid #16a34a;
+}
+
+
+/* =========================================================
+   TASK TITLE
+========================================================= */
+
+.task-title {
+    font-size: 16px;
+
+    font-weight: 800;
+
+    line-height: 1.45;
+
+    color: #172033;
+}
+
+
+.task-description {
+    font-size: 14px;
+
+    line-height: 1.55;
+
+    color: #667085;
+
+    margin-top: 6px;
+}
+
+
+/* =========================================================
+   TASK META
+========================================================= */
+
+.task-meta {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+    margin-top: 11px;
+}
+
+
+.task-meta-item {
+    font-size: 12px;
+
+    color: #667085;
+
+    font-weight: 600;
+}
+
+
+.task-meta-item i {
+    margin-right: 4px;
+}
+
+
+/* =========================================================
+   STATUS BADGES
+========================================================= */
+
+.task-status {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    padding: 6px 10px;
+
+    border-radius: 20px;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+}
+
+
+.status-pending {
+    background: #f1f5f9;
+
+    color: #475569;
+}
+
+
+.status-progress {
+    background: #fff5d8;
+
+    color: #996600;
+}
+
+
+.status-completed {
+    background: #e8f8ed;
+
+    color: #18733b;
+}
+
+
+/* =========================================================
+   TASK ACTIONS
+========================================================= */
+
+.task-actions {
+    margin-top: 14px;
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 8px;
+
+    flex-wrap: wrap;
+}
+
+
+.task-actions .btn {
+    font-size: 12px;
+
+    font-weight: 700;
+
+    border-radius: 8px;
+
+    padding: 7px 11px;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.empty-state {
+    text-align: center;
+
+    padding: 45px 20px;
+
+    color: #8a919d;
+}
+
+
+.empty-icon {
+    width: 60px;
+    height: 60px;
+
+    border-radius: 18px;
+
+    margin: 0 auto 15px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 28px;
+
+    background: #f3f4f6;
+}
+
+
+/* =========================================================
+   LEARNING
+========================================================= */
+
+.learning-box {
+    background:
+        linear-gradient(
+            135deg,
+            #effbf3,
+            #ffffff
+        );
+
+    border: 1px solid #dcefe3;
+
+    border-radius: 15px;
+
+    padding: 21px;
+
+    font-size: 14px;
+
+    line-height: 1.65;
+}
+
+
+.learning-title {
+    font-size: 15px;
+
+    font-weight: 800;
+
+    color: #18733b;
+
+    margin-bottom: 9px;
+}
+
+
+/* =========================================================
+   WEEKLY SCHEDULE
+========================================================= */
+
+.schedule-table {
+    min-width: 1000px;
+
+    margin: 0;
+}
+
+
+.schedule-table th {
+    background: #f8f9fb;
+
+    color: #667085;
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    text-transform: uppercase;
+
+    letter-spacing: .3px;
+
+    white-space: nowrap;
+
+    padding: 13px;
+}
+
+
+.schedule-table td {
+    font-size: 14px;
+
+    vertical-align: middle;
+
+    padding: 14px 13px;
+
+    color: #344054;
+}
+
+
+.schedule-table tr:hover {
+    background: #fafbff;
+}
+
+
+/* =========================================================
+   EVENT BADGES
+========================================================= */
+
+.type-badge {
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 6px 10px;
+
+    border-radius: 20px;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+}
+
+
+.badge-workshop {
+    background: #e8f1ff;
+    color: #1555a6;
+}
+
+
+.badge-fdp {
+    background: #f1e8ff;
+    color: #6637a6;
+}
+
+
+.badge-online {
+    background: #e7f8ff;
+    color: #087a9c;
+}
+
+
+.badge-office {
+    background: #fff4dd;
+    color: #946200;
+}
+
+
+.badge-guest {
+    background: #e8f8ed;
+    color: #18733b;
+}
+
+
+.badge-meeting {
+    background: #eeeeee;
+    color: #555;
+}
+
+
+.badge-other {
+    background: #f1f1f1;
+    color: #555;
+}
+
+
+/* =========================================================
+   WORKSHOPS
+========================================================= */
+
+.workshop-card {
+    height: 100%;
+
+    border: 1px solid #e7eaf0;
+
+    border-radius: 15px;
+
+    background: #ffffff;
+
+    padding: 18px;
+
+    transition: .2s;
+}
+
+
+.workshop-card:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 9px 24px rgba(15,23,42,.07);
+
+    border-color: #d8d3f7;
+}
+
+
+.workshop-title {
+    font-size: 15px;
+
+    font-weight: 800;
+
+    line-height: 1.4;
+}
+
+
+.workshop-meta {
+    font-size: 13px;
+
+    color: #667085;
+
+    margin-top: 8px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.modal-content {
+    border: 0;
+
+    border-radius: 19px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 25px 70px rgba(15,23,42,.20);
+}
+
+
+.modal-header {
+    padding: 20px 22px;
+
+    border-bottom: 1px solid #edf0f4;
+}
+
+
+.modal-title {
+    font-size: 20px;
+
+    font-weight: 800;
+}
+
+
+.modal-body {
+    padding: 22px;
+}
+
+
+.modal-footer {
+    padding: 17px 22px;
+
+    border-top: 1px solid #edf0f4;
+}
+
+
+.form-label {
+    font-size: 14px;
+
+    font-weight: 700;
+}
+
+
+.form-control {
+    border-radius: 10px;
+
+    padding: 12px 13px;
+
+    font-size: 14px;
+
+    border-color: #dfe3e8;
+}
+
+
+.form-control:focus {
+
+    border-color: #8b80e8;
+
+    box-shadow:
+        0 0 0 .2rem rgba(91,75,219,.10);
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width: 768px) {
 
     .trainer-dashboard {
-        padding: 25px 0 50px;
+        padding-top: 15px;
     }
 
-    .hero-card {
-        border: 0;
-        border-radius: 20px;
-        background: linear-gradient(135deg, #ffffff, #f2f6ff);
-        box-shadow: 0 8px 30px rgba(0,0,0,.06);
-        overflow: hidden;
+
+    .hero-card .card-body {
+        padding: 22px 18px;
     }
+
 
     .hero-title {
-        font-size: 28px;
-        font-weight: 750;
+        font-size: 24px;
     }
+
 
     .hero-subtitle {
-        color: #6c757d;
+        font-size: 14px;
     }
 
-    .stat-card {
-        border: 0;
-        border-radius: 17px;
-        box-shadow: 0 5px 20px rgba(0,0,0,.05);
-        transition: .2s;
-        height: 100%;
+
+    .attendance-box {
+        min-width: 100%;
+
+        font-size: 13px;
     }
 
-    .stat-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 28px rgba(0,0,0,.08);
+
+    .stat-card .card-body {
+        padding: 17px;
     }
 
-    .stat-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 13px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+
+    .stat-value {
+        font-size: 24px;
+    }
+
+
+    .section-header {
+        padding: 17px;
+    }
+
+
+    .section-title {
+        font-size: 17px;
+    }
+
+
+    .task-title {
+        font-size: 15px;
+    }
+
+
+    .task-description {
+        font-size: 13px;
+    }
+
+
+    .task-actions {
+        justify-content: flex-start;
+    }
+
+
+    .schedule-table {
+        min-width: 1000px;
+    }
+
+}
+
+
+@media(max-width: 480px) {
+
+    .hero-title {
         font-size: 22px;
     }
 
-    .section-card {
-        border: 0;
-        border-radius: 18px;
-        box-shadow: 0 5px 22px rgba(0,0,0,.05);
-        overflow: hidden;
-    }
-
-    .section-header {
-        padding: 18px 20px;
-        background: #fff;
-        border-bottom: 1px solid #edf0f4;
-    }
-
-    .work-card {
-        border: 1px solid #edf0f4;
-        border-radius: 13px;
-        padding: 15px;
-        background: #fff;
-        margin-bottom: 10px;
-        transition: .2s;
-    }
-
-    .work-card:hover {
-        border-color: #d9dee7;
-        transform: translateX(2px);
-    }
-
-    .learning-box {
-        background: linear-gradient(135deg,#effbf3,#ffffff);
-        border: 1px solid #dcefe3;
-        border-radius: 14px;
-        padding: 20px;
-    }
-
-    .schedule-table {
-        min-width: 950px;
-    }
-
-    .schedule-table th {
-        background: #f8f9fb;
-        color: #667085;
-        font-size: 12px;
-        text-transform: uppercase;
-        white-space: nowrap;
-    }
-
-    .schedule-table td {
-        font-size: 13px;
-        vertical-align: middle;
-    }
-
-    .type-badge {
-        padding: 6px 10px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 600;
-        white-space: nowrap;
-    }
-
-    .badge-workshop {
-        background: #e8f1ff;
-        color: #1555a6;
-    }
-
-    .badge-fdp {
-        background: #f1e8ff;
-        color: #6637a6;
-    }
-
-    .badge-online {
-        background: #e7f8ff;
-        color: #087a9c;
-    }
-
-    .badge-office {
-        background: #fff4dd;
-        color: #946200;
-    }
-
-    .badge-guest {
-        background: #e8f8ed;
-        color: #18733b;
-    }
-
-    .badge-meeting {
-        background: #eeeeee;
-        color: #555;
-    }
-
-    .badge-other {
-        background: #f1f1f1;
-        color: #555;
-    }
-
-    .attendance-box {
-        border-radius: 12px;
-        padding: 12px 15px;
-        margin-top: 15px;
-    }
-
-    .attendance-working {
-        background: #eaf8ef;
-        color: #18733b;
-    }
-
-    .attendance-out {
-        background: #f0f2f5;
-        color: #5f6368;
-    }
-
-    .attendance-not {
-        background: #fff0f0;
-        color: #b42318;
-    }
-
-    .workshop-card {
-        border: 1px solid #edf0f4;
-        border-radius: 15px;
-        background: #fff;
-        transition: .2s;
-    }
-
-    .workshop-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 22px rgba(0,0,0,.07);
-    }
-
-    .empty-state {
-        text-align: center;
-        padding: 45px 20px;
-        color: #8a919d;
-    }
-
-    .empty-icon {
-        font-size: 42px;
-        margin-bottom: 10px;
-    }
 
     .action-btn {
-        border-radius: 10px;
-        font-weight: 600;
+        width: 100%;
     }
 
-    .modal-content {
-        border: 0;
-        border-radius: 18px;
-        box-shadow: 0 20px 60px rgba(0,0,0,.18);
+
+    .work-summary {
+        margin-top: 8px;
     }
 
-    .modal-header {
-        border-bottom: 1px solid #edf0f4;
+}
+
+
+/* =========================================================
+   PREVIOUS 7 DAYS WORK
+========================================================= */
+
+.history-card {
+    border: 1px solid #e7eaf0;
+    border-radius: 19px;
+    background: #ffffff;
+    box-shadow: 0 6px 24px rgba(15,23,42,.05);
+    overflow: hidden;
+}
+
+.history-summary {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.history-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 800;
+    border: 1px solid #e7eaf0;
+    background: #f8fafc;
+    color: #475569;
+}
+
+.history-pill.completed {
+    background: #e8f8ed;
+    border-color: #d5eadc;
+    color: #18733b;
+}
+
+.history-pill.progress {
+    background: #fff5d8;
+    border-color: #f8e5a9;
+    color: #996600;
+}
+
+.history-pill.pending {
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+    color: #475569;
+}
+
+.history-day {
+    border: 1px solid #e8ebf0;
+    border-radius: 15px;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+
+.history-day:last-child {
+    margin-bottom: 0;
+}
+
+.history-day-header {
+    background: #f8f9fb;
+    border-bottom: 1px solid #edf0f4;
+    padding: 12px 15px;
+}
+
+.history-day-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: #172033;
+}
+
+.history-day-subtitle {
+    font-size: 12px;
+    color: #667085;
+    margin-top: 2px;
+}
+
+.history-task {
+    padding: 14px 15px;
+    border-bottom: 1px solid #f0f2f5;
+}
+
+.history-task:last-child {
+    border-bottom: 0;
+}
+
+.history-task-title {
+    font-size: 14px;
+    line-height: 1.45;
+    font-weight: 800;
+    color: #172033;
+}
+
+.history-task-description {
+    font-size: 12px;
+    line-height: 1.5;
+    color: #667085;
+    margin-top: 4px;
+}
+
+.history-task-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.history-task-actions .btn {
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 8px;
+    padding: 6px 9px;
+}
+
+.date-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 9px;
+    border-radius: 8px;
+    background: #eef2ff;
+    color: #4338ca;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.quick-link {
+    text-decoration: none;
+    border: 1px solid #e7eaf0;
+    border-radius: 11px;
+    padding: 9px 12px;
+    color: #344054;
+    background: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    transition: .2s;
+}
+
+.quick-link:hover {
+    color: #5b4bdb;
+    border-color: #d7d3f7;
+    background: #faf9ff;
+}
+
+@media(max-width: 768px) {
+    .history-task-actions {
+        justify-content: flex-start;
     }
+}
 
-    .modal-footer {
-        border-top: 1px solid #edf0f4;
-    }
-
-    .form-control {
-        border-radius: 10px;
-        padding: 11px 13px;
-    }
-
-    .form-control:focus {
-        box-shadow: 0 0 0 .2rem rgba(13,110,253,.10);
-    }
-
-    @media(max-width:768px) {
-
-        .hero-title {
-            font-size: 23px;
-        }
-
-        .schedule-table {
-            min-width: 950px;
-        }
-    }
 </style>
 
 
 <div class="container-fluid trainer-dashboard">
 
-    <!-- ================================================= -->
-    <!-- WELCOME / HEADER -->
-    <!-- ================================================= -->
 
-    <div class="card hero-card mb-4">
+<!-- =========================================================
+     HERO / WELCOME
+========================================================= -->
 
-        <div class="card-body p-4">
+<div class="card hero-card mb-4">
 
-            <div class="row align-items-center">
+    <div class="card-body">
 
-                <div class="col-lg-7">
+        <div class="row align-items-center">
 
-                    <div class="small text-primary fw-bold mb-2">
-                        TRAINER WORKSPACE
-                    </div>
+            <div class="col-lg-7">
 
-                    <div class="hero-title mb-2">
-                        👋 Welcome, {{ trainer.Name }}
-                    </div>
+                <div class="hero-label">
+                    <i class="bi bi-person-workspace"></i>
+                    TRAINER WORKSPACE
+                </div>
 
-                    <div class="hero-subtitle">
-                        {{ today|date:"l, d F Y" }}
-                    </div>
+
+                <div class="hero-title">
+                    👋 Welcome, {{ trainer.Name }}
+                </div>
+
+
+                <div class="hero-subtitle">
+                    <i class="bi bi-calendar3 me-1"></i>
+                    {{ today|date:"l, d F Y" }}
+                </div>
+
+
+                {% if is_full_time %}
+
+                    {% if attendance and attendance.check_in and not attendance.check_out %}
+
+                        <div class="attendance-box attendance-working">
+
+                            🟢
+                            <strong>
+                                You are currently working
+                            </strong>
+
+                            <br>
+
+                            <small>
+                                Checked in at
+                                <strong>
+                                    {{ attendance.check_in|date:"h:i A" }}
+                                </strong>
+                            </small>
+
+                        </div>
+
+
+                    {% elif attendance and attendance.check_out %}
+
+                        <div class="attendance-box attendance-out">
+
+                            ⚪
+                            <strong>
+                                Today's attendance completed
+                            </strong>
+
+                            <br>
+
+                            <small>
+                                Checked out at
+                                <strong>
+                                    {{ attendance.check_out|date:"h:i A" }}
+                                </strong>
+                            </small>
+
+                        </div>
+
+
+                    {% else %}
+
+                        <div class="attendance-box attendance-not">
+
+                            🔴
+                            <strong>
+                                You are not checked in
+                            </strong>
+
+                            <br>
+
+                            <small>
+                                Check in before adding today's work.
+                            </small>
+
+                        </div>
+
+                    {% endif %}
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- ACTIONS -->
+
+            <div class="col-lg-5 mt-4 mt-lg-0">
+
+                <div class="d-flex justify-content-lg-end flex-wrap gap-2">
 
                     {% if is_full_time %}
 
+                        {% if not attendance or not attendance.check_in %}
+
+                            <form
+                                method="POST"
+                                action="{% url 'daily_checkin' %}"
+                            >
+
+                                {% csrf_token %}
+
+                                <input
+                                    type="hidden"
+                                    name="action"
+                                    value="check_in"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-success action-btn"
+                                >
+                                    <i class="bi bi-box-arrow-in-right me-1"></i>
+                                    Check In
+                                </button>
+
+                            </form>
+
+
+                        {% elif attendance.check_in and not attendance.check_out %}
+
+                            <form
+                                method="POST"
+                                action="{% url 'daily_checkin' %}"
+                            >
+
+                                {% csrf_token %}
+
+                                <input
+                                    type="hidden"
+                                    name="action"
+                                    value="check_out"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-warning action-btn"
+                                >
+                                    <i class="bi bi-box-arrow-right me-1"></i>
+                                    Check Out
+                                </button>
+
+                            </form>
+
+                        {% endif %}
+
+
                         {% if attendance and attendance.check_in and not attendance.check_out %}
 
-                            <div class="attendance-box attendance-working">
-                                🟢 <strong>You are currently working</strong>
-                                <br>
-                                <small>
-                                    Checked in at
-                                    {{ attendance.check_in|date:"h:i A" }}
-                                </small>
-                            </div>
-
-                        {% elif attendance and attendance.check_out %}
-
-                            <div class="attendance-box attendance-out">
-                                ⚪ <strong>Today's attendance completed</strong>
-                                <br>
-                                <small>
-                                    Checked out at
-                                    {{ attendance.check_out|date:"h:i A" }}
-                                </small>
-                            </div>
+                            <button
+                                type="button"
+                                class="btn btn-primary action-btn"
+                                data-bs-toggle="modal"
+                                data-bs-target="#addWorkModal"
+                            >
+                                <i class="bi bi-plus-circle me-1"></i>
+                                Add Work
+                            </button>
 
                         {% else %}
 
-                            <div class="attendance-box attendance-not">
-                                🔴 <strong>You are not checked in</strong>
-                                <br>
-                                <small>
-                                    Check in before adding today's work.
-                                </small>
-                            </div>
+                            <button
+                                type="button"
+                                class="btn btn-secondary action-btn"
+                                disabled
+                            >
+                                <i class="bi bi-lock me-1"></i>
+                                Add Work
+                            </button>
 
                         {% endif %}
 
                     {% endif %}
 
-                </div>
 
-
-                <!-- ACTIONS -->
-
-                <div class="col-lg-5 mt-3 mt-lg-0">
-
-                    <div class="d-flex justify-content-lg-end flex-wrap gap-2">
-
-
-                        {% if is_full_time %}
-
-                            {% if not attendance or not attendance.check_in %}
-
-                                <!-- CHECK IN -->
-                                <form method="POST"
-                                      action="{% url 'daily_checkin' %}">
-
-                                    {% csrf_token %}
-
-                                    <input type="hidden"
-                                           name="action"
-                                           value="check_in">
-
-                                    <button type="submit"
-                                            class="btn btn-success action-btn px-4">
-
-                                        🟢 Check In
-
-                                    </button>
-
-                                </form>
-
-
-                            {% elif attendance.check_in and not attendance.check_out %}
-
-                                <!-- CHECK OUT -->
-                                <form method="POST"
-                                      action="{% url 'daily_checkin' %}">
-
-                                    {% csrf_token %}
-
-                                    <input type="hidden"
-                                           name="action"
-                                           value="check_out">
-
-                                    <button type="submit"
-                                            class="btn btn-warning action-btn px-4">
-
-                                        🟡 Check Out
-
-                                    </button>
-
-                                </form>
-
-                            {% endif %}
-
-
-                            <!-- ADD WORK -->
-
-                            {% if attendance and attendance.check_in and not attendance.check_out %}
-
-                                <button type="button"
-                                        class="btn btn-primary action-btn px-4"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#addWorkModal">
-
-                                    ➕ Add Work
-
-                                </button>
-
-                            {% else %}
-
-                                <button type="button"
-                                        class="btn btn-primary action-btn px-4"
-                                        disabled
-                                        title="Check in first">
-
-                                    🔒 Add Work
-
-                                </button>
-
-                            {% endif %}
-
-                        {% endif %}
-
-
-                        <a href="{% url 'add_daily_learning' %}"
-                           class="btn btn-outline-success action-btn">
-
-                            📚 Learning
-
-                        </a>
-
-                    </div>
+                    <a
+                        href="{% url 'add_daily_learning' %}"
+                        class="btn btn-outline-success action-btn"
+                    >
+                        <i class="bi bi-book me-1"></i>
+                        Learning
+                    </a>
 
                 </div>
 
             </div>
-
-        </div>
-
-    </div>
-
-
-
-    <!-- ================================================= -->
-    <!-- STATISTICS -->
-    <!-- ================================================= -->
-
-    <div class="row g-3 mb-4">
-
-
-        <!-- TRAINER -->
-
-        <div class="col-xl-3 col-md-6">
-
-            <div class="card stat-card">
-
-                <div class="card-body">
-
-                    <div class="d-flex justify-content-between">
-
-                        <div>
-
-                            <small class="text-muted">
-                                Trainer
-                            </small>
-
-                            <h5 class="fw-bold mt-2">
-                                {{ trainer.Name }}
-                            </h5>
-
-                            {% if is_full_time %}
-
-                                <span class="badge bg-success">
-                                    Full-Time
-                                </span>
-
-                            {% else %}
-
-                                <span class="badge bg-secondary">
-                                    Trainer
-                                </span>
-
-                            {% endif %}
-
-                        </div>
-
-                        <div class="stat-icon bg-primary bg-opacity-10">
-                            👨‍🏫
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- WORK -->
-
-        <div class="col-xl-3 col-md-6">
-
-            <div class="card stat-card">
-
-                <div class="card-body">
-
-                    <div class="d-flex justify-content-between">
-
-                        <div>
-
-                            <small class="text-muted">
-                                Today's Work
-                            </small>
-
-                            <h2 class="fw-bold mt-2">
-                                {{ today_tasks|length }}
-                            </h2>
-
-                            <small class="text-muted">
-                                Updates recorded
-                            </small>
-
-                        </div>
-
-                        <div class="stat-icon bg-success bg-opacity-10">
-                            💼
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- WEEKLY -->
-
-        <div class="col-xl-3 col-md-6">
-
-            <div class="card stat-card">
-
-                <div class="card-body">
-
-                    <div class="d-flex justify-content-between">
-
-                        <div>
-
-                            <small class="text-muted">
-                                Weekly Schedule
-                            </small>
-
-                            <h2 class="fw-bold mt-2">
-                                {{ weekly_schedule|length }}
-                            </h2>
-
-                            <small class="text-muted">
-                                Activities
-                            </small>
-
-                        </div>
-
-                        <div class="stat-icon bg-info bg-opacity-10">
-                            📅
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- ATTENDANCE -->
-
-        <div class="col-xl-3 col-md-6">
-
-            <div class="card stat-card">
-
-                <div class="card-body">
-
-                    <div class="d-flex justify-content-between">
-
-                        <div>
-
-                            <small class="text-muted">
-                                Attendance
-                            </small>
-
-                            {% if is_full_time %}
-
-                                {% if attendance and attendance.check_in %}
-
-                                    {% if attendance.check_out %}
-
-                                        <h5 class="fw-bold text-secondary mt-2">
-                                            Checked Out
-                                        </h5>
-
-                                    {% else %}
-
-                                        <h5 class="fw-bold text-success mt-2">
-                                            Working
-                                        </h5>
-
-                                    {% endif %}
-
-                                {% else %}
-
-                                    <h5 class="fw-bold text-danger mt-2">
-                                        Not Checked In
-                                    </h5>
-
-                                {% endif %}
-
-                            {% else %}
-
-                                <h5 class="fw-bold text-muted mt-2">
-                                    Not Applicable
-                                </h5>
-
-                            {% endif %}
-
-                        </div>
-
-                        <div class="stat-icon bg-warning bg-opacity-10">
-                            ⏱️
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-
-    <!-- ================================================= -->
-    <!-- TODAY WORK + LEARNING -->
-    <!-- ================================================= -->
-
-    <div class="row g-4 mb-4">
-
-
-        <!-- TODAY'S WORK -->
-
-        <div class="col-xl-6">
-
-            <div class="card section-card h-100">
-
-                <div class="section-header">
-
-                    <div class="d-flex justify-content-between align-items-center">
-
-                        <div>
-
-                            <h5 class="fw-bold mb-1">
-                                💼 Today's Work
-                            </h5>
-
-                            <small class="text-muted">
-                                What are you working on today?
-                            </small>
-
-                        </div>
-
-
-                        {% if is_full_time %}
-
-                            {% if attendance and attendance.check_in and not attendance.check_out %}
-
-                                <button type="button"
-                                        class="btn btn-sm btn-primary action-btn"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#addWorkModal">
-
-                                    + Add Work
-
-                                </button>
-
-                            {% endif %}
-
-                        {% endif %}
-
-                    </div>
-
-                </div>
-
-
-                <div class="card-body">
-
-                    {% if today_tasks %}
-
-                        {% for task in today_tasks %}
-
-                            <div class="work-card">
-
-                                <div class="d-flex justify-content-between gap-3">
-
-                                    <div>
-
-                                        <div class="fw-bold">
-                                            {{ task.task }}
-                                        </div>
-
-                                        {% if task.description %}
-
-                                            <div class="small text-muted mt-1">
-
-                                                {{ task.description }}
-
-                                            </div>
-
-                                        {% endif %}
-
-                                        {% if task.created_on %}
-
-                                            <div class="small text-muted mt-2">
-
-                                                Added:
-                                                {{ task.created_on|date:"h:i A" }}
-
-                                            </div>
-
-                                        {% endif %}
-
-                                    </div>
-
-
-                                    <div>
-
-                                        {% if task.status == "completed" %}
-
-                                            <span class="badge bg-success">
-                                                Completed
-                                            </span>
-
-                                        {% elif task.status == "in_progress" %}
-
-                                            <span class="badge bg-warning text-dark">
-                                                In Progress
-                                            </span>
-
-                                        {% else %}
-
-                                            <span class="badge bg-secondary">
-                                                Pending
-                                            </span>
-
-                                        {% endif %}
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        {% endfor %}
-
-                    {% else %}
-
-                        <div class="empty-state">
-
-                            <div class="empty-icon">
-                                📝
-                            </div>
-
-                            <h6 class="fw-bold">
-                                No work added today
-                            </h6>
-
-                            {% if is_full_time %}
-
-                                {% if attendance and attendance.check_in and not attendance.check_out %}
-
-                                    <p class="small text-muted">
-                                        Add your current training,
-                                        preparation, development,
-                                        meeting or other work.
-                                    </p>
-
-                                    <button type="button"
-                                            class="btn btn-primary action-btn"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#addWorkModal">
-
-                                        ➕ Add Today's Work
-
-                                    </button>
-
-                                {% else %}
-
-                                    <p class="small text-danger">
-                                        Please check in first.
-                                    </p>
-
-                                {% endif %}
-
-                            {% endif %}
-
-                        </div>
-
-                    {% endif %}
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- TODAY LEARNING -->
-
-        <div class="col-xl-6">
-
-            <div class="card section-card h-100">
-
-                <div class="section-header">
-
-                    <div class="d-flex justify-content-between align-items-center">
-
-                        <div>
-
-                            <h5 class="fw-bold mb-1">
-                                📚 Today's Learning
-                            </h5>
-
-                            <small class="text-muted">
-                                Record your learning and improvement
-                            </small>
-
-                        </div>
-
-                        <a href="{% url 'add_daily_learning' %}"
-                           class="btn btn-sm btn-outline-success action-btn">
-
-                            {% if daily_learning %}
-                                Edit
-                            {% else %}
-                                Add
-                            {% endif %}
-
-                        </a>
-
-                    </div>
-
-                </div>
-
-
-                <div class="card-body">
-
-                    {% if daily_learning and daily_learning.learning %}
-
-                        <div class="learning-box">
-
-                            <div class="fw-bold text-success mb-2">
-                                📖 Learning Update
-                            </div>
-
-                            <div style="white-space:pre-line;">
-                                {{ daily_learning.learning }}
-                            </div>
-
-                        </div>
-
-                    {% else %}
-
-                        <div class="empty-state">
-
-                            <div class="empty-icon">
-                                📖
-                            </div>
-
-                            <h6 class="fw-bold">
-                                No learning update yet
-                            </h6>
-
-                            <p class="small">
-                                Add what you learned or practiced today.
-                            </p>
-
-                            <a href="{% url 'add_daily_learning' %}"
-                               class="btn btn-success action-btn">
-
-                                + Add Learning
-
-                            </a>
-
-                        </div>
-
-                    {% endif %}
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-
-    <!-- ================================================= -->
-    <!-- WEEKLY SCHEDULE -->
-    <!-- ================================================= -->
-
-    <div class="card section-card mb-4">
-
-        <div class="section-header">
-
-            <div class="d-flex justify-content-between align-items-center">
-
-                <div>
-
-                    <h5 class="fw-bold mb-1">
-                        📅 Weekly Work Schedule
-                    </h5>
-
-                    <small class="text-muted">
-
-                        {{ week_start|date:"d M Y" }}
-                        -
-                        {{ week_end|date:"d M Y" }}
-
-                    </small>
-
-                </div>
-
-
-                <a href="{% url 'full_time_work_list' %}"
-                   class="btn btn-primary btn-sm action-btn">
-
-                    View Full Schedule
-
-                </a>
-
-            </div>
-
-        </div>
-
-
-        <div class="card-body p-0">
-
-            {% if weekly_schedule %}
-
-                <div class="table-responsive">
-
-                    <table class="table table-hover align-middle mb-0 schedule-table">
-
-                        <thead>
-
-                            <tr>
-
-                                <th class="px-3">Date</th>
-                                <th>Day</th>
-                                <th>Work / Program</th>
-                                <th>Type</th>
-                                <th>College</th>
-                                <th>Time</th>
-                                <th>Location</th>
-                                <th>Status</th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody>
-
-                            {% for item in weekly_schedule %}
-
-                                <tr>
-
-                                    <td class="px-3 fw-semibold">
-                                        {{ item.date|date:"d M Y" }}
-                                    </td>
-
-                                    <td>
-                                        {{ item.date|date:"D" }}
-                                    </td>
-
-                                    <td>
-                                        <strong>
-                                            {{ item.title }}
-                                        </strong>
-                                    </td>
-
-
-                                    <td>
-
-                                        {% if item.type == "Workshop" %}
-
-                                            <span class="type-badge badge-workshop">
-                                                Workshop
-                                            </span>
-
-                                        {% elif item.type == "FDP" %}
-
-                                            <span class="type-badge badge-fdp">
-                                                FDP
-                                            </span>
-
-                                        {% elif item.type == "Online Workshop" %}
-
-                                            <span class="type-badge badge-online">
-                                                Online Workshop
-                                            </span>
-
-                                        {% elif item.type == "Office Training" %}
-
-                                            <span class="type-badge badge-office">
-                                                Office Training
-                                            </span>
-
-                                        {% elif item.type == "Guest Faculty Training" %}
-
-                                            <span class="type-badge badge-guest">
-                                                Guest Faculty
-                                            </span>
-
-                                        {% elif item.type == "Meeting" %}
-
-                                            <span class="type-badge badge-meeting">
-                                                Meeting
-                                            </span>
-
-                                        {% else %}
-
-                                            <span class="type-badge badge-other">
-                                                {{ item.type }}
-                                            </span>
-
-                                        {% endif %}
-
-                                    </td>
-
-
-                                    <td>
-
-                                        {% if item.college %}
-
-                                            🏫 {{ item.college }}
-
-                                        {% else %}
-
-                                            —
-
-                                        {% endif %}
-
-                                    </td>
-
-
-                                    <td>
-
-                                        {% if item.time %}
-
-                                            🕐 {{ item.time }}
-
-                                        {% else %}
-
-                                            —
-
-                                        {% endif %}
-
-                                    </td>
-
-
-                                    <td>
-
-                                        {% if item.location %}
-
-                                            📍 {{ item.location }}
-
-                                        {% else %}
-
-                                            —
-
-                                        {% endif %}
-
-                                    </td>
-
-
-                                    <td>
-
-                                        {% if item.status %}
-
-                                            <span class="badge bg-light text-dark border">
-
-                                                {{ item.status }}
-
-                                            </span>
-
-                                        {% else %}
-
-                                            —
-
-                                        {% endif %}
-
-                                    </td>
-
-                                </tr>
-
-                            {% endfor %}
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            {% else %}
-
-                <div class="empty-state">
-
-                    <div class="empty-icon">
-                        📅
-                    </div>
-
-                    <h6 class="fw-bold">
-                        No scheduled activities this week
-                    </h6>
-
-                    <p class="small mb-0">
-                        Workshops, FDPs, online workshops,
-                        guest faculty training and meetings will appear here.
-                    </p>
-
-                </div>
-
-            {% endif %}
-
-        </div>
-
-    </div>
-
-
-
-    <!-- ================================================= -->
-    <!-- ASSIGNED WORKSHOPS -->
-    <!-- ================================================= -->
-
-    <div class="card section-card">
-
-        <div class="section-header">
-
-            <h5 class="fw-bold mb-1">
-                🎓 My Assigned Workshops
-            </h5>
-
-            <small class="text-muted">
-                Workshops assigned to you
-            </small>
-
-        </div>
-
-
-        <div class="card-body">
-
-            {% if workshops %}
-
-                <div class="row g-3">
-
-                    {% for workshop in workshops %}
-
-                        <div class="col-md-6 col-xl-4">
-
-                            <div class="workshop-card p-3 h-100">
-
-                                <div class="d-flex justify-content-between gap-2">
-
-                                    <h6 class="fw-bold">
-                                        {{ workshop.title }}
-                                    </h6>
-
-                                    <span class="badge bg-secondary">
-
-                                        {{ workshop.get_status_display }}
-
-                                    </span>
-
-                                </div>
-
-
-                                {% if workshop.college %}
-
-                                    <div class="small text-muted mb-2">
-
-                                        🏫 {{ workshop.college.name }}
-
-                                    </div>
-
-                                {% endif %}
-
-
-                                <div class="small text-muted">
-
-                                    📅
-
-                                    {{ workshop.start_date|date:"d M Y" }}
-
-                                    -
-
-                                    {{ workshop.end_date|date:"d M Y" }}
-
-                                </div>
-
-
-                                {% if workshop.departments %}
-
-                                    <div class="small text-muted mt-2">
-
-                                        🏢 {{ workshop.departments }}
-
-                                    </div>
-
-                                {% endif %}
-
-
-                                <div class="mt-3">
-
-                                    <a href="{% url 'workshop_detail' workshop.pk %}"
-                                       class="btn btn-sm btn-outline-primary action-btn">
-
-                                        View Workshop
-
-                                    </a>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    {% endfor %}
-
-                </div>
-
-            {% else %}
-
-                <div class="empty-state">
-
-                    <div class="empty-icon">
-                        🎓
-                    </div>
-
-                    <h6 class="fw-bold">
-                        No workshops assigned
-                    </h6>
-
-                    <p class="small mb-0">
-                        Assigned workshops will appear here.
-                    </p>
-
-                </div>
-
-            {% endif %}
 
         </div>
 
@@ -1231,22 +1322,1226 @@
 
 
 
-<!-- ===================================================== -->
-<!-- ADD TODAY'S WORK MODAL -->
-<!-- ===================================================== -->
+<!-- =========================================================
+     STATISTICS
+========================================================= -->
 
-<div class="modal fade"
-     id="addWorkModal"
-     tabindex="-1"
-     aria-hidden="true">
+<div class="row g-3 mb-4">
+
+
+    <!-- TRAINER -->
+
+    <div class="col-xl-3 col-md-6">
+
+        <div class="card stat-card">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between">
+
+                    <div>
+
+                        <div class="stat-label">
+                            Trainer
+                        </div>
+
+                        <div class="stat-value">
+                            {{ trainer.Name }}
+                        </div>
+
+
+                        {% if is_full_time %}
+
+                            <span class="badge bg-success mt-2">
+                                Full-Time
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge bg-secondary mt-2">
+                                Trainer
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="stat-icon bg-primary bg-opacity-10">
+                        <i class="bi bi-person-badge text-primary"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TODAY WORK -->
+
+    <div class="col-xl-3 col-md-6">
+
+        <div class="card stat-card">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between">
+
+                    <div>
+
+                        <div class="stat-label">
+                            Today's Work
+                        </div>
+
+                        <div class="stat-value">
+                            {{ today_tasks|length }}
+                        </div>
+
+                        <div class="small text-muted mt-1">
+                            Work updates
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-icon bg-success bg-opacity-10">
+                        <i class="bi bi-briefcase text-success"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- WEEKLY -->
+
+    <div class="col-xl-3 col-md-6">
+
+        <div class="card stat-card">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between">
+
+                    <div>
+
+                        <div class="stat-label">
+                            Weekly Schedule
+                        </div>
+
+                        <div class="stat-value">
+                            {{ weekly_schedule|length }}
+                        </div>
+
+                        <div class="small text-muted mt-1">
+                            Activities
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-icon bg-info bg-opacity-10">
+                        <i class="bi bi-calendar3 text-info"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ATTENDANCE -->
+
+    <div class="col-xl-3 col-md-6">
+
+        <div class="card stat-card">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between">
+
+                    <div>
+
+                        <div class="stat-label">
+                            Attendance
+                        </div>
+
+
+                        {% if is_full_time %}
+
+                            {% if attendance and attendance.check_in %}
+
+                                {% if attendance.check_out %}
+
+                                    <div class="stat-value text-secondary">
+                                        Checked Out
+                                    </div>
+
+                                {% else %}
+
+                                    <div class="stat-value text-success">
+                                        Working
+                                    </div>
+
+                                {% endif %}
+
+                            {% else %}
+
+                                <div class="stat-value text-danger">
+                                    Not Checked In
+                                </div>
+
+                            {% endif %}
+
+                        {% else %}
+
+                            <div class="stat-value text-muted">
+                                N/A
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="stat-icon bg-warning bg-opacity-10">
+                        <i class="bi bi-clock text-warning"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     TODAY'S WORK + LEARNING
+========================================================= -->
+
+<div class="row g-4 mb-4">
+
+
+<!-- =========================================================
+     TODAY'S WORK
+========================================================= -->
+
+<div class="col-xl-7">
+
+<div class="card section-card h-100">
+
+
+    <div class="section-header">
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+            <div>
+
+                <h5 class="section-title">
+                    <i class="bi bi-briefcase-fill text-primary me-2"></i>
+                    Today's Work
+                </h5>
+
+                <div class="section-subtitle">
+                    Record and complete your work for today.
+                </div>
+
+            </div>
+
+
+            <div class="d-flex align-items-center gap-3">
+
+                {% if today_tasks %}
+
+                    <div class="work-summary">
+
+                        <span class="work-summary-number">
+                            {{ today_tasks|length }}
+                        </span>
+
+                        <span class="work-summary-label">
+                            Tasks
+                        </span>
+
+                    </div>
+
+                {% endif %}
+
+
+                {% if is_full_time and attendance and attendance.check_in and not attendance.check_out %}
+
+                    <button
+                        type="button"
+                        class="btn btn-primary action-btn"
+                        data-bs-toggle="modal"
+                        data-bs-target="#addWorkModal"
+                    >
+                        <i class="bi bi-plus-lg me-1"></i>
+                        Add Work
+                    </button>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         PROGRESS
+    ====================================================== -->
+
+    {% if today_tasks %}
+
+        {% widthratio today_tasks|length 1 1 as total_tasks %}
+
+        <div class="progress-wrapper">
+
+            <div class="progress-info">
+
+                <span>
+                    <i class="bi bi-bar-chart-fill text-primary me-1"></i>
+                    Today's Progress
+                </span>
+
+                <span class="text-primary">
+                    {% for task in today_tasks %}
+                        {% if task.status == "completed" %}
+                        {% endif %}
+                    {% endfor %}
+
+                    {% with completed_count=0 %}
+                    {% endwith %}
+                </span>
+
+            </div>
+
+
+            <!--
+                Visual progress is based on completed task cards.
+                The backend status remains the source of truth.
+            -->
+
+            <div class="work-progress">
+
+                <div
+                    class="progress-bar"
+                    role="progressbar"
+                    style="
+                        width:
+                        {% if today_tasks %}
+                            {% widthratio completed_tasks_count today_tasks|length 100 %}
+                        {% else %}
+                            0
+                        {% endif %}%;
+                    "
+                ></div>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+
+
+    <div class="card-body p-3 p-md-4">
+
+
+        {% if today_tasks %}
+
+
+            {% for task in today_tasks %}
+
+                <div
+                    class="
+                        work-card
+                        {% if task.status == 'completed' %}
+                            completed
+                        {% elif task.status == 'in_progress' %}
+                            in-progress
+                        {% else %}
+                            pending
+                        {% endif %}
+                    "
+                >
+
+                    <!-- TASK HEADER -->
+
+                    <div class="d-flex justify-content-between align-items-start gap-3">
+
+                        <div class="flex-grow-1">
+
+                            <div class="task-title">
+                                {{ task.task }}
+                            </div>
+
+
+                            {% if task.description %}
+
+                                <div class="task-description">
+                                    {{ task.description }}
+                                </div>
+
+                            {% endif %}
+
+
+                            <div class="task-meta">
+
+                                {% if task.created_on %}
+
+                                    <span class="task-meta-item">
+                                        <i class="bi bi-clock"></i>
+                                        Added {{ task.created_on|date:"h:i A" }}
+                                    </span>
+
+                                {% endif %}
+
+
+                                {% if task.estimated_hours %}
+
+                                    <span class="task-meta-item">
+                                        <i class="bi bi-hourglass-split"></i>
+                                        {{ task.estimated_hours }} hr
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- STATUS -->
+
+                        <div>
+
+                            {% if task.status == "completed" %}
+
+                                <span class="task-status status-completed">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                    Completed
+                                </span>
+
+
+                            {% elif task.status == "in_progress" %}
+
+                                <span class="task-status status-progress">
+                                    <i class="bi bi-clock-fill"></i>
+                                    In Progress
+                                </span>
+
+
+                            {% else %}
+
+                                <span class="task-status status-pending">
+                                    <i class="bi bi-circle"></i>
+                                    Pending
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- ACTIONS -->
+
+                    <div class="task-actions">
+
+
+                        {% if task.status == "pending" %}
+
+                            <!-- START WORK -->
+
+                            <form
+                                method="POST"
+                                action="{% url 'change_task_status' task.id %}"
+                            >
+
+                                {% csrf_token %}
+
+                                <input
+                                    type="hidden"
+                                    name="status"
+                                    value="in_progress"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-outline-primary"
+                                >
+                                    <i class="bi bi-play-fill"></i>
+                                    Start Work
+                                </button>
+
+                            </form>
+
+
+                        {% elif task.status == "in_progress" %}
+
+                            <!-- COMPLETE -->
+
+                            <form
+                                method="POST"
+                                action="{% url 'change_task_status' task.id %}"
+                            >
+
+                                {% csrf_token %}
+
+                                <input
+                                    type="hidden"
+                                    name="status"
+                                    value="completed"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-success"
+                                >
+                                    <i class="bi bi-check2-circle"></i>
+                                    Mark Complete
+                                </button>
+
+                            </form>
+
+
+                        {% elif task.status == "completed" %}
+
+                            <!-- REOPEN -->
+
+                            <form
+                                method="POST"
+                                action="{% url 'change_task_status' task.id %}"
+                            >
+
+                                {% csrf_token %}
+
+                                <input
+                                    type="hidden"
+                                    name="status"
+                                    value="in_progress"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-outline-secondary"
+                                >
+                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                    Reopen
+                                </button>
+
+                            </form>
+
+                        {% endif %}
+
+
+                        <!-- VIEW / EDIT TASK -->
+
+                        <a
+                            href="{% url 'task_detail' task.id %}"
+                            class="btn btn-outline-dark"
+                        >
+                            <i class="bi bi-eye"></i>
+                            View
+                        </a>
+
+                        <a
+                            href="{% url 'edit_task' task.id %}"
+                            class="btn btn-outline-primary"
+                        >
+                            <i class="bi bi-pencil"></i>
+                            Edit
+                        </a>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+
+        {% else %}
+
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    <i class="bi bi-clipboard-check"></i>
+                </div>
+
+
+                <h6 class="fw-bold fs-5">
+                    No work added today
+                </h6>
+
+
+                {% if is_full_time %}
+
+                    {% if attendance and attendance.check_in and not attendance.check_out %}
+
+                        <p class="mb-3">
+                            Add your training, preparation,
+                            development, meetings or other work.
+                        </p>
+
+
+                        <button
+                            type="button"
+                            class="btn btn-primary action-btn"
+                            data-bs-toggle="modal"
+                            data-bs-target="#addWorkModal"
+                        >
+                            <i class="bi bi-plus-circle me-1"></i>
+                            Add Today's Work
+                        </button>
+
+                    {% else %}
+
+                        <p class="text-danger mb-0">
+                            <i class="bi bi-lock me-1"></i>
+                            Please check in before adding work.
+                        </p>
+
+                    {% endif %}
+
+                {% endif %}
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+</div>
+
+
+
+<!-- =========================================================
+     TODAY LEARNING
+========================================================= -->
+
+<div class="col-xl-5">
+
+<div class="card section-card h-100">
+
+
+    <div class="section-header">
+
+        <div class="d-flex justify-content-between align-items-center">
+
+            <div>
+
+                <h5 class="section-title">
+                    <i class="bi bi-book-fill text-success me-2"></i>
+                    Today's Learning
+                </h5>
+
+                <div class="section-subtitle">
+                    Record what you learned or practiced today.
+                </div>
+
+            </div>
+
+
+            <a
+                href="{% url 'add_daily_learning' %}"
+                class="btn btn-sm btn-outline-success action-btn"
+            >
+
+                {% if daily_learning %}
+                    <i class="bi bi-pencil me-1"></i>
+                    Edit
+                {% else %}
+                    <i class="bi bi-plus-lg me-1"></i>
+                    Add
+                {% endif %}
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <div class="card-body">
+
+
+        {% if daily_learning and daily_learning.learning %}
+
+            <div class="learning-box">
+
+                <div class="learning-title">
+
+                    <i class="bi bi-lightbulb-fill me-1"></i>
+
+                    Learning Update
+
+                </div>
+
+
+                <div style="white-space: pre-line;">
+                    {{ daily_learning.learning }}
+                </div>
+
+            </div>
+
+
+        {% else %}
+
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    <i class="bi bi-book"></i>
+                </div>
+
+
+                <h6 class="fw-bold fs-5">
+                    No learning update yet
+                </h6>
+
+
+                <p>
+                    Add what you learned,
+                    practiced or explored today.
+                </p>
+
+
+                <a
+                    href="{% url 'add_daily_learning' %}"
+                    class="btn btn-success action-btn"
+                >
+                    <i class="bi bi-plus-circle me-1"></i>
+                    Add Learning
+                </a>
+
+            </div>
+
+        {% endif %}
+
+
+    </div>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- =========================================================
+     WEEKLY SCHEDULE
+========================================================= -->
+
+<div class="card section-card mb-4">
+
+
+    <div class="section-header">
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+            <div>
+
+                <h5 class="section-title">
+
+                    <i class="bi bi-calendar-week-fill text-primary me-2"></i>
+
+                    Weekly Work Schedule
+
+                </h5>
+
+
+                <div class="section-subtitle">
+
+                    {{ week_start|date:"d M Y" }}
+
+                    -
+
+                    {{ week_end|date:"d M Y" }}
+
+                </div>
+
+            </div>
+
+
+            <a
+                href="{% url 'full_time_work_list' %}"
+                class="btn btn-primary action-btn"
+            >
+
+                <i class="bi bi-calendar3 me-1"></i>
+
+                View Full Schedule
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="card-body p-0">
+
+
+        {% if weekly_schedule %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle schedule-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th class="px-3">
+                                Date
+                            </th>
+
+                            <th>
+                                Day
+                            </th>
+
+                            <th>
+                                Work / Program
+                            </th>
+
+                            <th>
+                                Type
+                            </th>
+
+                            <th>
+                                College
+                            </th>
+
+                            <th>
+                                Time
+                            </th>
+
+                            <th>
+                                Location
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for item in weekly_schedule %}
+
+                            <tr>
+
+                                <td class="px-3 fw-bold">
+
+                                    {{ item.date|date:"d M Y" }}
+
+                                </td>
+
+
+                                <td>
+
+                                    {{ item.date|date:"D" }}
+
+                                </td>
+
+
+                                <td>
+
+                                    <strong>
+                                        {{ item.title }}
+                                    </strong>
+
+                                </td>
+
+
+                                <!-- TYPE -->
+
+                                <td>
+
+                                    {% if item.type == "Workshop" %}
+
+                                        <span class="type-badge badge-workshop">
+                                            <i class="bi bi-mortarboard me-1"></i>
+                                            Workshop
+                                        </span>
+
+
+                                    {% elif item.type == "FDP" %}
+
+                                        <span class="type-badge badge-fdp">
+                                            <i class="bi bi-award me-1"></i>
+                                            FDP
+                                        </span>
+
+
+                                    {% elif item.type == "Online Workshop" %}
+
+                                        <span class="type-badge badge-online">
+                                            <i class="bi bi-camera-video me-1"></i>
+                                            Online Workshop
+                                        </span>
+
+
+                                    {% elif item.type == "Office Training" %}
+
+                                        <span class="type-badge badge-office">
+                                            <i class="bi bi-building me-1"></i>
+                                            Office Training
+                                        </span>
+
+
+                                    {% elif item.type == "Guest Faculty Training" %}
+
+                                        <span class="type-badge badge-guest">
+                                            <i class="bi bi-person-video3 me-1"></i>
+                                            Guest Faculty
+                                        </span>
+
+
+                                    {% elif item.type == "Meeting" %}
+
+                                        <span class="type-badge badge-meeting">
+                                            <i class="bi bi-people me-1"></i>
+                                            Meeting
+                                        </span>
+
+
+                                    {% else %}
+
+                                        <span class="type-badge badge-other">
+                                            {{ item.type }}
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- COLLEGE -->
+
+                                <td>
+
+                                    {% if item.college %}
+
+                                        <i class="bi bi-building text-primary me-1"></i>
+
+                                        {{ item.college }}
+
+                                    {% else %}
+
+                                        —
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- TIME -->
+
+                                <td>
+
+                                    {% if item.time %}
+
+                                        <i class="bi bi-clock text-warning me-1"></i>
+
+                                        {{ item.time }}
+
+                                    {% else %}
+
+                                        —
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- LOCATION -->
+
+                                <td>
+
+                                    {% if item.location %}
+
+                                        <i class="bi bi-geo-alt text-danger me-1"></i>
+
+                                        {{ item.location }}
+
+                                    {% else %}
+
+                                        —
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- STATUS -->
+
+                                <td>
+
+                                    {% if item.status %}
+
+                                        <span class="badge bg-light text-dark border">
+
+                                            {{ item.status }}
+
+                                        </span>
+
+                                    {% else %}
+
+                                        —
+
+                                    {% endif %}
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+        {% else %}
+
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    <i class="bi bi-calendar-x"></i>
+                </div>
+
+
+                <h6 class="fw-bold fs-5">
+                    No scheduled activities this week
+                </h6>
+
+
+                <p class="mb-0">
+                    Workshops, FDPs, online workshops,
+                    guest faculty training and meetings
+                    will appear here.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     ASSIGNED WORKSHOPS
+========================================================= -->
+
+<div class="card section-card">
+
+
+    <div class="section-header">
+
+        <h5 class="section-title">
+
+            <i class="bi bi-mortarboard-fill text-primary me-2"></i>
+
+            My Assigned Workshops
+
+        </h5>
+
+
+        <div class="section-subtitle">
+
+            Workshops currently assigned to you.
+
+        </div>
+
+    </div>
+
+
+
+    <div class="card-body">
+
+
+        {% if workshops %}
+
+
+            <div class="row g-3">
+
+                {% for workshop in workshops %}
+
+                    <div class="col-md-6 col-xl-4">
+
+                        <div class="workshop-card">
+
+
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+
+                                <div class="workshop-title">
+
+                                    {{ workshop.title }}
+
+                                </div>
+
+
+                                <span class="badge bg-secondary">
+
+                                    {{ workshop.get_status_display }}
+
+                                </span>
+
+                            </div>
+
+
+                            {% if workshop.college %}
+
+                                <div class="workshop-meta">
+
+                                    <i class="bi bi-building text-primary me-1"></i>
+
+                                    {{ workshop.college.name }}
+
+                                </div>
+
+                            {% endif %}
+
+
+                            <div class="workshop-meta">
+
+                                <i class="bi bi-calendar3 me-1"></i>
+
+                                {{ workshop.start_date|date:"d M Y" }}
+
+                                -
+
+                                {{ workshop.end_date|date:"d M Y" }}
+
+                            </div>
+
+
+                            {% if workshop.departments %}
+
+                                <div class="workshop-meta">
+
+                                    <i class="bi bi-diagram-3 me-1"></i>
+
+                                    {{ workshop.departments }}
+
+                                </div>
+
+                            {% endif %}
+
+
+                            <div class="mt-3">
+
+                                <a
+                                    href="{% url 'workshop_detail' workshop.pk %}"
+                                    class="btn btn-sm btn-outline-primary action-btn"
+                                >
+
+                                    <i class="bi bi-eye me-1"></i>
+
+                                    View Workshop
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+        {% else %}
+
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    <i class="bi bi-mortarboard"></i>
+                </div>
+
+
+                <h6 class="fw-bold fs-5">
+                    No workshops assigned
+                </h6>
+
+
+                <p class="mb-0">
+                    Workshops assigned to you will appear here.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+</div>
+
+
+
+<!-- =========================================================
+     ADD TODAY'S WORK MODAL
+========================================================= -->
+
+<div
+    class="modal fade"
+    id="addWorkModal"
+    tabindex="-1"
+    aria-hidden="true"
+>
 
     <div class="modal-dialog modal-dialog-centered">
 
         <div class="modal-content">
 
 
-            <form method="POST"
-                  action="{% url 'add_today_task' %}">
+            <form
+                method="POST"
+                action="{% url 'add_today_task' %}"
+            >
 
                 {% csrf_token %}
 
@@ -1255,23 +2550,32 @@
 
                     <div>
 
-                        <h5 class="modal-title fw-bold">
-                            ➕ Add Today's Work
+                        <h5 class="modal-title">
+
+                            <i class="bi bi-plus-circle-fill text-primary me-2"></i>
+
+                            Add Today's Work
+
                         </h5>
 
-                        <small class="text-muted">
+
+                        <div class="small text-muted mt-1">
+
                             Record what you are working on today.
-                        </small>
+
+                        </div>
 
                     </div>
 
 
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal">
-                    </button>
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                    ></button>
 
                 </div>
+
 
 
                 <div class="modal-body">
@@ -1279,25 +2583,30 @@
 
                     <div class="mb-3">
 
-                        <label class="form-label fw-semibold">
+                        <label class="form-label">
 
                             What are you working on?
 
+                            <span class="text-danger">*</span>
+
                         </label>
 
-                        <input type="text"
-                               name="task"
-                               class="form-control"
-                               placeholder="Example: Preparing Python training material"
-                               required
-                               autofocus>
+
+                        <input
+                            type="text"
+                            name="task"
+                            class="form-control"
+                            placeholder="Example: Preparing Python training material"
+                            required
+                        >
 
                     </div>
 
 
+
                     <div class="mb-3">
 
-                        <label class="form-label fw-semibold">
+                        <label class="form-label">
 
                             Description
 
@@ -1307,44 +2616,68 @@
 
                         </label>
 
-                        <textarea name="description"
-                                  class="form-control"
-                                  rows="4"
-                                  placeholder="Add details about today's work..."></textarea>
+
+                        <textarea
+                            name="description"
+                            class="form-control"
+                            rows="4"
+                            placeholder="Add details about this work..."
+                        ></textarea>
 
                     </div>
 
 
-                    <div class="alert alert-light border small mb-0">
 
-                        📌 This work update will be recorded for
+                    <div class="alert alert-light border mb-0">
 
-                        <strong>
-                            {{ today|date:"d M Y" }}
-                        </strong>
+                        <div class="d-flex gap-2">
 
-                        under your trainer profile.
+                            <i class="bi bi-info-circle text-primary"></i>
+
+                            <div>
+
+                                <strong>
+                                    Task workflow
+                                </strong>
+
+                                <div class="small text-muted mt-1">
+
+                                    New work starts as
+                                    <strong>In Progress</strong>.
+                                    You can mark it completed
+                                    from Today's Work.
+
+                                </div>
+
+                            </div>
+
+                        </div>
 
                     </div>
 
                 </div>
 
 
+
                 <div class="modal-footer">
 
-                    <button type="button"
-                            class="btn btn-light action-btn"
-                            data-bs-dismiss="modal">
-
+                    <button
+                        type="button"
+                        class="btn btn-light action-btn"
+                        data-bs-dismiss="modal"
+                    >
                         Cancel
-
                     </button>
 
 
-                    <button type="submit"
-                            class="btn btn-primary action-btn px-4">
+                    <button
+                        type="submit"
+                        class="btn btn-primary action-btn px-4"
+                    >
 
-                        💾 Save Work
+                        <i class="bi bi-check2 me-1"></i>
+
+                        Save Work
 
                     </button>
 

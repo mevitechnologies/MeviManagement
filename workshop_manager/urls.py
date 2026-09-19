@@ -383,7 +383,11 @@ urlpatterns = [
         views.add_workshop_remark,
         name="add_workshop_remark",
     ),
-
+path(
+    "workshop/<int:pk>/delete/",
+    views.delete_workshop,
+    name="delete_workshop",
+),
     path(
         "remark/<int:remark_id>/edit/",
         views.edit_workshop_remark,

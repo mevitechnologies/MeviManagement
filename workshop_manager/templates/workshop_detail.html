@@ -1,365 +1,1432 @@
 {% extends 'base.html' %}
 
+{% block title %}
+    {{ workshop.title }} | Workshop Details
+{% endblock %}
+
 {% block content %}
 
-<div class="container-fluid mt-4">
+<style>
 
-```
-<!-- Workshop Header -->
-<div class="card shadow border-0 mb-4">
+    /* =========================================================
+       WORKSHOP DETAIL PAGE
+    ========================================================= */
 
-    <div class="card-header bg-primary text-white">
-        <div class="d-flex justify-content-between align-items-center">
+    .workshop-page {
+        padding: 25px 0 60px;
+    }
 
-            <div>
-                <h3 class="mb-0">
-                    <i class="bi bi-mortarboard-fill"></i>
-                    {{ workshop.title }}
-                </h3>
-            </div>
+    .workshop-hero {
+        border: 0;
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: 0 12px 35px rgba(15, 23, 42, .08);
+        background:
+            linear-gradient(
+                135deg,
+                #ffffff 0%,
+                #f5f3ff 55%,
+                #eef4ff 100%
+            );
+    }
 
-            <div>
-                {% if workshop.status == 'fixed' %}
-                    <span class="badge bg-success fs-6">Fixed</span>
+    .workshop-hero-header {
+        padding: 28px 30px;
+        background:
+            linear-gradient(
+                135deg,
+                #4f46e5,
+                #6366f1,
+                #7c3aed
+            );
+        color: white;
+    }
 
-                {% elif workshop.status == 'tentative' %}
-                    <span class="badge bg-warning text-dark fs-6">Tentative</span>
+    .workshop-title {
+        font-size: 28px;
+        font-weight: 800;
+        margin: 0;
+        line-height: 1.3;
+    }
 
-                {% elif workshop.status == 'completed' %}
-                    <span class="badge bg-info fs-6">Completed</span>
+    .workshop-subtitle {
+        margin-top: 8px;
+        font-size: 14px;
+        opacity: .9;
+    }
 
-                {% elif workshop.status == 'cancelled' %}
-                    <span class="badge bg-danger fs-6">Cancelled</span>
+    .status-badge {
+        font-size: 13px;
+        padding: 8px 14px;
+        border-radius: 30px;
+        font-weight: 800;
+    }
 
-                {% elif workshop.status == 'postponed' %}
-                    <span class="badge bg-secondary fs-6">Postponed</span>
-                {% endif %}
+    .workshop-body {
+        padding: 30px;
+    }
+
+    /* =========================================================
+       INFORMATION CARDS
+       ========================================================= */
+
+    .info-card {
+        height: 100%;
+        border: 1px solid #e7eaf0;
+        border-radius: 16px;
+        background: #ffffff;
+        padding: 19px;
+        transition: .2s ease;
+    }
+
+    .info-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(15, 23, 42, .06);
+    }
+
+    .info-label {
+        color: #667085;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        margin-bottom: 6px;
+    }
+
+    .info-value {
+        color: #172033;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    .info-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #eef2ff;
+        color: #4f46e5;
+        font-size: 18px;
+        margin-bottom: 12px;
+    }
+
+    /* =========================================================
+       REMARKS
+       ========================================================= */
+
+    .remarks-box {
+        background: #fafbff;
+        border: 1px solid #e8ebf0;
+        border-radius: 15px;
+        padding: 18px;
+        line-height: 1.7;
+        color: #475467;
+    }
+
+    /* =========================================================
+       TRAINERS
+       ========================================================= */
+
+    .trainer-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 13px;
+        border-radius: 30px;
+        background: #172033;
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: 700;
+        margin: 0 7px 7px 0;
+    }
+
+    .trainer-chip i {
+        color: #c7d2fe;
+    }
+
+    /* =========================================================
+       WORKSHOP TIMELINE
+       ========================================================= */
+
+    .timeline {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        margin: 25px 0 10px;
+    }
+
+    .timeline-item {
+        flex: 1;
+        text-align: center;
+        position: relative;
+    }
+
+    .timeline-item:not(:last-child)::after {
+        content: "";
+        position: absolute;
+        top: 17px;
+        left: 60%;
+        width: 80%;
+        height: 3px;
+        background: #e5e7eb;
+        z-index: 0;
+    }
+
+    .timeline-circle {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        margin: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #e5e7eb;
+        color: #667085;
+        position: relative;
+        z-index: 2;
+        font-size: 14px;
+    }
+
+    .timeline-label {
+        margin-top: 8px;
+        font-size: 11px;
+        font-weight: 700;
+        color: #667085;
+    }
+
+    .timeline-active .timeline-circle {
+        background: #4f46e5;
+        color: #ffffff;
+    }
+
+    .timeline-active .timeline-label {
+        color: #4f46e5;
+    }
+
+    /* =========================================================
+       SECTION
+       ========================================================= */
+
+    .section-card {
+        border: 1px solid #e7eaf0;
+        border-radius: 19px;
+        background: #ffffff;
+        box-shadow: 0 6px 24px rgba(15, 23, 42, .05);
+        overflow: hidden;
+    }
+
+    .section-header {
+        padding: 20px 22px;
+        border-bottom: 1px solid #edf0f4;
+        background: #ffffff;
+    }
+
+    .section-title {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 800;
+        color: #172033;
+    }
+
+    .section-subtitle {
+        margin-top: 4px;
+        color: #667085;
+        font-size: 13px;
+    }
+
+    .section-body {
+        padding: 22px;
+    }
+
+    /* =========================================================
+       TRAINER REPORT
+       ========================================================= */
+
+    .report-card {
+        border: 1px solid #e7eaf0;
+        border-left: 5px solid #4f46e5;
+        border-radius: 15px;
+        background: #ffffff;
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    .report-card:last-child {
+        margin-bottom: 0;
+    }
+
+    .report-header {
+        padding: 18px 20px;
+        border-bottom: 1px solid #edf0f4;
+        background: #fafbff;
+    }
+
+    .report-body {
+        padding: 20px;
+    }
+
+    .report-trainer {
+        font-size: 16px;
+        font-weight: 800;
+        color: #4f46e5;
+    }
+
+    .report-date {
+        color: #667085;
+        font-size: 12px;
+    }
+
+    .report-label {
+        font-size: 13px;
+        font-weight: 800;
+        color: #344054;
+        margin-bottom: 6px;
+    }
+
+    .report-text {
+        color: #475467;
+        font-size: 14px;
+        line-height: 1.65;
+        white-space: pre-line;
+    }
+
+    .feedback-box {
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 15px;
+        color: #475467;
+        line-height: 1.6;
+    }
+
+    .report-meta-card {
+        border: 1px solid #e7eaf0;
+        border-radius: 12px;
+        padding: 14px;
+        height: 100%;
+        background: #fafbff;
+    }
+
+    .report-meta-label {
+        font-size: 11px;
+        color: #667085;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .report-meta-value {
+        margin-top: 5px;
+        font-size: 14px;
+        font-weight: 800;
+        color: #172033;
+    }
+
+    /* =========================================================
+       BUTTONS
+       ========================================================= */
+
+    .action-btn {
+        border-radius: 10px;
+        padding: 9px 15px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .btn-delete {
+        border-radius: 10px;
+        padding: 9px 15px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    /* =========================================================
+       REPORT EMPTY STATE
+       ========================================================= */
+
+    .empty-state {
+        text-align: center;
+        padding: 45px 20px;
+        color: #667085;
+    }
+
+    .empty-icon {
+        width: 65px;
+        height: 65px;
+        border-radius: 18px;
+        margin: 0 auto 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #eef2ff;
+        color: #4f46e5;
+        font-size: 28px;
+    }
+
+    /* =========================================================
+       DELETE MODAL
+       ========================================================= */
+
+    .delete-modal-icon {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 18px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fee2e2;
+        color: #dc2626;
+        font-size: 30px;
+    }
+
+    .delete-modal-title {
+        font-size: 21px;
+        font-weight: 800;
+        color: #172033;
+    }
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 768px) {
+
+        .workshop-page {
+            padding-top: 15px;
+        }
+
+        .workshop-hero-header {
+            padding: 22px 18px;
+        }
+
+        .workshop-body {
+            padding: 20px 18px;
+        }
+
+        .workshop-title {
+            font-size: 22px;
+        }
+
+        .timeline-label {
+            font-size: 9px;
+        }
+
+        .timeline-item:not(:last-child)::after {
+            width: 65%;
+        }
+
+        .action-btn,
+        .btn-delete {
+            width: 100%;
+        }
+
+    }
+
+</style>
+
+
+<div class="container-fluid workshop-page">
+
+    <!-- =====================================================
+         WORKSHOP HERO
+    ====================================================== -->
+
+    <div class="card workshop-hero mb-4">
+
+        <div class="workshop-hero-header">
+
+            <div class="row align-items-center">
+
+                <div class="col-lg-8">
+
+                    <div class="d-flex align-items-center gap-2 mb-2">
+
+                        <span class="badge bg-light text-primary">
+                            <i class="bi bi-mortarboard-fill me-1"></i>
+                            Workshop
+                        </span>
+
+                        {% if workshop.status == 'fixed' %}
+                            <span class="badge bg-success status-badge">
+                                Fixed
+                            </span>
+
+                        {% elif workshop.status == 'tentative' %}
+                            <span class="badge bg-warning text-dark status-badge">
+                                Tentative
+                            </span>
+
+                        {% elif workshop.status == 'completed' %}
+                            <span class="badge bg-info status-badge">
+                                Completed
+                            </span>
+
+                        {% elif workshop.status == 'cancelled' %}
+                            <span class="badge bg-danger status-badge">
+                                Cancelled
+                            </span>
+
+                        {% elif workshop.status == 'postponed' %}
+                            <span class="badge bg-secondary status-badge">
+                                Postponed
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                    <h1 class="workshop-title">
+                        {{ workshop.title }}
+                    </h1>
+
+                    <div class="workshop-subtitle">
+
+                        <i class="bi bi-building me-1"></i>
+
+                        {{ workshop.college }}
+
+                        <span class="mx-2">•</span>
+
+                        <i class="bi bi-calendar3 me-1"></i>
+
+                        {{ workshop.start_date|date:"d M Y" }}
+
+                        {% if workshop.end_date != workshop.start_date %}
+
+                            -
+                            {{ workshop.end_date|date:"d M Y" }}
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-lg-4 mt-3 mt-lg-0">
+
+                    <div class="d-flex justify-content-lg-end flex-wrap gap-2">
+
+                        {% if request.user.is_superuser %}
+
+                            <a
+                                href="{% url 'edit_workshop' workshop.id %}"
+                                class="btn btn-warning action-btn">
+
+                                <i class="bi bi-pencil-square me-1"></i>
+
+                                Edit Workshop
+
+                            </a>
+
+                            <button
+                                type="button"
+                                class="btn btn-danger btn-delete"
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteWorkshopModal">
+
+                                <i class="bi bi-trash3 me-1"></i>
+
+                                Delete
+
+                            </button>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
             </div>
 
         </div>
+
+
+        <!-- =================================================
+             WORKSHOP INFORMATION
+        ================================================== -->
+
+        <div class="workshop-body">
+
+            <div class="row g-3">
+
+                <!-- College -->
+
+                <div class="col-md-6 col-xl-3">
+
+                    <div class="info-card">
+
+                        <div class="info-icon">
+                            <i class="bi bi-building"></i>
+                        </div>
+
+                        <div class="info-label">
+                            College
+                        </div>
+
+                        <div class="info-value">
+                            {{ workshop.college }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Department -->
+
+                <div class="col-md-6 col-xl-3">
+
+                    <div class="info-card">
+
+                        <div class="info-icon">
+                            <i class="bi bi-diagram-3"></i>
+                        </div>
+
+                        <div class="info-label">
+                            Department
+                        </div>
+
+                        <div class="info-value">
+                            {{ workshop.departments|default:"Not specified" }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Start -->
+
+                <div class="col-md-6 col-xl-3">
+
+                    <div class="info-card">
+
+                        <div class="info-icon">
+                            <i class="bi bi-calendar-event"></i>
+                        </div>
+
+                        <div class="info-label">
+                            Start Date
+                        </div>
+
+                        <div class="info-value">
+                            {{ workshop.start_date|date:"d M Y" }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- End -->
+
+                <div class="col-md-6 col-xl-3">
+
+                    <div class="info-card">
+
+                        <div class="info-icon">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+
+                        <div class="info-label">
+                            End Date
+                        </div>
+
+                        <div class="info-value">
+                            {{ workshop.end_date|date:"d M Y" }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 WORKSHOP TIMELINE
+            ================================================== -->
+
+            <div class="mt-4">
+
+                <h5 class="fw-bold mb-3">
+                    <i class="bi bi-bar-chart-steps text-primary me-1"></i>
+                    Workshop Progress
+                </h5>
+
+                <div class="timeline">
+
+                    <div class="timeline-item
+                        {% if workshop.status != 'cancelled' %}
+                            timeline-active
+                        {% endif %}">
+
+                        <div class="timeline-circle">
+                            <i class="bi bi-plus-lg"></i>
+                        </div>
+
+                        <div class="timeline-label">
+                            Created
+                        </div>
+
+                    </div>
+
+
+                    <div class="timeline-item
+                        {% if workshop.status == 'fixed' or workshop.status == 'completed' %}
+                            timeline-active
+                        {% endif %}">
+
+                        <div class="timeline-circle">
+                            <i class="bi bi-check-lg"></i>
+                        </div>
+
+                        <div class="timeline-label">
+                            Fixed
+                        </div>
+
+                    </div>
+
+
+                    <div class="timeline-item
+                        {% if workshop.status == 'completed' %}
+                            timeline-active
+                        {% endif %}">
+
+                        <div class="timeline-circle">
+                            <i class="bi bi-mortarboard"></i>
+                        </div>
+
+                        <div class="timeline-label">
+                            Conducted
+                        </div>
+
+                    </div>
+
+
+                    <div class="timeline-item
+                        {% if workshop.status == 'completed' %}
+                            timeline-active
+                        {% endif %}">
+
+                        <div class="timeline-circle">
+                            <i class="bi bi-flag-fill"></i>
+                        </div>
+
+                        <div class="timeline-label">
+                            Completed
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 REMARKS
+            ================================================== -->
+
+            <div class="mt-4">
+
+                <h5 class="fw-bold mb-3">
+
+                    <i class="bi bi-chat-left-text text-primary me-1"></i>
+
+                    Workshop Remarks
+
+                </h5>
+
+                <div class="remarks-box">
+
+                    {% if workshop.remarks %}
+
+                        {{ workshop.remarks|linebreaksbr }}
+
+                    {% else %}
+
+                        <span class="text-muted">
+                            No remarks available for this workshop.
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 ASSIGNED TRAINERS
+            ================================================== -->
+
+            <div class="mt-4">
+
+                <h5 class="fw-bold mb-3">
+
+                    <i class="bi bi-people-fill text-primary me-1"></i>
+
+                    Assigned Trainers
+
+                </h5>
+
+                <div>
+
+                    {% for trainer_item in workshop.assigned_trainers.all %}
+
+                        <span class="trainer-chip">
+
+                            <i class="bi bi-person-circle"></i>
+
+                            {{ trainer_item.Name }}
+
+                        </span>
+
+                    {% empty %}
+
+                        <div class="alert alert-light border">
+
+                            <i class="bi bi-info-circle me-1"></i>
+
+                            No trainers assigned to this workshop.
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 REPORT
+            ================================================== -->
+
+            {% if workshop.report %}
+
+                <div class="mt-4">
+
+                    <div class="alert alert-success d-flex
+                                justify-content-between
+                                align-items-center flex-wrap gap-2">
+
+                        <div>
+
+                            <strong>
+                                <i class="bi bi-file-earmark-check me-1"></i>
+                                Workshop Report Available
+                            </strong>
+
+                            <div class="small mt-1">
+                                A report has been uploaded for this workshop.
+                            </div>
+
+                        </div>
+
+                        <a
+                            href="{{ workshop.report.url }}"
+                            target="_blank"
+                            class="btn btn-outline-success">
+
+                            <i class="bi bi-download me-1"></i>
+
+                            Open Report
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            {% else %}
+
+                {% if workshop.status == "completed" %}
+
+                    <div class="mt-4">
+
+                        <div class="alert alert-warning">
+
+                            <i class="bi bi-exclamation-triangle me-1"></i>
+
+                            Workshop is marked as completed, but no workshop
+                            report has been uploaded yet.
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+            {% endif %}
+
+        </div>
+
     </div>
 
-    <div class="card-body">
 
-        <div class="row">
+    <!-- =====================================================
+         ACTION BAR
+    ====================================================== -->
 
-            <div class="col-md-6">
+    <div class="d-flex justify-content-between
+                align-items-center flex-wrap gap-2 mb-4">
 
-                <div class="mb-3">
-                    <strong>College</strong>
-                    <div>{{ workshop.college }}</div>
-                </div>
+        <div>
 
-                <div class="mb-3">
-                    <strong>Department</strong>
-                    <div>{{ workshop.departments }}</div>
-                </div>
+            {% if can_add_remark and not trainer_report_exists %}
 
-                <div class="mb-3">
-                    <strong>Workshop Remarks</strong>
-                    <div>
-                        {{ workshop.remarks|default:"No remarks available." }}
-                    </div>
-                </div>
+                <a
+                    href="{% url 'add_workshop_remark' workshop.id %}"
+                    class="btn btn-success action-btn">
 
-            </div>
+                    <i class="bi bi-journal-plus me-1"></i>
 
-            <div class="col-md-6">
+                    Add My Remark
 
-                <div class="mb-3">
-                    <strong>Start Date</strong>
-                    <div>{{ workshop.start_date }}</div>
-                </div>
+                </a>
 
-                <div class="mb-3">
-                    <strong>End Date</strong>
-                    <div>{{ workshop.end_date }}</div>
-                </div>
-
-                <div class="mb-3">
-                    <strong>Created On</strong>
-                    <div>{{ workshop.created_on|date:"d M Y H:i" }}</div>
-                </div>
-
-            </div>
+            {% endif %}
 
         </div>
 
-        <hr>
 
-        <!-- Assigned Trainers -->
-        <h5 class="mb-3">
-            <i class="bi bi-people-fill text-primary"></i>
-            Assigned Trainers
-        </h5>
+        <div class="d-flex flex-wrap gap-2">
 
-        {% for trainer_item in workshop.assigned_trainers.all %}
-            <span class="badge bg-dark p-2 me-2 mb-2">
-                {{ trainer_item.Name }}
-            </span>
-        {% empty %}
-            <p class="text-muted">
-                No trainers assigned.
-            </p>
-        {% endfor %}
+            {% if request.user.is_superuser %}
 
-        <hr>
+                <a
+                    href="{% url 'edit_workshop' workshop.id %}"
+                    class="btn btn-warning action-btn">
 
-        {% if workshop.report %}
-        <div class="mb-3">
+                    <i class="bi bi-pencil-square me-1"></i>
 
-            <strong>Workshop Report</strong><br>
+                    Edit Workshop
 
-            <a href="{{ workshop.report.url }}"
-               target="_blank"
-               class="btn btn-outline-success mt-2">
+                </a>
 
-                <i class="bi bi-download"></i>
-                Download Report
+                <button
+                    type="button"
+                    class="btn btn-danger btn-delete"
+                    data-bs-toggle="modal"
+                    data-bs-target="#deleteWorkshopModal">
+
+                    <i class="bi bi-trash3 me-1"></i>
+
+                    Delete Workshop
+
+                </button>
+
+            {% endif %}
+
+
+            <a
+                href="{% url 'workshop_list' %}"
+                class="btn btn-secondary action-btn">
+
+                <i class="bi bi-arrow-left me-1"></i>
+
+                Back to Workshops
 
             </a>
 
         </div>
-        {% endif %}
 
     </div>
 
-</div>
 
-<!-- Action Buttons -->
-<div class="d-flex justify-content-between mb-4">
+    <!-- =====================================================
+         TRAINER REPORTS
+    ====================================================== -->
 
-    <div>
+    <div class="section-card">
 
-        {% if can_add_remark and not trainer_report_exists %}
+        <div class="section-header">
 
-        <a href="{% url 'add_workshop_remark' workshop.id %}"
-           class="btn btn-success">
+            <div class="d-flex justify-content-between
+                        align-items-center flex-wrap gap-2">
 
-            <i class="bi bi-journal-plus"></i>
-            Add My Remark
+                <div>
 
-        </a>
+                    <h4 class="section-title">
 
-        {% endif %}
+                        <i class="bi bi-journal-text text-primary me-1"></i>
 
-    </div>
+                        Trainer Remarks & Learning Reports
 
-    <div>
+                    </h4>
 
-        {% if request.user.is_superuser %}
+                    <div class="section-subtitle">
 
-        <a href="{% url 'edit_workshop' workshop.id %}"
-           class="btn btn-warning">
-
-            <i class="bi bi-pencil-square"></i>
-            Edit Workshop
-
-        </a>
-
-        {% endif %}
-
-        <a href="{% url 'workshop_list' %}"
-           class="btn btn-secondary">
-
-            <i class="bi bi-arrow-left"></i>
-            Back
-
-        </a>
-
-    </div>
-
-</div>
-
-<!-- Trainer Reports -->
-<div class="card shadow border-0">
-
-    <div class="card-header bg-dark text-white">
-        <h4 class="mb-0">
-            <i class="bi bi-journal-text"></i>
-            Trainer Remarks & Learning Reports
-        </h4>
-    </div>
-
-    <div class="card-body">
-
-        {% for remark in workshop.trainer_reports.all %}
-
-        <div class="card shadow-sm border-start border-4 border-primary mb-4">
-
-            <div class="card-body">
-
-                <div class="d-flex justify-content-between align-items-center">
-
-                    <div>
-
-                        <h5 class="text-primary mb-1">
-                            <i class="bi bi-person-circle"></i>
-                            {{ remark.trainer.Name }}
-                        </h5>
-
-                        <small class="text-muted">
-                            Submitted on
-                            {{ remark.created_at|date:"d M Y H:i" }}
-                        </small>
-
-                    </div>
-
-                    <div>
-
-                        {% if request.user.is_superuser or trainer == remark.trainer %}
-
-                        <a href="{% url 'edit_workshop_remark' remark.id %}"
-                           class="btn btn-warning btn-sm">
-
-                            <i class="bi bi-pencil-square"></i>
-                            Edit
-
-                        </a>
-
-                        {% endif %}
+                        Trainer-wise workshop feedback, learning outcomes
+                        and observations.
 
                     </div>
 
                 </div>
 
-                <hr>
 
-                <div class="row">
+                <span class="badge bg-light text-dark">
 
-                    <div class="col-md-6">
+                    {{ workshop.trainer_reports.all|length }}
 
-                        <h6 class="fw-bold">Topics Covered</h6>
-                        <p>{{ remark.topics_covered }}</p>
+                    Report{{ workshop.trainer_reports.all|length|pluralize }}
 
-                    </div>
-
-                    <div class="col-md-6">
-
-                        <h6 class="fw-bold">Activities Conducted</h6>
-                        <p>{{ remark.activities_conducted|default:"Not provided" }}</p>
-
-                    </div>
-
-                </div>
-
-                <div class="row">
-
-                    <div class="col-md-6">
-
-                        <h6 class="fw-bold">Blockers Faced</h6>
-                        <p>{{ remark.blockers_faced|default:"None" }}</p>
-
-                    </div>
-
-                    <div class="col-md-6">
-
-                        <h6 class="fw-bold">Learning Outcomes</h6>
-                        <p>{{ remark.learning_outcomes|default:"Not provided" }}</p>
-
-                    </div>
-
-                </div>
-
-                <div class="row">
-
-                    <div class="col-md-6">
-
-                        <h6 class="fw-bold">Innovation Added</h6>
-                        <p>{{ remark.innovation_added|default:"None" }}</p>
-
-                    </div>
-
-                    <div class="col-md-6">
-
-                        <h6 class="fw-bold">Improvement Suggestions</h6>
-                        <p>{{ remark.improvement_suggestions|default:"None" }}</p>
-
-                    </div>
-
-                </div>
-
-                <div class="row mt-3">
-
-                    <div class="col-md-4">
-
-                        <strong>Notes Prepared</strong><br>
-
-                        {% if remark.notes_prepared %}
-                            <span class="badge bg-success">
-                                Yes
-                            </span>
-                        {% else %}
-                            <span class="badge bg-danger">
-                                No
-                            </span>
-                        {% endif %}
-
-                    </div>
-
-                    <div class="col-md-4">
-
-                        <strong>Rating</strong><br>
-
-                        <span class="badge bg-warning text-dark">
-                            ⭐ {{ remark.overall_rating }}/5
-                        </span>
-
-                    </div>
-
-                    <div class="col-md-4">
-
-                        <strong>Notes Link</strong><br>
-
-                        {% if remark.notes_link %}
-
-                        <a href="{{ remark.notes_link }}"
-                           target="_blank"
-                           class="btn btn-outline-primary btn-sm mt-1">
-
-                            Open Notes
-
-                        </a>
-
-                        {% else %}
-
-                        <span class="text-muted">
-                            Not Available
-                        </span>
-
-                        {% endif %}
-
-                    </div>
-
-                </div>
-
-                <hr>
-
-                <h6 class="fw-bold">
-                    Student Feedback
-                </h6>
-
-                <div class="alert alert-light border">
-                    {{ remark.student_feedback|default:"No feedback provided." }}
-                </div>
+                </span>
 
             </div>
 
         </div>
 
-        {% empty %}
 
-        <div class="alert alert-info">
-            <i class="bi bi-info-circle"></i>
-            No trainer remarks submitted yet.
+        <div class="section-body">
+
+            {% for remark in workshop.trainer_reports.all %}
+
+                <div class="report-card">
+
+                    <!-- Report Header -->
+
+                    <div class="report-header">
+
+                        <div class="d-flex justify-content-between
+                                    align-items-center flex-wrap gap-3">
+
+                            <div>
+
+                                <div class="report-trainer">
+
+                                    <i class="bi bi-person-circle me-1"></i>
+
+                                    {{ remark.trainer.Name }}
+
+                                </div>
+
+                                <div class="report-date">
+
+                                    Submitted on
+                                    {{ remark.created_at|date:"d M Y H:i" }}
+
+                                </div>
+
+                            </div>
+
+
+                            <div>
+
+                                {% if request.user.is_superuser or trainer == remark.trainer %}
+
+                                    <a
+                                        href="{% url 'edit_workshop_remark' remark.id %}"
+                                        class="btn btn-warning btn-sm action-btn">
+
+                                        <i class="bi bi-pencil-square me-1"></i>
+
+                                        Edit Report
+
+                                    </a>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Report Body -->
+
+                    <div class="report-body">
+
+                        <div class="row g-3">
+
+                            <!-- Topics -->
+
+                            <div class="col-lg-6">
+
+                                <div class="report-label">
+                                    Topics Covered
+                                </div>
+
+                                <div class="report-text">
+
+                                    {{ remark.topics_covered|default:"Not provided" }}
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Activities -->
+
+                            <div class="col-lg-6">
+
+                                <div class="report-label">
+                                    Activities Conducted
+                                </div>
+
+                                <div class="report-text">
+
+                                    {{ remark.activities_conducted|default:"Not provided" }}
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Blockers -->
+
+                            <div class="col-lg-6">
+
+                                <div class="report-label">
+                                    Blockers Faced
+                                </div>
+
+                                <div class="report-text">
+
+                                    {{ remark.blockers_faced|default:"None" }}
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Learning -->
+
+                            <div class="col-lg-6">
+
+                                <div class="report-label">
+                                    Learning Outcomes
+                                </div>
+
+                                <div class="report-text">
+
+                                    {{ remark.learning_outcomes|default:"Not provided" }}
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Innovation -->
+
+                            <div class="col-lg-6">
+
+                                <div class="report-label">
+                                    Innovation Added
+                                </div>
+
+                                <div class="report-text">
+
+                                    {{ remark.innovation_added|default:"None" }}
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Improvements -->
+
+                            <div class="col-lg-6">
+
+                                <div class="report-label">
+                                    Improvement Suggestions
+                                </div>
+
+                                <div class="report-text">
+
+                                    {{ remark.improvement_suggestions|default:"None" }}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- =================================================
+                             REPORT META
+                        ================================================== -->
+
+                        <div class="row g-3 mt-2">
+
+                            <div class="col-md-4">
+
+                                <div class="report-meta-card">
+
+                                    <div class="report-meta-label">
+                                        Notes Prepared
+                                    </div>
+
+                                    <div class="report-meta-value">
+
+                                        {% if remark.notes_prepared %}
+
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle me-1"></i>
+                                                Yes
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="badge bg-danger">
+                                                <i class="bi bi-x-circle me-1"></i>
+                                                No
+                                            </span>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-md-4">
+
+                                <div class="report-meta-card">
+
+                                    <div class="report-meta-label">
+                                        Overall Rating
+                                    </div>
+
+                                    <div class="report-meta-value">
+
+                                        <span class="badge bg-warning text-dark">
+
+                                            <i class="bi bi-star-fill me-1"></i>
+
+                                            {{ remark.overall_rating }}/5
+
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-md-4">
+
+                                <div class="report-meta-card">
+
+                                    <div class="report-meta-label">
+                                        Notes Link
+                                    </div>
+
+                                    <div class="report-meta-value">
+
+                                        {% if remark.notes_link %}
+
+                                            <a
+                                                href="{{ remark.notes_link }}"
+                                                target="_blank"
+                                                class="btn btn-outline-primary btn-sm">
+
+                                                <i class="bi bi-box-arrow-up-right me-1"></i>
+
+                                                Open Notes
+
+                                            </a>
+
+                                        {% else %}
+
+                                            <span class="text-muted">
+                                                Not Available
+                                            </span>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- =================================================
+                             STUDENT FEEDBACK
+                        ================================================== -->
+
+                        <div class="mt-4">
+
+                            <div class="report-label">
+                                Student Feedback
+                            </div>
+
+                            <div class="feedback-box">
+
+                                {{ remark.student_feedback|default:"No feedback provided." }}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% empty %}
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+
+                        <i class="bi bi-journal-x"></i>
+
+                    </div>
+
+                    <h5 class="fw-bold">
+                        No Trainer Reports Yet
+                    </h5>
+
+                    <p class="mb-3">
+                        No trainer remarks or learning reports have been
+                        submitted for this workshop.
+                    </p>
+
+                    {% if can_add_remark and not trainer_report_exists %}
+
+                        <a
+                            href="{% url 'add_workshop_remark' workshop.id %}"
+                            class="btn btn-primary action-btn">
+
+                            <i class="bi bi-journal-plus me-1"></i>
+
+                            Add My Remark
+
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+            {% endfor %}
+
         </div>
-
-        {% endfor %}
 
     </div>
 
 </div>
-```
+
+
+<!-- =========================================================
+     DELETE WORKSHOP CONFIRMATION MODAL
+========================================================== -->
+
+<div
+    class="modal fade"
+    id="deleteWorkshopModal"
+    tabindex="-1"
+    aria-labelledby="deleteWorkshopModalLabel"
+    aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content border-0 shadow-lg">
+
+            <div class="modal-body text-center p-5">
+
+                <div class="delete-modal-icon">
+
+                    <i class="bi bi-trash3"></i>
+
+                </div>
+
+                <h4
+                    class="delete-modal-title"
+                    id="deleteWorkshopModalLabel">
+
+                    Delete Workshop?
+
+                </h4>
+
+                <p class="text-muted mt-2">
+
+                    You are about to permanently delete:
+
+                </p>
+
+                <div class="alert alert-light border">
+
+                    <strong>
+                        {{ workshop.title }}
+                    </strong>
+
+                    <br>
+
+                    <small class="text-muted">
+
+                        {{ workshop.college }}
+
+                        <br>
+
+                        {{ workshop.start_date|date:"d M Y" }}
+
+                        -
+
+                        {{ workshop.end_date|date:"d M Y" }}
+
+                    </small>
+
+                </div>
+
+                <div class="alert alert-danger text-start">
+
+                    <i class="bi bi-exclamation-triangle me-1"></i>
+
+                    <strong>Warning:</strong>
+
+                    This action cannot be undone. Related trainer reports
+                    associated with this workshop may also be deleted.
+
+                </div>
+
+                <form
+                    method="post"
+                    action="{% url 'delete_workshop' workshop.id %}">
+
+                    {% csrf_token %}
+
+                    <div class="d-flex justify-content-center gap-2">
+
+                        <button
+                            type="button"
+                            class="btn btn-secondary action-btn"
+                            data-bs-dismiss="modal">
+
+                            Cancel
+
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="btn btn-danger action-btn">
+
+                            <i class="bi bi-trash3 me-1"></i>
+
+                            Yes, Delete Workshop
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
