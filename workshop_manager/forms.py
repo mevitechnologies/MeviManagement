@@ -1,5 +1,5 @@
 from django import forms
-
+from django.forms import modelformset_factory
 from .models import (
     Trainer,
     Workshop,
@@ -371,74 +371,81 @@ class OfficeTrainingForm(forms.ModelForm):
 # TODO TASK FORM
 # =========================================================
 
+# =====================================================
+# TODO TASK FORM
+# =====================================================
+
 class TodoTaskForm(forms.ModelForm):
 
     class Meta:
+
         model = TodoTask
 
         fields = [
             "trainer",
             "task",
             "description",
+            "category",
             "for_date",
             "priority",
             "estimated_hours",
         ]
 
         widgets = {
+
             "trainer": forms.Select(
                 attrs={
-                    "class": "form-select",
+                    "class": "form-control"
                 }
             ),
+
             "task": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "Enter task",
+                    "placeholder": "Enter work title"
                 }
             ),
+
             "description": forms.Textarea(
                 attrs={
                     "class": "form-control",
-                    "rows": 2,
-                    "placeholder": "Task description",
+                    "rows": 4,
+                    "placeholder": "Describe the work"
                 }
             ),
+
+            "category": forms.Select(
+                attrs={
+                    "class": "form-control"
+                }
+            ),
+
             "for_date": forms.DateInput(
                 attrs={
                     "class": "form-control",
-                    "type": "date",
+                    "type": "date"
                 }
             ),
+
             "priority": forms.Select(
                 attrs={
-                    "class": "form-select",
+                    "class": "form-control"
                 }
             ),
+
             "estimated_hours": forms.NumberInput(
                 attrs={
                     "class": "form-control",
                     "step": "0.5",
-                    "min": "0",
+                    "min": "0"
                 }
             ),
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Defensive filtering in addition to the model's
-        # limit_choices_to.
-        self.fields["trainer"].queryset = (
-            Trainer.objects
-            .filter(is_full_time=True)
-            .order_by("Name")
-        )
-
-
-# =========================================================
+             #====================================
 # SUBTASK FORM
 # =========================================================
+
 
 class SubTaskForm(forms.ModelForm):
 
@@ -463,10 +470,31 @@ class SubTaskForm(forms.ModelForm):
 # SUBTASK FORMSET
 # =========================================================
 
-SubTaskFormSet = forms.modelformset_factory(
+class SubTaskForm(forms.ModelForm):
+
+    class Meta:
+
+        model = SubTask
+
+        fields = [
+            "title"
+        ]
+
+        widgets = {
+
+            "title": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Enter subtask"
+                }
+            )
+        }
+
+
+SubTaskFormSet = modelformset_factory(
     SubTask,
     form=SubTaskForm,
-    extra=3,
+    extra=3
 )
 
 

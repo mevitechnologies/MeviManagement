@@ -90,6 +90,11 @@ class Trainer(models.Model):
         null=True,
         blank=True,
     )
+    profile_photo = models.ImageField(
+    upload_to="trainer_photos/",
+    blank=True,
+    null=True
+    )
 
     Name = models.CharField(
         max_length=35,
@@ -347,6 +352,18 @@ class OfficeTraining(models.Model):
 
 class TodoTask(models.Model):
 
+    CATEGORY_CHOICES = [
+        ("training", "Training"),
+        ("preparation", "Preparation"),
+        ("development", "Development"),
+        ("content", "Content Development"),
+        ("research", "Research"),
+        ("meeting", "Meeting"),
+        ("documentation", "Documentation"),
+        ("admin", "Administration"),
+        ("other", "Other"),
+    ]
+
     STATUS_CHOICES = [
         ("pending", "Pending"),
         ("in_progress", "In Progress"),
@@ -359,62 +376,50 @@ class TodoTask(models.Model):
         ("high", "High"),
     ]
 
-    # Only full-time trainers can own daily internal tasks
     trainer = models.ForeignKey(
         Trainer,
         on_delete=models.CASCADE,
-        limit_choices_to={
-            "is_full_time": True
-        },
+        limit_choices_to={"is_full_time": True},
     )
 
-    task = models.CharField(
-        max_length=255,
-    )
+    task = models.CharField(max_length=255)
 
     description = models.TextField(
         blank=True,
-        null=True,
+        null=True
+    )
+
+    category = models.CharField(
+        max_length=30,
+        choices=CATEGORY_CHOICES,
+        default="other"
     )
 
     for_date = models.DateField(
-        default=timezone.localdate,
+        default=timezone.localdate
     )
 
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
-        default="pending",
+        default="pending"
     )
 
     priority = models.CharField(
         max_length=10,
         choices=PRIORITY_CHOICES,
-        default="medium",
+        default="medium"
     )
 
     estimated_hours = models.DecimalField(
         max_digits=4,
         decimal_places=1,
-        default=1.0,
+        default=1.0
     )
 
-    is_done = models.BooleanField(
-        default=False,
-    )
+    is_done = models.BooleanField(default=False)
 
-    created_on = models.DateTimeField(
-        auto_now_add=True,
-    )
-
-    def __str__(self):
-        return (
-            f"{self.task} - "
-            f"{self.trainer.Name} "
-            f"({self.for_date})"
-        )
-
-
+    created_on = models.DateTimeField(auto_now_add=True)
 # =========================================================
 # SUB TASK
 # =========================================================

@@ -460,6 +460,7 @@ path(
     views.full_time_work_list,
     name="full_time_work_list"
 ),
+
 ]
 
 

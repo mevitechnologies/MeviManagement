@@ -1,778 +1,513 @@
 {% extends "base.html" %}
 
-{% block title %}Trainer Dashboard | Mevi Portal{% endblock %}
+{% block title %}Trainer Dashboard{% endblock %}
 
 {% block content %}
 
 <style>
 
 /* =========================================================
-   MEVI TRAINER DASHBOARD
-========================================================= */
+   TRAINER DASHBOARD
+   ========================================================= */
 
-.trainer-dashboard {
-    padding: 24px 0 60px;
-    color: #172033;
+:root {
+    --td-primary: #2563eb;
+    --td-primary-dark: #1d4ed8;
+    --td-success: #059669;
+    --td-danger: #dc2626;
+    --td-warning: #d97706;
+    --td-purple: #7c3aed;
+
+    --td-bg: #f5f7fb;
+    --td-card: #ffffff;
+    --td-border: #e5e7eb;
+
+    --td-text: #111827;
+    --td-muted: #6b7280;
+    --td-light: #9ca3af;
 }
 
 
 /* =========================================================
-   GLOBAL
-========================================================= */
+   MAIN
+   ========================================================= */
 
-.trainer-dashboard h1,
-.trainer-dashboard h2,
-.trainer-dashboard h3,
-.trainer-dashboard h4,
-.trainer-dashboard h5,
-.trainer-dashboard h6 {
-    color: #172033;
+.trainer-dashboard {
+    min-height: 100vh;
+    background: var(--td-bg);
+    padding: 24px;
 }
 
-.trainer-dashboard .text-muted {
-    color: #667085 !important;
+.trainer-container {
+    max-width: 1500px;
+    margin: 0 auto;
 }
 
 
 /* =========================================================
    HERO
-========================================================= */
+   ========================================================= */
 
-.hero-card {
-    border: 0;
-    border-radius: 22px;
-    overflow: hidden;
-
+.trainer-hero {
     background:
         linear-gradient(
             135deg,
-            #ffffff 0%,
-            #f5f3ff 55%,
-            #eef4ff 100%
+            #111827 0%,
+            #1f2937 55%,
+            #111827 100%
         );
 
-    box-shadow:
-        0 12px 35px rgba(15,23,42,.07);
-}
+    color: white;
 
+    border-radius: 24px;
 
-.hero-card .card-body {
-    padding: 30px;
-}
+    padding: 28px 32px;
 
-
-.hero-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-
-    padding: 7px 12px;
-
-    border-radius: 30px;
-
-    background: #ede9fe;
-
-    color: #5b4bdb;
-
-    font-size: 12px;
-
-    font-weight: 800;
-
-    letter-spacing: .7px;
-}
-
-
-.hero-title {
-    margin-top: 15px;
-
-    font-size: 31px;
-
-    line-height: 1.25;
-
-    font-weight: 800;
-
-    letter-spacing: -.7px;
-}
-
-
-.hero-subtitle {
-    margin-top: 7px;
-
-    color: #667085;
-
-    font-size: 15px;
-
-    font-weight: 500;
-}
-
-
-/* =========================================================
-   ATTENDANCE STATUS
-========================================================= */
-
-.attendance-box {
-    margin-top: 20px;
-
-    border-radius: 14px;
-
-    padding: 14px 17px;
-
-    display: inline-block;
-
-    min-width: 280px;
-
-    font-size: 14px;
-}
-
-
-.attendance-box small {
-    font-size: 13px;
-}
-
-
-.attendance-working {
-    background: #eaf8ef;
-
-    border: 1px solid #cdebd7;
-
-    color: #18733b;
-}
-
-
-.attendance-out {
-    background: #f1f3f5;
-
-    border: 1px solid #dfe3e8;
-
-    color: #5f6368;
-}
-
-
-.attendance-not {
-    background: #fff0f0;
-
-    border: 1px solid #ffd4d4;
-
-    color: #b42318;
-}
-
-
-/* =========================================================
-   ACTION BUTTONS
-========================================================= */
-
-.action-btn {
-    border-radius: 10px;
-
-    padding: 10px 16px;
-
-    font-size: 14px;
-
-    font-weight: 700;
-
-    transition:
-        transform .2s ease,
-        box-shadow .2s ease;
-}
-
-
-.action-btn:hover {
-    transform: translateY(-1px);
-}
-
-
-/* =========================================================
-   STATISTICS
-========================================================= */
-
-.stat-card {
-    height: 100%;
-
-    border: 1px solid #e8ebf0;
-
-    border-radius: 17px;
-
-    background: #ffffff;
+    margin-bottom: 22px;
 
     box-shadow:
-        0 5px 20px rgba(15,23,42,.05);
-
-    transition: .2s;
+        0 12px 30px rgba(15, 23, 42, 0.12);
 }
 
 
-.stat-card:hover {
-    transform: translateY(-3px);
-
-    box-shadow:
-        0 12px 28px rgba(15,23,42,.09);
-}
-
-
-.stat-card .card-body {
-    padding: 21px;
-}
-
-
-.stat-label {
-    font-size: 13px;
-
-    color: #667085;
-
-    font-weight: 600;
-}
-
-
-.stat-value {
-    font-size: 27px;
-
-    line-height: 1.2;
-
-    font-weight: 800;
-
-    margin-top: 8px;
-}
-
-
-.stat-icon {
-    width: 50px;
-    height: 50px;
-
-    border-radius: 14px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    font-size: 22px;
-}
-
-
-/* =========================================================
-   SECTION CARDS
-========================================================= */
-
-.section-card {
-    border: 1px solid #e7eaf0;
-
-    border-radius: 19px;
-
-    background: #ffffff;
-
-    box-shadow:
-        0 6px 24px rgba(15,23,42,.05);
-
-    overflow: hidden;
-}
-
-
-.section-header {
-    padding: 20px 22px;
-
-    background: #ffffff;
-
-    border-bottom: 1px solid #edf0f4;
-}
-
-
-.section-title {
-    font-size: 18px;
-
-    font-weight: 800;
-
-    margin: 0;
-}
-
-
-.section-subtitle {
-    font-size: 13px;
-
-    color: #667085;
-
-    margin-top: 5px;
-}
-
-
-/* =========================================================
-   TODAY'S WORK SUMMARY
-========================================================= */
-
-.work-summary {
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-}
-
-
-.work-summary-number {
-    font-size: 16px;
-
-    font-weight: 800;
-
-    color: #5b4bdb;
-}
-
-
-.work-summary-label {
-    color: #667085;
-
-    font-size: 13px;
-
-    font-weight: 600;
-}
-
-
-/* =========================================================
-   PROGRESS
-========================================================= */
-
-.progress-wrapper {
-    padding: 16px 22px;
-
-    background: #fafbff;
-
-    border-bottom: 1px solid #edf0f4;
-}
-
-
-.progress-info {
+.trainer-hero-inner {
     display: flex;
 
     justify-content: space-between;
 
     align-items: center;
 
-    margin-bottom: 8px;
-}
-
-
-.progress-info span {
-    font-size: 13px;
-
-    font-weight: 700;
-}
-
-
-.work-progress {
-    height: 9px;
-
-    border-radius: 20px;
-
-    background: #e9e7f8;
-
-    overflow: hidden;
-}
-
-
-.work-progress .progress-bar {
-    border-radius: 20px;
-
-    background:
-        linear-gradient(
-            90deg,
-            #5b4bdb,
-            #7c3aed
-        );
+    gap: 30px;
 }
 
 
 /* =========================================================
-   WORK CARD
-========================================================= */
+   PROFILE
+   ========================================================= */
 
-.work-card {
-    position: relative;
+.trainer-profile {
+    display: flex;
 
-    border: 1px solid #e8ebf0;
+    align-items: center;
 
-    border-radius: 14px;
+    gap: 18px;
 
-    padding: 17px;
-
-    background: #ffffff;
-
-    margin-bottom: 12px;
-
-    transition:
-        border .2s ease,
-        box-shadow .2s ease,
-        transform .2s ease;
+    min-width: 0;
 }
 
 
-.work-card:hover {
-    border-color: #d7d3f7;
+.trainer-profile-photo {
+    width: 82px;
+    height: 82px;
 
-    box-shadow:
-        0 7px 20px rgba(15,23,42,.06);
+    border-radius: 50%;
 
+    object-fit: cover;
+
+    border: 3px solid rgba(255,255,255,.9);
+
+    flex-shrink: 0;
+}
+
+
+.trainer-profile-placeholder {
+    width: 82px;
+    height: 82px;
+
+    border-radius: 50%;
+
+    background: #374151;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 30px;
+
+    font-weight: 800;
+
+    flex-shrink: 0;
+
+    border: 3px solid rgba(255,255,255,.8);
+}
+
+
+.trainer-welcome {
+    min-width: 0;
+}
+
+
+.trainer-welcome h1 {
+    margin: 0;
+
+    font-size: 28px;
+
+    font-weight: 800;
+
+    line-height: 1.2;
+}
+
+
+.trainer-welcome p {
+    margin: 6px 0 0;
+
+    color: rgba(255,255,255,.78);
+
+    font-size: 14px;
+}
+
+
+.trainer-date {
+    margin-top: 8px !important;
+
+    color: rgba(255,255,255,.6) !important;
+}
+
+
+/* =========================================================
+   ATTENDANCE
+   ========================================================= */
+
+.trainer-attendance {
+    text-align: right;
+
+    flex-shrink: 0;
+}
+
+
+.attendance-label {
+    font-size: 13px;
+
+    color: rgba(255,255,255,.65);
+
+    margin-bottom: 6px;
+}
+
+
+.attendance-status {
+    font-size: 16px;
+
+    font-weight: 700;
+
+    margin-bottom: 12px;
+}
+
+
+.attendance-time {
+    font-size: 12px;
+
+    color: rgba(255,255,255,.65);
+
+    margin-bottom: 12px;
+}
+
+
+.attendance-buttons {
+    display: flex;
+
+    gap: 8px;
+
+    justify-content: flex-end;
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.td-btn {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 6px;
+
+    min-height: 38px;
+
+    padding: 8px 14px;
+
+    border-radius: 9px;
+
+    border: 1px solid transparent;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    transition: .2s ease;
+}
+
+
+.td-btn:hover {
     transform: translateY(-1px);
 }
 
 
-.work-card:last-child {
-    margin-bottom: 0;
+.td-btn-primary {
+    background: var(--td-primary);
+
+    color: white;
 }
 
 
-.work-card.completed {
-    background: #fbfefc;
+.td-btn-primary:hover {
+    background: var(--td-primary-dark);
 
-    border-color: #d5eadc;
+    color: white;
 }
 
 
-.work-card.pending {
-    border-left: 4px solid #94a3b8;
+.td-btn-success {
+    background: var(--td-success);
+
+    color: white;
 }
 
 
-.work-card.in-progress {
-    border-left: 4px solid #f59e0b;
+.td-btn-danger {
+    background: var(--td-danger);
+
+    color: white;
 }
 
 
-.work-card.completed {
-    border-left: 4px solid #16a34a;
+.td-btn-secondary {
+    background: #f3f4f6;
+
+    color: #374151;
+
+    border-color: #e5e7eb;
+}
+
+
+.td-btn-white {
+    background: white;
+
+    color: #111827;
+}
+
+
+.td-btn-sm {
+    min-height: 32px;
+
+    padding: 6px 10px;
+
+    font-size: 12px;
 }
 
 
 /* =========================================================
-   TASK TITLE
-========================================================= */
+   STAT CARDS
+   ========================================================= */
 
-.task-title {
-    font-size: 16px;
+.td-stats {
+    display: grid;
 
-    font-weight: 800;
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
 
-    line-height: 1.45;
+    gap: 14px;
 
-    color: #172033;
+    margin-bottom: 22px;
 }
 
 
-.task-description {
-    font-size: 14px;
+.td-stat-card {
+    background: white;
 
-    line-height: 1.55;
+    border: 1px solid var(--td-border);
 
-    color: #667085;
+    border-radius: 16px;
 
-    margin-top: 6px;
+    padding: 18px;
+
+    box-shadow:
+        0 3px 12px rgba(15,23,42,.04);
 }
 
 
-/* =========================================================
-   TASK META
-========================================================= */
-
-.task-meta {
+.td-stat-top {
     display: flex;
 
-    flex-wrap: wrap;
+    align-items: center;
 
-    gap: 12px;
-
-    margin-top: 11px;
+    justify-content: space-between;
 }
 
 
-.task-meta-item {
+.td-stat-label {
     font-size: 12px;
 
-    color: #667085;
+    color: var(--td-muted);
 
     font-weight: 600;
 }
 
 
-.task-meta-item i {
-    margin-right: 4px;
-}
+.td-stat-icon {
+    width: 34px;
+    height: 34px;
 
-
-/* =========================================================
-   STATUS BADGES
-========================================================= */
-
-.task-status {
-    display: inline-flex;
-
-    align-items: center;
-
-    gap: 5px;
-
-    padding: 6px 10px;
-
-    border-radius: 20px;
-
-    font-size: 11px;
-
-    font-weight: 800;
-
-    white-space: nowrap;
-}
-
-
-.status-pending {
-    background: #f1f5f9;
-
-    color: #475569;
-}
-
-
-.status-progress {
-    background: #fff5d8;
-
-    color: #996600;
-}
-
-
-.status-completed {
-    background: #e8f8ed;
-
-    color: #18733b;
-}
-
-
-/* =========================================================
-   TASK ACTIONS
-========================================================= */
-
-.task-actions {
-    margin-top: 14px;
-
-    display: flex;
-
-    justify-content: flex-end;
-
-    gap: 8px;
-
-    flex-wrap: wrap;
-}
-
-
-.task-actions .btn {
-    font-size: 12px;
-
-    font-weight: 700;
-
-    border-radius: 8px;
-
-    padding: 7px 11px;
-}
-
-
-/* =========================================================
-   EMPTY STATE
-========================================================= */
-
-.empty-state {
-    text-align: center;
-
-    padding: 45px 20px;
-
-    color: #8a919d;
-}
-
-
-.empty-icon {
-    width: 60px;
-    height: 60px;
-
-    border-radius: 18px;
-
-    margin: 0 auto 15px;
+    border-radius: 9px;
 
     display: flex;
 
     align-items: center;
+
     justify-content: center;
 
-    font-size: 28px;
+    background: #eff6ff;
 
-    background: #f3f4f6;
-}
+    color: var(--td-primary);
 
-
-/* =========================================================
-   LEARNING
-========================================================= */
-
-.learning-box {
-    background:
-        linear-gradient(
-            135deg,
-            #effbf3,
-            #ffffff
-        );
-
-    border: 1px solid #dcefe3;
-
-    border-radius: 15px;
-
-    padding: 21px;
-
-    font-size: 14px;
-
-    line-height: 1.65;
-}
-
-
-.learning-title {
     font-size: 15px;
 
     font-weight: 800;
-
-    color: #18733b;
-
-    margin-bottom: 9px;
 }
 
 
-/* =========================================================
-   WEEKLY SCHEDULE
-========================================================= */
-
-.schedule-table {
-    min-width: 1000px;
-
-    margin: 0;
-}
-
-
-.schedule-table th {
-    background: #f8f9fb;
-
-    color: #667085;
-
-    font-size: 12px;
+.td-stat-number {
+    font-size: 27px;
 
     font-weight: 800;
 
-    text-transform: uppercase;
+    color: var(--td-text);
 
-    letter-spacing: .3px;
-
-    white-space: nowrap;
-
-    padding: 13px;
+    margin-top: 10px;
 }
 
 
-.schedule-table td {
-    font-size: 14px;
-
-    vertical-align: middle;
-
-    padding: 14px 13px;
-
-    color: #344054;
-}
-
-
-.schedule-table tr:hover {
-    background: #fafbff;
-}
-
-
-/* =========================================================
-   EVENT BADGES
-========================================================= */
-
-.type-badge {
-    display: inline-flex;
-
-    align-items: center;
-
-    padding: 6px 10px;
-
-    border-radius: 20px;
+.td-stat-sub {
+    color: var(--td-light);
 
     font-size: 11px;
 
-    font-weight: 800;
-
-    white-space: nowrap;
-}
-
-
-.badge-workshop {
-    background: #e8f1ff;
-    color: #1555a6;
-}
-
-
-.badge-fdp {
-    background: #f1e8ff;
-    color: #6637a6;
-}
-
-
-.badge-online {
-    background: #e7f8ff;
-    color: #087a9c;
-}
-
-
-.badge-office {
-    background: #fff4dd;
-    color: #946200;
-}
-
-
-.badge-guest {
-    background: #e8f8ed;
-    color: #18733b;
-}
-
-
-.badge-meeting {
-    background: #eeeeee;
-    color: #555;
-}
-
-
-.badge-other {
-    background: #f1f1f1;
-    color: #555;
+    margin-top: 3px;
 }
 
 
 /* =========================================================
-   WORKSHOPS
-========================================================= */
+   MAIN GRID
+   ========================================================= */
 
-.workshop-card {
-    height: 100%;
+.td-main-grid {
+    display: grid;
 
-    border: 1px solid #e7eaf0;
+    grid-template-columns:
+        minmax(0, 2fr)
+        minmax(310px, 1fr);
 
-    border-radius: 15px;
+    gap: 20px;
 
-    background: #ffffff;
-
-    padding: 18px;
-
-    transition: .2s;
+    align-items: start;
 }
 
 
-.workshop-card:hover {
-    transform: translateY(-3px);
+/* =========================================================
+   CARD
+   ========================================================= */
+
+.td-card {
+    background: var(--td-card);
+
+    border: 1px solid var(--td-border);
+
+    border-radius: 18px;
+
+    padding: 21px;
+
+    margin-bottom: 20px;
 
     box-shadow:
-        0 9px 24px rgba(15,23,42,.07);
-
-    border-color: #d8d3f7;
+        0 3px 12px rgba(15,23,42,.035);
 }
 
 
-.workshop-title {
+.td-card-header {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 18px;
+}
+
+
+.td-card-title {
+    font-size: 18px;
+
+    font-weight: 800;
+
+    color: var(--td-text);
+}
+
+
+.td-card-subtitle {
+    font-size: 12px;
+
+    color: var(--td-muted);
+
+    margin-top: 3px;
+}
+
+
+/* =========================================================
+   TASK
+   ========================================================= */
+
+.td-task {
+    border: 1px solid var(--td-border);
+
+    border-radius: 13px;
+
+    padding: 16px;
+
+    margin-bottom: 12px;
+
+    transition: .2s ease;
+
+    background: #fff;
+}
+
+
+.td-task:hover {
+    border-color: #cbd5e1;
+
+    box-shadow:
+        0 5px 15px rgba(15,23,42,.05);
+}
+
+
+.td-task:last-child {
+    margin-bottom: 0;
+}
+
+
+.td-task-main {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    gap: 15px;
+}
+
+
+.td-task-title {
+    color: var(--td-text);
+
     font-size: 15px;
 
     font-weight: 800;
@@ -781,538 +516,922 @@
 }
 
 
-.workshop-meta {
+.td-task-description {
+    color: var(--td-muted);
+
     font-size: 13px;
 
-    color: #667085;
+    margin-top: 5px;
 
-    margin-top: 8px;
-
-    line-height: 1.6;
-}
-
-
-/* =========================================================
-   MODAL
-========================================================= */
-
-.modal-content {
-    border: 0;
-
-    border-radius: 19px;
-
-    overflow: hidden;
-
-    box-shadow:
-        0 25px 70px rgba(15,23,42,.20);
-}
-
-
-.modal-header {
-    padding: 20px 22px;
-
-    border-bottom: 1px solid #edf0f4;
-}
-
-
-.modal-title {
-    font-size: 20px;
-
-    font-weight: 800;
-}
-
-
-.modal-body {
-    padding: 22px;
-}
-
-
-.modal-footer {
-    padding: 17px 22px;
-
-    border-top: 1px solid #edf0f4;
-}
-
-
-.form-label {
-    font-size: 14px;
-
-    font-weight: 700;
-}
-
-
-.form-control {
-    border-radius: 10px;
-
-    padding: 12px 13px;
-
-    font-size: 14px;
-
-    border-color: #dfe3e8;
-}
-
-
-.form-control:focus {
-
-    border-color: #8b80e8;
-
-    box-shadow:
-        0 0 0 .2rem rgba(91,75,219,.10);
-}
-
-
-/* =========================================================
-   MOBILE
-========================================================= */
-
-@media(max-width: 768px) {
-
-    .trainer-dashboard {
-        padding-top: 15px;
-    }
-
-
-    .hero-card .card-body {
-        padding: 22px 18px;
-    }
-
-
-    .hero-title {
-        font-size: 24px;
-    }
-
-
-    .hero-subtitle {
-        font-size: 14px;
-    }
-
-
-    .attendance-box {
-        min-width: 100%;
-
-        font-size: 13px;
-    }
-
-
-    .stat-card .card-body {
-        padding: 17px;
-    }
-
-
-    .stat-value {
-        font-size: 24px;
-    }
-
-
-    .section-header {
-        padding: 17px;
-    }
-
-
-    .section-title {
-        font-size: 17px;
-    }
-
-
-    .task-title {
-        font-size: 15px;
-    }
-
-
-    .task-description {
-        font-size: 13px;
-    }
-
-
-    .task-actions {
-        justify-content: flex-start;
-    }
-
-
-    .schedule-table {
-        min-width: 1000px;
-    }
-
-}
-
-
-@media(max-width: 480px) {
-
-    .hero-title {
-        font-size: 22px;
-    }
-
-
-    .action-btn {
-        width: 100%;
-    }
-
-
-    .work-summary {
-        margin-top: 8px;
-    }
-
-}
-
-
-/* =========================================================
-   PREVIOUS 7 DAYS WORK
-========================================================= */
-
-.history-card {
-    border: 1px solid #e7eaf0;
-    border-radius: 19px;
-    background: #ffffff;
-    box-shadow: 0 6px 24px rgba(15,23,42,.05);
-    overflow: hidden;
-}
-
-.history-summary {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.history-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 6px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 800;
-    border: 1px solid #e7eaf0;
-    background: #f8fafc;
-    color: #475569;
-}
-
-.history-pill.completed {
-    background: #e8f8ed;
-    border-color: #d5eadc;
-    color: #18733b;
-}
-
-.history-pill.progress {
-    background: #fff5d8;
-    border-color: #f8e5a9;
-    color: #996600;
-}
-
-.history-pill.pending {
-    background: #f1f5f9;
-    border-color: #e2e8f0;
-    color: #475569;
-}
-
-.history-day {
-    border: 1px solid #e8ebf0;
-    border-radius: 15px;
-    margin-bottom: 12px;
-    overflow: hidden;
-}
-
-.history-day:last-child {
-    margin-bottom: 0;
-}
-
-.history-day-header {
-    background: #f8f9fb;
-    border-bottom: 1px solid #edf0f4;
-    padding: 12px 15px;
-}
-
-.history-day-title {
-    font-size: 14px;
-    font-weight: 800;
-    color: #172033;
-}
-
-.history-day-subtitle {
-    font-size: 12px;
-    color: #667085;
-    margin-top: 2px;
-}
-
-.history-task {
-    padding: 14px 15px;
-    border-bottom: 1px solid #f0f2f5;
-}
-
-.history-task:last-child {
-    border-bottom: 0;
-}
-
-.history-task-title {
-    font-size: 14px;
-    line-height: 1.45;
-    font-weight: 800;
-    color: #172033;
-}
-
-.history-task-description {
-    font-size: 12px;
     line-height: 1.5;
-    color: #667085;
-    margin-top: 4px;
 }
 
-.history-task-actions {
+
+.td-task-meta {
     display: flex;
+
     align-items: center;
-    justify-content: flex-end;
+
     flex-wrap: wrap;
+
     gap: 6px;
+
     margin-top: 10px;
 }
 
-.history-task-actions .btn {
-    font-size: 11px;
-    font-weight: 700;
-    border-radius: 8px;
-    padding: 6px 9px;
+
+/* =========================================================
+   BADGES
+   ========================================================= */
+
+.td-badge {
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 4px 9px;
+
+    border-radius: 20px;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    white-space: nowrap;
 }
 
-.date-badge {
-    display: inline-flex;
+
+.td-badge-neutral {
+    background: #f3f4f6;
+
+    color: #4b5563;
+}
+
+
+.td-badge-pending {
+    background: #fef3c7;
+
+    color: #92400e;
+}
+
+
+.td-badge-progress {
+    background: #dbeafe;
+
+    color: #1e40af;
+}
+
+
+.td-badge-completed {
+    background: #d1fae5;
+
+    color: #065f46;
+}
+
+
+.td-badge-high {
+    background: #fee2e2;
+
+    color: #991b1b;
+}
+
+
+.td-badge-medium {
+    background: #fef3c7;
+
+    color: #92400e;
+}
+
+
+.td-badge-low {
+    background: #e5e7eb;
+
+    color: #374151;
+}
+
+
+/* =========================================================
+   TASK ACTIONS
+   ========================================================= */
+
+.td-task-actions {
+    display: flex;
+
     align-items: center;
-    gap: 5px;
-    padding: 5px 9px;
-    border-radius: 8px;
-    background: #eef2ff;
-    color: #4338ca;
+
+    flex-wrap: wrap;
+
+    gap: 7px;
+
+    margin-top: 13px;
+
+    padding-top: 12px;
+
+    border-top: 1px solid #f1f5f9;
+}
+
+
+.td-task-actions form {
+    margin: 0;
+}
+
+
+/* =========================================================
+   SUBTASKS
+   ========================================================= */
+
+.td-subtasks {
+    margin-top: 13px;
+
+    padding: 11px 13px;
+
+    background: #f8fafc;
+
+    border-radius: 10px;
+
+    border-left: 3px solid #cbd5e1;
+}
+
+
+.td-subtasks-title {
     font-size: 11px;
+
+    font-weight: 800;
+
+    color: #64748b;
+
+    text-transform: uppercase;
+
+    margin-bottom: 7px;
+}
+
+
+.td-subtask {
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    font-size: 12px;
+
+    color: #475569;
+
+    padding: 4px 0;
+}
+
+
+.td-subtask-done {
+    color: #059669;
+
+    font-weight: 700;
+}
+
+
+.td-subtask-pending {
+    color: #64748b;
+}
+
+
+/* =========================================================
+   PROGRESS
+   ========================================================= */
+
+.td-progress-wrapper {
+    margin-top: 12px;
+}
+
+
+.td-progress-info {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 6px;
+
+    font-size: 12px;
+}
+
+
+.td-progress-info span {
+    color: var(--td-muted);
+}
+
+
+.td-progress-info strong {
+    color: var(--td-text);
+}
+
+
+.td-progress {
+    width: 100%;
+
+    height: 8px;
+
+    background: #e5e7eb;
+
+    border-radius: 20px;
+
+    overflow: hidden;
+}
+
+
+.td-progress-bar {
+    height: 100%;
+
+    background: var(--td-primary);
+
+    border-radius: 20px;
+
+    transition: width .3s ease;
+}
+
+
+/* =========================================================
+   SCHEDULE
+   ========================================================= */
+
+.td-schedule-day {
+    padding: 13px 15px;
+
+    border-left: 3px solid var(--td-primary);
+
+    background: #f8fafc;
+
+    border-radius: 0 10px 10px 0;
+
+    margin-bottom: 10px;
+}
+
+
+.td-schedule-day:last-child {
+    margin-bottom: 0;
+}
+
+
+.td-schedule-date {
+    font-weight: 800;
+
+    font-size: 13px;
+
+    color: var(--td-text);
+}
+
+
+.td-schedule-today {
+    color: var(--td-primary);
+}
+
+
+.td-event {
+    margin-top: 8px;
+
+    padding: 10px;
+
+    background: white;
+
+    border: 1px solid var(--td-border);
+
+    border-radius: 9px;
+}
+
+
+.td-event-title {
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+
+.td-event-meta {
+    margin-top: 4px;
+
+    color: var(--td-muted);
+
+    font-size: 11px;
+}
+
+
+.td-workshop {
+    margin-top: 8px;
+
+    padding: 10px;
+
+    background: #eff6ff;
+
+    border: 1px solid #dbeafe;
+
+    border-radius: 9px;
+}
+
+
+.td-workshop-title {
+    font-size: 13px;
+
+    font-weight: 800;
+
+    color: #1e3a8a;
+}
+
+
+.td-workshop-college {
+    margin-top: 3px;
+
+    font-size: 11px;
+
+    color: #475569;
+}
+
+
+/* =========================================================
+   MONTHLY SUMMARY
+   ========================================================= */
+
+.td-summary-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 10px;
+
+    margin-top: 18px;
+}
+
+
+.td-summary-item {
+    padding: 12px;
+
+    background: #f8fafc;
+
+    border-radius: 10px;
+}
+
+
+.td-summary-number {
+    font-size: 19px;
+
+    font-weight: 800;
+
+    color: var(--td-text);
+}
+
+
+.td-summary-label {
+    margin-top: 2px;
+
+    color: var(--td-muted);
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   CATEGORY
+   ========================================================= */
+
+.td-category {
+    margin-bottom: 16px;
+}
+
+
+.td-category:last-child {
+    margin-bottom: 0;
+}
+
+
+.td-category-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-bottom: 6px;
+
+    font-size: 12px;
+}
+
+
+.td-category-name {
+    font-weight: 700;
+
+    color: #374151;
+}
+
+
+.td-category-info {
+    color: var(--td-muted);
+}
+
+
+/* =========================================================
+   WORKSHOP
+   ========================================================= */
+
+.td-upcoming-workshop {
+    padding: 13px;
+
+    border: 1px solid var(--td-border);
+
+    border-radius: 11px;
+
+    margin-bottom: 10px;
+}
+
+
+.td-upcoming-workshop:last-child {
+    margin-bottom: 0;
+}
+
+
+.td-upcoming-title {
+    font-weight: 800;
+
+    font-size: 13px;
+}
+
+
+.td-upcoming-college {
+    color: var(--td-muted);
+
+    font-size: 12px;
+
+    margin-top: 4px;
+}
+
+
+.td-upcoming-date {
+    color: var(--td-primary);
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    margin-top: 6px;
+}
+
+
+/* =========================================================
+   LEARNING
+   ========================================================= */
+
+.td-learning {
+    padding: 12px 0;
+
+    border-bottom: 1px solid #f1f5f9;
+}
+
+
+.td-learning:first-child {
+    padding-top: 0;
+}
+
+
+.td-learning:last-child {
+    border-bottom: none;
+
+    padding-bottom: 0;
+}
+
+
+.td-learning-date {
+    color: var(--td-muted);
+
+    font-size: 11px;
+}
+
+
+.td-learning-text {
+    color: #374151;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+
+    margin-top: 4px;
+}
+
+
+/* =========================================================
+   OVERDUE
+   ========================================================= */
+
+.td-overdue {
+    padding: 12px;
+
+    border: 1px solid #fee2e2;
+
+    background: #fffafa;
+
+    border-radius: 10px;
+
+    margin-bottom: 9px;
+}
+
+
+.td-overdue:last-child {
+    margin-bottom: 0;
+}
+
+
+.td-overdue-title {
+    color: #991b1b;
+
+    font-size: 13px;
+
     font-weight: 800;
 }
 
-.quick-link {
-    text-decoration: none;
-    border: 1px solid #e7eaf0;
-    border-radius: 11px;
-    padding: 9px 12px;
-    color: #344054;
-    background: #fff;
+
+.td-overdue-date {
+    color: #b91c1c;
+
+    font-size: 11px;
+
+    margin-top: 3px;
+}
+
+
+/* =========================================================
+   EMPTY
+   ========================================================= */
+
+.td-empty {
+    padding: 28px 15px;
+
+    text-align: center;
+
+    color: var(--td-light);
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   PREVIOUS WORK
+   ========================================================= */
+
+.td-history-task {
+    display: grid;
+
+    grid-template-columns:
+        100px
+        minmax(0, 1fr)
+        auto;
+
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 13px 0;
+
+    border-bottom: 1px solid #f1f5f9;
+}
+
+
+.td-history-task:last-child {
+    border-bottom: none;
+}
+
+
+.td-history-date {
+    color: var(--td-muted);
+
     font-size: 12px;
+
+    font-weight: 600;
+}
+
+
+.td-history-title {
+    font-size: 13px;
+
     font-weight: 700;
-    transition: .2s;
+
+    color: var(--td-text);
 }
 
-.quick-link:hover {
-    color: #5b4bdb;
-    border-color: #d7d3f7;
-    background: #faf9ff;
+
+.td-history-meta {
+    color: var(--td-muted);
+
+    font-size: 11px;
+
+    margin-top: 3px;
 }
 
-@media(max-width: 768px) {
-    .history-task-actions {
+
+.td-history-actions {
+    display: flex;
+
+    gap: 6px;
+}
+
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+.td-error {
+    background: #fff1f2;
+
+    border: 1px solid #fecdd3;
+
+    color: #9f1239;
+
+    padding: 18px;
+
+    border-radius: 12px;
+
+    margin-bottom: 20px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1200px) {
+
+    .td-stats {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 1000px) {
+
+    .trainer-hero-inner {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .trainer-attendance {
+        text-align: left;
+
+        width: 100%;
+    }
+
+    .attendance-buttons {
         justify-content: flex-start;
     }
+
+    .td-main-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .trainer-dashboard {
+        padding: 12px;
+    }
+
+    .trainer-hero {
+        padding: 22px;
+
+        border-radius: 18px;
+    }
+
+    .trainer-profile-photo,
+    .trainer-profile-placeholder {
+        width: 65px;
+        height: 65px;
+    }
+
+    .trainer-welcome h1 {
+        font-size: 22px;
+    }
+
+    .td-stats {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .td-card {
+        padding: 16px;
+    }
+
+    .td-task-main {
+        flex-direction: column;
+    }
+
+    .td-history-task {
+        grid-template-columns: 1fr;
+        gap: 7px;
+    }
+
+}
+
+
+@media (max-width: 450px) {
+
+    .td-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .trainer-profile {
+        align-items: flex-start;
+    }
+
 }
 
 </style>
 
 
-<div class="container-fluid trainer-dashboard">
+<div class="trainer-dashboard">
+
+<div class="trainer-container">
+
+
+{% if error %}
+
+    <div class="td-error">
+        {{ error }}
+    </div>
+
+{% endif %}
 
 
 <!-- =========================================================
-     HERO / WELCOME
-========================================================= -->
+     HERO
+     ========================================================= -->
 
-<div class="card hero-card mb-4">
+<div class="trainer-hero">
 
-    <div class="card-body">
+    <div class="trainer-hero-inner">
 
-        <div class="row align-items-center">
+        <div class="trainer-profile">
 
-            <div class="col-lg-7">
+            {% if trainer.profile_photo %}
 
-                <div class="hero-label">
-                    <i class="bi bi-person-workspace"></i>
-                    TRAINER WORKSPACE
+                <img
+                    src="{{ trainer.profile_photo.url }}"
+                    alt="{{ trainer.Name }}"
+                    class="trainer-profile-photo"
+                >
+
+            {% else %}
+
+                <div class="trainer-profile-placeholder">
+                    {{ trainer.Name|first|upper }}
                 </div>
 
-
-                <div class="hero-title">
-                    👋 Welcome, {{ trainer.Name }}
-                </div>
+            {% endif %}
 
 
-                <div class="hero-subtitle">
-                    <i class="bi bi-calendar3 me-1"></i>
+            <div class="trainer-welcome">
+
+                <h1>
+                    Welcome, {{ trainer.Name }}
+                </h1>
+
+                <p>
+                    Trainer Workspace
+
+                    {% if trainer.expertise %}
+                        · {{ trainer.expertise }}
+                    {% endif %}
+                </p>
+
+                <p class="trainer-date">
                     {{ today|date:"l, d F Y" }}
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- ATTENDANCE -->
+
+        <div class="trainer-attendance">
+
+            {% if trainer.is_full_time %}
+
+                <div class="attendance-label">
+                    Today's Attendance
                 </div>
 
 
-                {% if is_full_time %}
+                {% if checked_in %}
 
-                    {% if attendance and attendance.check_in and not attendance.check_out %}
+                    <div class="attendance-status">
+                        Currently Working
+                    </div>
 
-                        <div class="attendance-box attendance-working">
+                    {% if attendance.check_in %}
 
-                            🟢
-                            <strong>
-                                You are currently working
-                            </strong>
+                        <div class="attendance-time">
 
-                            <br>
-
-                            <small>
-                                Checked in at
-                                <strong>
-                                    {{ attendance.check_in|date:"h:i A" }}
-                                </strong>
-                            </small>
-
-                        </div>
-
-
-                    {% elif attendance and attendance.check_out %}
-
-                        <div class="attendance-box attendance-out">
-
-                            ⚪
-                            <strong>
-                                Today's attendance completed
-                            </strong>
-
-                            <br>
-
-                            <small>
-                                Checked out at
-                                <strong>
-                                    {{ attendance.check_out|date:"h:i A" }}
-                                </strong>
-                            </small>
-
-                        </div>
-
-
-                    {% else %}
-
-                        <div class="attendance-box attendance-not">
-
-                            🔴
-                            <strong>
-                                You are not checked in
-                            </strong>
-
-                            <br>
-
-                            <small>
-                                Check in before adding today's work.
-                            </small>
+                            Checked in at
+                            {{ attendance.check_in|date:"h:i A" }}
 
                         </div>
 
                     {% endif %}
+
+
+                    <div class="attendance-buttons">
+
+                        <form
+                            method="post"
+                            action="{% url 'daily_checkin' %}"
+                        >
+
+                            {% csrf_token %}
+
+                            <input
+                                type="hidden"
+                                name="action"
+                                value="check_out"
+                            >
+
+                            <button
+                                type="submit"
+                                class="td-btn td-btn-danger"
+                            >
+                                Check Out
+                            </button>
+
+                        </form>
+
+                    </div>
+
+
+                {% elif checked_out %}
+
+                    <div class="attendance-status">
+                        Attendance Completed
+                    </div>
+
+                    {% if attendance.check_in %}
+
+                        <div class="attendance-time">
+
+                            {{ attendance.check_in|date:"h:i A" }}
+
+                            -
+
+                            {{ attendance.check_out|date:"h:i A" }}
+
+                        </div>
+
+                    {% endif %}
+
+                {% else %}
+
+                    <div class="attendance-status">
+                        Not Checked In
+                    </div>
+
+                    <div class="attendance-buttons">
+
+                        <form
+                            method="post"
+                            action="{% url 'daily_checkin' %}"
+                        >
+
+                            {% csrf_token %}
+
+                            <input
+                                type="hidden"
+                                name="action"
+                                value="check_in"
+                            >
+
+                            <button
+                                type="submit"
+                                class="td-btn td-btn-success"
+                            >
+                                Check In
+                            </button>
+
+                        </form>
+
+                    </div>
 
                 {% endif %}
 
-            </div>
+            {% else %}
 
-
-            <!-- ACTIONS -->
-
-            <div class="col-lg-5 mt-4 mt-lg-0">
-
-                <div class="d-flex justify-content-lg-end flex-wrap gap-2">
-
-                    {% if is_full_time %}
-
-                        {% if not attendance or not attendance.check_in %}
-
-                            <form
-                                method="POST"
-                                action="{% url 'daily_checkin' %}"
-                            >
-
-                                {% csrf_token %}
-
-                                <input
-                                    type="hidden"
-                                    name="action"
-                                    value="check_in"
-                                >
-
-                                <button
-                                    type="submit"
-                                    class="btn btn-success action-btn"
-                                >
-                                    <i class="bi bi-box-arrow-in-right me-1"></i>
-                                    Check In
-                                </button>
-
-                            </form>
-
-
-                        {% elif attendance.check_in and not attendance.check_out %}
-
-                            <form
-                                method="POST"
-                                action="{% url 'daily_checkin' %}"
-                            >
-
-                                {% csrf_token %}
-
-                                <input
-                                    type="hidden"
-                                    name="action"
-                                    value="check_out"
-                                >
-
-                                <button
-                                    type="submit"
-                                    class="btn btn-warning action-btn"
-                                >
-                                    <i class="bi bi-box-arrow-right me-1"></i>
-                                    Check Out
-                                </button>
-
-                            </form>
-
-                        {% endif %}
-
-
-                        {% if attendance and attendance.check_in and not attendance.check_out %}
-
-                            <button
-                                type="button"
-                                class="btn btn-primary action-btn"
-                                data-bs-toggle="modal"
-                                data-bs-target="#addWorkModal"
-                            >
-                                <i class="bi bi-plus-circle me-1"></i>
-                                Add Work
-                            </button>
-
-                        {% else %}
-
-                            <button
-                                type="button"
-                                class="btn btn-secondary action-btn"
-                                disabled
-                            >
-                                <i class="bi bi-lock me-1"></i>
-                                Add Work
-                            </button>
-
-                        {% endif %}
-
-                    {% endif %}
-
-
-                    <a
-                        href="{% url 'add_daily_learning' %}"
-                        class="btn btn-outline-success action-btn"
-                    >
-                        <i class="bi bi-book me-1"></i>
-                        Learning
-                    </a>
-
+                <div class="attendance-label">
+                    Trainer Type
                 </div>
 
-            </div>
+                <div class="attendance-status">
+                    External / Part Time
+                </div>
+
+            {% endif %}
 
         </div>
 
@@ -1321,207 +1440,133 @@
 </div>
 
 
-
 <!-- =========================================================
-     STATISTICS
-========================================================= -->
+     TOP STATISTICS
+     ========================================================= -->
 
-<div class="row g-3 mb-4">
-
-
-    <!-- TRAINER -->
-
-    <div class="col-xl-3 col-md-6">
-
-        <div class="card stat-card">
-
-            <div class="card-body">
-
-                <div class="d-flex justify-content-between">
-
-                    <div>
-
-                        <div class="stat-label">
-                            Trainer
-                        </div>
-
-                        <div class="stat-value">
-                            {{ trainer.Name }}
-                        </div>
+<div class="td-stats">
 
 
-                        {% if is_full_time %}
+    <div class="td-stat-card">
 
-                            <span class="badge bg-success mt-2">
-                                Full-Time
-                            </span>
+        <div class="td-stat-top">
 
-                        {% else %}
-
-                            <span class="badge bg-secondary mt-2">
-                                Trainer
-                            </span>
-
-                        {% endif %}
-
-                    </div>
-
-
-                    <div class="stat-icon bg-primary bg-opacity-10">
-                        <i class="bi bi-person-badge text-primary"></i>
-                    </div>
-
-                </div>
-
+            <div class="td-stat-label">
+                TODAY'S WORK
             </div>
 
+            <div class="td-stat-icon">
+                W
+            </div>
+
+        </div>
+
+        <div class="td-stat-number">
+            {{ total_tasks }}
+        </div>
+
+        <div class="td-stat-sub">
+            tasks planned today
         </div>
 
     </div>
 
 
-    <!-- TODAY WORK -->
+    <div class="td-stat-card">
 
-    <div class="col-xl-3 col-md-6">
+        <div class="td-stat-top">
 
-        <div class="card stat-card">
-
-            <div class="card-body">
-
-                <div class="d-flex justify-content-between">
-
-                    <div>
-
-                        <div class="stat-label">
-                            Today's Work
-                        </div>
-
-                        <div class="stat-value">
-                            {{ today_tasks|length }}
-                        </div>
-
-                        <div class="small text-muted mt-1">
-                            Work updates
-                        </div>
-
-                    </div>
-
-
-                    <div class="stat-icon bg-success bg-opacity-10">
-                        <i class="bi bi-briefcase text-success"></i>
-                    </div>
-
-                </div>
-
+            <div class="td-stat-label">
+                COMPLETED
             </div>
 
+            <div class="td-stat-icon">
+                ✓
+            </div>
+
+        </div>
+
+        <div class="td-stat-number">
+            {{ completed_tasks }}
+        </div>
+
+        <div class="td-stat-sub">
+            completed today
         </div>
 
     </div>
 
 
-    <!-- WEEKLY -->
+    <div class="td-stat-card">
 
-    <div class="col-xl-3 col-md-6">
+        <div class="td-stat-top">
 
-        <div class="card stat-card">
-
-            <div class="card-body">
-
-                <div class="d-flex justify-content-between">
-
-                    <div>
-
-                        <div class="stat-label">
-                            Weekly Schedule
-                        </div>
-
-                        <div class="stat-value">
-                            {{ weekly_schedule|length }}
-                        </div>
-
-                        <div class="small text-muted mt-1">
-                            Activities
-                        </div>
-
-                    </div>
-
-
-                    <div class="stat-icon bg-info bg-opacity-10">
-                        <i class="bi bi-calendar3 text-info"></i>
-                    </div>
-
-                </div>
-
+            <div class="td-stat-label">
+                IN PROGRESS
             </div>
 
+            <div class="td-stat-icon">
+                →
+            </div>
+
+        </div>
+
+        <div class="td-stat-number">
+            {{ in_progress_tasks }}
+        </div>
+
+        <div class="td-stat-sub">
+            currently active
         </div>
 
     </div>
 
 
-    <!-- ATTENDANCE -->
+    <div class="td-stat-card">
 
-    <div class="col-xl-3 col-md-6">
+        <div class="td-stat-top">
 
-        <div class="card stat-card">
-
-            <div class="card-body">
-
-                <div class="d-flex justify-content-between">
-
-                    <div>
-
-                        <div class="stat-label">
-                            Attendance
-                        </div>
-
-
-                        {% if is_full_time %}
-
-                            {% if attendance and attendance.check_in %}
-
-                                {% if attendance.check_out %}
-
-                                    <div class="stat-value text-secondary">
-                                        Checked Out
-                                    </div>
-
-                                {% else %}
-
-                                    <div class="stat-value text-success">
-                                        Working
-                                    </div>
-
-                                {% endif %}
-
-                            {% else %}
-
-                                <div class="stat-value text-danger">
-                                    Not Checked In
-                                </div>
-
-                            {% endif %}
-
-                        {% else %}
-
-                            <div class="stat-value text-muted">
-                                N/A
-                            </div>
-
-                        {% endif %}
-
-                    </div>
-
-
-                    <div class="stat-icon bg-warning bg-opacity-10">
-                        <i class="bi bi-clock text-warning"></i>
-                    </div>
-
-                </div>
-
+            <div class="td-stat-label">
+                PLANNED HOURS
             </div>
 
+            <div class="td-stat-icon">
+                H
+            </div>
+
+        </div>
+
+        <div class="td-stat-number">
+            {{ planned_hours }}
+        </div>
+
+        <div class="td-stat-sub">
+            planned for today
+        </div>
+
+    </div>
+
+
+    <div class="td-stat-card">
+
+        <div class="td-stat-top">
+
+            <div class="td-stat-label">
+                COMPLETION
+            </div>
+
+            <div class="td-stat-icon">
+                %
+            </div>
+
+        </div>
+
+        <div class="td-stat-number">
+            {{ completion_percentage }}%
+        </div>
+
+        <div class="td-stat-sub">
+            today's progress
         </div>
 
     </div>
@@ -1529,71 +1574,136 @@
 </div>
 
 
+<!-- =========================================================
+     MAIN GRID
+     ========================================================= -->
+
+<div class="td-main-grid">
+
 
 <!-- =========================================================
-     TODAY'S WORK + LEARNING
-========================================================= -->
+     LEFT COLUMN
+     ========================================================= -->
 
-<div class="row g-4 mb-4">
+<div>
 
 
 <!-- =========================================================
      TODAY'S WORK
-========================================================= -->
+     ========================================================= -->
 
-<div class="col-xl-7">
+<div class="td-card">
 
-<div class="card section-card h-100">
+    <div class="td-card-header">
+
+        <div>
+
+            <div class="td-card-title">
+                Today's Work
+            </div>
+
+            <div class="td-card-subtitle">
+                Manage your work and track progress
+            </div>
+
+        </div>
 
 
-    <div class="section-header">
+        <a
+            href="{% url 'add_task_page' %}"
+            class="td-btn td-btn-primary"
+        >
+            + Add Work
+        </a>
 
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+    </div>
 
-            <div>
 
-                <h5 class="section-title">
-                    <i class="bi bi-briefcase-fill text-primary me-2"></i>
-                    Today's Work
-                </h5>
+    {% for task in today_tasks %}
 
-                <div class="section-subtitle">
-                    Record and complete your work for today.
+    <div class="td-task">
+
+
+        <div class="td-task-main">
+
+
+            <div style="min-width:0;">
+
+                <div class="td-task-title">
+                    {{ task.task }}
+                </div>
+
+
+                {% if task.description %}
+
+                <div class="td-task-description">
+                    {{ task.description }}
+                </div>
+
+                {% endif %}
+
+
+                <div class="td-task-meta">
+
+                    <span class="td-badge td-badge-neutral">
+
+                        {{ task.get_category_display }}
+
+                    </span>
+
+
+                    {% if task.priority == "high" %}
+
+                    <span class="td-badge td-badge-high">
+                        High Priority
+                    </span>
+
+                    {% elif task.priority == "medium" %}
+
+                    <span class="td-badge td-badge-medium">
+                        Medium
+                    </span>
+
+                    {% else %}
+
+                    <span class="td-badge td-badge-low">
+                        Low
+                    </span>
+
+                    {% endif %}
+
+
+                    <span class="td-badge td-badge-neutral">
+
+                        {{ task.estimated_hours }}
+                        hrs
+
+                    </span>
+
                 </div>
 
             </div>
 
 
-            <div class="d-flex align-items-center gap-3">
+            <div>
 
-                {% if today_tasks %}
+                {% if task.status == "completed" %}
 
-                    <div class="work-summary">
+                <span class="td-badge td-badge-completed">
+                    Completed
+                </span>
 
-                        <span class="work-summary-number">
-                            {{ today_tasks|length }}
-                        </span>
+                {% elif task.status == "in_progress" %}
 
-                        <span class="work-summary-label">
-                            Tasks
-                        </span>
+                <span class="td-badge td-badge-progress">
+                    In Progress
+                </span>
 
-                    </div>
+                {% else %}
 
-                {% endif %}
-
-
-                {% if is_full_time and attendance and attendance.check_in and not attendance.check_out %}
-
-                    <button
-                        type="button"
-                        class="btn btn-primary action-btn"
-                        data-bs-toggle="modal"
-                        data-bs-target="#addWorkModal"
-                    >
-                        <i class="bi bi-plus-lg me-1"></i>
-                        Add Work
-                    </button>
+                <span class="td-badge td-badge-pending">
+                    Pending
+                </span>
 
                 {% endif %}
 
@@ -1601,57 +1711,595 @@
 
         </div>
 
+
+        <!-- SUBTASKS -->
+
+        {% with subtasks=task.subtasks.all %}
+
+            {% if subtasks %}
+
+            <div class="td-subtasks">
+
+                <div class="td-subtasks-title">
+                    Subtasks
+                </div>
+
+
+                {% for subtask in subtasks %}
+
+                <div class="td-subtask
+                    {% if subtask.is_completed %}
+                        td-subtask-done
+                    {% else %}
+                        td-subtask-pending
+                    {% endif %}
+                ">
+
+                    {% if subtask.is_completed %}
+
+                        ✓
+
+                    {% else %}
+
+                        ○
+
+                    {% endif %}
+
+
+                    <span>
+                        {{ subtask.title }}
+                    </span>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <!-- ACTIONS -->
+
+        <div class="td-task-actions">
+
+
+            {% if task.status != "in_progress" and task.status != "completed" %}
+
+            <form
+                method="post"
+                action="{% url 'change_task_status' task.id %}"
+            >
+
+                {% csrf_token %}
+
+                <input
+                    type="hidden"
+                    name="status"
+                    value="in_progress"
+                >
+
+                <button
+                    type="submit"
+                    class="td-btn td-btn-secondary td-btn-sm"
+                >
+                    Start Work
+                </button>
+
+            </form>
+
+            {% endif %}
+
+
+            {% if task.status == "in_progress" %}
+
+            <form
+                method="post"
+                action="{% url 'change_task_status' task.id %}"
+            >
+
+                {% csrf_token %}
+
+                <input
+                    type="hidden"
+                    name="status"
+                    value="completed"
+                >
+
+                <button
+                    type="submit"
+                    class="td-btn td-btn-success td-btn-sm"
+                >
+                    Mark Complete
+                </button>
+
+            </form>
+
+            {% endif %}
+
+
+            {% if task.status == "pending" %}
+
+            <form
+                method="post"
+                action="{% url 'change_task_status' task.id %}"
+            >
+
+                {% csrf_token %}
+
+                <input
+                    type="hidden"
+                    name="status"
+                    value="completed"
+                >
+
+                <button
+                    type="submit"
+                    class="td-btn td-btn-success td-btn-sm"
+                >
+                    Complete
+                </button>
+
+            </form>
+
+            {% endif %}
+
+
+            <a
+                href="{% url 'task_detail' task.id %}"
+                class="td-btn td-btn-secondary td-btn-sm"
+            >
+                View
+            </a>
+
+
+            <a
+                href="{% url 'edit_task' task.id %}"
+                class="td-btn td-btn-secondary td-btn-sm"
+            >
+                Edit
+            </a>
+
+        </div>
+
+
+    </div>
+
+    {% empty %}
+
+        <div class="td-empty">
+
+            No work has been added for today.
+
+            <br>
+
+            <a
+                href="{% url 'add_task_page' %}"
+                style="
+                    color:#2563eb;
+                    font-weight:700;
+                    text-decoration:none;
+                "
+            >
+                Add your first task
+            </a>
+
+        </div>
+
+    {% endfor %}
+
+</div>
+
+
+<!-- =========================================================
+     TODAY'S LEARNING
+     ========================================================= -->
+
+<div class="td-card">
+
+    <div class="td-card-header">
+
+        <div>
+
+            <div class="td-card-title">
+                Today's Learning
+            </div>
+
+            <div class="td-card-subtitle">
+                Record what you learned or improved today
+            </div>
+
+        </div>
+
+
+        <a
+            href="{% url 'add_daily_learning' %}"
+            class="td-btn td-btn-primary"
+        >
+            + Add Learning
+        </a>
+
     </div>
 
 
+    {% if daily_learning %}
 
-    <!-- =====================================================
-         PROGRESS
-    ====================================================== -->
+        <div class="td-learning">
 
-    {% if today_tasks %}
+            <div class="td-learning-date">
+                {{ daily_learning.date|date:"l, d F Y" }}
+            </div>
 
-        {% widthratio today_tasks|length 1 1 as total_tasks %}
+            <div class="td-learning-text">
+                {{ daily_learning.learning|linebreaks }}
+            </div>
 
-        <div class="progress-wrapper">
+        </div>
 
-            <div class="progress-info">
+    {% else %}
 
-                <span>
-                    <i class="bi bi-bar-chart-fill text-primary me-1"></i>
-                    Today's Progress
+        <div class="td-empty">
+
+            No learning entry has been added for today.
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- =========================================================
+     WEEKLY SCHEDULE
+     ========================================================= -->
+
+<div class="td-card">
+
+    <div class="td-card-header">
+
+        <div>
+
+            <div class="td-card-title">
+                Weekly Schedule
+            </div>
+
+            <div class="td-card-subtitle">
+                Workshops, meetings and scheduled events
+            </div>
+
+        </div>
+
+
+        <a
+            href="{% url 'weekly_schedule' %}"
+            class="td-btn td-btn-secondary"
+        >
+            Full Schedule
+        </a>
+
+    </div>
+
+
+    {% for day in weekly_schedule %}
+
+    <div class="td-schedule-day">
+
+
+        <div class="
+            td-schedule-date
+            {% if day.date == today %}
+                td-schedule-today
+            {% endif %}
+        ">
+
+            {{ day.date|date:"D, d M Y" }}
+
+            {% if day.date == today %}
+                · Today
+            {% endif %}
+
+        </div>
+
+
+        {% for event in day.events %}
+
+        <div class="td-event">
+
+            <div class="td-event-title">
+                {{ event.title }}
+            </div>
+
+
+            <div class="td-event-meta">
+
+                {% if event.start_time %}
+
+                    {{ event.start_time|time:"h:i A" }}
+
+                    {% if event.end_time %}
+                        - {{ event.end_time|time:"h:i A" }}
+                    {% endif %}
+
+                {% endif %}
+
+
+                {% if event.location %}
+
+                    · {{ event.location }}
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+
+        {% for workshop in day.workshops %}
+
+        <div class="td-workshop">
+
+            <div class="td-workshop-title">
+                {{ workshop.title }}
+            </div>
+
+
+            <div class="td-workshop-college">
+
+                {{ workshop.college.name }}
+
+            </div>
+
+
+            <div class="td-workshop-college">
+
+                {{ workshop.start_date|date:"d M" }}
+
+                -
+
+                {{ workshop.end_date|date:"d M" }}
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+
+        {% if not day.events and not day.workshops %}
+
+        <div
+            style="
+                margin-top:8px;
+                color:#9ca3af;
+                font-size:12px;
+            "
+        >
+            No scheduled work
+        </div>
+
+        {% endif %}
+
+    </div>
+
+    {% empty %}
+
+        <div class="td-empty">
+            No schedule available.
+        </div>
+
+    {% endfor %}
+
+</div>
+
+
+</div>
+
+
+<!-- =========================================================
+     RIGHT COLUMN
+     ========================================================= -->
+
+<div>
+
+
+<!-- =========================================================
+     MONTHLY SUMMARY
+     ========================================================= -->
+
+<div class="td-card">
+
+    <div class="td-card-header">
+
+        <div>
+
+            <div class="td-card-title">
+                Monthly Work
+            </div>
+
+            <div class="td-card-subtitle">
+                {{ month_start|date:"F Y" }}
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="td-progress-wrapper">
+
+        <div class="td-progress-info">
+
+            <span>
+                Completion
+            </span>
+
+            <strong>
+                {{ monthly_completion_percentage }}%
+            </strong>
+
+        </div>
+
+
+        <div class="td-progress">
+
+            <div
+                class="td-progress-bar"
+                style="
+                    width:{{ monthly_completion_percentage }}%;
+                "
+            ></div>
+
+        </div>
+
+    </div>
+
+
+    <div class="td-summary-grid">
+
+
+        <div class="td-summary-item">
+
+            <div class="td-summary-number">
+                {{ monthly_total }}
+            </div>
+
+            <div class="td-summary-label">
+                Total Work
+            </div>
+
+        </div>
+
+
+        <div class="td-summary-item">
+
+            <div class="td-summary-number">
+                {{ monthly_completed }}
+            </div>
+
+            <div class="td-summary-label">
+                Completed
+            </div>
+
+        </div>
+
+
+        <div class="td-summary-item">
+
+            <div class="td-summary-number">
+                {{ monthly_in_progress }}
+            </div>
+
+            <div class="td-summary-label">
+                In Progress
+            </div>
+
+        </div>
+
+
+        <div class="td-summary-item">
+
+            <div class="td-summary-number">
+                {{ monthly_pending }}
+            </div>
+
+            <div class="td-summary-label">
+                Pending
+            </div>
+
+        </div>
+
+
+        <div class="td-summary-item">
+
+            <div class="td-summary-number">
+                {{ monthly_planned_hours }}
+            </div>
+
+            <div class="td-summary-label">
+                Planned Hours
+            </div>
+
+        </div>
+
+
+        <div class="td-summary-item">
+
+            <div class="td-summary-number">
+                {{ monthly_learning_days }}
+            </div>
+
+            <div class="td-summary-label">
+                Learning Days
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     CATEGORY STATISTICS
+     ========================================================= -->
+
+<div class="td-card">
+
+    <div class="td-card-header">
+
+        <div>
+
+            <div class="td-card-title">
+                Work by Category
+            </div>
+
+            <div class="td-card-subtitle">
+                Monthly activity
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {% for category in monthly_category_stats %}
+
+        {% if category.total %}
+
+        <div class="td-category">
+
+            <div class="td-category-header">
+
+                <span class="td-category-name">
+                    {{ category.name }}
                 </span>
 
-                <span class="text-primary">
-                    {% for task in today_tasks %}
-                        {% if task.status == "completed" %}
-                        {% endif %}
-                    {% endfor %}
+                <span class="td-category-info">
 
-                    {% with completed_count=0 %}
-                    {% endwith %}
+                    {{ category.completed }}/{{ category.total }}
+
+                    ·
+
+                    {{ category.hours }} hrs
+
                 </span>
 
             </div>
 
 
-            <!--
-                Visual progress is based on completed task cards.
-                The backend status remains the source of truth.
-            -->
+            <div class="td-progress">
 
-            <div class="work-progress">
+                {% widthratio category.completed category.total 100 as category_percent %}
 
                 <div
-                    class="progress-bar"
-                    role="progressbar"
+                    class="td-progress-bar"
                     style="
-                        width:
-                        {% if today_tasks %}
-                            {% widthratio completed_tasks_count today_tasks|length 100 %}
-                        {% else %}
-                            0
-                        {% endif %}%;
+                        width:{{ category_percent }}%;
                     "
                 ></div>
 
@@ -1659,1037 +2307,427 @@
 
         </div>
 
-    {% endif %}
+        {% endif %}
 
+    {% empty %}
 
+        <div class="td-empty">
+            No category data available.
+        </div>
 
-    <div class="card-body p-3 p-md-4">
+    {% endfor %}
 
+</div>
 
-        {% if today_tasks %}
 
+<!-- =========================================================
+     SUBTASK PROGRESS
+     ========================================================= -->
 
-            {% for task in today_tasks %}
+<div class="td-card">
 
-                <div
-                    class="
-                        work-card
-                        {% if task.status == 'completed' %}
-                            completed
-                        {% elif task.status == 'in_progress' %}
-                            in-progress
-                        {% else %}
-                            pending
-                        {% endif %}
-                    "
-                >
+    <div class="td-card-header">
 
-                    <!-- TASK HEADER -->
+        <div>
 
-                    <div class="d-flex justify-content-between align-items-start gap-3">
-
-                        <div class="flex-grow-1">
-
-                            <div class="task-title">
-                                {{ task.task }}
-                            </div>
-
-
-                            {% if task.description %}
-
-                                <div class="task-description">
-                                    {{ task.description }}
-                                </div>
-
-                            {% endif %}
-
-
-                            <div class="task-meta">
-
-                                {% if task.created_on %}
-
-                                    <span class="task-meta-item">
-                                        <i class="bi bi-clock"></i>
-                                        Added {{ task.created_on|date:"h:i A" }}
-                                    </span>
-
-                                {% endif %}
-
-
-                                {% if task.estimated_hours %}
-
-                                    <span class="task-meta-item">
-                                        <i class="bi bi-hourglass-split"></i>
-                                        {{ task.estimated_hours }} hr
-                                    </span>
-
-                                {% endif %}
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- STATUS -->
-
-                        <div>
-
-                            {% if task.status == "completed" %}
-
-                                <span class="task-status status-completed">
-                                    <i class="bi bi-check-circle-fill"></i>
-                                    Completed
-                                </span>
-
-
-                            {% elif task.status == "in_progress" %}
-
-                                <span class="task-status status-progress">
-                                    <i class="bi bi-clock-fill"></i>
-                                    In Progress
-                                </span>
-
-
-                            {% else %}
-
-                                <span class="task-status status-pending">
-                                    <i class="bi bi-circle"></i>
-                                    Pending
-                                </span>
-
-                            {% endif %}
-
-                        </div>
-
-                    </div>
-
-
-
-                    <!-- ACTIONS -->
-
-                    <div class="task-actions">
-
-
-                        {% if task.status == "pending" %}
-
-                            <!-- START WORK -->
-
-                            <form
-                                method="POST"
-                                action="{% url 'change_task_status' task.id %}"
-                            >
-
-                                {% csrf_token %}
-
-                                <input
-                                    type="hidden"
-                                    name="status"
-                                    value="in_progress"
-                                >
-
-                                <button
-                                    type="submit"
-                                    class="btn btn-outline-primary"
-                                >
-                                    <i class="bi bi-play-fill"></i>
-                                    Start Work
-                                </button>
-
-                            </form>
-
-
-                        {% elif task.status == "in_progress" %}
-
-                            <!-- COMPLETE -->
-
-                            <form
-                                method="POST"
-                                action="{% url 'change_task_status' task.id %}"
-                            >
-
-                                {% csrf_token %}
-
-                                <input
-                                    type="hidden"
-                                    name="status"
-                                    value="completed"
-                                >
-
-                                <button
-                                    type="submit"
-                                    class="btn btn-success"
-                                >
-                                    <i class="bi bi-check2-circle"></i>
-                                    Mark Complete
-                                </button>
-
-                            </form>
-
-
-                        {% elif task.status == "completed" %}
-
-                            <!-- REOPEN -->
-
-                            <form
-                                method="POST"
-                                action="{% url 'change_task_status' task.id %}"
-                            >
-
-                                {% csrf_token %}
-
-                                <input
-                                    type="hidden"
-                                    name="status"
-                                    value="in_progress"
-                                >
-
-                                <button
-                                    type="submit"
-                                    class="btn btn-outline-secondary"
-                                >
-                                    <i class="bi bi-arrow-counterclockwise"></i>
-                                    Reopen
-                                </button>
-
-                            </form>
-
-                        {% endif %}
-
-
-                        <!-- VIEW / EDIT TASK -->
-
-                        <a
-                            href="{% url 'task_detail' task.id %}"
-                            class="btn btn-outline-dark"
-                        >
-                            <i class="bi bi-eye"></i>
-                            View
-                        </a>
-
-                        <a
-                            href="{% url 'edit_task' task.id %}"
-                            class="btn btn-outline-primary"
-                        >
-                            <i class="bi bi-pencil"></i>
-                            Edit
-                        </a>
-
-                    </div>
-
-                </div>
-
-            {% endfor %}
-
-
-        {% else %}
-
-
-            <div class="empty-state">
-
-                <div class="empty-icon">
-                    <i class="bi bi-clipboard-check"></i>
-                </div>
-
-
-                <h6 class="fw-bold fs-5">
-                    No work added today
-                </h6>
-
-
-                {% if is_full_time %}
-
-                    {% if attendance and attendance.check_in and not attendance.check_out %}
-
-                        <p class="mb-3">
-                            Add your training, preparation,
-                            development, meetings or other work.
-                        </p>
-
-
-                        <button
-                            type="button"
-                            class="btn btn-primary action-btn"
-                            data-bs-toggle="modal"
-                            data-bs-target="#addWorkModal"
-                        >
-                            <i class="bi bi-plus-circle me-1"></i>
-                            Add Today's Work
-                        </button>
-
-                    {% else %}
-
-                        <p class="text-danger mb-0">
-                            <i class="bi bi-lock me-1"></i>
-                            Please check in before adding work.
-                        </p>
-
-                    {% endif %}
-
-                {% endif %}
-
+            <div class="td-card-title">
+                Today's Subtasks
             </div>
 
-        {% endif %}
+            <div class="td-card-subtitle">
+                Subtask completion
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="td-progress-wrapper">
+
+        <div class="td-progress-info">
+
+            <span>
+                {{ completed_subtasks }}
+                /
+                {{ total_subtasks }}
+                completed
+            </span>
+
+            <strong>
+                {{ subtask_percentage }}%
+            </strong>
+
+        </div>
+
+
+        <div class="td-progress">
+
+            <div
+                class="td-progress-bar"
+                style="
+                    width:{{ subtask_percentage }}%;
+                "
+            ></div>
+
+        </div>
 
     </div>
 
 </div>
 
-</div>
-
-
 
 <!-- =========================================================
-     TODAY LEARNING
-========================================================= -->
+     OVERDUE WORK
+     ========================================================= -->
 
-<div class="col-xl-5">
+<div class="td-card">
 
-<div class="card section-card h-100">
+    <div class="td-card-header">
 
+        <div>
 
-    <div class="section-header">
-
-        <div class="d-flex justify-content-between align-items-center">
-
-            <div>
-
-                <h5 class="section-title">
-                    <i class="bi bi-book-fill text-success me-2"></i>
-                    Today's Learning
-                </h5>
-
-                <div class="section-subtitle">
-                    Record what you learned or practiced today.
-                </div>
-
+            <div class="td-card-title">
+                Overdue Work
             </div>
 
+            <div class="td-card-subtitle">
+                Previous work not yet completed
+            </div>
+
+        </div>
+
+
+        {% if overdue_tasks %}
+
+            <span class="td-badge td-badge-high">
+                {{ overdue_tasks|length }}
+            </span>
+
+        {% endif %}
+
+    </div>
+
+
+    {% for task in overdue_tasks|slice:":5" %}
+
+    <div class="td-overdue">
+
+        <div class="td-overdue-title">
+            {{ task.task }}
+        </div>
+
+        <div class="td-overdue-date">
+
+            Due:
+
+            {{ task.for_date|date:"d M Y" }}
+
+            ·
+
+            {{ task.get_category_display }}
+
+        </div>
+
+
+        <div style="margin-top:7px;">
+
+            <span class="td-badge td-badge-high">
+                {{ task.get_priority_display }}
+            </span>
+
+            <span class="td-badge td-badge-neutral">
+                {{ task.estimated_hours }} hrs
+            </span>
+
+        </div>
+
+
+        <div style="margin-top:9px;">
 
             <a
-                href="{% url 'add_daily_learning' %}"
-                class="btn btn-sm btn-outline-success action-btn"
+                href="{% url 'task_detail' task.id %}"
+                class="td-btn td-btn-secondary td-btn-sm"
             >
-
-                {% if daily_learning %}
-                    <i class="bi bi-pencil me-1"></i>
-                    Edit
-                {% else %}
-                    <i class="bi bi-plus-lg me-1"></i>
-                    Add
-                {% endif %}
-
+                View Work
             </a>
 
         </div>
 
     </div>
 
+    {% empty %}
 
-    <div class="card-body">
+        <div class="td-empty">
+            No overdue work.
+        </div>
 
-
-        {% if daily_learning and daily_learning.learning %}
-
-            <div class="learning-box">
-
-                <div class="learning-title">
-
-                    <i class="bi bi-lightbulb-fill me-1"></i>
-
-                    Learning Update
-
-                </div>
-
-
-                <div style="white-space: pre-line;">
-                    {{ daily_learning.learning }}
-                </div>
-
-            </div>
-
-
-        {% else %}
-
-
-            <div class="empty-state">
-
-                <div class="empty-icon">
-                    <i class="bi bi-book"></i>
-                </div>
-
-
-                <h6 class="fw-bold fs-5">
-                    No learning update yet
-                </h6>
-
-
-                <p>
-                    Add what you learned,
-                    practiced or explored today.
-                </p>
-
-
-                <a
-                    href="{% url 'add_daily_learning' %}"
-                    class="btn btn-success action-btn"
-                >
-                    <i class="bi bi-plus-circle me-1"></i>
-                    Add Learning
-                </a>
-
-            </div>
-
-        {% endif %}
-
-
-    </div>
+    {% endfor %}
 
 </div>
-
-</div>
-
-</div>
-
 
 
 <!-- =========================================================
-     WEEKLY SCHEDULE
-========================================================= -->
+     UPCOMING WORKSHOPS
+     ========================================================= -->
 
-<div class="card section-card mb-4">
+<div class="td-card">
+
+    <div class="td-card-header">
+
+        <div>
+
+            <div class="td-card-title">
+                Upcoming Workshops
+            </div>
+
+            <div class="td-card-subtitle">
+                Your assigned workshops
+            </div>
+
+        </div>
+
+    </div>
 
 
-    <div class="section-header">
+    {% for workshop in upcoming_workshops %}
 
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div class="td-upcoming-workshop">
 
-            <div>
-
-                <h5 class="section-title">
-
-                    <i class="bi bi-calendar-week-fill text-primary me-2"></i>
-
-                    Weekly Work Schedule
-
-                </h5>
+        <div class="td-upcoming-title">
+            {{ workshop.title }}
+        </div>
 
 
-                <div class="section-subtitle">
+        <div class="td-upcoming-college">
 
-                    {{ week_start|date:"d M Y" }}
+            {{ workshop.college.name }}
 
-                    -
+        </div>
 
-                    {{ week_end|date:"d M Y" }}
 
-                </div>
+        <div class="td-upcoming-date">
+
+            {{ workshop.start_date|date:"d M Y" }}
+
+            -
+
+            {{ workshop.end_date|date:"d M Y" }}
+
+        </div>
+
+
+        <div style="margin-top:9px;">
+
+            <span class="td-badge td-badge-neutral">
+                {{ workshop.get_status_display }}
+            </span>
+
+        </div>
+
+    </div>
+
+    {% empty %}
+
+        <div class="td-empty">
+            No upcoming workshops.
+        </div>
+
+    {% endfor %}
+
+</div>
+
+
+<!-- =========================================================
+     RECENT LEARNING
+     ========================================================= -->
+
+<div class="td-card">
+
+    <div class="td-card-header">
+
+        <div>
+
+            <div class="td-card-title">
+                Recent Learning
+            </div>
+
+            <div class="td-card-subtitle">
+                This month's learning activity
+            </div>
+
+        </div>
+
+
+        <a
+            href="{% url 'my_learning_history' %}"
+            class="td-btn td-btn-secondary td-btn-sm"
+        >
+            View All
+        </a>
+
+    </div>
+
+
+    {% for learning in monthly_learning|slice:":5" %}
+
+    <div class="td-learning">
+
+        <div class="td-learning-date">
+
+            {{ learning.date|date:"d M Y" }}
+
+        </div>
+
+
+        <div class="td-learning-text">
+
+            {{ learning.learning|truncatechars:180 }}
+
+        </div>
+
+    </div>
+
+    {% empty %}
+
+        <div class="td-empty">
+            No learning records this month.
+        </div>
+
+    {% endfor %}
+
+</div>
+
+
+</div>
+
+</div>
+
+
+<!-- =========================================================
+     PREVIOUS 7 DAYS
+     ========================================================= -->
+
+<div class="td-card">
+
+    <div class="td-card-header">
+
+        <div>
+
+            <div class="td-card-title">
+                Previous 7 Days Work
+            </div>
+
+            <div class="td-card-subtitle">
+                Your recent work history
+            </div>
+
+        </div>
+
+
+        <a
+            href="{% url 'task_history' %}"
+            class="td-btn td-btn-secondary"
+        >
+            Work History
+        </a>
+
+    </div>
+
+
+    {% for task in previous_tasks %}
+
+    <div class="td-history-task">
+
+
+        <div class="td-history-date">
+
+            {{ task.for_date|date:"D, d M" }}
+
+        </div>
+
+
+        <div>
+
+            <div class="td-history-title">
+
+                {{ task.task }}
 
             </div>
 
 
+            <div class="td-history-meta">
+
+                {{ task.get_category_display }}
+
+                ·
+
+                {{ task.estimated_hours }} hrs
+
+            </div>
+
+        </div>
+
+
+        <div class="td-history-actions">
+
+
+            {% if task.status == "completed" %}
+
+                <span class="td-badge td-badge-completed">
+                    Completed
+                </span>
+
+            {% elif task.status == "in_progress" %}
+
+                <span class="td-badge td-badge-progress">
+                    In Progress
+                </span>
+
+            {% else %}
+
+                <span class="td-badge td-badge-pending">
+                    Pending
+                </span>
+
+            {% endif %}
+
+
             <a
-                href="{% url 'full_time_work_list' %}"
-                class="btn btn-primary action-btn"
+                href="{% url 'task_detail' task.id %}"
+                class="td-btn td-btn-secondary td-btn-sm"
             >
+                View
+            </a>
 
-                <i class="bi bi-calendar3 me-1"></i>
 
-                View Full Schedule
-
+            <a
+                href="{% url 'edit_task' task.id %}"
+                class="td-btn td-btn-secondary td-btn-sm"
+            >
+                Edit
             </a>
 
         </div>
 
-    </div>
-
-
-
-    <div class="card-body p-0">
-
-
-        {% if weekly_schedule %}
-
-            <div class="table-responsive">
-
-                <table class="table table-hover align-middle schedule-table">
-
-                    <thead>
-
-                        <tr>
-
-                            <th class="px-3">
-                                Date
-                            </th>
-
-                            <th>
-                                Day
-                            </th>
-
-                            <th>
-                                Work / Program
-                            </th>
-
-                            <th>
-                                Type
-                            </th>
-
-                            <th>
-                                College
-                            </th>
-
-                            <th>
-                                Time
-                            </th>
-
-                            <th>
-                                Location
-                            </th>
-
-                            <th>
-                                Status
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody>
-
-                        {% for item in weekly_schedule %}
-
-                            <tr>
-
-                                <td class="px-3 fw-bold">
-
-                                    {{ item.date|date:"d M Y" }}
-
-                                </td>
-
-
-                                <td>
-
-                                    {{ item.date|date:"D" }}
-
-                                </td>
-
-
-                                <td>
-
-                                    <strong>
-                                        {{ item.title }}
-                                    </strong>
-
-                                </td>
-
-
-                                <!-- TYPE -->
-
-                                <td>
-
-                                    {% if item.type == "Workshop" %}
-
-                                        <span class="type-badge badge-workshop">
-                                            <i class="bi bi-mortarboard me-1"></i>
-                                            Workshop
-                                        </span>
-
-
-                                    {% elif item.type == "FDP" %}
-
-                                        <span class="type-badge badge-fdp">
-                                            <i class="bi bi-award me-1"></i>
-                                            FDP
-                                        </span>
-
-
-                                    {% elif item.type == "Online Workshop" %}
-
-                                        <span class="type-badge badge-online">
-                                            <i class="bi bi-camera-video me-1"></i>
-                                            Online Workshop
-                                        </span>
-
-
-                                    {% elif item.type == "Office Training" %}
-
-                                        <span class="type-badge badge-office">
-                                            <i class="bi bi-building me-1"></i>
-                                            Office Training
-                                        </span>
-
-
-                                    {% elif item.type == "Guest Faculty Training" %}
-
-                                        <span class="type-badge badge-guest">
-                                            <i class="bi bi-person-video3 me-1"></i>
-                                            Guest Faculty
-                                        </span>
-
-
-                                    {% elif item.type == "Meeting" %}
-
-                                        <span class="type-badge badge-meeting">
-                                            <i class="bi bi-people me-1"></i>
-                                            Meeting
-                                        </span>
-
-
-                                    {% else %}
-
-                                        <span class="type-badge badge-other">
-                                            {{ item.type }}
-                                        </span>
-
-                                    {% endif %}
-
-                                </td>
-
-
-                                <!-- COLLEGE -->
-
-                                <td>
-
-                                    {% if item.college %}
-
-                                        <i class="bi bi-building text-primary me-1"></i>
-
-                                        {{ item.college }}
-
-                                    {% else %}
-
-                                        —
-
-                                    {% endif %}
-
-                                </td>
-
-
-                                <!-- TIME -->
-
-                                <td>
-
-                                    {% if item.time %}
-
-                                        <i class="bi bi-clock text-warning me-1"></i>
-
-                                        {{ item.time }}
-
-                                    {% else %}
-
-                                        —
-
-                                    {% endif %}
-
-                                </td>
-
-
-                                <!-- LOCATION -->
-
-                                <td>
-
-                                    {% if item.location %}
-
-                                        <i class="bi bi-geo-alt text-danger me-1"></i>
-
-                                        {{ item.location }}
-
-                                    {% else %}
-
-                                        —
-
-                                    {% endif %}
-
-                                </td>
-
-
-                                <!-- STATUS -->
-
-                                <td>
-
-                                    {% if item.status %}
-
-                                        <span class="badge bg-light text-dark border">
-
-                                            {{ item.status }}
-
-                                        </span>
-
-                                    {% else %}
-
-                                        —
-
-                                    {% endif %}
-
-                                </td>
-
-                            </tr>
-
-                        {% endfor %}
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-
-        {% else %}
-
-
-            <div class="empty-state">
-
-                <div class="empty-icon">
-                    <i class="bi bi-calendar-x"></i>
-                </div>
-
-
-                <h6 class="fw-bold fs-5">
-                    No scheduled activities this week
-                </h6>
-
-
-                <p class="mb-0">
-                    Workshops, FDPs, online workshops,
-                    guest faculty training and meetings
-                    will appear here.
-                </p>
-
-            </div>
-
-        {% endif %}
 
     </div>
 
-</div>
+    {% empty %}
 
+        <div class="td-empty">
 
-
-<!-- =========================================================
-     ASSIGNED WORKSHOPS
-========================================================= -->
-
-<div class="card section-card">
-
-
-    <div class="section-header">
-
-        <h5 class="section-title">
-
-            <i class="bi bi-mortarboard-fill text-primary me-2"></i>
-
-            My Assigned Workshops
-
-        </h5>
-
-
-        <div class="section-subtitle">
-
-            Workshops currently assigned to you.
+            No work recorded during the previous 7 days.
 
         </div>
 
-    </div>
-
-
-
-    <div class="card-body">
-
-
-        {% if workshops %}
-
-
-            <div class="row g-3">
-
-                {% for workshop in workshops %}
-
-                    <div class="col-md-6 col-xl-4">
-
-                        <div class="workshop-card">
-
-
-                            <div class="d-flex justify-content-between align-items-start gap-2">
-
-                                <div class="workshop-title">
-
-                                    {{ workshop.title }}
-
-                                </div>
-
-
-                                <span class="badge bg-secondary">
-
-                                    {{ workshop.get_status_display }}
-
-                                </span>
-
-                            </div>
-
-
-                            {% if workshop.college %}
-
-                                <div class="workshop-meta">
-
-                                    <i class="bi bi-building text-primary me-1"></i>
-
-                                    {{ workshop.college.name }}
-
-                                </div>
-
-                            {% endif %}
-
-
-                            <div class="workshop-meta">
-
-                                <i class="bi bi-calendar3 me-1"></i>
-
-                                {{ workshop.start_date|date:"d M Y" }}
-
-                                -
-
-                                {{ workshop.end_date|date:"d M Y" }}
-
-                            </div>
-
-
-                            {% if workshop.departments %}
-
-                                <div class="workshop-meta">
-
-                                    <i class="bi bi-diagram-3 me-1"></i>
-
-                                    {{ workshop.departments }}
-
-                                </div>
-
-                            {% endif %}
-
-
-                            <div class="mt-3">
-
-                                <a
-                                    href="{% url 'workshop_detail' workshop.pk %}"
-                                    class="btn btn-sm btn-outline-primary action-btn"
-                                >
-
-                                    <i class="bi bi-eye me-1"></i>
-
-                                    View Workshop
-
-                                </a>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                {% endfor %}
-
-            </div>
-
-
-        {% else %}
-
-
-            <div class="empty-state">
-
-                <div class="empty-icon">
-                    <i class="bi bi-mortarboard"></i>
-                </div>
-
-
-                <h6 class="fw-bold fs-5">
-                    No workshops assigned
-                </h6>
-
-
-                <p class="mb-0">
-                    Workshops assigned to you will appear here.
-                </p>
-
-            </div>
-
-        {% endif %}
-
-    </div>
+    {% endfor %}
 
 </div>
 
 
 </div>
 
-
-
-<!-- =========================================================
-     ADD TODAY'S WORK MODAL
-========================================================= -->
-
-<div
-    class="modal fade"
-    id="addWorkModal"
-    tabindex="-1"
-    aria-hidden="true"
->
-
-    <div class="modal-dialog modal-dialog-centered">
-
-        <div class="modal-content">
-
-
-            <form
-                method="POST"
-                action="{% url 'add_today_task' %}"
-            >
-
-                {% csrf_token %}
-
-
-                <div class="modal-header">
-
-                    <div>
-
-                        <h5 class="modal-title">
-
-                            <i class="bi bi-plus-circle-fill text-primary me-2"></i>
-
-                            Add Today's Work
-
-                        </h5>
-
-
-                        <div class="small text-muted mt-1">
-
-                            Record what you are working on today.
-
-                        </div>
-
-                    </div>
-
-
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal"
-                    ></button>
-
-                </div>
-
-
-
-                <div class="modal-body">
-
-
-                    <div class="mb-3">
-
-                        <label class="form-label">
-
-                            What are you working on?
-
-                            <span class="text-danger">*</span>
-
-                        </label>
-
-
-                        <input
-                            type="text"
-                            name="task"
-                            class="form-control"
-                            placeholder="Example: Preparing Python training material"
-                            required
-                        >
-
-                    </div>
-
-
-
-                    <div class="mb-3">
-
-                        <label class="form-label">
-
-                            Description
-
-                            <span class="text-muted fw-normal">
-                                (Optional)
-                            </span>
-
-                        </label>
-
-
-                        <textarea
-                            name="description"
-                            class="form-control"
-                            rows="4"
-                            placeholder="Add details about this work..."
-                        ></textarea>
-
-                    </div>
-
-
-
-                    <div class="alert alert-light border mb-0">
-
-                        <div class="d-flex gap-2">
-
-                            <i class="bi bi-info-circle text-primary"></i>
-
-                            <div>
-
-                                <strong>
-                                    Task workflow
-                                </strong>
-
-                                <div class="small text-muted mt-1">
-
-                                    New work starts as
-                                    <strong>In Progress</strong>.
-                                    You can mark it completed
-                                    from Today's Work.
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-
-                <div class="modal-footer">
-
-                    <button
-                        type="button"
-                        class="btn btn-light action-btn"
-                        data-bs-dismiss="modal"
-                    >
-                        Cancel
-                    </button>
-
-
-                    <button
-                        type="submit"
-                        class="btn btn-primary action-btn px-4"
-                    >
-
-                        <i class="bi bi-check2 me-1"></i>
-
-                        Save Work
-
-                    </button>
-
-                </div>
-
-            </form>
-
-        </div>
-
-    </div>
-
 </div>
-
 
 {% endblock %}

@@ -1,10 +1,13 @@
 from datetime import date, timedelta
+from decimal import Decimal
 import json
-
+from decimal import Decimal
+from django.db.models import Count, Q, Sum
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.paginator import Paginator
+from django.db.models import Count, Q, Sum
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
@@ -21,6 +24,7 @@ from .models import (
     College,
     CalendarEvent,
     DailyAttendance,
+    DailyLearning,
     MeetingNote,
     WorkshopRemarks,
 )
@@ -37,6 +41,7 @@ from .forms import (
     MeetingNoteForm,
     CalendarEventForm,
     WorkshopRemarksForm,
+    DailyLearningForm,
 )
 
 
@@ -1290,52 +1295,404 @@ def admin_task_dashboard(request):
     })
 
 @login_required
-@user_passes_test(is_superuser)
+# =====================================================
+# ADD TASK / ADD WORK
+# =====================================================
+
+# =====================================================
+# ADD TASK / ADD WORK
+# =====================================================
+
+# ============================================================
+# ADD TASK / ADD WORK
+# ============================================================
+
+@login_required
 def add_task_page(request):
-    form = TodoTaskForm(request.POST or None)
-    formset = SubTaskFormSet(
-        request.POST or None,
-        queryset=SubTask.objects.none(),
-        prefix="subtasks"
+
+    # ============================================================
+    # FIND LOGGED-IN TRAINER
+    # ============================================================
+
+    trainer = Trainer.objects.filter(
+        user=request.user
+    ).first()
+
+    if not trainer:
+        trainer = Trainer.objects.filter(
+            email__iexact=request.user.email
+        ).first()
+
+    # No trainer profile
+    if not trainer:
+        messages.error(
+            request,
+            "Your account is not linked to a Trainer profile."
+        )
+
+        if request.user.is_superuser:
+            return redirect("admin_task_dashboard")
+
+        return redirect("dashboard")
+
+    # ============================================================
+    # POST
+    # ============================================================
+
+    if request.method == "POST":
+
+        form = TodoTaskForm(request.POST)
+
+        # --------------------------------------------------------
+        # NORMAL TRAINER CAN ONLY CREATE WORK FOR THEMSELVES
+        # --------------------------------------------------------
+
+        if not request.user.is_superuser:
+
+            form.fields["trainer"].queryset = Trainer.objects.filter(
+                id=trainer.id
+            )
+
+            form.initial["trainer"] = trainer
+
+        # --------------------------------------------------------
+        # SUBTASK FORMSET
+        # --------------------------------------------------------
+
+        subtask_formset = SubTaskFormSet(
+            request.POST,
+            queryset=SubTask.objects.none(),
+            prefix="subtasks"
+        )
+
+        # ========================================================
+        # VALIDATE
+        # ========================================================
+
+        if form.is_valid() and subtask_formset.is_valid():
+
+            # ----------------------------------------------------
+            # CREATE MAIN TASK
+            # ----------------------------------------------------
+
+            task = form.save(commit=False)
+
+            # ----------------------------------------------------
+            # SECURITY
+            # ----------------------------------------------------
+
+            if not request.user.is_superuser:
+                task.trainer = trainer
+
+            # ----------------------------------------------------
+            # DEFAULT STATUS
+            # ----------------------------------------------------
+
+            task.status = "pending"
+            task.is_done = False
+
+            # ----------------------------------------------------
+            # SAVE MAIN TASK
+            # ----------------------------------------------------
+
+            task.save()
+
+            # ====================================================
+            # SAVE SUBTASKS
+            # ====================================================
+
+            saved_subtasks = 0
+
+            for subform in subtask_formset:
+
+                # Skip completely empty forms
+                if not subform.cleaned_data:
+                    continue
+
+                title = subform.cleaned_data.get("title")
+
+                if not title:
+                    continue
+
+                subtask = subform.save(commit=False)
+
+                # Connect to parent task
+                subtask.parent_task = task
+
+                # New subtasks are incomplete
+                subtask.is_completed = False
+
+                subtask.save()
+
+                saved_subtasks += 1
+
+            # ====================================================
+            # SUCCESS MESSAGE
+            # ====================================================
+
+            if saved_subtasks:
+
+                messages.success(
+                    request,
+                    f'Work "{task.task}" and '
+                    f'{saved_subtasks} subtask(s) added successfully.'
+                )
+
+            else:
+
+                messages.success(
+                    request,
+                    f'Work "{task.task}" added successfully.'
+                )
+
+            # ====================================================
+            # REDIRECT
+            # ====================================================
+
+            if request.user.is_superuser:
+                return redirect("admin_task_dashboard")
+
+            return redirect("trainer_dashboard")
+
+    # ============================================================
+    # GET
+    # ============================================================
+
+    else:
+
+        form = TodoTaskForm()
+
+        if not request.user.is_superuser:
+
+            form.fields["trainer"].queryset = Trainer.objects.filter(
+                id=trainer.id
+            )
+
+            form.initial["trainer"] = trainer
+
+        subtask_formset = SubTaskFormSet(
+            queryset=SubTask.objects.none(),
+            prefix="subtasks"
+        )
+
+    # ============================================================
+    # RENDER
+    # ============================================================
+
+    return render(
+        request,
+        "todo/add_task.html",
+        {
+            "form": form,
+            "subtask_formset": subtask_formset,
+            "trainer": trainer,
+        }
     )
-
-    if request.method == "POST" and form.is_valid() and formset.is_valid():
-        task = form.save()
-        for sub in formset:
-            if sub.cleaned_data.get("title"):
-                s = sub.save(commit=False)
-                s.parent_task = task
-                s.save()
-        return redirect("admin_task_dashboard")
-
-    return render(request, "todo/add_task.html", {
-        "form": form,
-        "subtask_formset": formset
-    })
-
+# ============================================================
+# TASK DETAIL
+# ============================================================
 
 @login_required
 def task_detail(request, task_id):
-    task = get_object_or_404(TodoTask, id=task_id)
+
+    task = get_object_or_404(
+        TodoTask.objects.select_related("trainer"),
+        id=task_id
+    )
+
+    # ============================================================
+    # PERMISSION
+    # ============================================================
+
+    if not request.user.is_superuser:
+
+        trainer = Trainer.objects.filter(
+            user=request.user
+        ).first()
+
+        if not trainer:
+
+            trainer = Trainer.objects.filter(
+                email__iexact=request.user.email
+            ).first()
+
+        if not trainer:
+
+            messages.error(
+                request,
+                "Your account is not linked to a Trainer profile."
+            )
+
+            return redirect("dashboard")
+
+        if task.trainer_id != trainer.id:
+
+            messages.error(
+                request,
+                "You can view only your own work."
+            )
+
+            return redirect("trainer_dashboard")
+
+    # ============================================================
+    # SUBTASKS
+    # ============================================================
+
     subtasks = task.subtasks.all()
 
     total = subtasks.count()
-    done = subtasks.filter(is_completed=True).count()
-    task.progress = int((done / total) * 100) if total else 0
 
-    return render(request, "todo/task_detail.html", {
-        "task": task,
-        "subtasks": subtasks
-    })
+    done = subtasks.filter(
+        is_completed=True
+    ).count()
 
+    progress = (
+        int((done / total) * 100)
+        if total
+        else 0
+    )
+
+    # ============================================================
+    # RENDER
+    # ============================================================
+
+    return render(
+        request,
+        "todo/task_detail.html",
+        {
+            "task": task,
+            "subtasks": subtasks,
+            "total_subtasks": total,
+            "completed_subtasks": done,
+            "progress": progress,
+        }
+    )
+# ============================================================
+# TOGGLE SUBTASK
+# ============================================================
 
 @login_required
-@user_passes_test(is_superuser)
-def toggle_subtask_done(request, task_id, subtask_id):
-    sub = get_object_or_404(SubTask, id=subtask_id, parent_task_id=task_id)
-    sub.is_completed = not sub.is_completed
-    sub.save()
-    return redirect("task_detail", task_id=task_id)
+@require_POST
+def toggle_subtask_done(
+    request,
+    task_id,
+    subtask_id
+):
+
+    # ============================================================
+    # GET SUBTASK
+    # ============================================================
+
+    subtask = get_object_or_404(
+        SubTask,
+        id=subtask_id,
+        parent_task_id=task_id
+    )
+
+    task = subtask.parent_task
+
+    # ============================================================
+    # FIND TRAINER
+    # ============================================================
+
+    trainer = Trainer.objects.filter(
+        user=request.user
+    ).first()
+
+    if not trainer:
+
+        trainer = Trainer.objects.filter(
+            email__iexact=request.user.email
+        ).first()
+
+    # ============================================================
+    # PERMISSION
+    # ============================================================
+
+    if not request.user.is_superuser:
+
+        if not trainer:
+
+            messages.error(
+                request,
+                "Trainer profile not found."
+            )
+
+            return redirect("dashboard")
+
+        if task.trainer_id != trainer.id:
+
+            messages.error(
+                request,
+                "You can update only your own work."
+            )
+
+            return redirect("trainer_dashboard")
+
+    # ============================================================
+    # TOGGLE SUBTASK
+    # ============================================================
+
+    subtask.is_completed = not subtask.is_completed
+
+    subtask.save(
+        update_fields=[
+            "is_completed"
+        ]
+    )
+
+    # ============================================================
+    # CALCULATE SUBTASK PROGRESS
+    # ============================================================
+
+    total_subtasks = task.subtasks.count()
+
+    completed_subtasks = (
+        task.subtasks
+        .filter(is_completed=True)
+        .count()
+    )
+
+    # ============================================================
+    # AUTOMATICALLY UPDATE PARENT TASK
+    # ============================================================
+
+    if (
+        total_subtasks > 0
+        and completed_subtasks == total_subtasks
+    ):
+
+        # ALL SUBTASKS COMPLETED
+        task.status = "completed"
+        task.is_done = True
+
+    elif completed_subtasks > 0:
+
+        # SOME SUBTASKS COMPLETED
+        task.status = "in_progress"
+        task.is_done = False
+
+    else:
+
+        # NO SUBTASKS COMPLETED
+        task.status = "pending"
+        task.is_done = False
+
+    task.save(
+        update_fields=[
+            "status",
+            "is_done"
+        ]
+    )
+
+    # ============================================================
+    # RETURN
+    # ============================================================
+
+    return redirect(
+        "task_detail",
+        task_id=task.id
+    )
 
 
 @login_required
@@ -1344,14 +1701,27 @@ def delete_task(request, task_id):
     get_object_or_404(TodoTask, id=task_id).delete()
     return redirect("task_history")
 
+
+# ============================================================
+# CHANGE TASK STATUS
+# ============================================================
+
 @login_required
 @require_POST
 def change_task_status(request, task_id):
+
+    # ============================================================
+    # GET TASK
+    # ============================================================
 
     task = get_object_or_404(
         TodoTask,
         id=task_id
     )
+
+    # ============================================================
+    # FIND TRAINER
+    # ============================================================
 
     trainer = Trainer.objects.filter(
         user=request.user
@@ -1359,25 +1729,46 @@ def change_task_status(request, task_id):
 
     if not trainer:
         trainer = Trainer.objects.filter(
-            email=request.user.email
+            email__iexact=request.user.email
         ).first()
 
-    if not trainer:
+    # ============================================================
+    # TRAINER PROFILE CHECK
+    # ============================================================
+
+    if not trainer and not request.user.is_superuser:
+
         messages.error(
             request,
             "Your account is not linked to a Trainer profile."
         )
+
         return redirect("dashboard")
 
-    # Trainer can modify only their own tasks
-    if not request.user.is_superuser and task.trainer_id != trainer.id:
-        messages.error(
-            request,
-            "You can update only your own work."
-        )
-        return redirect("trainer_dashboard")
+    # ============================================================
+    # PERMISSION
+    # ============================================================
+
+    if not request.user.is_superuser:
+
+        if task.trainer_id != trainer.id:
+
+            messages.error(
+                request,
+                "You can update only your own work."
+            )
+
+            return redirect("trainer_dashboard")
+
+    # ============================================================
+    # GET NEW STATUS
+    # ============================================================
 
     new_status = request.POST.get("status")
+
+    # ============================================================
+    # VALID STATUS
+    # ============================================================
 
     allowed_statuses = [
         "pending",
@@ -1386,13 +1777,23 @@ def change_task_status(request, task_id):
     ]
 
     if new_status not in allowed_statuses:
+
         messages.error(
             request,
             "Invalid task status."
         )
+
+        if request.user.is_superuser:
+            return redirect("admin_task_dashboard")
+
         return redirect("trainer_dashboard")
 
+    # ============================================================
+    # UPDATE TASK
+    # ============================================================
+
     task.status = new_status
+
     task.is_done = (
         new_status == "completed"
     )
@@ -1404,69 +1805,43 @@ def change_task_status(request, task_id):
         ]
     )
 
+    # ============================================================
+    # SUCCESS MESSAGE
+    # ============================================================
+
     if new_status == "completed":
+
         messages.success(
             request,
-            "Work marked as completed."
+            f'"{task.task}" marked as completed.'
         )
 
     elif new_status == "in_progress":
+
         messages.success(
             request,
-            "Work moved to In Progress."
+            f'"{task.task}" moved to In Progress.'
         )
 
     else:
+
         messages.success(
             request,
-            "Work moved to Pending."
+            f'"{task.task}" moved to Pending.'
         )
 
-    return redirect("trainer_dashboard")
+    # ============================================================
+    # REDIRECT
+    # ============================================================
 
+    if request.user.is_superuser:
 
-@login_required
-@user_passes_test(is_superuser)
-def add_subtask(request, task_id):
-    task = get_object_or_404(TodoTask, id=task_id)
+        return redirect(
+            "admin_task_dashboard"
+        )
 
-    if request.method == "POST":
-        title = request.POST.get("title")
-        if title:
-            SubTask.objects.create(parent_task=task, title=title)
-        return redirect("task_detail", task_id=task.id)
-
-    return render(request, "todo/add_subtask.html", {
-        "task": task
-    })
-@login_required
-@user_passes_test(is_superuser)
-def edit_subtask(request, subtask_id):
-
-    subtask = get_object_or_404(
-        SubTask,
-        id=subtask_id
-    )
-
-    if request.method == "POST":
-
-        title = request.POST.get("title")
-
-        if title:
-            subtask.title = title
-            subtask.save()
-
-            return redirect(
-                "task_detail",
-                task_id=subtask.parent_task.id
-            )
-
-    return render(
-        request,
-        "todo/edit_subtask.html",
-        {
-            "subtask": subtask
-        }
+    return redirect(
+        "trainer_dashboard"
     )
 @login_required
 @user_passes_test(is_superuser)
@@ -1514,62 +1889,63 @@ def edit_task(request, task_id):
 # TRAINER DASHBOARD
 # =====================================================
 
+# =====================================================
+# TRAINER DASHBOARD
+# =====================================================
+
 @login_required
 def trainer_dashboard(request):
 
-    # =================================================
-    # FIND TRAINER
-    # =================================================
-
-    trainer = (
-        Trainer.objects
-        .filter(user=request.user)
-        .first()
-    )
-
-    # Fallback: match by email
-    if not trainer:
-        trainer = (
-            Trainer.objects
-            .filter(email=request.user.email)
-            .first()
-        )
-
-    # Trainer profile not found
-    if not trainer:
-
-        messages.error(
-            request,
-            "Your account is not linked to a Trainer profile."
-        )
-
-        return redirect("dashboard")
-
-    # =================================================
-    # TODAY
-    # =================================================
-
     today = timezone.localdate()
 
-    # =================================================
-    # ATTENDANCE
-    # ONLY FULL-TIME TRAINERS
-    # =================================================
+    # =====================================================
+    # FIND TRAINER
+    # =====================================================
 
-    attendance = None
+    trainer = Trainer.objects.filter(
+        user=request.user
+    ).first()
 
-    if trainer.is_full_time:
+    if not trainer:
+        trainer = Trainer.objects.filter(
+            email=request.user.email
+        ).first()
 
-        attendance, created = (
-            DailyAttendance.objects.get_or_create(
-                trainer=trainer,
-                date=today
-            )
+    if not trainer:
+
+        return render(
+            request,
+            "trainer/trainer_dashboard.html",
+            {
+                "error": (
+                    "Your account is not linked to a Trainer profile."
+                )
+            }
         )
 
-    # =================================================
-    # TODAY'S WORK
-    # =================================================
+    # =====================================================
+    # TODAY ATTENDANCE
+    # =====================================================
+
+    attendance = DailyAttendance.objects.filter(
+        trainer=trainer,
+        date=today
+    ).first()
+
+    checked_in = bool(
+        attendance
+        and attendance.check_in
+        and not attendance.check_out
+    )
+
+    checked_out = bool(
+        attendance
+        and attendance.check_out
+    )
+
+    # =====================================================
+    # TODAY TASKS
+    # =====================================================
 
     today_tasks = (
         TodoTask.objects
@@ -1577,153 +1953,91 @@ def trainer_dashboard(request):
             trainer=trainer,
             for_date=today
         )
+        .prefetch_related("subtasks")
         .order_by(
+            "is_done",
+            "-priority",
             "-created_on"
         )
     )
 
-    # =================================================
-    # TODAY'S TASK COUNTS
-    # =================================================
+    # =====================================================
+    # TODAY TASK STATISTICS
+    # =====================================================
 
-    today_total_count = today_tasks.count()
+    task_stats = (
+        TodoTask.objects
+        .filter(
+            trainer=trainer,
+            for_date=today
+        )
+        .aggregate(
+            total=Count("id"),
 
-    today_completed_count = (
-        today_tasks
-        .filter(status="completed")
-        .count()
+            completed=Count(
+                "id",
+                filter=Q(
+                    status="completed"
+                )
+            ),
+
+            in_progress=Count(
+                "id",
+                filter=Q(
+                    status="in_progress"
+                )
+            ),
+
+            pending=Count(
+                "id",
+                filter=Q(
+                    status="pending"
+                )
+            ),
+
+            planned_hours=Sum(
+                "estimated_hours"
+            ),
+        )
     )
 
-    today_in_progress_count = (
-        today_tasks
-        .filter(status="in_progress")
-        .count()
+    total_tasks = (
+        task_stats["total"] or 0
     )
 
-    today_pending_count = (
-        today_tasks
-        .filter(status="pending")
-        .count()
+    completed_tasks = (
+        task_stats["completed"] or 0
     )
 
-    # =================================================
-    # TODAY'S PROGRESS
-    # =================================================
+    in_progress_tasks = (
+        task_stats["in_progress"] or 0
+    )
 
-    if today_total_count > 0:
+    pending_tasks = (
+        task_stats["pending"] or 0
+    )
 
-        completed_percentage = round(
+    planned_hours = (
+        task_stats["planned_hours"]
+        or Decimal("0")
+    )
+
+    if total_tasks > 0:
+
+        completion_percentage = round(
             (
-                today_completed_count
-                / today_total_count
+                completed_tasks
+                / total_tasks
             ) * 100
         )
 
     else:
 
-        completed_percentage = 0
+        completion_percentage = 0
 
-    # =================================================
-    # PREVIOUS 7 DAYS
-    #
-    # Example:
-    # Today = 19 Sep
-    #
-    # Previous 7 days:
-    # 12 Sep - 18 Sep
-    #
-    # Today itself is NOT included.
-    # =================================================
-
-    previous_7_days_start = (
-        today - timedelta(days=7)
-    )
-
-    previous_tasks = (
-        TodoTask.objects
-        .filter(
-            trainer=trainer,
-            for_date__gte=previous_7_days_start,
-            for_date__lt=today
-        )
-        .order_by(
-            "-for_date",
-            "-created_on"
-        )
-    )
-
-    # =================================================
-    # PREVIOUS 7 DAYS COUNTS
-    # =================================================
-
-    previous_total_count = (
-        previous_tasks.count()
-    )
-
-    previous_completed_count = (
-        previous_tasks
-        .filter(status="completed")
-        .count()
-    )
-
-    previous_in_progress_count = (
-        previous_tasks
-        .filter(status="in_progress")
-        .count()
-    )
-
-    previous_pending_count = (
-        previous_tasks
-        .filter(status="pending")
-        .count()
-    )
-
-    # =================================================
-    # PREVIOUS 7 DAYS UNFINISHED WORK
-    # =================================================
-
-    previous_pending_tasks = (
-        previous_tasks
-        .filter(
-            status__in=[
-                "pending",
-                "in_progress"
-            ]
-        )
-        .order_by(
-            "for_date",
-            "created_on"
-        )
-    )
-
-    # =================================================
-    # OVERDUE / UNFINISHED WORK
-    #
-    # Any task before today which is not completed.
-    # =================================================
-
-    overdue_tasks = (
-        TodoTask.objects
-        .filter(
-            trainer=trainer,
-            for_date__lt=today,
-            status__in=[
-                "pending",
-                "in_progress"
-            ]
-        )
-        .order_by(
-            "for_date",
-            "created_on"
-        )
-    )
-
-    overdue_count = overdue_tasks.count()
-
-    # =================================================
-    # TODAY'S LEARNING
-    # ALL TRAINERS CAN ADD LEARNING
-    # =================================================
+    # =====================================================
+    # TODAY LEARNING
+    # =====================================================
 
     daily_learning = (
         DailyLearning.objects
@@ -1734,82 +2048,299 @@ def trainer_dashboard(request):
         .first()
     )
 
-    # =================================================
-    # ASSIGNED WORKSHOPS
-    # =================================================
+    # =====================================================
+    # PREVIOUS 7 DAYS
+    # =====================================================
 
-    workshops = (
+    previous_7_days_start = (
+        today - timedelta(days=6)
+    )
+
+    previous_tasks = (
+        TodoTask.objects
+        .filter(
+            trainer=trainer,
+            for_date__gte=previous_7_days_start,
+            for_date__lte=today
+        )
+        .prefetch_related("subtasks")
+        .order_by(
+            "-for_date",
+            "-created_on"
+        )
+    )
+
+    # =====================================================
+    # OVERDUE WORK
+    # =====================================================
+
+    overdue_tasks = (
+        TodoTask.objects
+        .filter(
+            trainer=trainer,
+            for_date__lt=today
+        )
+        .exclude(
+            status="completed"
+        )
+        .prefetch_related("subtasks")
+        .order_by(
+            "for_date",
+            "-priority"
+        )
+    )
+
+    # =====================================================
+    # CURRENT MONTH
+    # =====================================================
+
+    month_start = today.replace(
+        day=1
+    )
+
+    if today.month == 12:
+
+        next_month = today.replace(
+            year=today.year + 1,
+            month=1,
+            day=1
+        )
+
+    else:
+
+        next_month = today.replace(
+            month=today.month + 1,
+            day=1
+        )
+
+    month_end = (
+        next_month - timedelta(days=1)
+    )
+
+    # =====================================================
+    # MONTHLY TASKS
+    # =====================================================
+
+    monthly_tasks = (
+        TodoTask.objects
+        .filter(
+            trainer=trainer,
+            for_date__gte=month_start,
+            for_date__lte=month_end
+        )
+    )
+
+    monthly_stats = (
+        monthly_tasks.aggregate(
+
+            total=Count("id"),
+
+            completed=Count(
+                "id",
+                filter=Q(
+                    status="completed"
+                )
+            ),
+
+            in_progress=Count(
+                "id",
+                filter=Q(
+                    status="in_progress"
+                )
+            ),
+
+            pending=Count(
+                "id",
+                filter=Q(
+                    status="pending"
+                )
+            ),
+
+            planned_hours=Sum(
+                "estimated_hours"
+            ),
+        )
+    )
+
+    monthly_total = (
+        monthly_stats["total"] or 0
+    )
+
+    monthly_completed = (
+        monthly_stats["completed"] or 0
+    )
+
+    monthly_in_progress = (
+        monthly_stats["in_progress"] or 0
+    )
+
+    monthly_pending = (
+        monthly_stats["pending"] or 0
+    )
+
+    monthly_planned_hours = (
+        monthly_stats["planned_hours"]
+        or Decimal("0")
+    )
+
+    if monthly_total > 0:
+
+        monthly_completion_percentage = round(
+            (
+                monthly_completed
+                / monthly_total
+            ) * 100
+        )
+
+    else:
+
+        monthly_completion_percentage = 0
+
+    # =====================================================
+    # MONTHLY CATEGORY STATISTICS
+    # =====================================================
+
+    monthly_category_stats = []
+
+    for (
+        category_code,
+        category_name
+    ) in TodoTask.CATEGORY_CHOICES:
+
+        category_tasks = monthly_tasks.filter(
+            category=category_code
+        )
+
+        category_total = (
+            category_tasks.count()
+        )
+
+        category_completed = (
+            category_tasks
+            .filter(
+                status="completed"
+            )
+            .count()
+        )
+
+        category_hours = (
+            category_tasks
+            .aggregate(
+                total=Sum(
+                    "estimated_hours"
+                )
+            )["total"]
+            or Decimal("0")
+        )
+
+        monthly_category_stats.append({
+
+            "code": category_code,
+
+            "name": category_name,
+
+            "total": category_total,
+
+            "completed": category_completed,
+
+            "hours": category_hours,
+        })
+
+    # =====================================================
+    # MONTHLY LEARNING
+    # =====================================================
+
+    monthly_learning = (
+        DailyLearning.objects
+        .filter(
+            trainer=trainer,
+            date__gte=month_start,
+            date__lte=month_end
+        )
+        .order_by("-date")
+    )
+
+    monthly_learning_days = (
+        monthly_learning.count()
+    )
+
+    # =====================================================
+    # ASSIGNED WORKSHOPS
+    # =====================================================
+
+    assigned_workshops = (
         Workshop.objects
         .filter(
             assigned_trainers=trainer
         )
-        .select_related(
-            "college"
+        .select_related("college")
+        .order_by("-start_date")
+    )
+
+    # =====================================================
+    # UPCOMING WORKSHOPS
+    # =====================================================
+
+    upcoming_workshops = (
+        assigned_workshops
+        .filter(
+            start_date__gte=today
+        )
+        .exclude(
+            status="cancelled"
         )
         .order_by(
             "start_date"
+        )[:5]
+    )
+
+    # =====================================================
+    # ONGOING WORKSHOPS
+    # =====================================================
+
+    ongoing_workshops = (
+        assigned_workshops
+        .filter(
+            start_date__lte=today,
+            end_date__gte=today
+        )
+        .exclude(
+            status__in=[
+                "cancelled",
+                "completed"
+            ]
         )
     )
 
-    # =================================================
-    # CURRENT WEEK
-    # MONDAY -> SUNDAY
-    # =================================================
+    # =====================================================
+    # WEEKLY CALENDAR
+    # =====================================================
 
     week_start = (
-        today -
-        timedelta(
+        today
+        - timedelta(
             days=today.weekday()
         )
     )
 
     week_end = (
-        week_start +
-        timedelta(days=6)
+        week_start
+        + timedelta(days=6)
     )
 
-    # =================================================
-    # WORKSHOPS FOR THIS TRAINER
-    # THAT OVERLAP CURRENT WEEK
-    # =================================================
-
-    weekly_workshops = (
-        Workshop.objects
-        .filter(
-            assigned_trainers=trainer,
-            start_date__lte=week_end,
-            end_date__gte=week_start
-        )
-        .select_related(
-            "college"
-        )
-        .order_by(
-            "start_date",
-            "title"
-        )
-    )
-
-    # =================================================
-    # CALENDAR EVENTS
-    #
-    # FDP
-    # ONLINE WORKSHOP
-    # OFFICE
-    # GUEST FACULTY
-    # MEETING
-    # OTHER
-    # =================================================
-
-    weekly_events = (
+    calendar_events = (
         CalendarEvent.objects
         .filter(
-            trainers=trainer,
             date__gte=week_start,
-            date__lte=week_end
+            date__lte=week_end,
+            trainers=trainer
         )
         .select_related(
-            "college",
-            "workshop"
+            "workshop",
+            "college"
+        )
+        .prefetch_related(
+            "trainers"
         )
         .order_by(
             "date",
@@ -1817,366 +2348,161 @@ def trainer_dashboard(request):
         )
     )
 
-    # =================================================
-    # WEEKLY SCHEDULE
-    # =================================================
+    weekly_schedule = []
 
-    schedule = []
+    for offset in range(7):
 
-    for day_offset in range(7):
-
-        current_day = (
-            week_start +
-            timedelta(
-                days=day_offset
-            )
+        current_date = (
+            week_start
+            + timedelta(days=offset)
         )
 
-        day_items = []
+        day_events = [
+            event
+            for event in calendar_events
+            if event.date == current_date
+        ]
 
-        # =================================================
-        # WORKSHOPS
-        # =================================================
-
-        for workshop in weekly_workshops:
-
+        day_workshops = [
+            workshop
+            for workshop in assigned_workshops
             if (
                 workshop.start_date
-                <= current_day
+                <= current_date
                 <= workshop.end_date
-            ):
-
-                day_items.append({
-
-                    "date":
-                        current_day,
-
-                    "title":
-                        workshop.title,
-
-                    "type":
-                        "Workshop",
-
-                    "college":
-                        (
-                            workshop.college.name
-                            if workshop.college
-                            else "-"
-                        ),
-
-                    "time":
-                        "-",
-
-                    "location":
-                        "-",
-
-                    "status":
-                        workshop.get_status_display(),
-
-                    "object":
-                        workshop,
-
-                })
-
-        # =================================================
-        # CALENDAR EVENTS
-        # =================================================
-
-        for event in weekly_events:
-
-            if event.date != current_day:
-                continue
-
-            # ---------------------------------------------
-            # Avoid duplicate workshop
-            # ---------------------------------------------
-
-            if (
-                event.workshop
-                and event.event_type == "workshop"
-            ):
-                continue
-
-            # ---------------------------------------------
-            # TIME
-            # ---------------------------------------------
-
-            time_text = "-"
-
-            if (
-                event.start_time
-                and event.end_time
-            ):
-
-                time_text = (
-                    f"{event.start_time.strftime('%I:%M %p')}"
-                    f" - "
-                    f"{event.end_time.strftime('%I:%M %p')}"
-                )
-
-            elif event.start_time:
-
-                time_text = (
-                    event.start_time.strftime(
-                        "%I:%M %p"
-                    )
-                )
-
-            # ---------------------------------------------
-            # ADD EVENT
-            # ---------------------------------------------
-
-            day_items.append({
-
-                "date":
-                    current_day,
-
-                "title":
-                    event.title,
-
-                "type":
-                    event.get_event_type_display(),
-
-                "college":
-                    (
-                        event.college.name
-                        if event.college
-                        else "-"
-                    ),
-
-                "time":
-                    time_text,
-
-                "location":
-                    event.location or "-",
-
-                "status":
-                    "Scheduled",
-
-                "object":
-                    event,
-
-            })
-
-        # =================================================
-        # SORT DAY
-        # =================================================
-
-        def schedule_sort_key(item):
-
-            time_value = item.get(
-                "time",
-                "-"
             )
+        ]
 
-            # Items without a time go last
-            if time_value == "-":
-                return "99:99"
+        weekly_schedule.append({
 
-            return time_value
+            "date": current_date,
 
-        day_items.sort(
-            key=schedule_sort_key
-        )
+            "events": day_events,
 
-        schedule.extend(
-            day_items
-        )
+            "workshops": day_workshops,
+        })
 
-    # =================================================
-    # WEEKLY SCHEDULE COUNTS
-    # =================================================
+    # =====================================================
+    # TODAY SUBTASK STATISTICS
+    # =====================================================
 
-    weekly_schedule_count = len(
-        schedule
-    )
-
-    # =================================================
-    # TODAY'S SCHEDULE
-    # =================================================
-
-    today_schedule = [
-        item
-        for item in schedule
-        if item["date"] == today
-    ]
-
-    # =================================================
-    # UPCOMING SCHEDULE
-    #
-    # From tomorrow until end of current week
-    # =================================================
-
-    upcoming_schedule = [
-        item
-        for item in schedule
-        if item["date"] > today
-    ]
-
-    # =================================================
-    # WORKSHOP COUNTS
-    # =================================================
-
-    assigned_workshop_count = (
-        workshops.count()
-    )
-
-    current_week_workshop_count = (
-        weekly_workshops.count()
-    )
-
-    # =================================================
-    # ACTIVE WORKSHOPS
-    # =================================================
-
-    active_workshops = (
-        workshops
+    today_subtasks = (
+        SubTask.objects
         .filter(
-            status__in=[
-                "fixed",
-                "tentative"
-            ]
+            parent_task__trainer=trainer,
+            parent_task__for_date=today
         )
     )
 
-    # =================================================
-    # RENDER
-    # =================================================
+    total_subtasks = (
+        today_subtasks.count()
+    )
+
+    completed_subtasks = (
+        today_subtasks
+        .filter(
+            is_completed=True
+        )
+        .count()
+    )
+
+    if total_subtasks > 0:
+
+        subtask_percentage = round(
+            (
+                completed_subtasks
+                / total_subtasks
+            ) * 100
+        )
+
+    else:
+
+        subtask_percentage = 0
+
+    # =====================================================
+    # CONTEXT
+    # =====================================================
+
+    context = {
+
+        "trainer": trainer,
+
+        # Attendance
+        "attendance": attendance,
+        "checked_in": checked_in,
+        "checked_out": checked_out,
+
+        # Date
+        "today": today,
+
+        # Today
+        "today_tasks": today_tasks,
+        "daily_learning": daily_learning,
+
+        # Today statistics
+        "total_tasks": total_tasks,
+        "completed_tasks": completed_tasks,
+        "in_progress_tasks": in_progress_tasks,
+        "pending_tasks": pending_tasks,
+        "planned_hours": planned_hours,
+        "completion_percentage": completion_percentage,
+
+        # Previous work
+        "previous_tasks": previous_tasks,
+        "overdue_tasks": overdue_tasks,
+
+        # Monthly
+        "month_start": month_start,
+        "monthly_total": monthly_total,
+        "monthly_completed": monthly_completed,
+        "monthly_in_progress": monthly_in_progress,
+        "monthly_pending": monthly_pending,
+        "monthly_planned_hours": monthly_planned_hours,
+        "monthly_completion_percentage":
+            monthly_completion_percentage,
+        "monthly_category_stats":
+            monthly_category_stats,
+
+        # Learning
+        "monthly_learning":
+            monthly_learning,
+
+        "monthly_learning_days":
+            monthly_learning_days,
+
+        # Workshops
+        "assigned_workshops":
+            assigned_workshops,
+
+        "upcoming_workshops":
+            upcoming_workshops,
+
+        "ongoing_workshops":
+            ongoing_workshops,
+
+        # Calendar
+        "week_start": week_start,
+
+        "week_end": week_end,
+
+        "weekly_schedule":
+            weekly_schedule,
+
+        # Subtasks
+        "total_subtasks":
+            total_subtasks,
+
+        "completed_subtasks":
+            completed_subtasks,
+
+        "subtask_percentage":
+            subtask_percentage,
+    }
 
     return render(
         request,
         "todo/trainer_dashboard.html",
-        {
-
-            # ---------------------------------------------
-            # TRAINER
-            # ---------------------------------------------
-
-            "trainer":
-                trainer,
-
-            "today":
-                today,
-
-            "is_full_time":
-                trainer.is_full_time,
-
-            # ---------------------------------------------
-            # ATTENDANCE
-            # ---------------------------------------------
-
-            "attendance":
-                attendance,
-
-            # ---------------------------------------------
-            # TODAY'S WORK
-            # ---------------------------------------------
-
-            "today_tasks":
-                today_tasks,
-
-            "tasks":
-                today_tasks,
-
-            "today_total_count":
-                today_total_count,
-
-            "today_completed_count":
-                today_completed_count,
-
-            "today_in_progress_count":
-                today_in_progress_count,
-
-            "today_pending_count":
-                today_pending_count,
-
-            "completed_tasks_count":
-                today_completed_count,
-
-            "completed_percentage":
-                completed_percentage,
-
-            # ---------------------------------------------
-            # PREVIOUS 7 DAYS
-            # ---------------------------------------------
-
-            "previous_tasks":
-                previous_tasks,
-
-            "previous_pending_tasks":
-                previous_pending_tasks,
-
-            "previous_total_count":
-                previous_total_count,
-
-            "previous_completed_count":
-                previous_completed_count,
-
-            "previous_in_progress_count":
-                previous_in_progress_count,
-
-            "previous_pending_count":
-                previous_pending_count,
-
-            # ---------------------------------------------
-            # OVERDUE WORK
-            # ---------------------------------------------
-
-            "overdue_tasks":
-                overdue_tasks,
-
-            "overdue_count":
-                overdue_count,
-
-            # ---------------------------------------------
-            # LEARNING
-            # ---------------------------------------------
-
-            "daily_learning":
-                daily_learning,
-
-            # ---------------------------------------------
-            # WORKSHOPS
-            # ---------------------------------------------
-
-            "workshops":
-                workshops,
-
-            "active_workshops":
-                active_workshops,
-
-            "assigned_workshop_count":
-                assigned_workshop_count,
-
-            "current_week_workshop_count":
-                current_week_workshop_count,
-
-            # ---------------------------------------------
-            # WEEK
-            # ---------------------------------------------
-
-            "week_start":
-                week_start,
-
-            "week_end":
-                week_end,
-
-            # ---------------------------------------------
-            # SCHEDULE
-            # ---------------------------------------------
-
-            "weekly_schedule":
-                schedule,
-
-            "weekly_schedule_count":
-                weekly_schedule_count,
-
-            "today_schedule":
-                today_schedule,
-
-            "upcoming_schedule":
-                upcoming_schedule,
-        }
+        context
     )
 @login_required
 def trainer_schedule(request):
@@ -2473,7 +2799,43 @@ def delete_office_training(request, pk):
 # =====================================================
 # TASK HISTORY (ADMIN ONLY)
 # =====================================================
+@login_required
+@user_passes_test(is_superuser)
+def add_subtask(request, task_id):
 
+    task = get_object_or_404(
+        TodoTask,
+        id=task_id
+    )
+
+    if request.method == "POST":
+
+        title = request.POST.get("title", "").strip()
+
+        if title:
+            SubTask.objects.create(
+                parent_task=task,
+                title=title,
+                is_completed=False
+            )
+
+            messages.success(
+                request,
+                "Subtask added successfully."
+            )
+
+        return redirect(
+            "task_detail",
+            task_id=task.id
+        )
+
+    return render(
+        request,
+        "todo/add_subtask.html",
+        {
+            "task": task
+        }
+    )
 @login_required
 @user_passes_test(is_superuser)
 def task_history(request):
@@ -2509,7 +2871,48 @@ def task_history(request):
         "query_date": date_filter,
         "query_priority": priority,
     })
+@login_required
+@user_passes_test(is_superuser)
+def edit_subtask(request, subtask_id):
 
+    subtask = get_object_or_404(
+        SubTask,
+        id=subtask_id
+    )
+
+    if request.method == "POST":
+
+        title = request.POST.get("title", "").strip()
+
+        if title:
+
+            subtask.title = title
+            subtask.save(
+                update_fields=["title"]
+            )
+
+            messages.success(
+                request,
+                "Subtask updated successfully."
+            )
+
+            return redirect(
+                "task_detail",
+                task_id=subtask.parent_task.id
+            )
+
+        messages.error(
+            request,
+            "Subtask title cannot be empty."
+        )
+
+    return render(
+        request,
+        "todo/edit_subtask.html",
+        {
+            "subtask": subtask
+        }
+    )
 @login_required
 def completed_workshops(request):
     workshops = Workshop.objects.filter(status='completed').order_by('-end_date')
@@ -3916,3 +4319,4 @@ def full_time_work_list(request):
                 today,
         }
     )
+

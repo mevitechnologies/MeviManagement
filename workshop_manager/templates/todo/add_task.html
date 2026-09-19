@@ -1,41 +1,989 @@
-{% extends 'base.html' %}
-{% load crispy_forms_tags %}
+{% extends "base.html" %}
+
+{% block title %}
+Add Work
+{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3><i class="bi bi-plus-circle text-primary"></i> Create New Task</h3>
-    <a href="{% url 'admin_task_dashboard' %}" class="btn btn-outline-secondary">
-      <i class="bi bi-arrow-left"></i> Back to Dashboard
-    </a>
-  </div>
 
-  <form method="POST" class="card shadow-sm p-4 bg-light">
-    {% csrf_token %}
-    <div class="row g-3">
-      <div class="col-md-6">{{ form.trainer|as_crispy_field }}</div>
-      <div class="col-md-6">{{ form.task|as_crispy_field }}</div>
-      <div class="col-md-12">{{ form.description|as_crispy_field }}</div>
-      <div class="col-md-4">{{ form.for_date|as_crispy_field }}</div>
-      <div class="col-md-4">{{ form.estimated_hours|as_crispy_field }}</div>
-      <div class="col-md-4">{{ form.priority|as_crispy_field }}</div>
+<style>
+
+    /* =========================================================
+       PAGE
+       ========================================================= */
+
+    .add-work-page {
+        min-height: 100vh;
+        background: #f5f7fb;
+        padding: 30px;
+    }
+
+    .add-work-container {
+        max-width: 950px;
+        margin: 0 auto;
+    }
+
+    /* =========================================================
+       CARD
+       ========================================================= */
+
+    .add-work-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+    }
+
+    /* =========================================================
+       HEADER
+       ========================================================= */
+
+    .add-work-header {
+        padding: 28px 32px;
+        border-bottom: 1px solid #e5e7eb;
+        background: #ffffff;
+    }
+
+    .add-work-title {
+        font-size: 25px;
+        font-weight: 800;
+        color: #111827;
+        line-height: 1.3;
+    }
+
+    .add-work-subtitle {
+        margin-top: 6px;
+        color: #6b7280;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    /* =========================================================
+       BODY
+       ========================================================= */
+
+    .add-work-body {
+        padding: 32px;
+    }
+
+    /* =========================================================
+       FORM
+       ========================================================= */
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #374151;
+    }
+
+    .form-control,
+    .form-select,
+    select,
+    input[type="text"],
+    input[type="date"],
+    input[type="number"],
+    textarea {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 11px 13px;
+        border: 1px solid #d1d5db;
+        border-radius: 9px;
+        background: #ffffff;
+        color: #111827;
+        font-size: 14px;
+        transition: border-color 0.2s ease,
+                    box-shadow 0.2s ease;
+    }
+
+    textarea {
+        min-height: 110px;
+        resize: vertical;
+    }
+
+    .form-control:focus,
+    .form-select:focus,
+    select:focus,
+    input:focus,
+    textarea:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+    }
+
+    .form-error {
+        margin-top: 6px;
+        color: #dc2626;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .non-field-error {
+        margin-bottom: 20px;
+        padding: 12px 14px;
+        border: 1px solid #fecaca;
+        border-radius: 9px;
+        background: #fef2f2;
+        color: #b91c1c;
+        font-size: 13px;
+    }
+
+
+    /* =========================================================
+       SUBTASK SECTION
+       ========================================================= */
+
+    .subtask-section {
+        margin-top: 30px;
+        padding: 24px;
+        border: 1px solid #dbe3ef;
+        border-radius: 14px;
+        background: #f8fafc;
+    }
+
+    .subtask-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .subtask-title {
+        font-size: 17px;
+        font-weight: 800;
+        color: #111827;
+    }
+
+    .subtask-description {
+        margin-top: 5px;
+        font-size: 12px;
+        line-height: 1.6;
+        color: #6b7280;
+    }
+
+    .subtask-count {
+        padding: 6px 10px;
+        border-radius: 20px;
+        background: #e0ecff;
+        color: #1d4ed8;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    /* =========================================================
+       SUBTASK ROW
+       ========================================================= */
+
+    .subtask-row {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        margin-bottom: 12px;
+        padding: 8px;
+        border-radius: 10px;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        transition: border-color 0.2s ease,
+                    box-shadow 0.2s ease;
+    }
+
+    .subtask-row:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
+    }
+
+    .subtask-number {
+        min-width: 30px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 800;
+        color: #374151;
+    }
+
+    .subtask-input-wrapper {
+        flex: 1;
+    }
+
+    .subtask-input-wrapper input {
+        margin: 0;
+    }
+
+    .remove-subtask {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        border: none;
+        border-radius: 8px;
+        background: #fee2e2;
+        color: #dc2626;
+        font-size: 19px;
+        font-weight: 700;
+        line-height: 1;
+        cursor: pointer;
+        transition: background 0.2s ease,
+                    transform 0.2s ease;
+    }
+
+    .remove-subtask:hover {
+        background: #fecaca;
+        transform: scale(1.03);
+    }
+
+    /* =========================================================
+       ADD SUBTASK BUTTON
+       ========================================================= */
+
+    .add-subtask-btn {
+        margin-top: 8px;
+        padding: 10px 15px;
+        border: 1px dashed #2563eb;
+        border-radius: 9px;
+        background: #eff6ff;
+        color: #2563eb;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s ease,
+                    border-color 0.2s ease;
+    }
+
+    .add-subtask-btn:hover {
+        background: #dbeafe;
+        border-color: #1d4ed8;
+    }
+
+    /* =========================================================
+       SUBTASK INFO
+       ========================================================= */
+
+    .subtask-info {
+        margin-top: 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        background: #f1f5f9;
+        color: #64748b;
+        font-size: 11px;
+        line-height: 1.5;
+    }
+
+    /* =========================================================
+       ACTIONS
+       ========================================================= */
+
+    .actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 11px 20px;
+        border-radius: 9px;
+        border: none;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-cancel {
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .btn-cancel:hover {
+        background: #e5e7eb;
+    }
+
+    .btn-save {
+        background: #2563eb;
+        color: #ffffff;
+        min-width: 130px;
+    }
+
+    .btn-save:hover {
+        background: #1d4ed8;
+        transform: translateY(-1px);
+        box-shadow: 0 5px 14px rgba(37, 99, 235, 0.2);
+    }
+
+    /* =========================================================
+       REQUIRED FIELD
+       ========================================================= */
+
+    .required {
+        color: #dc2626;
+        margin-left: 2px;
+    }
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @media (max-width: 700px) {
+
+        .add-work-page {
+            padding: 15px;
+        }
+
+        .add-work-header {
+            padding: 22px 20px;
+        }
+
+        .add-work-body {
+            padding: 20px;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
+
+        .subtask-section {
+            padding: 18px;
+        }
+
+        .subtask-header {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .subtask-row {
+            gap: 7px;
+        }
+
+        .subtask-number {
+            min-width: 27px;
+            width: 27px;
+            height: 27px;
+        }
+
+        .remove-subtask {
+            min-width: 30px;
+            width: 30px;
+            height: 30px;
+        }
+
+        .actions {
+            flex-direction: column-reverse;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+
+</style>
+
+
+<div class="add-work-page">
+
+    <div class="add-work-container">
+
+        <div class="add-work-card">
+
+            <!-- =================================================
+                 HEADER
+                 ================================================= -->
+
+            <div class="add-work-header">
+
+                <div class="add-work-title">
+                    Add Work
+                </div>
+
+                <div class="add-work-subtitle">
+                    Create a work item and break it into smaller
+                    subtasks for better tracking and completion.
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 BODY
+                 ================================================= -->
+
+            <div class="add-work-body">
+
+                <form
+                    method="post"
+                    action="{% url 'add_task_page' %}"
+                    id="add-work-form"
+                >
+
+                    {% csrf_token %}
+
+
+                    <!-- =================================================
+                         MAIN FORM ERRORS
+                         ================================================= -->
+
+                    {% if form.non_field_errors %}
+
+                        <div class="non-field-error">
+                            {{ form.non_field_errors }}
+                        </div>
+
+                    {% endif %}
+
+
+                    <!-- =================================================
+                         TRAINER
+                         ================================================= -->
+
+                    <div class="form-group">
+
+                        <label class="form-label">
+                            Trainer
+                        </label>
+
+                        {{ form.trainer }}
+
+                        {% for error in form.trainer.errors %}
+
+                            <div class="form-error">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- =================================================
+                         WORK / TASK
+                         ================================================= -->
+
+                    <div class="form-group">
+
+                        <label class="form-label">
+                            Work / Task
+                            <span class="required">*</span>
+                        </label>
+
+                        {{ form.task }}
+
+                        {% for error in form.task.errors %}
+
+                            <div class="form-error">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- =================================================
+                         DESCRIPTION
+                         ================================================= -->
+
+                    <div class="form-group">
+
+                        <label class="form-label">
+                            Description
+                        </label>
+
+                        {{ form.description }}
+
+                        {% for error in form.description.errors %}
+
+                            <div class="form-error">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- =================================================
+                         CATEGORY + DATE
+                         ================================================= -->
+
+                    <div class="form-row">
+
+                        <div class="form-group">
+
+                            <label class="form-label">
+                                Category
+                            </label>
+
+                            {{ form.category }}
+
+                            {% for error in form.category.errors %}
+
+                                <div class="form-error">
+                                    {{ error }}
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label class="form-label">
+                                Work Date
+                            </label>
+
+                            {{ form.for_date }}
+
+                            {% for error in form.for_date.errors %}
+
+                                <div class="form-error">
+                                    {{ error }}
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         PRIORITY + PLANNED HOURS
+                         ================================================= -->
+
+                    <div class="form-row">
+
+                        <div class="form-group">
+
+                            <label class="form-label">
+                                Priority
+                            </label>
+
+                            {{ form.priority }}
+
+                            {% for error in form.priority.errors %}
+
+                                <div class="form-error">
+                                    {{ error }}
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label class="form-label">
+                                Planned Hours
+                            </label>
+
+                            {{ form.estimated_hours }}
+
+                            {% for error in form.estimated_hours.errors %}
+
+                                <div class="form-error">
+                                    {{ error }}
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         SUBTASKS
+                         ================================================= -->
+
+                    <div class="subtask-section">
+
+                        <div class="subtask-header">
+
+                            <div>
+
+                                <div class="subtask-title">
+                                    Subtasks
+                                </div>
+
+                                <div class="subtask-description">
+                                    Break this work into smaller steps.
+                                    Each subtask can later be marked
+                                    as completed independently.
+                                </div>
+
+                            </div>
+
+                            <div class="subtask-count">
+                                Add as many as required
+                            </div>
+
+                        </div>
+
+
+                        <!-- =================================================
+                             IMPORTANT DJANGO FORMSET MANAGEMENT FORM
+                             ================================================= -->
+
+                        {{ subtask_formset.management_form }}
+
+
+                        <!-- =================================================
+                             SUBTASK CONTAINER
+                             ================================================= -->
+
+                        <div id="subtask-container">
+
+                            {% for subform in subtask_formset %}
+
+                                <div class="subtask-row">
+
+                                    <div class="subtask-number">
+                                        {{ forloop.counter }}
+                                    </div>
+
+                                    <div class="subtask-input-wrapper">
+
+                                        {{ subform.title }}
+
+                                        {% for error in subform.title.errors %}
+
+                                            <div class="form-error">
+                                                {{ error }}
+                                            </div>
+
+                                        {% endfor %}
+
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        class="remove-subtask"
+                                        onclick="removeSubtask(this)"
+                                        title="Remove subtask"
+                                    >
+                                        ×
+                                    </button>
+
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+
+                        <!-- =================================================
+                             ADD SUBTASK BUTTON
+                             ================================================= -->
+
+                        <button
+                            type="button"
+                            class="add-subtask-btn"
+                            onclick="addSubtask()"
+                        >
+                            + Add Subtask
+                        </button>
+
+
+                        <div class="subtask-info">
+                            You can divide the main work into multiple
+                            smaller activities. Complete each subtask
+                            individually from the task details page.
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         ACTIONS
+                         ================================================= -->
+
+                    <div class="actions">
+
+                        <a
+                            href="{% url 'trainer_dashboard' %}"
+                            class="btn btn-cancel"
+                        >
+                            Cancel
+                        </a>
+
+
+                        <button
+                            type="submit"
+                            class="btn btn-save"
+                        >
+                            Save Work
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
     </div>
 
-    <hr class="my-4">
-
-    <h5 class="mb-3"><i class="bi bi-list-task text-success"></i> Subtasks</h5>
-    <div class="subtasks">
-      {{ subtask_formset.management_form }}
-      {% for form in subtask_formset %}
-        <div class="mb-2">{{ form.title|as_crispy_field }}</div>
-      {% endfor %}
-    </div>
-
-    <div class="mt-4 d-flex justify-content-end">
-      <button type="submit" class="btn btn-primary">
-        <i class="bi bi-save"></i> Save Task
-      </button>
-    </div>
-  </form>
 </div>
+
+
+<!-- =========================================================
+     SUBTASK JAVASCRIPT
+     ========================================================= -->
+
+<script>
+
+    /*
+     * Add a new subtask dynamically.
+     *
+     * Django formsets require TOTAL_FORMS to be
+     * updated whenever a new form is added.
+     */
+
+    function addSubtask() {
+
+        const container =
+            document.getElementById("subtask-container");
+
+        const totalForms =
+            document.getElementById(
+                "id_subtasks-TOTAL_FORMS"
+            );
+
+        if (!container || !totalForms) {
+            console.error(
+                "Django subtask formset was not found."
+            );
+            return;
+        }
+
+        const index =
+            parseInt(totalForms.value);
+
+        const number =
+            container.querySelectorAll(
+                ".subtask-row"
+            ).length + 1;
+
+
+        /*
+         * Create new row manually.
+         */
+
+        const row =
+            document.createElement("div");
+
+        row.className = "subtask-row";
+
+
+        row.innerHTML = `
+
+            <div class="subtask-number">
+                ${number}
+            </div>
+
+            <div class="subtask-input-wrapper">
+
+                <input
+                    type="text"
+                    name="subtasks-${index}-title"
+                    id="id_subtasks-${index}-title"
+                    class="form-control"
+                    placeholder="Enter subtask"
+                    autocomplete="off"
+                >
+
+            </div>
+
+            <button
+                type="button"
+                class="remove-subtask"
+                onclick="removeSubtask(this)"
+                title="Remove subtask"
+            >
+                ×
+            </button>
+
+        `;
+
+
+        container.appendChild(row);
+
+
+        /*
+         * Tell Django there is one more form.
+         */
+
+        totalForms.value = index + 1;
+
+
+        updateSubtaskNumbers();
+
+
+        /*
+         * Automatically focus the new input.
+         */
+
+        const input =
+            row.querySelector("input");
+
+        if (input) {
+            input.focus();
+        }
+
+    }
+
+
+    /*
+     * Remove a subtask from the visible page.
+     */
+
+    function removeSubtask(button) {
+
+        const row =
+            button.closest(".subtask-row");
+
+        if (!row) {
+            return;
+        }
+
+
+        /*
+         * Do not reduce TOTAL_FORMS.
+         *
+         * Django formsets use indexes and expect
+         * the total number of submitted forms.
+         *
+         * The removed row is simply disabled.
+         */
+
+        const input =
+            row.querySelector("input");
+
+        if (input) {
+
+            input.value = "";
+
+            input.disabled = true;
+
+        }
+
+
+        row.style.display = "none";
+
+
+        updateSubtaskNumbers();
+
+    }
+
+
+    /*
+     * Update visible numbering.
+     */
+
+    function updateSubtaskNumbers() {
+
+        const rows =
+            document.querySelectorAll(
+                "#subtask-container .subtask-row"
+            );
+
+        let number = 1;
+
+
+        rows.forEach(function(row) {
+
+            if (
+                row.style.display === "none"
+            ) {
+                return;
+            }
+
+            const numberElement =
+                row.querySelector(
+                    ".subtask-number"
+                );
+
+            if (numberElement) {
+
+                numberElement.textContent =
+                    number;
+
+            }
+
+            number++;
+
+        });
+
+    }
+
+
+    /*
+     * Prevent accidental double submission.
+     */
+
+    document
+        .getElementById("add-work-form")
+        .addEventListener("submit", function() {
+
+            const saveButton =
+                this.querySelector(
+                    ".btn-save"
+                );
+
+            if (saveButton) {
+
+                saveButton.disabled = true;
+
+                saveButton.innerText =
+                    "Saving...";
+
+            }
+
+        });
+
+
+    /*
+     * Initial numbering.
+     */
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function() {
+
+            updateSubtaskNumbers();
+
+        }
+    );
+
+</script>
+
 {% endblock %}
