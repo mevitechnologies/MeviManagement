@@ -8,399 +8,505 @@ Add Work
 
 <style>
 
-    /* =========================================================
-       PAGE
-       ========================================================= */
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.add-work-page {
+    min-height: 100vh;
+    background: #f5f7fb;
+    padding: 30px;
+}
+
+.add-work-container {
+    max-width: 950px;
+    margin: 0 auto;
+}
+
+
+/* =========================================================
+   CARD
+   ========================================================= */
+
+.add-work-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.add-work-header {
+    padding: 28px 32px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #ffffff;
+}
+
+.add-work-title {
+    font-size: 25px;
+    font-weight: 800;
+    color: #111827;
+    line-height: 1.3;
+}
+
+.add-work-subtitle {
+    margin-top: 6px;
+    color: #6b7280;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   BODY
+   ========================================================= */
+
+.add-work-body {
+    padding: 32px;
+}
+
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #374151;
+}
+
+.form-control,
+.form-select,
+select,
+input[type="text"],
+input[type="date"],
+input[type="number"],
+textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px 13px;
+    border: 1px solid #d1d5db;
+    border-radius: 9px;
+    background: #ffffff;
+    color: #111827;
+    font-size: 14px;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+.form-control:focus,
+.form-select:focus,
+select:focus,
+input:focus,
+textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.form-error {
+    margin-top: 6px;
+    color: #dc2626;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.non-field-error {
+    margin-bottom: 20px;
+    padding: 12px 14px;
+    border: 1px solid #fecaca;
+    border-radius: 9px;
+    background: #fef2f2;
+    color: #b91c1c;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   WORK SOURCE
+   ========================================================= */
+
+.work-source-section {
+    margin-bottom: 24px;
+    padding: 20px;
+    border: 1px solid #dbe3ef;
+    border-radius: 13px;
+    background: #f8fafc;
+}
+
+.work-source-title {
+    margin-bottom: 5px;
+    font-size: 15px;
+    font-weight: 800;
+    color: #111827;
+}
+
+.work-source-description {
+    margin-bottom: 15px;
+    color: #6b7280;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   LINKED WORK BOXES
+   ========================================================= */
+
+.linked-work-box {
+    display: none;
+    margin-bottom: 20px;
+    padding: 18px;
+    border: 1px solid #dbe3ef;
+    border-radius: 12px;
+    background: #f8fafc;
+}
+
+.linked-work-box.active {
+    display: block;
+}
+
+.linked-work-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #374151;
+}
+
+.linked-work-help {
+    margin-top: 7px;
+    font-size: 11px;
+    color: #6b7280;
+}
+
+.event-extra-info {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #eef2ff;
+    color: #4f46e5;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   AUTO TASK
+   ========================================================= */
+
+.auto-task-info {
+    margin-top: 7px;
+    padding: 8px 11px;
+    border-radius: 7px;
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 11px;
+}
+
+.task-auto-filled {
+    background: #f8fafc !important;
+    color: #374151 !important;
+}
+
+.task-manual {
+    background: #ffffff !important;
+}
+
+
+/* =========================================================
+   SUBTASK SECTION
+   ========================================================= */
+
+.subtask-section {
+    margin-top: 30px;
+    padding: 24px;
+    border: 1px solid #dbe3ef;
+    border-radius: 14px;
+    background: #f8fafc;
+}
+
+.subtask-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.subtask-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: #111827;
+}
+
+.subtask-description {
+    margin-top: 5px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #6b7280;
+}
+
+.subtask-count {
+    padding: 6px 10px;
+    border-radius: 20px;
+    background: #e0ecff;
+    color: #1d4ed8;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   SUBTASK ROW
+   ========================================================= */
+
+.subtask-row {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-bottom: 12px;
+    padding: 8px;
+    border-radius: 10px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.subtask-row:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
+}
+
+.subtask-number {
+    min-width: 30px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+    color: #374151;
+}
+
+.subtask-input-wrapper {
+    flex: 1;
+}
+
+.subtask-input-wrapper input {
+    margin: 0;
+}
+
+.remove-subtask {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border: none;
+    border-radius: 8px;
+    background: #fee2e2;
+    color: #dc2626;
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.remove-subtask:hover {
+    background: #fecaca;
+    transform: scale(1.03);
+}
+
+
+/* =========================================================
+   ADD SUBTASK BUTTON
+   ========================================================= */
+
+.add-subtask-btn {
+    margin-top: 8px;
+    padding: 10px 15px;
+    border: 1px dashed #2563eb;
+    border-radius: 9px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.add-subtask-btn:hover {
+    background: #dbeafe;
+    border-color: #1d4ed8;
+}
+
+
+/* =========================================================
+   SUBTASK INFO
+   ========================================================= */
+
+.subtask-info {
+    margin-top: 14px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+
+.actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 11px 20px;
+    border-radius: 9px;
+    border: none;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-cancel {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.btn-cancel:hover {
+    background: #e5e7eb;
+}
+
+.btn-save {
+    background: #2563eb;
+    color: #ffffff;
+    min-width: 130px;
+}
+
+.btn-save:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 14px rgba(37, 99, 235, 0.2);
+}
+
+
+/* =========================================================
+   REQUIRED
+   ========================================================= */
+
+.required {
+    color: #dc2626;
+    margin-left: 2px;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
 
     .add-work-page {
-        min-height: 100vh;
-        background: #f5f7fb;
-        padding: 30px;
+        padding: 15px;
     }
-
-    .add-work-container {
-        max-width: 950px;
-        margin: 0 auto;
-    }
-
-    /* =========================================================
-       CARD
-       ========================================================= */
-
-    .add-work-card {
-        background: #ffffff;
-        border: 1px solid #e5e7eb;
-        border-radius: 18px;
-        overflow: hidden;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
-    }
-
-    /* =========================================================
-       HEADER
-       ========================================================= */
 
     .add-work-header {
-        padding: 28px 32px;
-        border-bottom: 1px solid #e5e7eb;
-        background: #ffffff;
+        padding: 22px 20px;
     }
-
-    .add-work-title {
-        font-size: 25px;
-        font-weight: 800;
-        color: #111827;
-        line-height: 1.3;
-    }
-
-    .add-work-subtitle {
-        margin-top: 6px;
-        color: #6b7280;
-        font-size: 13px;
-        line-height: 1.6;
-    }
-
-    /* =========================================================
-       BODY
-       ========================================================= */
 
     .add-work-body {
-        padding: 32px;
-    }
-
-    /* =========================================================
-       FORM
-       ========================================================= */
-
-    .form-group {
-        margin-bottom: 20px;
-    }
-
-    .form-label {
-        display: block;
-        margin-bottom: 8px;
-        font-size: 13px;
-        font-weight: 700;
-        color: #374151;
-    }
-
-    .form-control,
-    .form-select,
-    select,
-    input[type="text"],
-    input[type="date"],
-    input[type="number"],
-    textarea {
-        width: 100%;
-        box-sizing: border-box;
-        padding: 11px 13px;
-        border: 1px solid #d1d5db;
-        border-radius: 9px;
-        background: #ffffff;
-        color: #111827;
-        font-size: 14px;
-        transition: border-color 0.2s ease,
-                    box-shadow 0.2s ease;
-    }
-
-    textarea {
-        min-height: 110px;
-        resize: vertical;
-    }
-
-    .form-control:focus,
-    .form-select:focus,
-    select:focus,
-    input:focus,
-    textarea:focus {
-        outline: none;
-        border-color: #2563eb;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+        padding: 20px;
     }
 
     .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 18px;
+        grid-template-columns: 1fr;
+        gap: 0;
     }
-
-    .form-error {
-        margin-top: 6px;
-        color: #dc2626;
-        font-size: 12px;
-        line-height: 1.5;
-    }
-
-    .non-field-error {
-        margin-bottom: 20px;
-        padding: 12px 14px;
-        border: 1px solid #fecaca;
-        border-radius: 9px;
-        background: #fef2f2;
-        color: #b91c1c;
-        font-size: 13px;
-    }
-
-
-    /* =========================================================
-       SUBTASK SECTION
-       ========================================================= */
 
     .subtask-section {
-        margin-top: 30px;
-        padding: 24px;
-        border: 1px solid #dbe3ef;
-        border-radius: 14px;
-        background: #f8fafc;
+        padding: 18px;
     }
 
     .subtask-header {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 20px;
-        margin-bottom: 20px;
+        flex-direction: column;
+        gap: 10px;
     }
-
-    .subtask-title {
-        font-size: 17px;
-        font-weight: 800;
-        color: #111827;
-    }
-
-    .subtask-description {
-        margin-top: 5px;
-        font-size: 12px;
-        line-height: 1.6;
-        color: #6b7280;
-    }
-
-    .subtask-count {
-        padding: 6px 10px;
-        border-radius: 20px;
-        background: #e0ecff;
-        color: #1d4ed8;
-        font-size: 11px;
-        font-weight: 700;
-        white-space: nowrap;
-    }
-
-    /* =========================================================
-       SUBTASK ROW
-       ========================================================= */
 
     .subtask-row {
-        display: flex;
-        align-items: center;
-        gap: 11px;
-        margin-bottom: 12px;
-        padding: 8px;
-        border-radius: 10px;
-        background: #ffffff;
-        border: 1px solid #e5e7eb;
-        transition: border-color 0.2s ease,
-                    box-shadow 0.2s ease;
-    }
-
-    .subtask-row:hover {
-        border-color: #cbd5e1;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
+        gap: 7px;
     }
 
     .subtask-number {
-        min-width: 30px;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background: #e5e7eb;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        font-weight: 800;
-        color: #374151;
-    }
-
-    .subtask-input-wrapper {
-        flex: 1;
-    }
-
-    .subtask-input-wrapper input {
-        margin: 0;
+        min-width: 27px;
+        width: 27px;
+        height: 27px;
     }
 
     .remove-subtask {
-        width: 32px;
-        height: 32px;
-        min-width: 32px;
-        border: none;
-        border-radius: 8px;
-        background: #fee2e2;
-        color: #dc2626;
-        font-size: 19px;
-        font-weight: 700;
-        line-height: 1;
-        cursor: pointer;
-        transition: background 0.2s ease,
-                    transform 0.2s ease;
+        min-width: 30px;
+        width: 30px;
+        height: 30px;
     }
-
-    .remove-subtask:hover {
-        background: #fecaca;
-        transform: scale(1.03);
-    }
-
-    /* =========================================================
-       ADD SUBTASK BUTTON
-       ========================================================= */
-
-    .add-subtask-btn {
-        margin-top: 8px;
-        padding: 10px 15px;
-        border: 1px dashed #2563eb;
-        border-radius: 9px;
-        background: #eff6ff;
-        color: #2563eb;
-        font-size: 13px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: background 0.2s ease,
-                    border-color 0.2s ease;
-    }
-
-    .add-subtask-btn:hover {
-        background: #dbeafe;
-        border-color: #1d4ed8;
-    }
-
-    /* =========================================================
-       SUBTASK INFO
-       ========================================================= */
-
-    .subtask-info {
-        margin-top: 14px;
-        padding: 10px 12px;
-        border-radius: 8px;
-        background: #f1f5f9;
-        color: #64748b;
-        font-size: 11px;
-        line-height: 1.5;
-    }
-
-    /* =========================================================
-       ACTIONS
-       ========================================================= */
 
     .actions {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 15px;
-        margin-top: 32px;
-        padding-top: 24px;
-        border-top: 1px solid #e5e7eb;
+        flex-direction: column-reverse;
     }
 
     .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 42px;
-        padding: 11px 20px;
-        border-radius: 9px;
-        border: none;
-        font-size: 13px;
-        font-weight: 700;
-        text-decoration: none;
-        cursor: pointer;
-        transition: all 0.2s ease;
+        width: 100%;
     }
-
-    .btn-cancel {
-        background: #f3f4f6;
-        color: #374151;
-    }
-
-    .btn-cancel:hover {
-        background: #e5e7eb;
-    }
-
-    .btn-save {
-        background: #2563eb;
-        color: #ffffff;
-        min-width: 130px;
-    }
-
-    .btn-save:hover {
-        background: #1d4ed8;
-        transform: translateY(-1px);
-        box-shadow: 0 5px 14px rgba(37, 99, 235, 0.2);
-    }
-
-    /* =========================================================
-       REQUIRED FIELD
-       ========================================================= */
-
-    .required {
-        color: #dc2626;
-        margin-left: 2px;
-    }
-
-    /* =========================================================
-       MOBILE
-       ========================================================= */
-
-    @media (max-width: 700px) {
-
-        .add-work-page {
-            padding: 15px;
-        }
-
-        .add-work-header {
-            padding: 22px 20px;
-        }
-
-        .add-work-body {
-            padding: 20px;
-        }
-
-        .form-row {
-            grid-template-columns: 1fr;
-            gap: 0;
-        }
-
-        .subtask-section {
-            padding: 18px;
-        }
-
-        .subtask-header {
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .subtask-row {
-            gap: 7px;
-        }
-
-        .subtask-number {
-            min-width: 27px;
-            width: 27px;
-            height: 27px;
-        }
-
-        .remove-subtask {
-            min-width: 30px;
-            width: 30px;
-            height: 30px;
-        }
-
-        .actions {
-            flex-direction: column-reverse;
-        }
-
-        .btn {
-            width: 100%;
-        }
-    }
+}
 
 </style>
 
@@ -410,6 +516,7 @@ Add Work
     <div class="add-work-container">
 
         <div class="add-work-card">
+
 
             <!-- =================================================
                  HEADER
@@ -422,8 +529,9 @@ Add Work
                 </div>
 
                 <div class="add-work-subtitle">
-                    Create a work item and break it into smaller
-                    subtasks for better tracking and completion.
+                    Select an existing activity or add other work.
+                    The work title will be automatically filled
+                    when you select an existing activity.
                 </div>
 
             </div>
@@ -445,7 +553,7 @@ Add Work
 
 
                     <!-- =================================================
-                         MAIN FORM ERRORS
+                         FORM ERRORS
                          ================================================= -->
 
                     {% if form.non_field_errors %}
@@ -465,11 +573,245 @@ Add Work
 
                         <label class="form-label">
                             Trainer
+                            <span class="required">*</span>
                         </label>
 
                         {{ form.trainer }}
 
                         {% for error in form.trainer.errors %}
+
+                            <div class="form-error">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- =================================================
+                         WORK SOURCE
+                         ================================================= -->
+
+                    <div class="work-source-section">
+
+                        <div class="work-source-title">
+                            What type of work is this?
+                        </div>
+
+                        <div class="work-source-description">
+                            Select an existing activity assigned to the
+                            trainer, or choose Other Work to enter it manually.
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 0;">
+
+                            <label class="form-label">
+                                Work Type
+                                <span class="required">*</span>
+                            </label>
+
+                            {{ form.work_source }}
+
+                            {% for error in form.work_source.errors %}
+
+                                <div class="form-error">
+                                    {{ error }}
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         WORKSHOP
+                         ================================================= -->
+
+                    <div
+                        class="linked-work-box"
+                        id="workshop-box"
+                    >
+
+                        <label
+                            class="linked-work-label"
+                            for="id_workshop"
+                        >
+                            Select Workshop
+                        </label>
+
+                        <select
+                            name="workshop"
+                            id="id_workshop"
+                            class="form-select"
+                        >
+
+                            <option value="">
+                                Select workshop
+                            </option>
+
+                            {% for workshop in form.workshop.field.queryset %}
+
+                                <option
+                                    value="{{ workshop.pk }}"
+                                    data-title="{{ workshop.title|escape }}"
+                                    {% if form.workshop.value|stringformat:"s" == workshop.pk|stringformat:"s" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ workshop.title }}
+                                    {% if workshop.college %}
+                                        — {{ workshop.college.name }}
+                                    {% endif %}
+                                    ({{ workshop.start_date|date:"d M Y" }})
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                        <div class="linked-work-help">
+                            Only workshops assigned to the selected trainer
+                            are available.
+                        </div>
+
+                        {% for error in form.workshop.errors %}
+
+                            <div class="form-error">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- =================================================
+                         OFFICE TRAINING
+                         ================================================= -->
+
+                    <div
+                        class="linked-work-box"
+                        id="office-training-box"
+                    >
+
+                        <label
+                            class="linked-work-label"
+                            for="id_office_training"
+                        >
+                            Select Office Training
+                        </label>
+
+                        <select
+                            name="office_training"
+                            id="id_office_training"
+                            class="form-select"
+                        >
+
+                            <option value="">
+                                Select office training
+                            </option>
+
+                            {% for training in form.office_training.field.queryset %}
+
+                                <option
+                                    value="{{ training.pk }}"
+                                    data-title="{{ training.name|escape }}"
+                                    {% if form.office_training.value|stringformat:"s" == training.pk|stringformat:"s" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ training.name }}
+                                    — {{ training.batch_id }}
+                                    ({{ training.start_date|date:"d M Y" }})
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                        <div class="linked-work-help">
+                            Only office trainings assigned to the selected
+                            trainer are available.
+                        </div>
+
+                        {% for error in form.office_training.errors %}
+
+                            <div class="form-error">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- =================================================
+                         CALENDAR EVENT
+                         ================================================= -->
+
+                    <div
+                        class="linked-work-box"
+                        id="calendar-event-box"
+                    >
+
+                        <label
+                            class="linked-work-label"
+                            for="id_calendar_event"
+                        >
+                            Select Scheduled Event
+                        </label>
+
+                        <select
+                            name="calendar_event"
+                            id="id_calendar_event"
+                            class="form-select"
+                        >
+
+                            <option value="">
+                                Select scheduled event
+                            </option>
+
+                            {% for event in form.calendar_event.field.queryset %}
+
+                                <option
+                                    value="{{ event.pk }}"
+                                    data-title="{{ event.title|escape }}"
+                                    data-event-type="{{ event.get_event_type_display|escape }}"
+                                    data-guest="{{ event.guest_faculty|escape }}"
+                                    data-date="{{ event.date|date:'d M Y' }}"
+                                    {% if form.calendar_event.value|stringformat:"s" == event.pk|stringformat:"s" %}
+                                        selected
+                                    {% endif %}
+                                >
+
+                                    {{ event.title }}
+                                    — {{ event.get_event_type_display }}
+                                    — {{ event.date|date:"d M Y" }}
+
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+
+                        <div
+                            class="event-extra-info"
+                            id="event-extra-info"
+                            style="display:none;"
+                        ></div>
+
+
+                        <div class="linked-work-help">
+                            Includes FDPs, online workshops, guest faculty
+                            training, meetings, office events and other
+                            scheduled events assigned to the trainer.
+                        </div>
+
+                        {% for error in form.calendar_event.errors %}
 
                             <div class="form-error">
                                 {{ error }}
@@ -492,6 +834,15 @@ Add Work
                         </label>
 
                         {{ form.task }}
+
+                        <div
+                            class="auto-task-info"
+                            id="task-help"
+                        >
+                            Select a Workshop, Office Training or Scheduled
+                            Event above. The task title will be filled
+                            automatically.
+                        </div>
 
                         {% for error in form.task.errors %}
 
@@ -574,7 +925,7 @@ Add Work
 
 
                     <!-- =================================================
-                         PRIORITY + PLANNED HOURS
+                         PRIORITY + HOURS
                          ================================================= -->
 
                     <div class="form-row">
@@ -648,16 +999,8 @@ Add Work
                         </div>
 
 
-                        <!-- =================================================
-                             IMPORTANT DJANGO FORMSET MANAGEMENT FORM
-                             ================================================= -->
-
                         {{ subtask_formset.management_form }}
 
-
-                        <!-- =================================================
-                             SUBTASK CONTAINER
-                             ================================================= -->
 
                         <div id="subtask-container">
 
@@ -699,10 +1042,6 @@ Add Work
                         </div>
 
 
-                        <!-- =================================================
-                             ADD SUBTASK BUTTON
-                             ================================================= -->
-
                         <button
                             type="button"
                             class="add-subtask-btn"
@@ -738,6 +1077,7 @@ Add Work
                         <button
                             type="submit"
                             class="btn btn-save"
+                            id="save-work-button"
                         >
                             Save Work
                         </button>
@@ -755,171 +1095,543 @@ Add Work
 </div>
 
 
-<!-- =========================================================
-     SUBTASK JAVASCRIPT
-     ========================================================= -->
-
 <script>
 
-    /*
-     * Add a new subtask dynamically.
-     *
-     * Django formsets require TOTAL_FORMS to be
-     * updated whenever a new form is added.
-     */
+/* =========================================================
+   ELEMENTS
+   ========================================================= */
 
-    function addSubtask() {
+const workSource =
+    document.getElementById("id_work_source");
 
-        const container =
-            document.getElementById("subtask-container");
+const workshopBox =
+    document.getElementById("workshop-box");
 
-        const totalForms =
-            document.getElementById(
-                "id_subtasks-TOTAL_FORMS"
+const officeTrainingBox =
+    document.getElementById("office-training-box");
+
+const calendarEventBox =
+    document.getElementById("calendar-event-box");
+
+const workshopSelect =
+    document.getElementById("id_workshop");
+
+const officeTrainingSelect =
+    document.getElementById("id_office_training");
+
+const calendarEventSelect =
+    document.getElementById("id_calendar_event");
+
+const taskInput =
+    document.getElementById("id_task");
+
+const taskHelp =
+    document.getElementById("task-help");
+
+const eventExtraInfo =
+    document.getElementById("event-extra-info");
+
+
+/* =========================================================
+   GET SELECTED TITLE
+   ========================================================= */
+
+function getSelectedTitle(selectElement) {
+
+    if (!selectElement) {
+        return "";
+    }
+
+    const option =
+        selectElement.options[
+            selectElement.selectedIndex
+        ];
+
+    if (!option) {
+        return "";
+    }
+
+    return option.getAttribute("data-title") || "";
+}
+
+
+/* =========================================================
+   UPDATE TASK TITLE
+   ========================================================= */
+
+function updateTaskTitle() {
+
+    const source =
+        workSource ? workSource.value : "";
+
+    let title = "";
+
+
+    if (source === "workshop") {
+
+        title =
+            getSelectedTitle(
+                workshopSelect
             );
 
-        if (!container || !totalForms) {
-            console.error(
-                "Django subtask formset was not found."
+        taskInput.readOnly = true;
+
+        taskInput.classList.remove(
+            "task-manual"
+        );
+
+        taskInput.classList.add(
+            "task-auto-filled"
+        );
+
+        taskHelp.innerText =
+            "Task title is automatically taken from the selected workshop.";
+
+    }
+
+
+    else if (source === "office_training") {
+
+        title =
+            getSelectedTitle(
+                officeTrainingSelect
             );
-            return;
+
+        taskInput.readOnly = true;
+
+        taskInput.classList.remove(
+            "task-manual"
+        );
+
+        taskInput.classList.add(
+            "task-auto-filled"
+        );
+
+        taskHelp.innerText =
+            "Task title is automatically taken from the selected office training.";
+
+    }
+
+
+    else if (source === "calendar_event") {
+
+        title =
+            getSelectedTitle(
+                calendarEventSelect
+            );
+
+        taskInput.readOnly = true;
+
+        taskInput.classList.remove(
+            "task-manual"
+        );
+
+        taskInput.classList.add(
+            "task-auto-filled"
+        );
+
+        taskHelp.innerText =
+            "Task title is automatically taken from the selected scheduled event.";
+
+    }
+
+
+    else if (source === "other") {
+
+        taskInput.readOnly = false;
+
+        taskInput.classList.remove(
+            "task-auto-filled"
+        );
+
+        taskInput.classList.add(
+            "task-manual"
+        );
+
+        taskHelp.innerText =
+            "Enter the work title manually.";
+
+        return;
+    }
+
+
+    else {
+
+        taskInput.readOnly = true;
+
+        taskInput.classList.remove(
+            "task-manual"
+        );
+
+        taskInput.classList.add(
+            "task-auto-filled"
+        );
+
+        taskHelp.innerText =
+            "Select a work type and activity.";
+
+    }
+
+
+    taskInput.value = title;
+}
+
+
+/* =========================================================
+   SHOW / HIDE SOURCE BOXES
+   ========================================================= */
+
+function updateWorkSource() {
+
+    const source =
+        workSource ? workSource.value : "";
+
+
+    /* Hide everything */
+
+    workshopBox.classList.remove("active");
+
+    officeTrainingBox.classList.remove("active");
+
+    calendarEventBox.classList.remove("active");
+
+
+    /* Workshop */
+
+    if (source === "workshop") {
+
+        workshopBox.classList.add("active");
+
+    }
+
+
+    /* Office Training */
+
+    else if (source === "office_training") {
+
+        officeTrainingBox.classList.add("active");
+
+    }
+
+
+    /* Calendar Event */
+
+    else if (source === "calendar_event") {
+
+        calendarEventBox.classList.add("active");
+
+    }
+
+
+    updateTaskTitle();
+
+    updateEventInfo();
+}
+
+
+/* =========================================================
+   CALENDAR EVENT INFORMATION
+   ========================================================= */
+
+function updateEventInfo() {
+
+    if (!calendarEventSelect || !eventExtraInfo) {
+        return;
+    }
+
+    const option =
+        calendarEventSelect.options[
+            calendarEventSelect.selectedIndex
+        ];
+
+
+    if (!option || !option.value) {
+
+        eventExtraInfo.style.display = "none";
+
+        eventExtraInfo.innerHTML = "";
+
+        return;
+    }
+
+
+    const eventType =
+        option.getAttribute(
+            "data-event-type"
+        ) || "";
+
+
+    const guest =
+        option.getAttribute(
+            "data-guest"
+        ) || "";
+
+
+    const date =
+        option.getAttribute(
+            "data-date"
+        ) || "";
+
+
+    let html =
+        "<strong>Event Type:</strong> "
+        + eventType;
+
+
+    if (date) {
+
+        html +=
+            "<br><strong>Date:</strong> "
+            + date;
+
+    }
+
+
+    if (guest) {
+
+        html +=
+            "<br><strong>Guest Faculty:</strong> "
+            + guest;
+
+    }
+
+
+    eventExtraInfo.innerHTML = html;
+
+    eventExtraInfo.style.display = "block";
+}
+
+
+/* =========================================================
+   SOURCE CHANGE
+   ========================================================= */
+
+if (workSource) {
+
+    workSource.addEventListener(
+        "change",
+        function() {
+
+            updateWorkSource();
+
         }
+    );
 
-        const index =
-            parseInt(totalForms.value);
-
-        const number =
-            container.querySelectorAll(
-                ".subtask-row"
-            ).length + 1;
+}
 
 
-        /*
-         * Create new row manually.
-         */
+/* =========================================================
+   WORKSHOP CHANGE
+   ========================================================= */
 
-        const row =
-            document.createElement("div");
+if (workshopSelect) {
 
-        row.className = "subtask-row";
+    workshopSelect.addEventListener(
+        "change",
+        function() {
+
+            updateTaskTitle();
+
+        }
+    );
+
+}
 
 
-        row.innerHTML = `
+/* =========================================================
+   OFFICE TRAINING CHANGE
+   ========================================================= */
 
-            <div class="subtask-number">
-                ${number}
-            </div>
+if (officeTrainingSelect) {
 
-            <div class="subtask-input-wrapper">
+    officeTrainingSelect.addEventListener(
+        "change",
+        function() {
 
-                <input
-                    type="text"
-                    name="subtasks-${index}-title"
-                    id="id_subtasks-${index}-title"
-                    class="form-control"
-                    placeholder="Enter subtask"
-                    autocomplete="off"
-                >
+            updateTaskTitle();
 
-            </div>
+        }
+    );
 
-            <button
-                type="button"
-                class="remove-subtask"
-                onclick="removeSubtask(this)"
-                title="Remove subtask"
+}
+
+
+/* =========================================================
+   CALENDAR EVENT CHANGE
+   ========================================================= */
+
+if (calendarEventSelect) {
+
+    calendarEventSelect.addEventListener(
+        "change",
+        function() {
+
+            updateTaskTitle();
+
+            updateEventInfo();
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   SUBTASK - ADD
+   ========================================================= */
+
+function addSubtask() {
+
+    const container =
+        document.getElementById(
+            "subtask-container"
+        );
+
+    const totalForms =
+        document.getElementById(
+            "id_subtasks-TOTAL_FORMS"
+        );
+
+
+    if (!container || !totalForms) {
+
+        console.error(
+            "Django subtask formset was not found."
+        );
+
+        return;
+    }
+
+
+    const index =
+        parseInt(
+            totalForms.value
+        );
+
+
+    const number =
+        container.querySelectorAll(
+            ".subtask-row"
+        ).length + 1;
+
+
+    const row =
+        document.createElement("div");
+
+    row.className =
+        "subtask-row";
+
+
+    row.innerHTML = `
+
+        <div class="subtask-number">
+            ${number}
+        </div>
+
+        <div class="subtask-input-wrapper">
+
+            <input
+                type="text"
+                name="subtasks-${index}-title"
+                id="id_subtasks-${index}-title"
+                class="form-control"
+                placeholder="Enter subtask"
+                autocomplete="off"
             >
-                ×
-            </button>
 
-        `;
+        </div>
 
+        <button
+            type="button"
+            class="remove-subtask"
+            onclick="removeSubtask(this)"
+            title="Remove subtask"
+        >
+            ×
+        </button>
 
-        container.appendChild(row);
-
-
-        /*
-         * Tell Django there is one more form.
-         */
-
-        totalForms.value = index + 1;
-
-
-        updateSubtaskNumbers();
+    `;
 
 
-        /*
-         * Automatically focus the new input.
-         */
+    container.appendChild(row);
 
-        const input =
-            row.querySelector("input");
 
-        if (input) {
-            input.focus();
-        }
+    totalForms.value =
+        index + 1;
+
+
+    updateSubtaskNumbers();
+
+
+    const input =
+        row.querySelector("input");
+
+
+    if (input) {
+
+        input.focus();
+
+    }
+
+}
+
+
+/* =========================================================
+   SUBTASK - REMOVE
+   ========================================================= */
+
+function removeSubtask(button) {
+
+    const row =
+        button.closest(
+            ".subtask-row"
+        );
+
+
+    if (!row) {
+        return;
+    }
+
+
+    const input =
+        row.querySelector("input");
+
+
+    if (input) {
+
+        input.value = "";
+
+        input.disabled = true;
 
     }
 
 
-    /*
-     * Remove a subtask from the visible page.
-     */
-
-    function removeSubtask(button) {
-
-        const row =
-            button.closest(".subtask-row");
-
-        if (!row) {
-            return;
-        }
+    row.style.display =
+        "none";
 
 
-        /*
-         * Do not reduce TOTAL_FORMS.
-         *
-         * Django formsets use indexes and expect
-         * the total number of submitted forms.
-         *
-         * The removed row is simply disabled.
-         */
+    updateSubtaskNumbers();
 
-        const input =
-            row.querySelector("input");
-
-        if (input) {
-
-            input.value = "";
-
-            input.disabled = true;
-
-        }
+}
 
 
-        row.style.display = "none";
+/* =========================================================
+   SUBTASK - NUMBERING
+   ========================================================= */
+
+function updateSubtaskNumbers() {
+
+    const rows =
+        document.querySelectorAll(
+            "#subtask-container .subtask-row"
+        );
 
 
-        updateSubtaskNumbers();
-
-    }
+    let number = 1;
 
 
-    /*
-     * Update visible numbering.
-     */
-
-    function updateSubtaskNumbers() {
-
-        const rows =
-            document.querySelectorAll(
-                "#subtask-container .subtask-row"
-            );
-
-        let number = 1;
-
-
-        rows.forEach(function(row) {
+    rows.forEach(
+        function(row) {
 
             if (
                 row.style.display === "none"
@@ -927,10 +1639,12 @@ Add Work
                 return;
             }
 
+
             const numberElement =
                 row.querySelector(
                     ".subtask-number"
                 );
+
 
             if (numberElement) {
 
@@ -939,50 +1653,69 @@ Add Work
 
             }
 
+
             number++;
 
-        });
+        }
+    );
 
-    }
+}
 
 
-    /*
-     * Prevent accidental double submission.
-     */
+/* =========================================================
+   PREVENT DOUBLE SUBMISSION
+   ========================================================= */
 
-    document
-        .getElementById("add-work-form")
-        .addEventListener("submit", function() {
+const addWorkForm =
+    document.getElementById(
+        "add-work-form"
+    );
+
+
+if (addWorkForm) {
+
+    addWorkForm.addEventListener(
+        "submit",
+        function() {
 
             const saveButton =
-                this.querySelector(
-                    ".btn-save"
+                document.getElementById(
+                    "save-work-button"
                 );
+
 
             if (saveButton) {
 
-                saveButton.disabled = true;
+                saveButton.disabled =
+                    true;
 
                 saveButton.innerText =
                     "Saving...";
 
             }
 
-        });
-
-
-    /*
-     * Initial numbering.
-     */
-
-    document.addEventListener(
-        "DOMContentLoaded",
-        function() {
-
-            updateSubtaskNumbers();
-
         }
     );
+
+}
+
+
+/* =========================================================
+   INITIAL PAGE LOAD
+   ========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        updateWorkSource();
+
+        updateEventInfo();
+
+        updateSubtaskNumbers();
+
+    }
+);
 
 </script>
 

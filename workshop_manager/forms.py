@@ -375,14 +375,39 @@ class OfficeTrainingForm(forms.ModelForm):
 # TODO TASK FORM
 # =====================================================
 
+# =========================================================
+# TODO TASK / TODAY'S WORK FORM
+# =========================================================
+
 class TodoTaskForm(forms.ModelForm):
 
-    class Meta:
+    WORK_SOURCE_CHOICES = [
+        ("", "Select work type"),
+        ("workshop", "Workshop"),
+        ("office_training", "Office Training"),
+        ("calendar_event", "Scheduled Event / Guest Faculty / FDP"),
+        ("other", "Other Work"),
+    ]
 
+    work_source = forms.ChoiceField(
+        choices=WORK_SOURCE_CHOICES,
+        required=True,
+        widget=forms.Select(
+            attrs={
+                "class": "form-select",
+                "id": "id_work_source",
+            }
+        ),
+    )
+
+    class Meta:
         model = TodoTask
 
         fields = [
             "trainer",
+            "workshop",
+            "office_training",
+            "calendar_event",
             "task",
             "description",
             "category",
@@ -395,14 +420,37 @@ class TodoTaskForm(forms.ModelForm):
 
             "trainer": forms.Select(
                 attrs={
-                    "class": "form-control"
+                    "class": "form-select",
+                }
+            ),
+
+            "workshop": forms.Select(
+                attrs={
+                    "class": "form-select",
+                    "id": "id_workshop",
+                }
+            ),
+
+            "office_training": forms.Select(
+                attrs={
+                    "class": "form-select",
+                    "id": "id_office_training",
+                }
+            ),
+
+            "calendar_event": forms.Select(
+                attrs={
+                    "class": "form-select",
+                    "id": "id_calendar_event",
                 }
             ),
 
             "task": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "Enter work title"
+                    "placeholder": "Work title",
+                    "readonly": "readonly",
+                    "id": "id_task",
                 }
             ),
 
@@ -410,26 +458,26 @@ class TodoTaskForm(forms.ModelForm):
                 attrs={
                     "class": "form-control",
                     "rows": 4,
-                    "placeholder": "Describe the work"
+                    "placeholder": "Additional notes about today's work",
                 }
             ),
 
             "category": forms.Select(
                 attrs={
-                    "class": "form-control"
+                    "class": "form-select",
                 }
             ),
 
             "for_date": forms.DateInput(
                 attrs={
                     "class": "form-control",
-                    "type": "date"
+                    "type": "date",
                 }
             ),
 
             "priority": forms.Select(
                 attrs={
-                    "class": "form-control"
+                    "class": "form-select",
                 }
             ),
 
@@ -437,12 +485,144 @@ class TodoTaskForm(forms.ModelForm):
                 attrs={
                     "class": "form-control",
                     "step": "0.5",
-                    "min": "0"
+                    "min": "0",
                 }
             ),
         }
 
-             #====================================
+    def __init__(self, *args, trainer=None, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        # -----------------------------------------------------
+        # Trainer
+        # -----------------------------------------------------
+
+        if trainer:
+
+            self.fields["trainer"].queryset = Trainer.objects.filter(
+                id=trainer.id
+            )
+
+            self.fields["trainer"].initial = trainer
+
+            # -------------------------------------------------
+            # Workshops assigned to this trainer
+            # -------------------------------------------------
+
+            self.fields["workshop"].queryset = (
+                Workshop.objects
+                .filter(
+                    assigned_trainers=trainer
+                )
+                .order_by("-start_date", "title")
+            )
+
+            # -------------------------------------------------
+            # Office trainings assigned to this trainer
+            # -------------------------------------------------
+
+            self.fields["office_training"].queryset = (
+                OfficeTraining.objects
+                .filter(
+                    trainers=trainer
+                )
+                .order_by("-start_date", "name")
+            )
+
+            # -------------------------------------------------
+            # Calendar events assigned to this trainer
+            # -------------------------------------------------
+
+            self.fields["calendar_event"].queryset = (
+                CalendarEvent.objects
+                .filter(
+                    trainers=trainer
+                )
+                .order_by("-date", "start_time", "title")
+            )
+
+        else:
+
+            self.fields["workshop"].queryset = Workshop.objects.all()
+            self.fields["office_training"].queryset = OfficeTraining.objects.all()
+            self.fields["calendar_event"].queryset = CalendarEvent.objects.all()
+
+        # -----------------------------------------------------
+        # Optional fields
+        # -----------------------------------------------------
+
+        self.fields["workshop"].required = False
+        self.fields["office_training"].required = False
+        self.fields["calendar_event"].required = False
+
+        # -----------------------------------------------------
+        # Nice empty labels
+        # -----------------------------------------------------
+
+        self.fields["workshop"].empty_label = "Select workshop"
+        self.fields["office_training"].empty_label = "Select office training"
+        self.fields["calendar_event"].empty_label = "Select scheduled event"
+
+    def clean(self):
+
+        cleaned_data = super().clean()
+
+        source = cleaned_data.get("work_source")
+
+        workshop = cleaned_data.get("workshop")
+        office_training = cleaned_data.get("office_training")
+        calendar_event = cleaned_data.get("calendar_event")
+
+        # -----------------------------------------------------
+        # WORKSHOP
+        # -----------------------------------------------------
+
+        if source == "workshop" and not workshop:
+
+            self.add_error(
+                "workshop",
+                "Please select a workshop."
+            )
+
+        # -----------------------------------------------------
+        # OFFICE TRAINING
+        # -----------------------------------------------------
+
+        elif source == "office_training" and not office_training:
+
+            self.add_error(
+                "office_training",
+                "Please select an office training."
+            )
+
+        # -----------------------------------------------------
+        # CALENDAR EVENT
+        # -----------------------------------------------------
+
+        elif source == "calendar_event" and not calendar_event:
+
+            self.add_error(
+                "calendar_event",
+                "Please select a scheduled event."
+            )
+
+        # -----------------------------------------------------
+        # OTHER
+        # -----------------------------------------------------
+
+        elif source == "other":
+
+            task = cleaned_data.get("task")
+
+            if not task:
+
+                self.add_error(
+                    "task",
+                    "Please enter the work title."
+                )
+
+        return cleaned_data         #====================================
 # SUBTASK FORM
 # =========================================================
 

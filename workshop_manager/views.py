@@ -1294,190 +1294,110 @@ def admin_task_dashboard(request):
         }
     })
 
-@login_required
-# =====================================================
-# ADD TASK / ADD WORK
-# =====================================================
 
 # =====================================================
 # ADD TASK / ADD WORK
 # =====================================================
 
-# ============================================================
-# ADD TASK / ADD WORK
-# ============================================================
 
 @login_required
 def add_task_page(request):
 
-    # ============================================================
-    # FIND LOGGED-IN TRAINER
-    # ============================================================
-
-    trainer = Trainer.objects.filter(
-        user=request.user
-    ).first()
-
-    if not trainer:
-        trainer = Trainer.objects.filter(
-            email__iexact=request.user.email
-        ).first()
-
-    # No trainer profile
-    if not trainer:
-        messages.error(
-            request,
-            "Your account is not linked to a Trainer profile."
-        )
-
-        if request.user.is_superuser:
-            return redirect("admin_task_dashboard")
-
-        return redirect("dashboard")
-
-    # ============================================================
-    # POST
-    # ============================================================
-
     if request.method == "POST":
 
-        form = TodoTaskForm(request.POST)
-
-        # --------------------------------------------------------
-        # NORMAL TRAINER CAN ONLY CREATE WORK FOR THEMSELVES
-        # --------------------------------------------------------
-
-        if not request.user.is_superuser:
-
-            form.fields["trainer"].queryset = Trainer.objects.filter(
-                id=trainer.id
-            )
-
-            form.initial["trainer"] = trainer
-
-        # --------------------------------------------------------
-        # SUBTASK FORMSET
-        # --------------------------------------------------------
+        form = TodoTaskForm(
+            request.POST,
+            trainer=request.user.trainer
+            if hasattr(request.user, "trainer")
+            else None
+        )
 
         subtask_formset = SubTaskFormSet(
             request.POST,
-            queryset=SubTask.objects.none(),
             prefix="subtasks"
         )
 
-        # ========================================================
-        # VALIDATE
-        # ========================================================
-
         if form.is_valid() and subtask_formset.is_valid():
-
-            # ----------------------------------------------------
-            # CREATE MAIN TASK
-            # ----------------------------------------------------
 
             task = form.save(commit=False)
 
-            # ----------------------------------------------------
-            # SECURITY
-            # ----------------------------------------------------
+            # -------------------------------------------------
+            # TRAINER
+            # -------------------------------------------------
 
             if not request.user.is_superuser:
+
+                trainer = Trainer.objects.filter(
+                    user=request.user
+                ).first()
+
+                if not trainer:
+                    trainer = Trainer.objects.filter(
+                        email=request.user.email
+                    ).first()
+
+                if not trainer:
+                    messages.error(
+                        request,
+                        "Your account is not linked to a Trainer profile."
+                    )
+                    return redirect("dashboard")
+
                 task.trainer = trainer
 
-            # ----------------------------------------------------
+            # -------------------------------------------------
             # DEFAULT STATUS
-            # ----------------------------------------------------
+            # -------------------------------------------------
 
             task.status = "pending"
             task.is_done = False
 
-            # ----------------------------------------------------
-            # SAVE MAIN TASK
-            # ----------------------------------------------------
-
             task.save()
 
-            # ====================================================
-            # SAVE SUBTASKS
-            # ====================================================
+            # -------------------------------------------------
+            # SUBTASKS
+            # -------------------------------------------------
 
-            saved_subtasks = 0
+            subtask_formset.instance = task
+            subtask_formset.save()
 
-            for subform in subtask_formset:
-
-                # Skip completely empty forms
-                if not subform.cleaned_data:
-                    continue
-
-                title = subform.cleaned_data.get("title")
-
-                if not title:
-                    continue
-
-                subtask = subform.save(commit=False)
-
-                # Connect to parent task
-                subtask.parent_task = task
-
-                # New subtasks are incomplete
-                subtask.is_completed = False
-
-                subtask.save()
-
-                saved_subtasks += 1
-
-            # ====================================================
-            # SUCCESS MESSAGE
-            # ====================================================
-
-            if saved_subtasks:
-
-                messages.success(
-                    request,
-                    f'Work "{task.task}" and '
-                    f'{saved_subtasks} subtask(s) added successfully.'
-                )
-
-            else:
-
-                messages.success(
-                    request,
-                    f'Work "{task.task}" added successfully.'
-                )
-
-            # ====================================================
-            # REDIRECT
-            # ====================================================
-
-            if request.user.is_superuser:
-                return redirect("admin_task_dashboard")
+            messages.success(
+                request,
+                "Work added successfully."
+            )
 
             return redirect("trainer_dashboard")
 
-    # ============================================================
-    # GET
-    # ============================================================
-
     else:
 
-        form = TodoTaskForm()
+        # -------------------------------------------------
+        # DEFAULT TRAINER
+        # -------------------------------------------------
+
+        initial = {}
 
         if not request.user.is_superuser:
 
-            form.fields["trainer"].queryset = Trainer.objects.filter(
-                id=trainer.id
-            )
+            trainer = Trainer.objects.filter(
+                user=request.user
+            ).first()
 
-            form.initial["trainer"] = trainer
+            if not trainer:
+                trainer = Trainer.objects.filter(
+                    email=request.user.email
+                ).first()
+
+            if trainer:
+                initial["trainer"] = trainer
+
+        form = TodoTaskForm(
+            initial=initial
+        )
 
         subtask_formset = SubTaskFormSet(
             queryset=SubTask.objects.none(),
             prefix="subtasks"
         )
-
-    # ============================================================
-    # RENDER
-    # ============================================================
 
     return render(
         request,
@@ -1485,7 +1405,6 @@ def add_task_page(request):
         {
             "form": form,
             "subtask_formset": subtask_formset,
-            "trainer": trainer,
         }
     )
 # ============================================================

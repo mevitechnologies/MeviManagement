@@ -347,7 +347,7 @@ class OfficeTraining(models.Model):
 
 
 # =========================================================
-# TODO TASK
+#TODO TASK
 # =========================================================
 
 class TodoTask(models.Model):
@@ -382,7 +382,41 @@ class TodoTask(models.Model):
         limit_choices_to={"is_full_time": True},
     )
 
-    task = models.CharField(max_length=255)
+    # =====================================================
+    # LINK TO EXISTING WORK
+    # =====================================================
+
+    workshop = models.ForeignKey(
+        Workshop,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="daily_work_tasks",
+    )
+
+    office_training = models.ForeignKey(
+        OfficeTraining,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="daily_work_tasks",
+    )
+
+    calendar_event = models.ForeignKey(
+        "CalendarEvent",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="daily_work_tasks",
+    )
+
+    # =====================================================
+    # TASK DETAILS
+    # =====================================================
+
+    task = models.CharField(
+        max_length=255
+    )
 
     description = models.TextField(
         blank=True,
@@ -417,9 +451,20 @@ class TodoTask(models.Model):
         default=1.0
     )
 
-    is_done = models.BooleanField(default=False)
+    is_done = models.BooleanField(
+        default=False
+    )
 
-    created_on = models.DateTimeField(auto_now_add=True)
+    created_on = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return (
+            f"{self.task} - "
+            f"{self.trainer.Name} - "
+            f"{self.for_date}"
+        )
 # =========================================================
 # SUB TASK
 # =========================================================
