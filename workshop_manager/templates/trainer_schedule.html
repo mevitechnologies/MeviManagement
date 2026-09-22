@@ -6,6 +6,10 @@ Trainer Schedule
 
 {% block content %}
 
+<!-- =========================================================
+     FULLCALENDAR
+========================================================= -->
+
 <link
     href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css"
     rel="stylesheet"
@@ -13,352 +17,2105 @@ Trainer Schedule
 
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 
+
 <style>
 
-    body {
-        background: #f6f8fb;
+/* =========================================================
+   MEVI TRAINER SCHEDULE
+========================================================= */
+
+:root {
+
+    --primary: #5b4bdb;
+    --primary-dark: #4535bd;
+
+    --blue: #2563eb;
+    --green: #16a34a;
+    --orange: #f59e0b;
+    --red: #dc3545;
+    --purple: #7c3aed;
+
+    --text: #172033;
+    --muted: #64748b;
+
+    --border: #e5e7eb;
+
+    --background: #f5f7fb;
+
+    --card: #ffffff;
+
+    --shadow:
+        0 10px 35px rgba(15, 23, 42, 0.08);
+
+    --shadow-hover:
+        0 18px 45px rgba(15, 23, 42, 0.13);
+
+}
+
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+body {
+
+    background:
+        linear-gradient(
+            180deg,
+            #f8faff 0%,
+            #f4f6fb 100%
+        );
+
+    color: var(--text);
+
+}
+
+
+/* =========================================================
+   MAIN CONTAINER
+========================================================= */
+
+.schedule-page {
+
+    width: 100%;
+
+    padding:
+        28px
+        24px
+        50px;
+
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.schedule-hero {
+
+    position: relative;
+
+    overflow: hidden;
+
+    border-radius: 24px;
+
+    padding: 30px 32px;
+
+    margin-bottom: 22px;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            135deg,
+            #5b4bdb 0%,
+            #6949d8 45%,
+            #764ba2 100%
+        );
+
+    box-shadow:
+        0 18px 50px
+        rgba(91, 75, 219, 0.22);
+
+}
+
+
+.schedule-hero::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 280px;
+
+    height: 280px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255,255,255,0.08);
+
+    right: -70px;
+
+    top: -110px;
+
+}
+
+
+.schedule-hero::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 180px;
+
+    height: 180px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255,255,255,0.06);
+
+    left: 38%;
+
+    bottom: -100px;
+
+}
+
+
+.hero-content {
+
+    position: relative;
+
+    z-index: 2;
+
+}
+
+
+.hero-top {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+}
+
+
+.hero-title {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 16px;
+
+    margin: 0;
+
+    font-size: 32px;
+
+    font-weight: 800;
+
+    letter-spacing: -0.5px;
+
+}
+
+
+.hero-icon {
+
+    width: 58px;
+
+    height: 58px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 17px;
+
+    background:
+        rgba(255,255,255,0.16);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.18);
+
+    font-size: 28px;
+
+}
+
+
+.hero-subtitle {
+
+    margin:
+
+        8px
+        0
+        0
+        74px;
+
+    color:
+        rgba(255,255,255,0.86);
+
+    font-size: 15px;
+
+    line-height: 1.6;
+
+}
+
+
+.hero-actions {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+}
+
+
+.hero-actions .btn {
+
+    border-radius: 12px;
+
+    padding:
+        10px
+        16px;
+
+    font-weight: 700;
+
+}
+
+
+/* =========================================================
+   TRAINER INFO
+========================================================= */
+
+.trainer-info {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-top: 22px;
+
+    padding-top: 18px;
+
+    border-top:
+        1px solid
+        rgba(255,255,255,0.18);
+
+}
+
+
+.trainer-avatar {
+
+    width: 44px;
+
+    height: 44px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        rgba(255,255,255,0.17);
+
+    font-size: 19px;
+
+}
+
+
+.trainer-info-name {
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+}
+
+
+.trainer-info-label {
+
+    font-size: 12px;
+
+    color:
+        rgba(255,255,255,0.75);
+
+}
+
+
+/* =========================================================
+   TOOLBAR CARD
+========================================================= */
+
+.schedule-toolbar {
+
+    background: var(--card);
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius: 18px;
+
+    padding: 16px 18px;
+
+    margin-bottom: 18px;
+
+    box-shadow:
+        0 6px 22px
+        rgba(15,23,42,0.05);
+
+}
+
+
+.toolbar-left {
+
+    display: flex;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+}
+
+
+.toolbar-note {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    color: var(--muted);
+
+    font-size: 13px;
+
+}
+
+
+.toolbar-note i {
+
+    color: var(--primary);
+
+    font-size: 16px;
+
+}
+
+
+/* =========================================================
+   FILTER
+========================================================= */
+
+.event-filter {
+
+    min-width: 190px;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius: 10px;
+
+    padding:
+        9px
+        12px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    color: var(--text);
+
+    background: white;
+
+}
+
+
+/* =========================================================
+   CALENDAR CARD
+========================================================= */
+
+.calendar-card {
+
+    background: var(--card);
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius: 22px;
+
+    padding: 18px;
+
+    box-shadow: var(--shadow);
+
+    overflow: hidden;
+
+}
+
+
+/* =========================================================
+   CALENDAR
+========================================================= */
+
+#trainer-calendar {
+
+    min-height: 760px;
+
+}
+
+
+/* =========================================================
+   FULLCALENDAR TOOLBAR
+========================================================= */
+
+.fc {
+
+    font-family:
+        inherit;
+
+}
+
+
+.fc .fc-toolbar {
+
+    margin-bottom: 22px;
+
+    gap: 12px;
+
+}
+
+
+.fc .fc-toolbar-title {
+
+    font-size: 24px;
+
+    font-weight: 800;
+
+    color: var(--text);
+
+}
+
+
+.fc .fc-button {
+
+    border: 0 !important;
+
+    border-radius: 9px !important;
+
+    background: #eef2ff !important;
+
+    color: #4338ca !important;
+
+    font-weight: 700 !important;
+
+    padding:
+        8px
+        13px !important;
+
+    box-shadow: none !important;
+
+}
+
+
+.fc .fc-button:hover {
+
+    background: #e0e7ff !important;
+
+}
+
+
+.fc .fc-button-primary:not(:disabled).fc-button-active {
+
+    background:
+        var(--primary) !important;
+
+    color: white !important;
+
+}
+
+
+.fc .fc-today-button {
+
+    background:
+        #f1f5f9 !important;
+
+    color:
+        #334155 !important;
+
+}
+
+
+.fc .fc-scrollgrid {
+
+    border:
+        1px solid
+        #e2e8f0 !important;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+}
+
+
+.fc-theme-standard td,
+.fc-theme-standard th {
+
+    border-color:
+        #e8edf3 !important;
+
+}
+
+
+/* =========================================================
+   DAY HEADERS
+========================================================= */
+
+.fc .fc-col-header-cell {
+
+    background:
+        #f8fafc;
+
+}
+
+
+.fc .fc-col-header-cell-cushion {
+
+    padding:
+        12px 5px;
+
+    color:
+        #475569;
+
+    font-size:
+        13px;
+
+    font-weight:
+        800;
+
+    text-decoration:
+        none;
+
+}
+
+
+/* =========================================================
+   DAY NUMBERS
+========================================================= */
+
+.fc .fc-daygrid-day-number {
+
+    padding:
+        9px;
+
+    color:
+        #475569;
+
+    font-size:
+        13px;
+
+    font-weight:
+        700;
+
+    text-decoration:
+        none;
+
+}
+
+
+/* =========================================================
+   TODAY
+========================================================= */
+
+.fc .fc-day-today {
+
+    background:
+        rgba(91,75,219,0.045) !important;
+
+}
+
+
+.fc .fc-day-today
+.fc-daygrid-day-number {
+
+    background:
+        var(--primary);
+
+    color:
+        white;
+
+    border-radius:
+        8px;
+
+    margin:
+        5px;
+
+}
+
+
+/* =========================================================
+   TIME GRID
+========================================================= */
+
+.fc .fc-timegrid-slot {
+
+    height:
+        52px;
+
+}
+
+
+.fc .fc-timegrid-axis-cushion {
+
+    font-size:
+        11px;
+
+    color:
+        #64748b;
+
+    font-weight:
+        700;
+
+}
+
+
+.fc .fc-timegrid-slot-label-cushion {
+
+    font-size:
+        11px;
+
+    color:
+        #64748b;
+
+}
+
+
+/* =========================================================
+   EVENTS
+========================================================= */
+
+.fc-event {
+
+    cursor:
+        pointer;
+
+    border:
+        0 !important;
+
+    border-radius:
+        8px !important;
+
+    padding:
+        4px 7px !important;
+
+    font-size:
+        12px !important;
+
+    font-weight:
+        700 !important;
+
+    box-shadow:
+        0 3px 10px
+        rgba(15,23,42,0.12);
+
+}
+
+
+.fc-event:hover {
+
+    filter:
+        brightness(0.96);
+
+    transform:
+        translateY(-1px);
+
+}
+
+
+.fc-event-title {
+
+    font-weight:
+        700 !important;
+
+}
+
+
+.fc-daygrid-event {
+
+    margin:
+        2px 4px !important;
+
+}
+
+
+/* =========================================================
+   LIST VIEW
+========================================================= */
+
+.fc-list-event {
+
+    cursor:
+        pointer;
+
+}
+
+
+.fc .fc-list-event-title {
+
+    font-size:
+        14px;
+
+    font-weight:
+        700;
+
+}
+
+
+.fc .fc-list-event-time {
+
+    font-size:
+        13px;
+
+    color:
+        #64748b;
+
+}
+
+
+.fc .fc-list-day-cushion {
+
+    background:
+        #f8fafc;
+
+}
+
+
+.fc .fc-list-day-text,
+.fc .fc-list-day-side-text {
+
+    color:
+        #334155;
+
+    font-weight:
+        800;
+
+    text-decoration:
+        none;
+
+}
+
+
+/* =========================================================
+   LEGEND
+========================================================= */
+
+.legend-section {
+
+    margin-top:
+        20px;
+
+    padding-top:
+        18px;
+
+    border-top:
+        1px solid
+        var(--border);
+
+}
+
+
+.legend-title {
+
+    font-size:
+        13px;
+
+    font-weight:
+        800;
+
+    color:
+        #475569;
+
+    margin-bottom:
+        12px;
+
+}
+
+
+.legend {
+
+    display:
+        flex;
+
+    flex-wrap:
+        wrap;
+
+    gap:
+        9px;
+
+}
+
+
+.legend-item {
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        7px;
+
+    padding:
+        7px 10px;
+
+    border:
+        1px solid
+        #e2e8f0;
+
+    border-radius:
+        9px;
+
+    background:
+        #f8fafc;
+
+    color:
+        #475569;
+
+    font-size:
+        12px;
+
+    font-weight:
+        700;
+
+}
+
+
+.legend-box {
+
+    width:
+        11px;
+
+    height:
+        11px;
+
+    border-radius:
+        4px;
+
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.event-modal-card {
+
+    border:
+        0;
+
+    border-radius:
+        20px;
+
+    overflow:
+        hidden;
+
+    box-shadow:
+        0 25px 70px
+        rgba(15,23,42,0.22);
+
+}
+
+
+.event-modal-card .modal-header {
+
+    padding:
+        20px 22px;
+
+    color:
+        white;
+
+    background:
+        linear-gradient(
+            135deg,
+            #5b4bdb,
+            #764ba2
+        );
+
+    border:
+        0;
+
+}
+
+
+.event-modal-card .modal-title {
+
+    font-size:
+        20px;
+
+    font-weight:
+        800;
+
+}
+
+
+.event-modal-card .modal-body {
+
+    padding:
+        24px;
+
+}
+
+
+.event-detail {
+
+    height:
+        100%;
+
+    padding:
+        15px;
+
+    border:
+        1px solid
+        #e5e7eb;
+
+    border-radius:
+        13px;
+
+    background:
+        #f8fafc;
+
+}
+
+
+.event-detail-label {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        7px;
+
+    margin-bottom:
+        5px;
+
+    color:
+        #64748b;
+
+    font-size:
+        11px;
+
+    font-weight:
+        800;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        .5px;
+
+}
+
+
+.event-detail-label i {
+
+    color:
+        var(--primary);
+
+    font-size:
+        14px;
+
+}
+
+
+.event-detail-value {
+
+    color:
+        #172033;
+
+    font-size:
+        14px;
+
+    font-weight:
+        650;
+
+    line-height:
+        1.5;
+
+    word-break:
+        break-word;
+
+}
+
+
+.event-description {
+
+    padding:
+        16px;
+
+    border-radius:
+        13px;
+
+    background:
+        #f8fafc;
+
+    border:
+        1px solid
+        #e5e7eb;
+
+    color:
+        #475569;
+
+    font-size:
+        14px;
+
+    line-height:
+        1.7;
+
+}
+
+
+/* =========================================================
+   MODAL FOOTER
+========================================================= */
+
+.event-modal-card .modal-footer {
+
+    padding:
+        15px 22px;
+
+    background:
+        #f8fafc;
+
+    border-top:
+        1px solid
+        #e5e7eb;
+
+}
+
+
+.event-modal-card .btn {
+
+    border-radius:
+        10px;
+
+    padding:
+        9px 14px;
+
+    font-size:
+        13px;
+
+    font-weight:
+        700;
+
+}
+
+
+/* =========================================================
+   SOURCE BADGE
+========================================================= */
+
+.source-badge {
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        5px;
+
+    padding:
+        5px 9px;
+
+    border-radius:
+        7px;
+
+    background:
+        #eef2ff;
+
+    color:
+        #4338ca;
+
+    font-size:
+        11px;
+
+    font-weight:
+        800;
+
+}
+
+
+/* =========================================================
+   STATUS BADGES
+========================================================= */
+
+.status-badge {
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    padding:
+        5px 9px;
+
+    border-radius:
+        7px;
+
+    background:
+        #ecfdf5;
+
+    color:
+        #15803d;
+
+    font-size:
+        11px;
+
+    font-weight:
+        800;
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .schedule-page {
+
+        padding:
+            20px
+            16px
+            40px;
+
     }
 
-    .calendar-wrapper {
-        background: white;
-        border-radius: 18px;
-        padding: 20px;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    .hero-title {
+
+        font-size:
+            28px;
+
+    }
+
+    .hero-subtitle {
+
+        margin-left:
+            0;
+
+    }
+
+}
+
+
+@media (max-width: 768px) {
+
+    .schedule-page {
+
+        padding:
+            14px
+            10px
+            30px;
+
+    }
+
+    .schedule-hero {
+
+        padding:
+            22px;
+
+        border-radius:
+            18px;
+
+    }
+
+    .hero-top {
+
+        flex-direction:
+            column;
+
+        align-items:
+            flex-start;
+
+    }
+
+    .hero-actions {
+
+        width:
+            100%;
+
+    }
+
+    .hero-actions .btn {
+
+        width:
+            100%;
+
+    }
+
+    .hero-title {
+
+        font-size:
+            24px;
+
+    }
+
+    .hero-icon {
+
+        width:
+            48px;
+
+        height:
+            48px;
+
+        font-size:
+            22px;
+
+    }
+
+    .calendar-card {
+
+        padding:
+            10px;
+
+        border-radius:
+            16px;
+
     }
 
     #trainer-calendar {
-        min-height: 750px;
+
+        min-height:
+            650px;
+
+    }
+
+    .fc .fc-toolbar {
+
+        flex-direction:
+            column;
+
+        align-items:
+            stretch;
+
+    }
+
+    .fc .fc-toolbar-chunk {
+
+        display:
+            flex;
+
+        justify-content:
+            center;
+
+        flex-wrap:
+            wrap;
+
+        gap:
+            5px;
+
     }
 
     .fc .fc-toolbar-title {
-        font-size: 1.4rem;
-        font-weight: 700;
+
+        font-size:
+            19px;
+
+    }
+
+    .fc .fc-button {
+
+        font-size:
+            11px !important;
+
+        padding:
+            7px 9px !important;
+
+    }
+
+    .event-filter {
+
+        width:
+            100%;
+
+    }
+
+}
+
+
+@media (max-width: 480px) {
+
+    .schedule-page {
+
+        padding:
+            8px
+            6px
+            25px;
+
+    }
+
+    .schedule-hero {
+
+        padding:
+            18px;
+
+    }
+
+    .hero-title {
+
+        font-size:
+            21px;
+
+    }
+
+    .hero-subtitle {
+
+        font-size:
+            13px;
+
+    }
+
+    .calendar-card {
+
+        padding:
+            6px;
+
+    }
+
+    #trainer-calendar {
+
+        min-height:
+            580px;
+
+    }
+
+    .fc .fc-daygrid-day-number {
+
+        font-size:
+            11px;
+
     }
 
     .fc-event {
-        cursor: pointer;
-        border-radius: 6px;
-        padding: 3px 5px;
-        font-size: 0.85rem;
-    }
 
-    .fc-timegrid-slot {
-        height: 45px;
-    }
+        font-size:
+            10px !important;
 
-    .calendar-header {
-        background: linear-gradient(
-            135deg,
-            #667eea,
-            #764ba2
-        );
-        color: white;
-        padding: 22px;
-        border-radius: 18px 18px 0 0;
-    }
+        padding:
+            3px 4px !important;
 
-    .legend {
-        display: flex;
-        gap: 20px;
-        flex-wrap: wrap;
-        margin-top: 12px;
     }
 
     .legend-item {
-        font-size: 13px;
+
+        font-size:
+            10px;
+
     }
 
-    .legend-box {
-        width: 12px;
-        height: 12px;
-        display: inline-block;
-        border-radius: 3px;
-        margin-right: 5px;
+}
+
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+
+        scroll-behavior:
+            auto !important;
+
+        transition:
+            none !important;
+
+        animation:
+            none !important;
+
     }
 
-    .event-modal-card {
-        border-radius: 15px;
-        border: 0;
-        overflow: hidden;
-    }
-
-    .calendar-header .btn {
-        border-radius: 10px;
-    }
-
-    @media (max-width: 768px) {
-        #trainer-calendar {
-            min-height: 620px;
-        }
-
-        .fc .fc-toolbar {
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .fc .fc-toolbar-title {
-            font-size: 1.1rem;
-        }
-    }
+}
 
 </style>
 
 
-<div class="container-fluid mt-4">
+<!-- =========================================================
+     PAGE
+========================================================= -->
 
-    <div class="calendar-wrapper">
+<div class="schedule-page">
 
-        <!-- HEADER -->
 
-        <div class="calendar-header mb-3">
+    <!-- =====================================================
+         HERO
+    ===================================================== -->
 
-            <div class="d-flex justify-content-between align-items-center">
+    <section class="schedule-hero">
+
+        <div class="hero-content">
+
+            <div class="hero-top">
 
                 <div>
 
-                    <h3 class="mb-1">
-                        <i class="bi bi-calendar-week"></i>
-                        Trainer Schedule
-                    </h3>
+                    <h1 class="hero-title">
 
-                    <small>
-                        Manage workshops, trainings, meetings and events
-                    </small>
+                        <span class="hero-icon">
+                            <i class="bi bi-calendar-week"></i>
+                        </span>
+
+                        Trainer Schedule
+
+                    </h1>
+
+                    <p class="hero-subtitle">
+
+                        Your personal schedule containing
+                        workshops, trainings, events and assigned work.
+
+                    </p>
 
                 </div>
 
+
                 {% if request.user.is_superuser %}
 
-                <a
-                    href="{% url 'add_calendar_event' %}"
-                    class="btn btn-light"
-                >
-                    <i class="bi bi-plus-circle"></i>
-                    Add Event
-                </a>
+                <div class="hero-actions">
+
+                    <a
+                        href="{% url 'add_calendar_event' %}"
+                        class="btn btn-light"
+                    >
+
+                        <i class="bi bi-plus-circle me-1"></i>
+
+                        Add Event
+
+                    </a>
+
+                </div>
 
                 {% endif %}
 
             </div>
 
+
+            <!-- TRAINER -->
+
+            {% if trainer %}
+
+            <div class="trainer-info">
+
+                <div class="trainer-avatar">
+
+                    <i class="bi bi-person"></i>
+
+                </div>
+
+                <div>
+
+                    <div class="trainer-info-name">
+
+                        {{ trainer.Name }}
+
+                    </div>
+
+                    <div class="trainer-info-label">
+
+                        Personal Schedule
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         TOOLBAR
+    ===================================================== -->
+
+    <div class="schedule-toolbar">
+
+        <div
+            class="d-flex
+                   justify-content-between
+                   align-items-center
+                   flex-wrap
+                   gap-3"
+        >
+
+            <div class="toolbar-left">
+
+                <div class="toolbar-note">
+
+                    <i class="bi bi-info-circle"></i>
+
+                    <span>
+                        Only work assigned to this trainer is shown.
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <select
+                    id="eventTypeFilter"
+                    class="event-filter"
+                >
+
+                    <option value="all">
+                        All Work
+                    </option>
+
+                    <option value="Workshop">
+                        Workshops
+                    </option>
+
+                    <option value="Office Training">
+                        Office Training
+                    </option>
+
+                    <option value="Calendar Event">
+                        Calendar Events
+                    </option>
+
+                    <option value="Assigned Work">
+                        Assigned Work
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         CALENDAR
+    ===================================================== -->
+
+    <div class="calendar-card">
+
+        <div id="trainer-calendar"></div>
+
+
+        <!-- =================================================
+             LEGEND
+        ================================================= -->
+
+        <div class="legend-section">
+
+            <div class="legend-title">
+
+                <i class="bi bi-palette me-1"></i>
+
+                Schedule Categories
+
+            </div>
+
+
             <div class="legend">
 
                 <span class="legend-item">
-                    <span class="legend-box" style="background:#198754;"></span>
+
+                    <span
+                        class="legend-box"
+                        style="background:#198754;"
+                    ></span>
+
                     Workshop
+
                 </span>
 
-                <span class="legend-item">
-                    <span class="legend-box" style="background:#dc3545;"></span>
-                    FDP
-                </span>
 
                 <span class="legend-item">
-                    <span class="legend-box" style="background:#20c997;"></span>
-                    Online Workshop
-                </span>
 
-                <span class="legend-item">
-                    <span class="legend-box" style="background:#0d6efd;"></span>
+                    <span
+                        class="legend-box"
+                        style="background:#0d6efd;"
+                    ></span>
+
                     Office Training
+
                 </span>
 
-                <span class="legend-item">
-                    <span class="legend-box" style="background:#fd7e14;"></span>
-                    Guest Faculty Training
-                </span>
 
                 <span class="legend-item">
-                    <span class="legend-box" style="background:#6f42c1;"></span>
+
+                    <span
+                        class="legend-box"
+                        style="background:#dc3545;"
+                    ></span>
+
+                    FDP
+
+                </span>
+
+
+                <span class="legend-item">
+
+                    <span
+                        class="legend-box"
+                        style="background:#20c997;"
+                    ></span>
+
+                    Online Workshop
+
+                </span>
+
+
+                <span class="legend-item">
+
+                    <span
+                        class="legend-box"
+                        style="background:#fd7e14;"
+                    ></span>
+
+                    Guest Training
+
+                </span>
+
+
+                <span class="legend-item">
+
+                    <span
+                        class="legend-box"
+                        style="background:#6f42c1;"
+                    ></span>
+
                     Meeting
+
                 </span>
+
 
                 <span class="legend-item">
-                    <span class="legend-box" style="background:#6c757d;"></span>
-                    Other
+
+                    <span
+                        class="legend-box"
+                        style="background:#475569;"
+                    ></span>
+
+                    Assigned Work
+
+                </span>
+
+
+                <span class="legend-item">
+
+                    <span
+                        class="legend-box"
+                        style="background:#16a34a;"
+                    ></span>
+
+                    Completed Work
+
                 </span>
 
             </div>
 
         </div>
-
-
-        <!-- CALENDAR -->
-
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-            <div class="text-muted small">
-                <i class="bi bi-info-circle me-1"></i>
-                Click an event to view details.
-                Drag and resize events only when permitted.
-            </div>
-
-            {% if request.user.is_superuser %}
-            <a
-                href="{% url 'add_calendar_event' %}"
-                class="btn btn-primary"
-            >
-                <i class="bi bi-plus-circle me-1"></i>
-                Add Calendar Event
-            </a>
-            {% endif %}
-        </div>
-
-        <div id="trainer-calendar"></div>
 
     </div>
 
 </div>
 
 
-<!-- EVENT DETAILS MODAL -->
+
+<!-- =========================================================
+     EVENT DETAILS MODAL
+========================================================= -->
 
 <div
     class="modal fade"
     id="eventModal"
     tabindex="-1"
+    aria-hidden="true"
 >
 
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
 
         <div class="modal-content event-modal-card">
 
+
+            <!-- HEADER -->
+
             <div class="modal-header">
 
-                <h5
-                    class="modal-title"
-                    id="modalEventTitle"
-                >
-                    Event Details
-                </h5>
+                <div>
+
+                    <div
+                        class="small mb-1"
+                        style="opacity:.75;"
+                    >
+                        Schedule Details
+                    </div>
+
+                    <h5
+                        class="modal-title"
+                        id="modalEventTitle"
+                    >
+                        Event Details
+                    </h5>
+
+                </div>
+
 
                 <button
                     type="button"
-                    class="btn-close"
+                    class="btn-close btn-close-white"
                     data-bs-dismiss="modal"
+                    aria-label="Close"
                 ></button>
 
             </div>
+
+
+
+            <!-- BODY -->
 
             <div class="modal-body">
 
                 <div class="row g-3">
 
+
+                    <!-- SOURCE -->
+
                     <div class="col-md-6">
 
-                        <strong>
-                            <i class="bi bi-people"></i>
-                            Trainers
-                        </strong>
+                        <div class="event-detail">
 
-                        <div
-                            id="modalTrainers"
-                            class="text-muted"
-                        ></div>
+                            <div class="event-detail-label">
+
+                                <i class="bi bi-diagram-3"></i>
+
+                                Source
+
+                            </div>
+
+                            <div
+                                id="modalSource"
+                                class="event-detail-value"
+                            >
+                                —
+                            </div>
+
+                        </div>
 
                     </div>
 
 
+
+                    <!-- EVENT TYPE -->
+
                     <div class="col-md-6">
 
-                        <strong>
-                            <i class="bi bi-bookmark"></i>
-                            Event Type
-                        </strong>
+                        <div class="event-detail">
 
-                        <div
-                            id="modalType"
-                            class="text-muted"
-                        ></div>
+                            <div class="event-detail-label">
+
+                                <i class="bi bi-bookmark"></i>
+
+                                Event Type
+
+                            </div>
+
+                            <div
+                                id="modalType"
+                                class="event-detail-value"
+                            >
+                                —
+                            </div>
+
+                        </div>
 
                     </div>
 
 
+
+                    <!-- TRAINERS -->
+
                     <div class="col-md-6">
 
-                        <strong>
-                            <i class="bi bi-building"></i>
-                            College
-                        </strong>
+                        <div class="event-detail">
 
-                        <div
-                            id="modalCollege"
-                            class="text-muted"
-                        ></div>
+                            <div class="event-detail-label">
+
+                                <i class="bi bi-people"></i>
+
+                                Trainers
+
+                            </div>
+
+                            <div
+                                id="modalTrainers"
+                                class="event-detail-value"
+                            >
+                                —
+                            </div>
+
+                        </div>
 
                     </div>
 
 
+
+                    <!-- STATUS -->
+
                     <div class="col-md-6">
 
-                        <strong>
-                            <i class="bi bi-book"></i>
-                            Workshop
-                        </strong>
+                        <div class="event-detail">
 
-                        <div
-                            id="modalWorkshop"
-                            class="text-muted"
-                        ></div>
+                            <div class="event-detail-label">
+
+                                <i class="bi bi-check-circle"></i>
+
+                                Status
+
+                            </div>
+
+                            <div
+                                id="modalStatus"
+                                class="event-detail-value"
+                            >
+                                —
+                            </div>
+
+                        </div>
 
                     </div>
 
 
+
+                    <!-- COLLEGE -->
+
                     <div class="col-md-6">
 
-                        <strong>
-                            <i class="bi bi-diagram-3"></i>
-                            Department
-                        </strong>
+                        <div class="event-detail">
 
-                        <div
-                            id="modalDepartment"
-                            class="text-muted"
-                        ></div>
+                            <div class="event-detail-label">
+
+                                <i class="bi bi-building"></i>
+
+                                College
+
+                            </div>
+
+                            <div
+                                id="modalCollege"
+                                class="event-detail-value"
+                            >
+                                —
+                            </div>
+
+                        </div>
 
                     </div>
 
 
+
+                    <!-- WORKSHOP -->
+
                     <div class="col-md-6">
 
-                        <strong>
-                            <i class="bi bi-person-badge"></i>
-                            Guest Faculty
-                        </strong>
+                        <div class="event-detail">
 
-                        <div
-                            id="modalGuestFaculty"
-                            class="text-muted"
-                        ></div>
+                            <div class="event-detail-label">
+
+                                <i class="bi bi-book"></i>
+
+                                Workshop
+
+                            </div>
+
+                            <div
+                                id="modalWorkshop"
+                                class="event-detail-value"
+                            >
+                                —
+                            </div>
+
+                        </div>
 
                     </div>
 
 
+
+                    <!-- DEPARTMENT -->
+
                     <div class="col-md-6">
 
-                        <strong>
-                            <i class="bi bi-geo-alt"></i>
-                            Location
-                        </strong>
+                        <div class="event-detail">
 
-                        <div
-                            id="modalLocation"
-                            class="text-muted"
-                        ></div>
+                            <div class="event-detail-label">
+
+                                <i class="bi bi-diagram-3"></i>
+
+                                Department
+
+                            </div>
+
+                            <div
+                                id="modalDepartment"
+                                class="event-detail-value"
+                            >
+                                —
+                            </div>
+
+                        </div>
 
                     </div>
 
+
+
+                    <!-- GUEST FACULTY -->
+
+                    <div class="col-md-6">
+
+                        <div class="event-detail">
+
+                            <div class="event-detail-label">
+
+                                <i class="bi bi-person-badge"></i>
+
+                                Guest Faculty
+
+                            </div>
+
+                            <div
+                                id="modalGuestFaculty"
+                                class="event-detail-value"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- LOCATION -->
+
+                    <div class="col-md-6">
+
+                        <div class="event-detail">
+
+                            <div class="event-detail-label">
+
+                                <i class="bi bi-geo-alt"></i>
+
+                                Location
+
+                            </div>
+
+                            <div
+                                id="modalLocation"
+                                class="event-detail-value"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- PRIORITY -->
+
+                    <div class="col-md-6">
+
+                        <div class="event-detail">
+
+                            <div class="event-detail-label">
+
+                                <i class="bi bi-flag"></i>
+
+                                Priority
+
+                            </div>
+
+                            <div
+                                id="modalPriority"
+                                class="event-detail-value"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- LINKED WORK -->
 
                     <div class="col-12">
 
-                        <strong>
+                        <div class="event-detail">
+
+                            <div class="event-detail-label">
+
+                                <i class="bi bi-link-45deg"></i>
+
+                                Linked Work
+
+                            </div>
+
+                            <div
+                                id="modalLinkedWork"
+                                class="event-detail-value"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- DESCRIPTION -->
+
+                    <div class="col-12">
+
+                        <div class="event-detail-label mb-2">
+
                             <i class="bi bi-card-text"></i>
+
                             Description
-                        </strong>
+
+                        </div>
 
                         <div
                             id="modalDescription"
-                            class="text-muted mt-1"
-                        ></div>
+                            class="event-description"
+                        >
+                            —
+                        </div>
 
                     </div>
 
@@ -366,7 +2123,12 @@ Trainer Schedule
 
             </div>
 
+
+
+            <!-- FOOTER -->
+
             <div class="modal-footer">
+
 
                 {% if request.user.is_superuser %}
 
@@ -375,36 +2137,50 @@ Trainer Schedule
                     href="#"
                     class="btn btn-primary"
                 >
-                    <i class="bi bi-pencil"></i>
+
+                    <i class="bi bi-pencil me-1"></i>
+
                     Edit
+
                 </a>
+
 
                 <a
                     id="duplicateDayBtn"
                     href="#"
                     class="btn btn-outline-success"
                 >
-                    <i class="bi bi-copy"></i>
+
+                    <i class="bi bi-copy me-1"></i>
+
                     Next Day
+
                 </a>
+
 
                 <a
                     id="duplicateWeekBtn"
                     href="#"
                     class="btn btn-outline-info"
                 >
-                    <i class="bi bi-calendar-plus"></i>
+
+                    <i class="bi bi-calendar-plus me-1"></i>
+
                     Next Week
+
                 </a>
 
                 {% endif %}
+
 
                 <button
                     type="button"
                     class="btn btn-secondary"
                     data-bs-dismiss="modal"
                 >
+
                     Close
+
                 </button>
 
             </div>
@@ -416,21 +2192,38 @@ Trainer Schedule
 </div>
 
 
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+
 <script>
 
 document.addEventListener(
-    'DOMContentLoaded',
+    "DOMContentLoaded",
     function () {
+
+
+        /* =====================================================
+           CALENDAR ELEMENT
+        ===================================================== */
 
         const calendarEl =
             document.getElementById(
-                'trainer-calendar'
+                "trainer-calendar"
             );
 
 
-        const events =
-            {{ events_json|safe }};
+        /* =====================================================
+           EVENTS FROM DJANGO
+        ===================================================== */
 
+        let events = {{ events_json|safe }};
+
+
+        /* =====================================================
+           CALENDAR
+        ===================================================== */
 
         const calendar =
             new FullCalendar.Calendar(
@@ -438,13 +2231,52 @@ document.addEventListener(
                 {
 
                     initialView:
-                        'timeGridWeek',
+                        "timeGridWeek",
+
 
                     height:
-                        'auto',
+                        "auto",
+
+
+                    contentHeight:
+                        "auto",
+
 
                     nowIndicator:
                         true,
+
+
+                    dayMaxEvents:
+                        4,
+
+
+                    stickyHeaderDates:
+                        true,
+
+
+                    expandRows:
+                        true,
+
+
+                    firstDay:
+                        1,
+
+
+                    slotMinTime:
+                        "07:00:00",
+
+
+                    slotMaxTime:
+                        "22:00:00",
+
+
+                    scrollTime:
+                        "08:00:00",
+
+
+                    allDaySlot:
+                        true,
+
 
                     selectable:
                         {% if request.user.is_superuser %}
@@ -453,370 +2285,284 @@ document.addEventListener(
                         false
                         {% endif %},
 
+
                     editable:
-                        {% if request.user.is_superuser %}
-                        true
-                        {% else %}
-                        false
-                        {% endif %},
+                        false,
+
 
                     eventDurationEditable:
-                        {% if request.user.is_superuser %}
-                        true
-                        {% else %}
-                        false
-                        {% endif %},
+                        false,
+
+
+                    eventStartEditable:
+                        false,
+
 
                     headerToolbar: {
 
                         left:
-                            'prev,next today',
+                            "prev,next today",
 
                         center:
-                            'title',
+                            "title",
 
                         right:
-                            'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+                            "dayGridMonth,timeGridWeek,timeGridDay,listWeek"
+
                     },
 
 
-                    slotMinTime:
-                        '07:00:00',
+                    buttonText: {
 
-                    slotMaxTime:
-                        '22:00:00',
+                        today:
+                            "Today",
+
+                        month:
+                            "Month",
+
+                        week:
+                            "Week",
+
+                        day:
+                            "Day",
+
+                        list:
+                            "List"
+
+                    },
 
 
                     events:
                         events,
 
 
-                    /* =========================
-                       CLICK EMPTY TIME SLOT
-                    ========================= */
-
-                    dateClick:
-                        function(info) {
-
-                            {% if request.user.is_superuser %}
-
-                            let url =
-                                "{% url 'add_calendar_event' %}"
-                                +
-                                "?date="
-                                +
-                                encodeURIComponent(
-                                    info.dateStr.split("T")[0]
-                                );
-
-                            if (
-                                info.dateStr.includes("T")
-                            ) {
-
-                                const time =
-                                    info.dateStr
-                                    .split("T")[1]
-                                    .substring(0,5);
-
-                                url +=
-                                    "&time="
-                                    +
-                                    encodeURIComponent(
-                                        time
-                                    );
-                            }
-
-                            window.location.href =
-                                url;
-
-                            {% endif %}
-
-                        },
-
-
-                    /* =========================
+                    /* =========================================
                        EVENT CLICK
-                    ========================= */
+                    ========================================= */
 
                     eventClick:
                         function(info) {
 
                             info.jsEvent.preventDefault();
 
+
                             const event =
                                 info.event;
+
 
                             const props =
                                 event.extendedProps;
 
 
+                            /* -------------------------------
+                               BASIC INFORMATION
+                            -------------------------------- */
+
                             document.getElementById(
-                                'modalEventTitle'
+                                "modalEventTitle"
                             ).innerText =
                                 event.title;
 
 
                             document.getElementById(
-                                'modalTrainers'
+                                "modalSource"
+                            ).innerText =
+                                props.source ||
+                                "—";
+
+
+                            document.getElementById(
+                                "modalTrainers"
                             ).innerText =
                                 props.trainers ||
                                 "Not assigned";
 
 
                             document.getElementById(
-                                'modalType'
+                                "modalType"
                             ).innerText =
                                 props.event_type ||
-                                "";
+                                "—";
 
 
                             document.getElementById(
-                                'modalCollege'
+                                "modalStatus"
+                            ).innerText =
+                                props.status ||
+                                "—";
+
+
+                            document.getElementById(
+                                "modalCollege"
                             ).innerText =
                                 props.college ||
                                 "—";
 
 
                             document.getElementById(
-                                'modalWorkshop'
+                                "modalWorkshop"
                             ).innerText =
                                 props.workshop ||
                                 "—";
 
 
                             document.getElementById(
-                                'modalDepartment'
+                                "modalDepartment"
                             ).innerText =
                                 props.department ||
                                 "—";
 
 
                             document.getElementById(
-                                'modalGuestFaculty'
+                                "modalGuestFaculty"
                             ).innerText =
                                 props.guest_faculty ||
                                 "—";
 
 
                             document.getElementById(
-                                'modalLocation'
+                                "modalLocation"
                             ).innerText =
                                 props.location ||
                                 "—";
 
 
                             document.getElementById(
-                                'modalDescription'
+                                "modalPriority"
+                            ).innerText =
+                                props.priority ||
+                                "—";
+
+
+                            document.getElementById(
+                                "modalLinkedWork"
+                            ).innerText =
+                                props.linked_work ||
+                                "—";
+
+
+                            document.getElementById(
+                                "modalDescription"
                             ).innerText =
                                 props.description ||
                                 "—";
 
 
+                            /* =================================
+                               ADMIN LINKS
+                            ================================= */
+
                             {% if request.user.is_superuser %}
 
-                            document.getElementById(
-                                'editEventBtn'
-                            ).href =
-                                "{% url 'edit_calendar_event' 0 %}"
-                                .replace(
-                                    "/0/",
-                                    "/" + event.id + "/"
-                                );
+                            /*
+                             * Only CalendarEvent IDs use
+                             * event-<id>.
+                             *
+                             * Do not show edit controls for
+                             * workshops/tasks/office training.
+                             */
+
+                            if (
+                                event.id.startsWith(
+                                    "event-"
+                                )
+                            ) {
+
+                                const realId =
+                                    event.id.replace(
+                                        "event-",
+                                        ""
+                                    );
 
 
-                            document.getElementById(
-                                'duplicateDayBtn'
-                            ).href =
-                                "{% url 'duplicate_calendar_event_next_day' 0 %}"
-                                .replace(
-                                    "/0/",
-                                    "/" + event.id + "/"
-                                );
+                                document.getElementById(
+                                    "editEventBtn"
+                                ).href =
+                                    "{% url 'edit_calendar_event' 0 %}"
+                                    .replace(
+                                        "/0/",
+                                        "/" +
+                                        realId +
+                                        "/"
+                                    );
 
 
-                            document.getElementById(
-                                'duplicateWeekBtn'
-                            ).href =
-                                "{% url 'duplicate_calendar_event_next_week' 0 %}"
-                                .replace(
-                                    "/0/",
-                                    "/" + event.id + "/"
-                                );
+                                document.getElementById(
+                                    "duplicateDayBtn"
+                                ).href =
+                                    "{% url 'duplicate_calendar_event_next_day' 0 %}"
+                                    .replace(
+                                        "/0/",
+                                        "/" +
+                                        realId +
+                                        "/"
+                                    );
+
+
+                                document.getElementById(
+                                    "duplicateWeekBtn"
+                                ).href =
+                                    "{% url 'duplicate_calendar_event_next_week' 0 %}"
+                                    .replace(
+                                        "/0/",
+                                        "/" +
+                                        realId +
+                                        "/"
+                                    );
+
+
+                                document.getElementById(
+                                    "editEventBtn"
+                                ).style.display =
+                                    "inline-block";
+
+                                document.getElementById(
+                                    "duplicateDayBtn"
+                                ).style.display =
+                                    "inline-block";
+
+                                document.getElementById(
+                                    "duplicateWeekBtn"
+                                ).style.display =
+                                    "inline-block";
+
+                            }
+
+                            else {
+
+                                document.getElementById(
+                                    "editEventBtn"
+                                ).style.display =
+                                    "none";
+
+                                document.getElementById(
+                                    "duplicateDayBtn"
+                                ).style.display =
+                                    "none";
+
+                                document.getElementById(
+                                    "duplicateWeekBtn"
+                                ).style.display =
+                                    "none";
+
+                            }
 
                             {% endif %}
 
+
+                            /* =================================
+                               SHOW MODAL
+                            ================================= */
 
                             const modal =
                                 new bootstrap.Modal(
                                     document.getElementById(
-                                        'eventModal'
+                                        "eventModal"
                                     )
                                 );
 
+
                             modal.show();
-
-                        },
-
-
-                    /* =========================
-                       DRAG EVENT TO NEW DATE
-                    ========================= */
-
-                    eventDrop:
-                        function(info) {
-
-                            const event =
-                                info.event;
-
-                            const eventId =
-                                event.id;
-
-                            const newDate =
-                                event.start
-                                .toISOString()
-                                .split("T")[0];
-
-
-                            {% if request.user.is_superuser %}
-
-                            fetch(
-                                "{% url 'move_calendar_event' 0 %}"
-                                .replace(
-                                    "/0/",
-                                    "/" + eventId + "/"
-                                ),
-                                {
-
-                                    method: "POST",
-
-                                    headers: {
-
-                                        "Content-Type":
-                                            "application/json",
-
-                                        "X-CSRFToken":
-                                            "{{ csrf_token }}"
-                                    },
-
-                                    body:
-                                        JSON.stringify({
-
-                                            date:
-                                                newDate
-
-                                        })
-                                }
-                            )
-                            .then(
-                                response =>
-                                    response.json()
-                            )
-                            .then(
-                                data => {
-
-                                    if (
-                                        !data.success
-                                    ) {
-
-                                        info.revert();
-
-                                        alert(
-                                            data.error ||
-                                            "Unable to move event."
-                                        );
-
-                                    }
-
-                                }
-                            )
-                            .catch(
-                                function() {
-
-                                    info.revert();
-
-                                    alert(
-                                        "Unable to update event."
-                                    );
-
-                                }
-                            );
-
-                            {% endif %}
-
-                        },
-
-
-                    /* =========================
-                       RESIZE EVENT
-                    ========================= */
-
-                    eventResize:
-                        function(info) {
-
-                            const event =
-                                info.event;
-
-
-                            {% if request.user.is_superuser %}
-
-                            fetch(
-                                "{% url 'resize_calendar_event' 0 %}"
-                                .replace(
-                                    "/0/",
-                                    "/" + event.id + "/"
-                                ),
-                                {
-
-                                    method: "POST",
-
-                                    headers: {
-
-                                        "Content-Type":
-                                            "application/json",
-
-                                        "X-CSRFToken":
-                                            "{{ csrf_token }}"
-                                    },
-
-                                    body:
-                                        JSON.stringify({
-
-                                            start:
-                                                event.start
-                                                .toTimeString()
-                                                .substring(0,8),
-
-                                            end:
-                                                event.end
-                                                ?
-                                                event.end
-                                                .toTimeString()
-                                                .substring(0,8)
-                                                :
-                                                null
-
-                                        })
-                                }
-                            )
-                            .then(
-                                response =>
-                                    response.json()
-                            )
-                            .then(
-                                data => {
-
-                                    if (
-                                        !data.success
-                                    ) {
-
-                                        info.revert();
-
-                                    }
-
-                                }
-                            );
-
-                            {% endif %}
 
                         }
 
@@ -824,9 +2570,92 @@ document.addEventListener(
             );
 
 
+        /* =====================================================
+           RENDER
+        ===================================================== */
+
         calendar.render();
 
+
+
+        /* =====================================================
+           EVENT TYPE FILTER
+        ===================================================== */
+
+        const filter =
+            document.getElementById(
+                "eventTypeFilter"
+            );
+
+
+        filter.addEventListener(
+            "change",
+            function() {
+
+                const selected =
+                    this.value;
+
+
+                calendar.removeAllEventSources();
+
+
+                let filteredEvents;
+
+
+                if (
+                    selected === "all"
+                ) {
+
+                    filteredEvents =
+                        events;
+
+                }
+
+                else {
+
+                    filteredEvents =
+                        events.filter(
+                            function(event) {
+
+                                return (
+                                    event.extendedProps &&
+                                    event.extendedProps.event_type ===
+                                    selected
+                                );
+
+                            }
+                        );
+
+                }
+
+
+                calendar.addEventSource(
+                    filteredEvents
+                );
+
+            }
+        );
+
+
+        /* =====================================================
+           RESET FILTER WHEN VIEW CHANGES
+        ===================================================== */
+
+        calendar.on(
+            "datesSet",
+            function() {
+
+                /*
+                 * Keep current filter.
+                 * FullCalendar automatically
+                 * handles the current range.
+                 */
+
+            }
+        );
+
     }
+
 );
 
 </script>

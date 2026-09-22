@@ -2424,121 +2424,539 @@ def trainer_dashboard(request):
         context
     )
 @login_required
+# ============================================================
+# TRAINER PERSONAL SCHEDULE
+# ============================================================
+
+@login_required
 def trainer_schedule(request):
 
-    events = CalendarEvent.objects.prefetch_related(
-        "trainers"
-    ).select_related(
-        "college",
-        "workshop"
-    ).order_by(
-        "date",
-        "start_time"
+    # ========================================================
+    # FIND TRAINER CONNECTED TO LOGGED-IN USER
+    # ========================================================
+
+    trainer = (
+        Trainer.objects
+        .filter(user=request.user)
+        .first()
     )
 
-    events_json = []
-
-    for event in events:
-
-        trainer_names = ", ".join(
-            trainer.Name
-            for trainer in event.trainers.all()
+    # Fallback: match trainer by email
+    if not trainer:
+        trainer = (
+            Trainer.objects
+            .filter(email__iexact=request.user.email)
+            .first()
         )
 
-        start = None
-        end = None
+    if not trainer:
+
+        messages.error(
+            request,
+            "Your account is not linked to a Trainer profile."
+        )
+
+        return redirect("dashboard")
+
+    # ========================================================
+    # EVENT COLORS
+    # ========================================================
+
+    event_colors = {
+
+        "workshop": "#198754",
+        "office_training": "#0d6efd",
+        "fdp": "#dc3545",
+        "online_workshop": "#20c997",
+        "office": "#0d6efd",
+        "guest_training": "#fd7e14",
+        "meeting": "#6f42c1",
+        "task": "#475569",
+        "other": "#6c757d",
+
+    }
+
+    events = []
+
+    # ========================================================
+    # 1. WORKSHOPS ASSIGNED TO THIS TRAINER
+    # ========================================================
+
+    workshops = (
+        Workshop.objects
+        .filter(
+            assigned_trainers=trainer
+        )
+        .select_related("college")
+        .order_by("start_date")
+    )
+
+    for workshop in workshops:
+
+        trainer_names = ", ".join(
+            t.Name
+            for t in workshop.assigned_trainers.all()
+        )
+
+        events.append({
+
+            "id": f"workshop-{workshop.pk}",
+
+            "title": f"📚 {workshop.title}",
+
+            "start": (
+                workshop.start_date.strftime("%Y-%m-%d")
+                if workshop.start_date
+                else None
+            ),
+
+            # FullCalendar end date is exclusive
+            "end": (
+                (
+                    workshop.end_date +
+                    timedelta(days=1)
+                ).strftime("%Y-%m-%d")
+                if workshop.end_date
+                else None
+            ),
+
+            "allDay": True,
+
+            "backgroundColor":
+                event_colors["workshop"],
+
+            "borderColor":
+                event_colors["workshop"],
+
+            # Trainer cannot move workshop
+            "editable": False,
+
+            "extendedProps": {
+
+                "source": "Workshop",
+
+                "trainers":
+                    trainer_names,
+
+                "event_type":
+                    "Workshop",
+
+                "college":
+                    workshop.college.name
+                    if workshop.college
+                    else "—",
+
+                "workshop":
+                    workshop.title,
+
+                "department":
+                    workshop.departments or "—",
+
+                "location":
+                    workshop.college.name
+                    if workshop.college
+                    else "—",
+
+                "status":
+                    workshop.get_status_display(),
+
+                "description":
+                    workshop.remarks or "",
+
+            },
+        })
+
+    # ========================================================
+    # 2. OFFICE TRAINING ASSIGNED TO THIS TRAINER
+    # ========================================================
+
+    office_trainings = (
+        OfficeTraining.objects
+        .filter(
+            trainers=trainer
+        )
+        .prefetch_related("trainers")
+        .order_by("start_date")
+    )
+
+    for training in office_trainings:
+
+        trainer_names = ", ".join(
+            t.Name
+            for t in training.trainers.all()
+        )
+
+        location = (
+            training.hall
+            if training.hall
+            else "Mevi Technologies"
+        )
+
+        events.append({
+
+            "id": f"office-{training.pk}",
+
+            "title":
+                f"🏢 {training.name}",
+
+            "start": (
+                training.start_date.strftime("%Y-%m-%d")
+            ),
+
+            "end": (
+                (
+                    training.end_date +
+                    timedelta(days=1)
+                ).strftime("%Y-%m-%d")
+            ),
+
+            "allDay": True,
+
+            "backgroundColor":
+                event_colors["office_training"],
+
+            "borderColor":
+                event_colors["office_training"],
+
+            "editable": False,
+
+            "extendedProps": {
+
+                "source":
+                    "Office Training",
+
+                "trainers":
+                    trainer_names,
+
+                "event_type":
+                    "Office Training",
+
+                "college":
+                    "Mevi Technologies",
+
+                "workshop":
+                    "—",
+
+                "department":
+                    "—",
+
+                "location":
+                    location,
+
+                "status":
+                    "Scheduled",
+
+                "description":
+                    (
+                        f"Batch: {training.batch_id} | "
+                        f"Mode: {training.get_mode_display()}"
+                    ),
+
+            },
+        })
+
+    # ========================================================
+    # 3. CALENDAR EVENTS ASSIGNED TO THIS TRAINER
+    # ========================================================
+
+    calendar_events = (
+        CalendarEvent.objects
+        .filter(
+            trainers=trainer
+        )
+        .select_related(
+            "college",
+            "workshop"
+        )
+        .prefetch_related(
+            "trainers"
+        )
+        .order_by(
+            "date",
+            "start_time"
+        )
+    )
+
+    for event in calendar_events:
+
+        trainer_names = ", ".join(
+            t.Name
+            for t in event.trainers.all()
+        )
+
+        # -----------------------------------------------
+        # START
+        # -----------------------------------------------
 
         if event.start_time:
 
-            start = f"{event.date}T{event.start_time}"
+            start = (
+                f"{event.date}T"
+                f"{event.start_time}"
+            )
 
         else:
 
             start = str(event.date)
 
+        # -----------------------------------------------
+        # END
+        # -----------------------------------------------
+
         if event.end_time:
 
-            end = f"{event.date}T{event.end_time}"
+            end = (
+                f"{event.date}T"
+                f"{event.end_time}"
+            )
 
-        event_color = {
-            "workshop": "#198754",
-            "fdp": "#dc3545",
-            "online_workshop": "#20c997",
-            "office": "#0d6efd",
-            "guest_training": "#fd7e14",
-            "meeting": "#6f42c1",
-            "other": "#6c757d",
-        }.get(
-            event.event_type,
-            "#6c757d"
+        else:
+
+            end = None
+
+        event_type_key = (
+            event.event_type
+            if event.event_type
+            else "other"
         )
 
-        events_json.append({
+        color = event_colors.get(
+            event_type_key,
+            event_colors["other"]
+        )
 
-            "id": str(event.id),
+        events.append({
 
-            "title": event.title,
+            "id":
+                f"event-{event.pk}",
 
-            "start": start,
+            "title":
+                f"📅 {event.title}",
 
-            "end": end,
+            "start":
+                start,
 
-            "allDay": not bool(event.start_time),
+            "end":
+                end,
 
-            "backgroundColor": event_color,
+            "allDay":
+                not bool(event.start_time),
 
-            "borderColor": event_color,
+            "backgroundColor":
+                color,
 
-            "editable": request.user.is_superuser,
+            "borderColor":
+                color,
 
-            "durationEditable": request.user.is_superuser,
+            "editable":
+                False,
 
-            "startEditable": request.user.is_superuser,
+            "durationEditable":
+                False,
 
-            "url": reverse(
-                "edit_calendar_event",
-                args=[event.id]
-            ),
+            "startEditable":
+                False,
 
             "extendedProps": {
 
-                "trainers": trainer_names,
+                "source":
+                    "Calendar Event",
+
+                "trainers":
+                    trainer_names,
 
                 "event_type":
                     event.get_event_type_display(),
 
                 "college":
-                    event.college.name
-                    if event.college
-                    else "",
+                    (
+                        event.college.name
+                        if event.college
+                        else "—"
+                    ),
 
                 "workshop":
-                    event.workshop.title
-                    if event.workshop
-                    else "",
+                    (
+                        event.workshop.title
+                        if event.workshop
+                        else "—"
+                    ),
 
                 "department":
-                    event.department,
+                    event.department or "—",
 
                 "location":
-                    event.location,
+                    event.location or "—",
 
                 "guest_faculty":
-                    getattr(event, "guest_faculty", ""),
+                    getattr(
+                        event,
+                        "guest_faculty",
+                        ""
+                    ),
+
+                "status":
+                    "Scheduled",
 
                 "description":
-                    event.description,
-            }
+                    event.description or "",
+
+            },
         })
+
+    # ========================================================
+    # 4. TODO / DAILY WORK ASSIGNED TO THIS TRAINER
+    # ========================================================
+
+    tasks = (
+        TodoTask.objects
+        .filter(
+            trainer=trainer
+        )
+        .select_related(
+            "workshop",
+            "office_training",
+            "calendar_event"
+        )
+        .order_by(
+            "for_date",
+            "created_on"
+        )
+    )
+
+    for task in tasks:
+
+        # -----------------------------------------------
+        # Determine task color
+        # -----------------------------------------------
+
+        if task.status == "completed":
+
+            task_color = "#16a34a"
+
+        elif task.status == "in_progress":
+
+            task_color = "#f59e0b"
+
+        else:
+
+            task_color = event_colors["task"]
+
+        # -----------------------------------------------
+        # Determine linked work
+        # -----------------------------------------------
+
+        linked_work = "Independent Task"
+
+        if task.workshop:
+
+            linked_work = (
+                f"Workshop: "
+                f"{task.workshop.title}"
+            )
+
+        elif task.office_training:
+
+            linked_work = (
+                f"Office Training: "
+                f"{task.office_training.name}"
+            )
+
+        elif task.calendar_event:
+
+            linked_work = (
+                f"Event: "
+                f"{task.calendar_event.title}"
+            )
+
+        # -----------------------------------------------
+        # Task event
+        # -----------------------------------------------
+
+        events.append({
+
+            "id":
+                f"task-{task.pk}",
+
+            "title":
+                f"✓ {task.task}",
+
+            "start":
+                str(task.for_date),
+
+            "end":
+                None,
+
+            "allDay":
+                True,
+
+            "backgroundColor":
+                task_color,
+
+            "borderColor":
+                task_color,
+
+            "editable":
+                False,
+
+            "extendedProps": {
+
+                "source":
+                    "Daily Work",
+
+                "trainers":
+                    trainer.Name,
+
+                "event_type":
+                    "Assigned Work",
+
+                "college":
+                    "—",
+
+                "workshop":
+                    (
+                        task.workshop.title
+                        if task.workshop
+                        else "—"
+                    ),
+
+                "department":
+                    "—",
+
+                "location":
+                    "—",
+
+                "status":
+                    task.get_status_display(),
+
+                "priority":
+                    task.get_priority_display(),
+
+                "linked_work":
+                    linked_work,
+
+                "description":
+                    task.description or "",
+
+            },
+        })
+
+    # ========================================================
+    # SEND TO CALENDAR
+    # ========================================================
 
     return render(
         request,
         "trainer_schedule.html",
         {
-            "events_json": json.dumps(events_json),
+            "trainer": trainer,
+            "events_json":
+                json.dumps(
+                    events,
+                    default=str
+                ),
         }
     )
-
 @login_required
 def follow_ups(request):
     """
