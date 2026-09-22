@@ -7,38 +7,37 @@
 
 /* =========================================================
    MEVI TASK MANAGEMENT
+   PREMIUM LARGE TYPOGRAPHY UI
 ========================================================= */
 
 :root {
+    --mevi-primary: #5b4bdb;
+    --mevi-primary-dark: #4338ca;
+    --mevi-secondary: #7c3aed;
+    --mevi-pink: #ec4899;
 
-    --mevi-primary: #5B4BDB;
-    --mevi-primary-dark: #4338CA;
-    --mevi-secondary: #7C3AED;
-    --mevi-pink: #EC4899;
+    --pending: #ef4444;
+    --pending-soft: #fef2f2;
 
-    --pending: #EF4444;
-    --pending-soft: #FEF2F2;
+    --progress: #f59e0b;
+    --progress-soft: #fffbeb;
 
-    --progress: #F59E0B;
-    --progress-soft: #FFFBEB;
+    --completed: #16a34a;
+    --completed-soft: #f0fdf4;
 
-    --completed: #16A34A;
-    --completed-soft: #F0FDF4;
-
-    --blue: #2563EB;
-    --blue-soft: #EFF6FF;
+    --blue: #2563eb;
+    --blue-soft: #eff6ff;
 
     --dark: #172033;
     --dark-soft: #344054;
 
     --muted: #667085;
-    --muted-light: #98A2B3;
+    --muted-light: #98a2b3;
 
-    --border: #EAECF0;
+    --border: #e4e7ec;
 
-    --page-bg: #F6F7FB;
-
-    --white: #FFFFFF;
+    --page-bg: #f5f7fb;
+    --white: #ffffff;
 
     --radius-sm: 10px;
     --radius-md: 15px;
@@ -46,37 +45,49 @@
     --radius-xl: 26px;
 
     --shadow:
-        0 7px 25px rgba(16,24,40,.055);
+        0 5px 18px rgba(16,24,40,.055);
 
     --shadow-hover:
-        0 15px 35px rgba(16,24,40,.11);
-}
-
-
-body {
-
-    background:
-        var(--page-bg);
-
+        0 14px 35px rgba(16,24,40,.11);
 }
 
 
 /* =========================================================
-   MAIN
+   BODY
+========================================================= */
+
+body {
+    background:
+        linear-gradient(
+            180deg,
+            #f8f9fc 0%,
+            #f5f7fb 100%
+        );
+
+    color:
+        var(--dark);
+
+    font-size:
+        16px;
+}
+
+
+/* =========================================================
+   MAIN PAGE
 ========================================================= */
 
 .task-page {
+    width:
+        100%;
 
-    max-width: 1600px;
+    max-width:
+        1650px;
 
     margin:
         0 auto;
 
     padding:
-        26px
-        26px
-        50px;
-
+        34px 34px 55px;
 }
 
 
@@ -85,7 +96,467 @@ body {
 ========================================================= */
 
 .page-header {
+    display:
+        flex;
 
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        24px;
+
+    margin-bottom:
+        28px;
+}
+
+.page-header-left {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        18px;
+
+    min-width:
+        0;
+}
+
+.page-icon {
+    width:
+        62px;
+
+    height:
+        62px;
+
+    flex:
+        0 0 62px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    border-radius:
+        18px;
+
+    color:
+        #ffffff;
+
+    font-size:
+        26px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--mevi-primary),
+            var(--mevi-secondary)
+        );
+
+    box-shadow:
+        0 12px 25px
+        rgba(91,75,219,.22);
+}
+
+.page-title {
+    margin:
+        0;
+
+    color:
+        var(--dark);
+
+    font-size:
+        34px;
+
+    line-height:
+        1.15;
+
+    font-weight:
+        850;
+
+    letter-spacing:
+        -.7px;
+}
+
+.page-subtitle {
+    margin:
+        7px 0 0;
+
+    color:
+        var(--muted);
+
+    font-size:
+        15px;
+
+    line-height:
+        1.5;
+}
+
+.page-actions {
+    display:
+        flex;
+
+    flex-wrap:
+        wrap;
+
+    gap:
+        10px;
+}
+
+.page-action {
+    min-height:
+        46px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        8px;
+
+    padding:
+        0 17px;
+
+    border-radius:
+        11px;
+
+    text-decoration:
+        none;
+
+    font-size:
+        14px;
+
+    font-weight:
+        750;
+
+    transition:
+        .2s ease;
+}
+
+.page-action.primary {
+    color:
+        #ffffff;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--mevi-primary),
+            var(--mevi-secondary)
+        );
+
+    box-shadow:
+        0 8px 20px
+        rgba(91,75,219,.20);
+}
+
+.page-action.secondary {
+    color:
+        var(--dark-soft);
+
+    background:
+        #ffffff;
+
+    border:
+        1px solid var(--border);
+
+    box-shadow:
+        var(--shadow);
+}
+
+.page-action:hover {
+    transform:
+        translateY(-2px);
+
+    text-decoration:
+        none;
+}
+
+.page-action.secondary:hover {
+    color:
+        var(--mevi-primary);
+
+    border-color:
+        #cfc9ff;
+
+    background:
+        #faf9ff;
+}
+
+
+/* =========================================================
+   TEAM STRIP
+========================================================= */
+
+.team-strip {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        18px;
+
+    padding:
+        16px 20px;
+
+    margin-bottom:
+        28px;
+
+    border-radius:
+        15px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #f2efff,
+            #fff3fa
+        );
+
+    border:
+        1px solid #e8e2ff;
+
+    box-shadow:
+        0 4px 15px rgba(91,75,219,.04);
+}
+
+.team-strip-text {
+    color:
+        var(--dark-soft);
+
+    font-size:
+        15px;
+
+    line-height:
+        1.6;
+}
+
+.team-strip-text strong {
+    color:
+        var(--mevi-primary);
+
+    font-size:
+        16px;
+}
+
+.team-strip-date {
+    white-space:
+        nowrap;
+
+    color:
+        var(--muted);
+
+    font-size:
+        13px;
+
+    font-weight:
+        700;
+}
+
+
+/* =========================================================
+   STATISTICS
+========================================================= */
+
+.stats-grid {
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap:
+        18px;
+
+    margin-bottom:
+        30px;
+}
+
+.stat-card {
+    position:
+        relative;
+
+    overflow:
+        hidden;
+
+    min-height:
+        145px;
+
+    padding:
+        22px;
+
+    border-radius:
+        18px;
+
+    background:
+        #ffffff;
+
+    border:
+        1px solid var(--border);
+
+    box-shadow:
+        var(--shadow);
+
+    transition:
+        .2s ease;
+}
+
+.stat-card:hover {
+    transform:
+        translateY(-4px);
+
+    box-shadow:
+        var(--shadow-hover);
+}
+
+.stat-card::after {
+    content:
+        "";
+
+    position:
+        absolute;
+
+    width:
+        110px;
+
+    height:
+        110px;
+
+    border-radius:
+        50%;
+
+    right:
+        -45px;
+
+    bottom:
+        -45px;
+
+    background:
+        rgba(91,75,219,.05);
+
+    pointer-events:
+        none;
+}
+
+.stat-top {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+}
+
+.stat-icon {
+    width:
+        46px;
+
+    height:
+        46px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    border-radius:
+        13px;
+
+    font-size:
+        19px;
+}
+
+.stat-total .stat-icon {
+    background:
+        #f0edff;
+
+    color:
+        var(--mevi-primary);
+}
+
+.stat-pending .stat-icon {
+    background:
+        var(--pending-soft);
+
+    color:
+        var(--pending);
+}
+
+.stat-progress .stat-icon {
+    background:
+        var(--progress-soft);
+
+    color:
+        var(--progress);
+}
+
+.stat-completed .stat-icon {
+    background:
+        var(--completed-soft);
+
+    color:
+        var(--completed);
+}
+
+.stat-number {
+    margin-top:
+        17px;
+
+    color:
+        var(--dark);
+
+    font-size:
+        36px;
+
+    line-height:
+        1;
+
+    font-weight:
+        850;
+}
+
+.stat-label {
+    margin-top:
+        8px;
+
+    color:
+        var(--muted);
+
+    font-size:
+        14px;
+
+    font-weight:
+        650;
+}
+
+
+/* =========================================================
+   BOARD TOOLBAR
+========================================================= */
+
+.board-toolbar {
     display:
         flex;
 
@@ -99,474 +570,24 @@ body {
         20px;
 
     margin-bottom:
-        24px;
-
+        17px;
 }
 
-
-.page-header-left {
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    gap:
-        14px;
-
-}
-
-
-.page-icon {
-
-    width:
-        52px;
-
-    height:
-        52px;
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-    border-radius:
-        16px;
-
-    color:
-        white;
-
-    font-size:
-        22px;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--mevi-primary),
-            var(--mevi-secondary)
-        );
-
-    box-shadow:
-        0 10px 22px
-        rgba(91,75,219,.20);
-
-}
-
-
-.page-title {
-
-    margin:
-        0;
-
+.board-heading {
     color:
         var(--dark);
 
     font-size:
-        26px;
+        23px;
 
     font-weight:
         850;
 
-    letter-spacing:
-        -.5px;
-
-}
-
-
-.page-subtitle {
-
-    margin:
-        4px
-        0
-        0;
-
-    color:
-        var(--muted);
-
-    font-size:
-        12px;
-
-}
-
-
-.page-actions {
-
-    display:
-        flex;
-
-    flex-wrap:
-        wrap;
-
-    gap:
-        8px;
-
-}
-
-
-.page-action {
-
-    min-height:
-        40px;
-
-    display:
-        inline-flex;
-
-    align-items:
-        center;
-
-    gap:
-        7px;
-
-    padding:
-        0
-        14px;
-
-    border-radius:
-        10px;
-
-    text-decoration:
-        none;
-
-    font-size:
-        11px;
-
-    font-weight:
-        750;
-
-    transition:
-        .2s ease;
-
-}
-
-
-.page-action.primary {
-
-    color:
-        white;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--mevi-primary),
-            var(--mevi-secondary)
-        );
-
-    box-shadow:
-        0 7px 18px
-        rgba(91,75,219,.18);
-
-}
-
-
-.page-action.secondary {
-
-    color:
-        var(--dark-soft);
-
-    background:
-        white;
-
-    border:
-        1px solid
-        var(--border);
-
-}
-
-
-.page-action:hover {
-
-    transform:
-        translateY(-2px);
-
-}
-
-
-/* =========================================================
-   WELCOME STRIP
-========================================================= */
-
-.team-strip {
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        space-between;
-
-    gap:
-        15px;
-
-    padding:
-        13px
-        17px;
-
-    margin-bottom:
-        22px;
-
-    border-radius:
-        14px;
-
-    background:
-        linear-gradient(
-            90deg,
-            #F4F1FF,
-            #FFF4FA
-        );
-
-    border:
-        1px solid
-        #E9E4FF;
-
-}
-
-
-.team-strip-text {
-
-    color:
-        var(--dark-soft);
-
-    font-size:
-        11px;
-
     line-height:
-        1.5;
-
+        1.3;
 }
 
-
-.team-strip-text strong {
-
-    color:
-        var(--mevi-primary);
-
-}
-
-
-.team-strip-date {
-
-    white-space:
-        nowrap;
-
-    color:
-        var(--muted);
-
-    font-size:
-        10px;
-
-    font-weight:
-        700;
-
-}
-
-
-/* =========================================================
-   STATS
-========================================================= */
-
-.stats-grid {
-
-    display:
-        grid;
-
-    grid-template-columns:
-        repeat(4, 1fr);
-
-    gap:
-        13px;
-
-    margin-bottom:
-        26px;
-
-}
-
-
-.stat-card {
-
-    position:
-        relative;
-
-    overflow:
-        hidden;
-
-    padding:
-        18px;
-
-    min-height:
-        122px;
-
-    border-radius:
-        17px;
-
-    background:
-        white;
-
-    border:
-        1px solid
-        var(--border);
-
-    box-shadow:
-        var(--shadow);
-
-    transition:
-        .2s ease;
-
-}
-
-
-.stat-card:hover {
-
-    transform:
-        translateY(-3px);
-
-    box-shadow:
-        var(--shadow-hover);
-
-}
-
-
-.stat-card::after {
-
-    content:
-        "";
-
-    position:
-        absolute;
-
-    width:
-        80px;
-
-    height:
-        80px;
-
-    border-radius:
-        50%;
-
-    right:
-        -30px;
-
-    bottom:
-        -30px;
-
-    background:
-        rgba(91,75,219,.045);
-
-}
-
-
-.stat-top {
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        space-between;
-
-}
-
-
-.stat-icon {
-
-    width:
-        37px;
-
-    height:
-        37px;
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-    border-radius:
-        11px;
-
-    font-size:
-        16px;
-
-}
-
-
-.stat-total .stat-icon {
-
-    background:
-        #F0EDFF;
-
-    color:
-        var(--mevi-primary);
-
-}
-
-
-.stat-pending .stat-icon {
-
-    background:
-        var(--pending-soft);
-
-    color:
-        var(--pending);
-
-}
-
-
-.stat-progress .stat-icon {
-
-    background:
-        var(--progress-soft);
-
-    color:
-        var(--progress);
-
-}
-
-
-.stat-completed .stat-icon {
-
-    background:
-        var(--completed-soft);
-
-    color:
-        var(--completed);
-
-}
-
-
-.stat-number {
-
-    margin-top:
-        14px;
-
-    color:
-        var(--dark);
-
-    font-size:
-        27px;
-
-    line-height:
-        1;
-
-    font-weight:
-        850;
-
-}
-
-
-.stat-label {
-
+.board-description {
     margin-top:
         5px;
 
@@ -574,84 +595,29 @@ body {
         var(--muted);
 
     font-size:
-        10px;
-
-    font-weight:
-        650;
-
-}
-
-
-/* =========================================================
-   BOARD TOOLBAR
-========================================================= */
-
-.board-toolbar {
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        space-between;
-
-    gap:
-        12px;
-
-    margin-bottom:
         14px;
 
+    line-height:
+        1.5;
 }
-
-
-.board-heading {
-
-    color:
-        var(--dark);
-
-    font-size:
-        17px;
-
-    font-weight:
-        850;
-
-}
-
-
-.board-description {
-
-    margin-top:
-        3px;
-
-    color:
-        var(--muted);
-
-    font-size:
-        10px;
-
-}
-
 
 .search-box {
-
     position:
         relative;
 
     width:
-        240px;
+        300px;
 
+    flex-shrink:
+        0;
 }
 
-
 .search-box i {
-
     position:
         absolute;
 
     left:
-        11px;
+        14px;
 
     top:
         50%;
@@ -663,56 +629,56 @@ body {
         var(--muted-light);
 
     font-size:
-        12px;
-
+        15px;
 }
 
-
 .search-box input {
-
     width:
         100%;
 
     height:
-        38px;
+        46px;
 
     padding:
-        0
-        12px
-        0
-        32px;
+        0 14px 0 40px;
 
     border:
-        1px solid
-        var(--border);
+        1px solid var(--border);
 
     border-radius:
-        10px;
+        11px;
 
     outline:
         none;
 
     background:
-        white;
+        #ffffff;
 
     color:
         var(--dark);
 
     font-size:
-        10px;
-
-}
-
-
-.search-box input:focus {
-
-    border-color:
-        #C9C2FF;
+        14px;
 
     box-shadow:
-        0 0 0 3px
-        rgba(91,75,219,.07);
+        0 3px 12px rgba(16,24,40,.035);
 
+    transition:
+        .2s ease;
+}
+
+.search-box input::placeholder {
+    color:
+        #98a2b3;
+}
+
+.search-box input:focus {
+    border-color:
+        #bdb5ff;
+
+    box-shadow:
+        0 0 0 4px
+        rgba(91,75,219,.08);
 }
 
 
@@ -721,7 +687,6 @@ body {
 ========================================================= */
 
 .kanban-board {
-
     display:
         grid;
 
@@ -729,39 +694,38 @@ body {
         repeat(3, minmax(0, 1fr));
 
     gap:
-        16px;
+        20px;
 
     align-items:
         start;
-
 }
 
 
 /* =========================================================
-   COLUMN
+   KANBAN COLUMN
 ========================================================= */
 
 .kanban-column {
-
     min-width:
         0;
 
     min-height:
-        600px;
+        620px;
 
     padding:
-        14px;
+        17px;
 
     border-radius:
-        20px;
+        21px;
 
     background:
-        #EEF1F6;
+        #edf0f5;
 
     border:
-        1px solid
-        #E5E7EB;
+        1px solid #e2e5ea;
 
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.65);
 }
 
 
@@ -770,7 +734,6 @@ body {
 ========================================================= */
 
 .column-header {
-
     display:
         flex;
 
@@ -781,18 +744,13 @@ body {
         space-between;
 
     padding:
-        7px
-        4px
-        13px;
+        5px 4px 16px;
 
     margin-bottom:
         7px;
-
 }
 
-
 .column-title-wrap {
-
     display:
         flex;
 
@@ -800,82 +758,67 @@ body {
         center;
 
     gap:
-        9px;
-
+        11px;
 }
 
-
 .column-dot {
-
     width:
-        10px;
+        12px;
 
     height:
-        10px;
+        12px;
+
+    flex:
+        0 0 12px;
 
     border-radius:
         50%;
-
 }
 
-
 .pending-dot {
-
     background:
         var(--pending);
 
     box-shadow:
-        0 0 0 4px
+        0 0 0 5px
         rgba(239,68,68,.10);
-
 }
 
-
 .progress-dot {
-
     background:
         var(--progress);
 
     box-shadow:
-        0 0 0 4px
+        0 0 0 5px
         rgba(245,158,11,.10);
-
 }
 
-
 .completed-dot {
-
     background:
         var(--completed);
 
     box-shadow:
-        0 0 0 4px
+        0 0 0 5px
         rgba(22,163,74,.10);
-
 }
 
-
 .column-title {
-
     color:
         var(--dark);
 
     font-size:
-        13px;
+        17px;
 
     font-weight:
         850;
-
 }
 
-
 .column-count {
-
     min-width:
-        27px;
+        32px;
 
     height:
-        25px;
+        30px;
 
     display:
         flex;
@@ -887,51 +830,40 @@ body {
         center;
 
     padding:
-        0
-        7px;
+        0 9px;
 
     border-radius:
-        8px;
+        9px;
 
     font-size:
-        10px;
+        13px;
 
     font-weight:
         850;
-
 }
-
 
 .pending-count {
-
     color:
-        #B91C1C;
+        #b91c1c;
 
     background:
-        #FEE2E2;
-
+        #fee2e2;
 }
-
 
 .progress-count {
-
     color:
-        #B45309;
+        #b45309;
 
     background:
-        #FEF3C7;
-
+        #fef3c7;
 }
 
-
 .completed-count {
-
     color:
-        #15803D;
+        #15803d;
 
     background:
-        #DCFCE7;
-
+        #dcfce7;
 }
 
 
@@ -940,53 +872,50 @@ body {
 ========================================================= */
 
 .task-card {
-
     position:
         relative;
 
     padding:
-        15px;
+        19px;
 
     margin-bottom:
-        11px;
+        13px;
 
     border-radius:
-        15px;
+        16px;
 
     background:
-        white;
+        #ffffff;
 
     border:
-        1px solid
-        #E8EAF0;
+        1px solid #e5e7eb;
 
     box-shadow:
-        0 4px 14px
-        rgba(16,24,40,.045);
+        0 4px 15px
+        rgba(16,24,40,.05);
 
     transition:
         .22s ease;
-
 }
 
-
 .task-card:hover {
-
     transform:
         translateY(-3px);
 
     border-color:
-        #DDD9FF;
+        #d8d3ff;
 
     box-shadow:
-        0 12px 25px
-        rgba(16,24,40,.09);
-
+        0 13px 28px
+        rgba(16,24,40,.10);
 }
 
+.task-card:last-child {
+    margin-bottom:
+        0;
+}
 
 .task-top {
-
     display:
         flex;
 
@@ -997,26 +926,20 @@ body {
         flex-start;
 
     gap:
-        10px;
-
+        13px;
 }
-
 
 .task-title-wrap {
-
     min-width:
         0;
-
 }
 
-
 .task-title {
-
     color:
         var(--dark);
 
     font-size:
-        12px;
+        17px;
 
     line-height:
         1.45;
@@ -1024,23 +947,25 @@ body {
     font-weight:
         800;
 
+    word-break:
+        break-word;
 }
 
-
 .task-id {
-
     display:
         block;
 
     margin-top:
-        3px;
+        5px;
 
     color:
         var(--muted-light);
 
     font-size:
-        8px;
+        12px;
 
+    font-weight:
+        650;
 }
 
 
@@ -1049,56 +974,56 @@ body {
 ========================================================= */
 
 .priority {
-
     flex:
         0 0 auto;
 
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
     padding:
-        5px
-        8px;
+        7px 10px;
 
     border-radius:
-        7px;
+        8px;
 
     font-size:
-        8px;
+        12px;
+
+    line-height:
+        1.2;
 
     font-weight:
         800;
 
+    white-space:
+        nowrap;
 }
-
 
 .priority-high {
-
     color:
-        #B91C1C;
+        #b91c1c;
 
     background:
-        #FEE2E2;
-
+        #fee2e2;
 }
-
 
 .priority-medium {
-
     color:
-        #A16207;
+        #a16207;
 
     background:
-        #FEF3C7;
-
+        #fef3c7;
 }
 
-
 .priority-low {
-
     color:
-        #15803D;
+        #15803d;
 
     background:
-        #DCFCE7;
-
+        #dcfce7;
 }
 
 
@@ -1107,7 +1032,6 @@ body {
 ========================================================= */
 
 .task-meta {
-
     display:
         flex;
 
@@ -1115,16 +1039,13 @@ body {
         wrap;
 
     gap:
-        7px;
+        8px;
 
     margin-top:
-        13px;
-
+        15px;
 }
 
-
 .meta-item {
-
     display:
         inline-flex;
 
@@ -1132,35 +1053,36 @@ body {
         center;
 
     gap:
-        5px;
+        6px;
 
     padding:
-        5px
-        7px;
+        7px 9px;
 
     border-radius:
-        7px;
+        8px;
 
     background:
-        #F8F9FB;
+        #f7f8fa;
 
     color:
         var(--muted);
 
     font-size:
-        8px;
+        12px;
+
+    line-height:
+        1.3;
 
     font-weight:
         650;
-
 }
 
-
 .meta-item i {
-
     color:
         var(--mevi-primary);
 
+    font-size:
+        13px;
 }
 
 
@@ -1169,7 +1091,6 @@ body {
 ========================================================= */
 
 .trainer-row {
-
     display:
         flex;
 
@@ -1177,28 +1098,27 @@ body {
         center;
 
     gap:
-        8px;
+        10px;
 
     margin-top:
-        13px;
+        15px;
 
     padding-top:
-        11px;
+        13px;
 
     border-top:
-        1px solid
-        #F1F2F4;
-
+        1px solid #eef0f3;
 }
 
-
 .trainer-avatar {
-
     width:
-        27px;
+        36px;
 
     height:
-        27px;
+        36px;
+
+    flex:
+        0 0 36px;
 
     display:
         flex;
@@ -1216,108 +1136,103 @@ body {
         var(--mevi-primary);
 
     background:
-        #F0EDFF;
+        #f0edff;
 
     font-size:
-        10px;
+        13px;
 
     font-weight:
         850;
-
 }
-
 
 .trainer-info {
-
     min-width:
         0;
-
 }
 
-
 .trainer-name {
-
     color:
         var(--dark-soft);
 
     font-size:
-        9px;
+        14px;
 
     font-weight:
         800;
 
+    white-space:
+        nowrap;
+
+    overflow:
+        hidden;
+
+    text-overflow:
+        ellipsis;
 }
 
-
 .trainer-label {
-
     color:
         var(--muted-light);
 
     font-size:
-        7px;
+        12px;
 
+    margin-top:
+        2px;
 }
 
 
 /* =========================================================
-   PROGRESS
+   TASK PROGRESS
 ========================================================= */
 
 .task-progress {
-
     margin-top:
-        13px;
-
+        15px;
 }
 
-
 .progress-head {
-
     display:
         flex;
 
     justify-content:
         space-between;
 
-    margin-bottom:
-        6px;
+    align-items:
+        center;
 
+    margin-bottom:
+        7px;
 }
 
-
 .progress-label {
-
     color:
         var(--muted);
 
     font-size:
-        8px;
+        12px;
 
+    font-weight:
+        700;
 }
 
-
 .progress-value {
-
     color:
         var(--dark-soft);
 
     font-size:
-        8px;
+        13px;
 
     font-weight:
-        800;
-
+        850;
 }
 
-
 .progress-track {
-
     width:
         100%;
 
     height:
-        6px;
+        9px;
 
     overflow:
         hidden;
@@ -1326,13 +1241,10 @@ body {
         20px;
 
     background:
-        #ECEEF2;
-
+        #e8eaf0;
 }
 
-
 .progress-fill {
-
     height:
         100%;
 
@@ -1346,256 +1258,33 @@ body {
             var(--mevi-pink)
         );
 
+    transition:
+        width .4s ease;
 }
 
-
 .progress-fill.complete {
-
     background:
         linear-gradient(
             90deg,
-            #16A34A,
-            #22C55E
+            #16a34a,
+            #22c55e
         );
-/* =========================================================
-   MEVI UI — LARGER & MORE READABLE TYPOGRAPHY
-   ========================================================= */
-
-/* Main page */
-body {
-    font-size: 16px;
-}
-
-/* Page heading */
-.page-title,
-.header-title {
-    font-size: 28px !important;
-    font-weight: 800 !important;
-}
-
-.page-subtitle,
-.header-subtitle {
-    font-size: 15px !important;
-}
-
-/* Top action buttons */
-.btn,
-button {
-    font-size: 15px !important;
-    font-weight: 700;
-}
-
-.btn i,
-button i {
-    font-size: 15px;
-}
-
-/* Team strip / information banner */
-.team-strip {
-    font-size: 15px !important;
-}
-
-.team-strip strong {
-    font-size: 16px !important;
-}
-
-/* Statistics */
-.stat-card .stat-value,
-.stat-number {
-    font-size: 30px !important;
-    font-weight: 800 !important;
-}
-
-.stat-card .stat-label,
-.stat-label {
-    font-size: 14px !important;
-    font-weight: 600 !important;
-}
-
-/* Board toolbar */
-.board-title,
-.toolbar-title {
-    font-size: 19px !important;
-    font-weight: 800 !important;
-}
-
-.search-input,
-.search-box input {
-    font-size: 15px !important;
-}
-
-/* Kanban column headers */
-.kanban-column-header,
-.column-header {
-    font-size: 17px !important;
-    font-weight: 800 !important;
-}
-
-.kanban-column-header .count,
-.column-count {
-    font-size: 14px !important;
-    font-weight: 800 !important;
-}
-
-/* =========================================================
-   TASK CARDS
-   ========================================================= */
-
-.task-card {
-    padding: 20px !important;
-}
-
-/* Task title — most important */
-.task-card .task-title,
-.task-card h4,
-.task-card h5 {
-    font-size: 17px !important;
-    line-height: 1.45 !important;
-    font-weight: 800 !important;
-}
-
-/* Task description */
-.task-card .task-description {
-    font-size: 14px !important;
-    line-height: 1.55 !important;
-}
-
-/* Task metadata */
-.task-card .task-meta,
-.task-card .meta,
-.task-card .task-info {
-    font-size: 14px !important;
-}
-
-.task-card .task-meta i,
-.task-card .meta i {
-    font-size: 14px !important;
-}
-
-/* Trainer name */
-.task-card .trainer-name,
-.task-card .assignee-name {
-    font-size: 15px !important;
-    font-weight: 700 !important;
-}
-
-/* Trainer role / secondary text */
-.task-card .trainer-role,
-.task-card .assignee-role {
-    font-size: 13px !important;
-}
-
-/* Task ID */
-.task-card .task-id {
-    font-size: 12px !important;
-    font-weight: 700 !important;
-}
-
-/* Priority badge */
-.priority-badge,
-.badge {
-    font-size: 12px !important;
-    font-weight: 800 !important;
-    padding: 6px 10px !important;
-}
-
-/* Date / hours */
-.task-card .date,
-.task-card .hours,
-.task-card .estimated-hours {
-    font-size: 14px !important;
-    font-weight: 600 !important;
-}
-
-/* Progress */
-.progress-label {
-    font-size: 13px !important;
-    font-weight: 700 !important;
-}
-
-.progress-percentage {
-    font-size: 14px !important;
-    font-weight: 800 !important;
-}
-
-/* Action icons */
-.task-actions a,
-.task-actions button {
-    font-size: 15px !important;
-}
-
-/* Empty state */
-.empty-state h4,
-.empty-state h5 {
-    font-size: 17px !important;
-    font-weight: 800 !important;
-}
-
-.empty-state p {
-    font-size: 14px !important;
-}
-
-/* Footer */
-.footer-message {
-    font-size: 15px !important;
-    font-weight: 600 !important;
 }
 
 
 /* =========================================================
-   MODAL
-   ========================================================= */
+   COMPLETED SUBTASK TEXT
+========================================================= */
 
-.modal-title {
-    font-size: 21px !important;
-    font-weight: 800 !important;
-}
+.task-progress > div:last-child {
+    margin-top:
+        6px !important;
 
-.modal-body label {
-    font-size: 15px !important;
-    font-weight: 700 !important;
-}
+    color:
+        var(--muted-light) !important;
 
-.modal-body input,
-.modal-body textarea,
-.modal-body select {
-    font-size: 15px !important;
-}
-
-
-/* =========================================================
-   MOBILE
-   ========================================================= */
-
-@media (max-width: 768px) {
-
-    .page-title,
-    .header-title {
-        font-size: 24px !important;
-    }
-
-    .stat-card .stat-value,
-    .stat-number {
-        font-size: 26px !important;
-    }
-
-    .kanban-column-header,
-    .column-header {
-        font-size: 16px !important;
-    }
-
-    .task-card .task-title,
-    .task-card h4,
-    .task-card h5 {
-        font-size: 16px !important;
-    }
-
-    .task-card .task-meta,
-    .task-card .meta,
-    .task-card .task-info {
-        font-size: 14px !important;
-    }
-}
+    font-size:
+        11px !important;
 }
 
 
@@ -1604,7 +1293,6 @@ button i {
 ========================================================= */
 
 .task-actions {
-
     display:
         flex;
 
@@ -1615,79 +1303,87 @@ button i {
         center;
 
     gap:
-        7px;
+        9px;
 
     margin-top:
+        16px;
+
+    padding-top:
         13px;
 
+    border-top:
+        1px solid #f1f2f4;
 }
 
-
 .view-task {
-
     display:
         inline-flex;
 
     align-items:
         center;
 
+    justify-content:
+        center;
+
     gap:
-        5px;
+        6px;
+
+    min-height:
+        38px;
 
     padding:
-        7px
-        9px;
+        7px 12px;
 
     border-radius:
-        8px;
+        9px;
 
     color:
         var(--mevi-primary);
 
     background:
-        #F4F2FF;
+        #f3f1ff;
 
     text-decoration:
         none;
 
     font-size:
-        8px;
+        13px;
 
     font-weight:
         800;
 
+    transition:
+        .18s ease;
 }
 
-
 .view-task:hover {
-
     color:
         var(--mevi-primary-dark);
 
     background:
-        #EDE9FE;
+        #e9e5ff;
 
+    text-decoration:
+        none;
+
+    transform:
+        translateY(-1px);
 }
 
-
 .admin-actions {
-
     display:
         flex;
 
     gap:
-        5px;
-
+        7px;
 }
 
-
 .icon-btn {
-
     width:
-        29px;
+        36px;
 
     height:
-        29px;
+        36px;
 
     display:
         flex;
@@ -1699,14 +1395,13 @@ button i {
         center;
 
     border-radius:
-        8px;
+        9px;
 
     background:
-        white;
+        #ffffff;
 
     border:
-        1px solid
-        var(--border);
+        1px solid var(--border);
 
     color:
         var(--muted);
@@ -1715,39 +1410,35 @@ button i {
         none;
 
     font-size:
-        10px;
+        14px;
 
     transition:
-        .15s ease;
-
+        .17s ease;
 }
 
-
 .icon-btn:hover {
-
     color:
         var(--mevi-primary);
 
     border-color:
-        #CFC9FF;
+        #cfc9ff;
 
     background:
-        #F8F7FF;
+        #f8f7ff;
 
+    transform:
+        translateY(-1px);
 }
 
-
 .icon-btn.delete:hover {
-
     color:
         var(--pending);
 
     border-color:
-        #FECACA;
+        #fecaca;
 
     background:
-        #FEF2F2;
-
+        #fef2f2;
 }
 
 
@@ -1756,40 +1447,37 @@ button i {
 ========================================================= */
 
 .view-only {
-
     margin-top:
-        10px;
+        12px;
 
     padding:
-        6px;
+        8px;
 
     text-align:
         center;
 
     border-radius:
-        7px;
+        8px;
 
     color:
         var(--muted-light);
 
     background:
-        #F8F9FB;
+        #f8f9fb;
 
     font-size:
-        7px;
+        11px;
 
     font-weight:
         700;
-
 }
 
 
 /* =========================================================
-   EMPTY
+   EMPTY COLUMN
 ========================================================= */
 
 .empty-column {
-
     display:
         flex;
 
@@ -1803,24 +1491,24 @@ button i {
         center;
 
     min-height:
-        330px;
+        390px;
+
+    padding:
+        30px;
 
     color:
         var(--muted-light);
 
     text-align:
         center;
-
 }
 
-
 .empty-icon {
-
     width:
-        54px;
+        68px;
 
     height:
-        54px;
+        68px;
 
     display:
         flex;
@@ -1832,51 +1520,47 @@ button i {
         center;
 
     margin-bottom:
-        12px;
+        15px;
 
     border-radius:
-        17px;
+        20px;
 
     background:
-        rgba(255,255,255,.75);
+        rgba(255,255,255,.8);
 
     font-size:
-        22px;
+        29px;
 
+    box-shadow:
+        0 5px 16px rgba(16,24,40,.04);
 }
 
-
 .empty-title {
-
     color:
         var(--dark-soft);
 
     font-size:
-        11px;
+        15px;
 
     font-weight:
         800;
-
 }
 
-
 .empty-text {
-
     max-width:
-        170px;
+        240px;
 
     margin-top:
-        4px;
+        6px;
 
     color:
         var(--muted-light);
 
     font-size:
-        8px;
+        13px;
 
     line-height:
-        1.5;
-
+        1.6;
 }
 
 
@@ -1885,206 +1569,66 @@ button i {
 ========================================================= */
 
 .task-footer {
-
     margin-top:
-        23px;
+        28px;
 
     padding:
-        19px;
+        25px;
 
     text-align:
         center;
 
     border-radius:
-        16px;
+        18px;
 
     border:
-        1px solid
-        #E9E4FF;
+        1px solid #e8e2ff;
 
     background:
         linear-gradient(
             135deg,
-            #F5F3FF,
-            #FFF3F8
+            #f5f3ff,
+            #fff3f8
         );
 
+    box-shadow:
+        0 5px 18px rgba(91,75,219,.035);
 }
 
-
 .task-footer-title {
-
     color:
         var(--dark);
 
     font-size:
-        12px;
+        18px;
 
     font-weight:
         850;
-
 }
 
-
 .task-footer-text {
-
     max-width:
-        700px;
+        760px;
 
     margin:
-        5px
-        auto
-        0;
+        8px auto 0;
 
     color:
         var(--muted);
 
     font-size:
-        9px;
+        14px;
 
     line-height:
-        1.6;
-
+        1.7;
 }
 
-
 .task-footer-highlight {
-
     color:
         var(--mevi-primary);
 
     font-weight:
         800;
-
-}
-
-
-/* =========================================================
-   RESPONSIVE
-========================================================= */
-
-@media (max-width: 1200px) {
-
-    .stats-grid {
-
-        grid-template-columns:
-            repeat(2, 1fr);
-
-    }
-
-    .kanban-board {
-
-        grid-template-columns:
-            1fr;
-
-    }
-
-    .kanban-column {
-
-        min-height:
-            auto;
-
-    }
-
-}
-
-
-@media (max-width: 700px) {
-
-    .task-page {
-
-        padding:
-            15px
-            13px
-            35px;
-
-    }
-
-    .page-header {
-
-        align-items:
-            flex-start;
-
-        flex-direction:
-            column;
-
-    }
-
-    .page-title {
-
-        font-size:
-            22px;
-
-    }
-
-    .page-actions {
-
-        width:
-            100%;
-
-    }
-
-    .page-action {
-
-        flex:
-            1;
-
-    }
-
-    .stats-grid {
-
-        grid-template-columns:
-            repeat(2, 1fr);
-
-        gap:
-            9px;
-
-    }
-
-    .stat-card {
-
-        min-height:
-            105px;
-
-        padding:
-            13px;
-
-    }
-
-    .stat-number {
-
-        font-size:
-            22px;
-
-    }
-
-    .board-toolbar {
-
-        align-items:
-            stretch;
-
-        flex-direction:
-            column;
-
-    }
-
-    .search-box {
-
-        width:
-            100%;
-
-    }
-
-    .team-strip {
-
-        align-items:
-            flex-start;
-
-        flex-direction:
-            column;
-
-    }
-
 }
 
 
@@ -2093,10 +1637,301 @@ button i {
 ========================================================= */
 
 .task-card.hidden {
-
     display:
         none;
+}
 
+
+/* =========================================================
+   RESPONSIVE — 1250
+========================================================= */
+
+@media (max-width: 1250px) {
+
+    .task-page {
+        padding:
+            28px 26px 48px;
+    }
+
+    .stats-grid {
+        grid-template-columns:
+            repeat(2, minmax(0,1fr));
+    }
+
+    .kanban-board {
+        grid-template-columns:
+            1fr;
+    }
+
+    .kanban-column {
+        min-height:
+            auto;
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE — 850
+========================================================= */
+
+@media (max-width: 850px) {
+
+    .page-header {
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+    }
+
+    .page-actions {
+        width:
+            100%;
+    }
+
+    .page-action {
+        flex:
+            1;
+    }
+
+    .board-toolbar {
+        align-items:
+            stretch;
+
+        flex-direction:
+            column;
+    }
+
+    .search-box {
+        width:
+            100%;
+    }
+
+    .team-strip {
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE — 600
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .task-page {
+        padding:
+            19px 14px 38px;
+    }
+
+    .page-header-left {
+        align-items:
+            flex-start;
+    }
+
+    .page-icon {
+        width:
+            52px;
+
+        height:
+            52px;
+
+        flex-basis:
+            52px;
+
+        font-size:
+            22px;
+    }
+
+    .page-title {
+        font-size:
+            27px;
+    }
+
+    .page-subtitle {
+        font-size:
+            13px;
+    }
+
+    .page-actions {
+        flex-direction:
+            column;
+    }
+
+    .page-action {
+        width:
+            100%;
+    }
+
+    .stats-grid {
+        grid-template-columns:
+            repeat(2, minmax(0,1fr));
+
+        gap:
+            12px;
+    }
+
+    .stat-card {
+        min-height:
+            125px;
+
+        padding:
+            17px;
+    }
+
+    .stat-number {
+        font-size:
+            29px;
+    }
+
+    .stat-label {
+        font-size:
+            12px;
+    }
+
+    .board-heading {
+        font-size:
+            20px;
+    }
+
+    .board-description {
+        font-size:
+            13px;
+    }
+
+    .kanban-column {
+        padding:
+            13px;
+
+        border-radius:
+            17px;
+    }
+
+    .task-card {
+        padding:
+            16px;
+    }
+
+    .task-top {
+        flex-direction:
+            column;
+    }
+
+    .priority {
+        align-self:
+            flex-start;
+    }
+
+    .task-title {
+        font-size:
+            16px;
+    }
+
+    .task-id {
+        font-size:
+            11px;
+    }
+
+    .meta-item {
+        font-size:
+            11px;
+    }
+
+    .trainer-name {
+        font-size:
+            13px;
+    }
+
+    .trainer-label {
+        font-size:
+            11px;
+    }
+
+    .view-task {
+        font-size:
+            12px;
+    }
+
+    .task-footer-title {
+        font-size:
+            16px;
+    }
+
+    .task-footer-text {
+        font-size:
+            13px;
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE — 400
+========================================================= */
+
+@media (max-width: 400px) {
+
+    .stats-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+    .page-title {
+        font-size:
+            24px;
+    }
+
+    .team-strip-text {
+        font-size:
+            13px;
+    }
+
+    .stat-number {
+        font-size:
+            28px;
+    }
+
+    .column-title {
+        font-size:
+            15px;
+    }
+}
+
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+:focus-visible {
+    outline:
+        3px solid rgba(91,75,219,.30);
+
+    outline-offset:
+        2px;
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        scroll-behavior:
+            auto !important;
+
+        animation-duration:
+            .01ms !important;
+
+        transition-duration:
+            .01ms !important;
+    }
 }
 
 </style>
