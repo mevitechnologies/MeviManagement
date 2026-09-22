@@ -19,14 +19,20 @@ from .models import (
 # TRAINER FORM
 # =========================================================
 
+# =========================================================
+# TRAINER FORM
+# =========================================================
+
 class TrainerForm(forms.ModelForm):
 
     class Meta:
         model = Trainer
+
         fields = [
             "Name",
             "email",
             "phone",
+            "profile_photo",
             "expertise",
             "is_available",
             "cv",
@@ -34,41 +40,64 @@ class TrainerForm(forms.ModelForm):
         ]
 
         widgets = {
+
             "Name": forms.TextInput(
                 attrs={
                     "class": "form-control",
                     "placeholder": "Full Name",
+                    "autocomplete": "name",
                 }
             ),
+
             "email": forms.EmailInput(
                 attrs={
                     "class": "form-control",
                     "placeholder": "Email address",
+                    "autocomplete": "email",
                 }
             ),
+
             "phone": forms.TextInput(
                 attrs={
                     "class": "form-control",
                     "placeholder": "Phone number",
+                    "autocomplete": "tel",
                 }
             ),
+
+            "profile_photo": forms.ClearableFileInput(
+                attrs={
+                    "class": "form-control",
+                    "accept": "image/*",
+                    "id": "id_profile_photo",
+                }
+            ),
+
             "expertise": forms.Textarea(
                 attrs={
                     "class": "form-control",
-                    "rows": 2,
-                    "placeholder": "Expertise areas",
+                    "rows": 3,
+                    "placeholder": (
+                        "Example: Python, Machine Learning, "
+                        "Deep Learning, Django, Data Science"
+                    ),
                 }
             ),
+
             "is_available": forms.CheckboxInput(
                 attrs={
                     "class": "form-check-input",
                 }
             ),
+
             "cv": forms.ClearableFileInput(
                 attrs={
                     "class": "form-control",
+                    "accept": ".pdf,.doc,.docx",
+                    "id": "id_cv",
                 }
             ),
+
             "is_full_time": forms.CheckboxInput(
                 attrs={
                     "class": "form-check-input",
@@ -76,6 +105,59 @@ class TrainerForm(forms.ModelForm):
             ),
         }
 
+    def clean_phone(self):
+        phone = self.cleaned_data.get("phone")
+
+        if phone:
+            phone = phone.strip()
+
+            if not phone.replace("+", "").replace(" ", "").isdigit():
+                raise forms.ValidationError(
+                    "Please enter a valid phone number."
+                )
+
+        return phone
+
+    def clean_profile_photo(self):
+        photo = self.cleaned_data.get("profile_photo")
+
+        if photo:
+
+            # Maximum 5 MB
+            if photo.size > 5 * 1024 * 1024:
+                raise forms.ValidationError(
+                    "Profile photo must be less than 5 MB."
+                )
+
+        return photo
+
+    def clean_cv(self):
+        cv = self.cleaned_data.get("cv")
+
+        if cv:
+
+            # Maximum 10 MB
+            if cv.size > 10 * 1024 * 1024:
+                raise forms.ValidationError(
+                    "CV must be less than 10 MB."
+                )
+
+            allowed_extensions = [
+                ".pdf",
+                ".doc",
+                ".docx",
+            ]
+
+            extension = (
+                "." + cv.name.split(".")[-1].lower()
+            )
+
+            if extension not in allowed_extensions:
+                raise forms.ValidationError(
+                    "Only PDF, DOC and DOCX files are allowed."
+                )
+
+        return cv
 
 # =========================================================
 # WORKSHOP FORM

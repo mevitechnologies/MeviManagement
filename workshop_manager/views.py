@@ -1248,12 +1248,37 @@ def add_trainer(request):
 @login_required
 @user_passes_test(is_superuser)
 def edit_trainer(request, pk):
-    trainer = get_object_or_404(Trainer, pk=pk)
-    form = TrainerForm(request.POST or None, instance=trainer)
+
+    trainer = get_object_or_404(
+        Trainer,
+        pk=pk
+    )
+
+    form = TrainerForm(
+        request.POST or None,
+        request.FILES or None,
+        instance=trainer
+    )
+
     if form.is_valid():
+
         form.save()
+
+        messages.success(
+            request,
+            "Trainer profile updated successfully."
+        )
+
         return redirect("trainer_list")
-    return render(request, "edit_trainer.html", {"form": form})
+
+    return render(
+        request,
+        "edit_trainer.html",
+        {
+            "form": form,
+            "trainer": trainer,
+        }
+    )
 
 
 @login_required

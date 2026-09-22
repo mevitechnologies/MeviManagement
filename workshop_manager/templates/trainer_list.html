@@ -1,102 +1,1572 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Trainer List</h2>
-        <a href="{% url 'add_trainer' %}" class="btn btn-primary">+ Add Trainer</a>
+
+<style>
+
+    /* =========================================================
+       PAGE
+    ========================================================= */
+
+    .trainer-page {
+        max-width: 1450px;
+        margin: 0 auto;
+        padding: 25px 20px 60px;
+    }
+
+
+    /* =========================================================
+       HERO
+       ========================================================= */
+
+    .trainer-hero {
+        position: relative;
+        overflow: hidden;
+        border-radius: 24px;
+        padding: 30px 35px;
+        margin-bottom: 25px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #4f46e5 0%,
+                #6366f1 50%,
+                #7c3aed 100%
+            );
+
+        color: white;
+
+        box-shadow:
+            0 18px 45px rgba(79, 70, 229, .20);
+    }
+
+    .trainer-hero::before {
+        content: "";
+        position: absolute;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        background: rgba(255,255,255,.08);
+        right: 80px;
+        top: -100px;
+    }
+
+    .trainer-hero::after {
+        content: "";
+        position: absolute;
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        background: rgba(255,255,255,.06);
+        right: -40px;
+        bottom: -70px;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .hero-icon {
+        width: 62px;
+        height: 62px;
+        border-radius: 17px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background: rgba(255,255,255,.15);
+
+        font-size: 28px;
+
+        margin-bottom: 16px;
+    }
+
+    .trainer-hero h1 {
+        font-size: 34px;
+        font-weight: 800;
+        margin: 0 0 8px;
+        letter-spacing: -.5px;
+    }
+
+    .trainer-hero p {
+        margin: 0;
+        font-size: 15px;
+        opacity: .9;
+        max-width: 650px;
+    }
+
+    .hero-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .btn-add-trainer {
+        background: white;
+        color: #4f46e5;
+        border: none;
+        border-radius: 11px;
+        padding: 11px 18px;
+        font-weight: 700;
+        transition: .2s;
+    }
+
+    .btn-add-trainer:hover {
+        background: #f8fafc;
+        color: #4338ca;
+        transform: translateY(-1px);
+    }
+
+
+    /* =========================================================
+       STAT CARDS
+       ========================================================= */
+
+    .stat-card {
+        background: white;
+        border: 1px solid #edf0f5;
+        border-radius: 18px;
+        padding: 20px;
+
+        height: 100%;
+
+        box-shadow:
+            0 6px 24px rgba(15,23,42,.05);
+
+        transition: .2s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow:
+            0 12px 30px rgba(15,23,42,.08);
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+
+        border-radius: 13px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 21px;
+
+        margin-bottom: 13px;
+    }
+
+    .stat-icon-purple {
+        background: #eef2ff;
+        color: #4f46e5;
+    }
+
+    .stat-icon-green {
+        background: #ecfdf3;
+        color: #16a34a;
+    }
+
+    .stat-icon-red {
+        background: #fff1f2;
+        color: #dc2626;
+    }
+
+    .stat-icon-blue {
+        background: #eff6ff;
+        color: #2563eb;
+    }
+
+    .stat-number {
+        font-size: 29px;
+        line-height: 1;
+        font-weight: 800;
+        color: #111827;
+        margin-bottom: 6px;
+    }
+
+    .stat-label {
+        color: #6b7280;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+
+    /* =========================================================
+       TOOLBAR
+       ========================================================= */
+
+    .toolbar-card {
+        background: white;
+        border: 1px solid #edf0f5;
+        border-radius: 18px;
+        padding: 18px;
+
+        box-shadow:
+            0 6px 24px rgba(15,23,42,.04);
+
+        margin-bottom: 20px;
+    }
+
+    .search-wrapper {
+        position: relative;
+    }
+
+    .search-wrapper i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 17px;
+    }
+
+    .search-input {
+        padding-left: 43px;
+        min-height: 46px;
+        border-radius: 11px;
+        border: 1px solid #dfe3ea;
+    }
+
+    .search-input:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 4px rgba(99,102,241,.10);
+    }
+
+    .search-btn {
+        min-height: 46px;
+        border-radius: 11px;
+        padding: 0 20px;
+        font-weight: 700;
+    }
+
+
+    /* =========================================================
+       TRAINER TABLE
+       ========================================================= */
+
+    .table-card {
+        background: white;
+        border: 1px solid #edf0f5;
+        border-radius: 20px;
+
+        overflow: hidden;
+
+        box-shadow:
+            0 8px 30px rgba(15,23,42,.05);
+    }
+
+    .table-header {
+        padding: 20px 22px;
+        border-bottom: 1px solid #edf0f5;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .table-title {
+        font-size: 18px;
+        font-weight: 800;
+        color: #1f2937;
+        margin: 0;
+    }
+
+    .table-subtitle {
+        color: #6b7280;
+        font-size: 13px;
+        margin-top: 3px;
+    }
+
+    .trainer-table {
+        margin: 0;
+        vertical-align: middle;
+    }
+
+    .trainer-table thead th {
+        background: #f8fafc;
+        color: #64748b;
+
+        font-size: 11px;
+        font-weight: 800;
+
+        text-transform: uppercase;
+        letter-spacing: .5px;
+
+        padding: 15px 16px;
+
+        border-bottom: 1px solid #e9edf3;
+        white-space: nowrap;
+    }
+
+    .trainer-table tbody td {
+        padding: 16px;
+        border-bottom: 1px solid #f0f2f5;
+        color: #374151;
+        font-size: 14px;
+    }
+
+    .trainer-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .trainer-table tbody tr {
+        transition: .15s;
+    }
+
+    .trainer-table tbody tr:hover {
+        background: #fafbff;
+    }
+
+
+    /* =========================================================
+       PROFILE
+       ========================================================= */
+
+    .trainer-profile {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 190px;
+    }
+
+    .trainer-photo {
+        width: 52px;
+        height: 52px;
+
+        border-radius: 50%;
+
+        object-fit: cover;
+
+        border: 3px solid #eef2ff;
+
+        flex-shrink: 0;
+    }
+
+    .trainer-photo-placeholder {
+        width: 52px;
+        height: 52px;
+
+        border-radius: 50%;
+
+        background: #eef2ff;
+
+        color: #4f46e5;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 21px;
+
+        border: 3px solid #eef2ff;
+
+        flex-shrink: 0;
+    }
+
+    .trainer-name {
+        font-weight: 800;
+        color: #111827;
+        margin-bottom: 3px;
+    }
+
+    .trainer-type {
+        font-size: 11px;
+        color: #6b7280;
+    }
+
+
+    /* =========================================================
+       EXPERTISE
+       ========================================================= */
+
+    .expertise-text {
+        max-width: 220px;
+        line-height: 1.5;
+        color: #4b5563;
+    }
+
+
+    /* =========================================================
+       BADGES
+       ========================================================= */
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+
+        padding: 6px 10px;
+
+        border-radius: 999px;
+
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .status-available {
+        background: #ecfdf3;
+        color: #15803d;
+    }
+
+    .status-unavailable {
+        background: #fff1f2;
+        color: #be123c;
+    }
+
+    .fulltime-badge {
+        background: #eef2ff;
+        color: #4338ca;
+        padding: 5px 9px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 700;
+    }
+
+    .parttime-badge {
+        background: #f1f5f9;
+        color: #475569;
+        padding: 5px 9px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 700;
+    }
+
+
+    /* =========================================================
+       CV
+       ========================================================= */
+
+    .cv-btn {
+        border-radius: 9px;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .no-cv {
+        color: #9ca3af;
+        font-size: 12px;
+    }
+
+
+    /* =========================================================
+       ACTIONS
+       ========================================================= */
+
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+    }
+
+    .action-btn {
+        width: 35px;
+        height: 35px;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 9px;
+
+        font-size: 14px;
+
+        transition: .2s;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-1px);
+    }
+
+
+    /* =========================================================
+       PAGINATION
+       ========================================================= */
+
+    .pagination-wrapper {
+        padding: 18px 22px;
+
+        border-top: 1px solid #edf0f5;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .page-info {
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+    .pagination {
+        margin: 0;
+    }
+
+    .page-link {
+        border: 1px solid #e5e7eb;
+        color: #4f46e5;
+        font-weight: 600;
+        border-radius: 8px !important;
+        margin: 0 2px;
+    }
+
+    .page-item.active .page-link {
+        background: #4f46e5;
+        border-color: #4f46e5;
+        color: white;
+    }
+
+
+    /* =========================================================
+       EMPTY STATE
+       ========================================================= */
+
+    .empty-state {
+        padding: 70px 25px;
+        text-align: center;
+    }
+
+    .empty-icon {
+        width: 80px;
+        height: 80px;
+
+        margin: 0 auto 18px;
+
+        border-radius: 22px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background: #eef2ff;
+        color: #4f46e5;
+
+        font-size: 35px;
+    }
+
+    .empty-state h4 {
+        font-weight: 800;
+        color: #1f2937;
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        color: #6b7280;
+        margin-bottom: 20px;
+    }
+
+
+    /* =========================================================
+       MOBILE CARDS
+       ========================================================= */
+
+    .mobile-trainer-card {
+        display: none;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media(max-width: 992px) {
+
+        .trainer-table thead {
+            display: none;
+        }
+
+        .trainer-table,
+        .trainer-table tbody,
+        .trainer-table tr,
+        .trainer-table td {
+            display: block;
+            width: 100%;
+        }
+
+        .trainer-table tbody tr {
+            display: none;
+        }
+
+        .mobile-trainer-card {
+            display: block;
+            padding: 20px;
+            border-bottom: 1px solid #edf0f5;
+        }
+
+        .mobile-trainer-card:last-child {
+            border-bottom: none;
+        }
+
+    }
+
+
+    @media(max-width: 768px) {
+
+        .trainer-page {
+            padding: 15px 10px 40px;
+        }
+
+        .trainer-hero {
+            padding: 23px;
+            border-radius: 18px;
+        }
+
+        .trainer-hero h1 {
+            font-size: 26px;
+        }
+
+        .hero-actions {
+            margin-top: 20px;
+        }
+
+        .btn-add-trainer {
+            width: 100%;
+        }
+
+        .pagination-wrapper {
+            flex-direction: column;
+        }
+
+        .table-header {
+            padding: 18px;
+        }
+
+        .stat-number {
+            font-size: 25px;
+        }
+
+    }
+
+
+    @media(max-width: 480px) {
+
+        .trainer-hero h1 {
+            font-size: 23px;
+        }
+
+        .trainer-hero p {
+            font-size: 13px;
+        }
+
+        .stat-card {
+            padding: 16px;
+        }
+
+    }
+
+</style>
+
+
+<div class="trainer-page">
+
+
+    <!-- =========================================================
+         HERO
+         ========================================================= -->
+
+    <div class="trainer-hero">
+
+        <div class="hero-content">
+
+            <div class="row align-items-center">
+
+                <div class="col-lg-8">
+
+                    <div class="hero-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+
+                    <h1>
+                        Trainer Management
+                    </h1>
+
+                    <p>
+                        Manage trainer profiles, expertise, availability,
+                        CVs and training assignments from one place.
+                    </p>
+
+                </div>
+
+
+                <div class="col-lg-4">
+
+                    <div class="hero-actions justify-content-lg-end">
+
+                        <a
+                            href="{% url 'add_trainer' %}"
+                            class="btn btn-add-trainer"
+                        >
+                            <i class="bi bi-person-plus-fill me-2"></i>
+                            Add Trainer
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 
-    <!-- Search Bar -->
-    <form method="get" class="mb-3">
-        <div class="input-group">
-            <input type="text" name="q" class="form-control" placeholder="Search by name..." value="{{ request.GET.q }}">
-            <button class="btn btn-outline-secondary" type="submit">Search</button>
-        </div>
-    </form>
+
+
+    <!-- =========================================================
+         STATISTICS
+         ========================================================= -->
 
     {% if trainers %}
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered align-middle">
-            <thead class="table-dark">
-                <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Expertise</th>
-                    <th>Available</th>
-                    <th>CV</th>
-                    <th style="width: 160px;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for trainer in trainers %}
-                <tr>
-                    <td>{{ trainer.Name }}</td>
-                    <td>{{ trainer.email }}</td>
-                    <td>{{ trainer.phone }}</td>
-                    <td>{{ trainer.expertise }}</td>
-                    <td>
-                        {% if trainer.is_available %}
-                            <span class="badge bg-success">Yes</span>
-                        {% else %}
-                            <span class="badge bg-danger">No</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if trainer.cv %}
-                            <a href="{{ trainer.cv.url }}" target="_blank" class="btn btn-sm btn-outline-info">View</a>
-                        {% else %}
-                            <span class="text-muted">No CV</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <div class="d-flex gap-2">
-                            <a href="{% url 'edit_trainer' trainer.pk %}" class="btn btn-sm btn-warning">Edit</a>
-                            <a href="{% url 'delete_trainer' trainer.pk %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this trainer?')">Delete</a>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+
+    <div class="row g-3 mb-4">
+
+
+        <!-- TOTAL -->
+
+        <div class="col-6 col-xl-3">
+
+            <div class="stat-card">
+
+                <div class="stat-icon stat-icon-purple">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+
+                <div class="stat-number">
+                    {{ trainers.paginator.count }}
+                </div>
+
+                <div class="stat-label">
+                    Total Trainers
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- AVAILABLE -->
+
+        <div class="col-6 col-xl-3">
+
+            <div class="stat-card">
+
+                <div class="stat-icon stat-icon-green">
+                    <i class="bi bi-person-check-fill"></i>
+                </div>
+
+                <div class="stat-number">
+                    {{ trainers.paginator.object_list|length }}
+                </div>
+
+                <div class="stat-label">
+                    Trainers Listed
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- PAGE -->
+
+        <div class="col-6 col-xl-3">
+
+            <div class="stat-card">
+
+                <div class="stat-icon stat-icon-blue">
+                    <i class="bi bi-file-earmark-person-fill"></i>
+                </div>
+
+                <div class="stat-number">
+                    {{ trainers.number }}
+                </div>
+
+                <div class="stat-label">
+                    Current Page
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- PAGE COUNT -->
+
+        <div class="col-6 col-xl-3">
+
+            <div class="stat-card">
+
+                <div class="stat-icon stat-icon-purple">
+                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                </div>
+
+                <div class="stat-number">
+                    {{ trainers.paginator.num_pages }}
+                </div>
+
+                <div class="stat-label">
+                    Total Pages
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 
-    <!-- Pagination Controls -->
-    <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center">
-            {% if trainers.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?q={{ request.GET.q }}&page={{ trainers.previous_page_number }}">&laquo;</a>
-                </li>
-            {% else %}
-                <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
-            {% endif %}
-
-            {% for num in trainers.paginator.page_range %}
-                {% if trainers.number == num %}
-                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                {% else %}
-                    <li class="page-item">
-                        <a class="page-link" href="?q={{ request.GET.q }}&page={{ num }}">{{ num }}</a>
-                    </li>
-                {% endif %}
-            {% endfor %}
-
-            {% if trainers.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="?q={{ request.GET.q }}&page={{ trainers.next_page_number }}">&raquo;</a>
-                </li>
-            {% else %}
-                <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
-            {% endif %}
-        </ul>
-    </nav>
-
-    {% else %}
-    <div class="alert alert-warning text-center">
-        No trainers available. Click <strong>+ Add Trainer</strong> to add one.
-    </div>
     {% endif %}
+
+
+
+    <!-- =========================================================
+         SEARCH
+         ========================================================= -->
+
+    <div class="toolbar-card">
+
+        <form method="get">
+
+            <div class="row g-2 align-items-center">
+
+                <div class="col-lg-10">
+
+                    <div class="search-wrapper">
+
+                        <i class="bi bi-search"></i>
+
+                        <input
+                            type="text"
+                            name="q"
+                            class="form-control search-input"
+                            placeholder="Search trainer by name..."
+                            value="{{ request.GET.q|default:'' }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-lg-2">
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary search-btn w-100"
+                    >
+                        <i class="bi bi-search me-1"></i>
+                        Search
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+
+    <!-- =========================================================
+         TRAINER TABLE
+         ========================================================= -->
+
+    <div class="table-card">
+
+
+        <div class="table-header">
+
+            <div>
+
+                <h3 class="table-title">
+                    <i class="bi bi-person-lines-fill me-2"></i>
+                    Trainers
+                </h3>
+
+                <div class="table-subtitle">
+                    Trainer profiles and availability
+                </div>
+
+            </div>
+
+
+            {% if trainers %}
+
+            <span class="badge bg-light text-dark border">
+
+                {{ trainers.paginator.count }}
+                Trainer{{ trainers.paginator.count|pluralize }}
+
+            </span>
+
+            {% endif %}
+
+        </div>
+
+
+
+        {% if trainers %}
+
+        <!-- =====================================================
+             DESKTOP TABLE
+             ===================================================== -->
+
+        <div class="table-responsive">
+
+            <table class="table trainer-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Trainer
+                        </th>
+
+                        <th>
+                            Contact
+                        </th>
+
+                        <th>
+                            Expertise
+                        </th>
+
+                        <th>
+                            Employment
+                        </th>
+
+                        <th>
+                            Availability
+                        </th>
+
+                        <th>
+                            CV
+                        </th>
+
+                        <th class="text-end">
+                            Actions
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for trainer in trainers %}
+
+                    <tr>
+
+
+                        <!-- TRAINER -->
+
+                        <td>
+
+                            <div class="trainer-profile">
+
+                                {% if trainer.profile_photo %}
+
+                                    <img
+                                        src="{{ trainer.profile_photo.url }}"
+                                        alt="{{ trainer.Name }}"
+                                        class="trainer-photo"
+                                    >
+
+                                {% else %}
+
+                                    <div class="trainer-photo-placeholder">
+                                        <i class="bi bi-person-fill"></i>
+                                    </div>
+
+                                {% endif %}
+
+
+                                <div>
+
+                                    <div class="trainer-name">
+                                        {{ trainer.Name }}
+                                    </div>
+
+                                    {% if trainer.is_full_time %}
+
+                                        <span class="fulltime-badge">
+                                            Full-Time
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="parttime-badge">
+                                            Part-Time
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- CONTACT -->
+
+                        <td>
+
+                            <div class="mb-1">
+
+                                <i class="bi bi-envelope me-1 text-muted"></i>
+
+                                {{ trainer.email }}
+
+                            </div>
+
+                            <div class="text-muted small">
+
+                                <i class="bi bi-telephone me-1"></i>
+
+                                {{ trainer.phone }}
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- EXPERTISE -->
+
+                        <td>
+
+                            {% if trainer.expertise %}
+
+                                <div class="expertise-text">
+
+                                    {{ trainer.expertise }}
+
+                                </div>
+
+                            {% else %}
+
+                                <span class="text-muted">
+                                    Not specified
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- EMPLOYMENT -->
+
+                        <td>
+
+                            {% if trainer.is_full_time %}
+
+                                <span class="fulltime-badge">
+                                    <i class="bi bi-briefcase-fill me-1"></i>
+                                    Full-Time
+                                </span>
+
+                            {% else %}
+
+                                <span class="parttime-badge">
+                                    <i class="bi bi-person-workspace me-1"></i>
+                                    Part-Time
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- AVAILABLE -->
+
+                        <td>
+
+                            {% if trainer.is_available %}
+
+                                <span class="status-badge status-available">
+
+                                    <i class="bi bi-circle-fill"
+                                       style="font-size:7px;"></i>
+
+                                    Available
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="status-badge status-unavailable">
+
+                                    <i class="bi bi-circle-fill"
+                                       style="font-size:7px;"></i>
+
+                                    Unavailable
+
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- CV -->
+
+                        <td>
+
+                            {% if trainer.cv %}
+
+                                <div class="d-flex gap-1">
+
+                                    <a
+                                        href="{{ trainer.cv.url }}"
+                                        target="_blank"
+                                        class="btn btn-sm btn-outline-danger cv-btn"
+                                        title="View CV"
+                                    >
+                                        <i class="bi bi-eye me-1"></i>
+                                        View
+                                    </a>
+
+                                    <a
+                                        href="{{ trainer.cv.url }}"
+                                        download
+                                        class="btn btn-sm btn-outline-secondary cv-btn"
+                                        title="Download CV"
+                                    >
+                                        <i class="bi bi-download"></i>
+                                    </a>
+
+                                </div>
+
+                            {% else %}
+
+                                <span class="no-cv">
+                                    <i class="bi bi-file-earmark-x me-1"></i>
+                                    No CV
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- ACTIONS -->
+
+                        <td>
+
+                            <div class="action-buttons justify-content-end">
+
+
+                                <!-- VIEW -->
+
+                                <a
+                                    href="#"
+                                    class="btn btn-sm btn-outline-primary action-btn"
+                                    title="View Trainer"
+                                    data-bs-toggle="tooltip"
+                                >
+                                    <i class="bi bi-eye"></i>
+                                </a>
+
+
+                                <!-- EDIT -->
+
+                                <a
+                                    href="{% url 'edit_trainer' trainer.pk %}"
+                                    class="btn btn-sm btn-outline-warning action-btn"
+                                    title="Edit Trainer"
+                                    data-bs-toggle="tooltip"
+                                >
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+
+
+                                <!-- DELETE -->
+
+                                <a
+                                    href="{% url 'delete_trainer' trainer.pk %}"
+                                    class="btn btn-sm btn-outline-danger action-btn"
+                                    title="Delete Trainer"
+                                    data-bs-toggle="tooltip"
+                                    onclick="return confirm(
+                                        'Are you sure you want to delete {{ trainer.Name }}?'
+                                    );"
+                                >
+                                    <i class="bi bi-trash3"></i>
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+
+                    <!-- =================================================
+                         MOBILE CARD
+                         ================================================= -->
+
+                    <tr class="mobile-row">
+
+                        <td colspan="7">
+
+                            <div class="mobile-trainer-card">
+
+                                <div class="d-flex align-items-center gap-3 mb-3">
+
+                                    {% if trainer.profile_photo %}
+
+                                        <img
+                                            src="{{ trainer.profile_photo.url }}"
+                                            alt="{{ trainer.Name }}"
+                                            class="trainer-photo"
+                                        >
+
+                                    {% else %}
+
+                                        <div class="trainer-photo-placeholder">
+                                            <i class="bi bi-person-fill"></i>
+                                        </div>
+
+                                    {% endif %}
+
+
+                                    <div>
+
+                                        <div class="trainer-name">
+                                            {{ trainer.Name }}
+                                        </div>
+
+                                        <div class="small text-muted">
+                                            {{ trainer.email }}
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="row g-3">
+
+                                    <div class="col-6">
+
+                                        <div class="small text-muted">
+                                            Phone
+                                        </div>
+
+                                        <strong>
+                                            {{ trainer.phone }}
+                                        </strong>
+
+                                    </div>
+
+
+                                    <div class="col-6">
+
+                                        <div class="small text-muted">
+                                            Status
+                                        </div>
+
+                                        {% if trainer.is_available %}
+
+                                            <span class="status-badge status-available">
+                                                Available
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="status-badge status-unavailable">
+                                                Unavailable
+                                            </span>
+
+                                        {% endif %}
+
+                                    </div>
+
+
+                                    <div class="col-12">
+
+                                        <div class="small text-muted mb-1">
+                                            Expertise
+                                        </div>
+
+                                        {% if trainer.expertise %}
+                                            {{ trainer.expertise }}
+                                        {% else %}
+                                            <span class="text-muted">
+                                                Not specified
+                                            </span>
+                                        {% endif %}
+
+                                    </div>
+
+
+                                    <div class="col-12">
+
+                                        <div class="d-flex gap-2 flex-wrap">
+
+                                            {% if trainer.cv %}
+
+                                                <a
+                                                    href="{{ trainer.cv.url }}"
+                                                    target="_blank"
+                                                    class="btn btn-sm btn-outline-danger"
+                                                >
+                                                    <i class="bi bi-file-earmark-person me-1"></i>
+                                                    View CV
+                                                </a>
+
+                                                <a
+                                                    href="{{ trainer.cv.url }}"
+                                                    download
+                                                    class="btn btn-sm btn-outline-secondary"
+                                                >
+                                                    <i class="bi bi-download me-1"></i>
+                                                    Download
+                                                </a>
+
+                                            {% endif %}
+
+
+                                            <a
+                                                href="{% url 'edit_trainer' trainer.pk %}"
+                                                class="btn btn-sm btn-warning"
+                                            >
+                                                <i class="bi bi-pencil me-1"></i>
+                                                Edit
+                                            </a>
+
+
+                                            <a
+                                                href="{% url 'delete_trainer' trainer.pk %}"
+                                                class="btn btn-sm btn-danger"
+                                                onclick="return confirm(
+                                                    'Are you sure you want to delete {{ trainer.Name }}?'
+                                                );"
+                                            >
+                                                <i class="bi bi-trash3 me-1"></i>
+                                                Delete
+                                            </a>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+
+        <!-- =====================================================
+             PAGINATION
+             ===================================================== -->
+
+        <div class="pagination-wrapper">
+
+
+            <div class="page-info">
+
+                Showing page
+                <strong>{{ trainers.number }}</strong>
+                of
+                <strong>{{ trainers.paginator.num_pages }}</strong>
+
+                ·
+
+                {{ trainers.paginator.count }}
+                total trainers
+
+            </div>
+
+
+            <nav aria-label="Trainer pagination">
+
+                <ul class="pagination">
+
+
+                    <!-- PREVIOUS -->
+
+                    {% if trainers.has_previous %}
+
+                        <li class="page-item">
+
+                            <a
+                                class="page-link"
+                                href="?q={{ request.GET.q|urlencode }}&page={{ trainers.previous_page_number }}"
+                                aria-label="Previous"
+                            >
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+
+                        </li>
+
+                    {% else %}
+
+                        <li class="page-item disabled">
+
+                            <span class="page-link">
+                                <i class="bi bi-chevron-left"></i>
+                            </span>
+
+                        </li>
+
+                    {% endif %}
+
+
+
+                    <!-- PAGE NUMBERS -->
+
+                    {% for num in trainers.paginator.page_range %}
+
+                        {% if trainers.number == num %}
+
+                            <li class="page-item active">
+
+                                <span class="page-link">
+                                    {{ num }}
+                                </span>
+
+                            </li>
+
+                        {% else %}
+
+                            <li class="page-item">
+
+                                <a
+                                    class="page-link"
+                                    href="?q={{ request.GET.q|urlencode }}&page={{ num }}"
+                                >
+                                    {{ num }}
+                                </a>
+
+                            </li>
+
+                        {% endif %}
+
+                    {% endfor %}
+
+
+
+                    <!-- NEXT -->
+
+                    {% if trainers.has_next %}
+
+                        <li class="page-item">
+
+                            <a
+                                class="page-link"
+                                href="?q={{ request.GET.q|urlencode }}&page={{ trainers.next_page_number }}"
+                                aria-label="Next"
+                            >
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+
+                        </li>
+
+                    {% else %}
+
+                        <li class="page-item disabled">
+
+                            <span class="page-link">
+                                <i class="bi bi-chevron-right"></i>
+                            </span>
+
+                        </li>
+
+                    {% endif %}
+
+                </ul>
+
+            </nav>
+
+        </div>
+
+
+        {% else %}
+
+
+        <!-- =====================================================
+             EMPTY STATE
+             ===================================================== -->
+
+        <div class="empty-state">
+
+            <div class="empty-icon">
+                <i class="bi bi-people"></i>
+            </div>
+
+            <h4>
+                No Trainers Found
+            </h4>
+
+            <p>
+                There are currently no trainers matching your search.
+            </p>
+
+            <a
+                href="{% url 'add_trainer' %}"
+                class="btn btn-primary"
+            >
+                <i class="bi bi-person-plus-fill me-2"></i>
+                Add Your First Trainer
+            </a>
+
+        </div>
+
+        {% endif %}
+
+
+    </div>
+
 </div>
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    /*
+     * Bootstrap tooltips
+     */
+
+    const tooltipTriggerList =
+        document.querySelectorAll(
+            '[data-bs-toggle="tooltip"]'
+        );
+
+    tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+
+        if (
+            typeof bootstrap !== "undefined" &&
+            bootstrap.Tooltip
+        ) {
+            new bootstrap.Tooltip(
+                tooltipTriggerEl
+            );
+        }
+
+    });
+
+});
+
+</script>
+
 {% endblock %}
