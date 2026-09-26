@@ -6,38 +6,826 @@ Master Calendar
 
 {% block content %}
 
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
+<link
+    href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css"
+    rel="stylesheet"
+>
 
-<div class="container-fluid mt-4">
+<style>
 
-    <div class="card shadow border-0">
+/* =========================================================
+   MASTER CALENDAR
+========================================================= */
 
-        <div class="card-header bg-primary text-white">
+.calendar-page {
+    padding: 24px 18px 40px;
+}
 
-            <div class="d-flex justify-content-between align-items-center">
+/* =========================================================
+   HEADER
+========================================================= */
 
-                <h3 class="mb-0">
+.calendar-hero {
+    background:
+        linear-gradient(
+            135deg,
+            #4f46e5 0%,
+            #6366f1 45%,
+            #7c3aed 100%
+        );
+    border-radius: 22px;
+    padding: 28px 30px;
+    color: #ffffff;
+    margin-bottom: 22px;
+    box-shadow: 0 12px 30px rgba(79, 70, 229, 0.20);
+}
+
+.calendar-hero-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.calendar-title-area {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.calendar-title-icon {
+    width: 62px;
+    height: 62px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    backdrop-filter: blur(10px);
+}
+
+.calendar-title-area h1 {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.calendar-title-area p {
+    margin: 6px 0 0;
+    font-size: 15px;
+    opacity: 0.90;
+}
+
+.calendar-date-box {
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.20);
+    border-radius: 16px;
+    padding: 13px 18px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+}
+
+.calendar-date-box .date-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.75;
+}
+
+.calendar-date-box .date-value {
+    font-size: 17px;
+    font-weight: 700;
+    margin-top: 3px;
+}
+
+/* =========================================================
+   LEGEND
+========================================================= */
+
+.calendar-toolbar-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 16px 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 5px 20px rgba(15, 23, 42, 0.07);
+    border: 1px solid #eef2f7;
+}
+
+.calendar-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.legend {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.legend-title {
+    font-size: 13px;
+    font-weight: 800;
+    color: #475569;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.legend-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+}
+
+.legend-workshop {
+    background: #5b4bdb;
+}
+
+.legend-office {
+    background: #2563eb;
+}
+
+.legend-fdp {
+    background: #ec4899;
+}
+
+.legend-online {
+    background: #20c997;
+}
+
+.legend-meeting {
+    background: #7c3aed;
+}
+
+.legend-guest {
+    background: #f59e0b;
+}
+
+/* =========================================================
+   CALENDAR CARD
+========================================================= */
+
+.calendar-card {
+    background: #ffffff;
+    border-radius: 22px;
+    border: 1px solid #eef2f7;
+    box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+    overflow: hidden;
+}
+
+.calendar-card-body {
+    padding: 20px;
+}
+
+/* =========================================================
+   FULLCALENDAR
+========================================================= */
+
+#calendar {
+    width: 100%;
+}
+
+.fc {
+    font-family: inherit;
+}
+
+.fc .fc-toolbar {
+    margin-bottom: 20px;
+}
+
+.fc .fc-toolbar-title {
+    font-size: 25px;
+    font-weight: 800;
+    color: #172033;
+}
+
+.fc .fc-button {
+    border: 0 !important;
+    background: #4f46e5 !important;
+    box-shadow: none !important;
+    font-weight: 700;
+    border-radius: 9px !important;
+    padding: 8px 13px;
+}
+
+.fc .fc-button:hover {
+    background: #4338ca !important;
+}
+
+.fc .fc-button-primary:disabled {
+    opacity: 0.55;
+}
+
+.fc .fc-button-active {
+    background: #312e81 !important;
+}
+
+.fc .fc-col-header-cell {
+    background: #f8fafc;
+}
+
+.fc .fc-col-header-cell-cushion {
+    color: #475569;
+    font-size: 13px;
+    font-weight: 800;
+    padding: 11px 4px;
+}
+
+.fc .fc-daygrid-day-number {
+    color: #334155;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 8px;
+}
+
+.fc .fc-day-today {
+    background: rgba(99, 102, 241, 0.07) !important;
+}
+
+.fc .fc-day-today .fc-daygrid-day-number {
+    background: #4f46e5;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 4px;
+}
+
+.fc-theme-standard td,
+.fc-theme-standard th {
+    border-color: #edf0f5;
+}
+
+.fc-theme-standard .fc-scrollgrid {
+    border-color: #edf0f5;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+/* =========================================================
+   EVENT DESIGN
+========================================================= */
+
+.fc-event {
+    border-radius: 8px !important;
+    border: 0 !important;
+    padding: 0 !important;
+    margin: 2px 3px !important;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.fc-event:hover {
+    filter: brightness(0.96);
+    transform: translateY(-1px);
+    transition: 0.15s ease;
+}
+
+.calendar-event-content {
+    padding: 6px 7px;
+    color: #ffffff;
+    line-height: 1.25;
+}
+
+.calendar-event-title {
+    font-size: 12px;
+    font-weight: 800;
+    white-space: normal;
+    overflow: hidden;
+}
+
+.calendar-event-trainer {
+    margin-top: 3px;
+    font-size: 10.5px;
+    font-weight: 600;
+    opacity: 0.94;
+    white-space: normal;
+    line-height: 1.25;
+}
+
+.calendar-event-meta {
+    margin-top: 2px;
+    font-size: 10px;
+    opacity: 0.86;
+}
+
+/* =========================================================
+   LIST VIEW
+========================================================= */
+
+.fc-list-event {
+    cursor: pointer;
+}
+
+.fc-list-event:hover td {
+    background: #f8fafc !important;
+}
+
+.fc-list-event-title {
+    font-weight: 700;
+}
+
+.fc-list-event-time {
+    font-weight: 700;
+}
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.event-modal .modal-dialog {
+    max-width: 650px;
+}
+
+.event-modal .modal-content {
+    border: 0;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 25px 70px rgba(15, 23, 42, 0.25);
+}
+
+.event-modal-header {
+    color: #ffffff;
+    padding: 24px 26px;
+    position: relative;
+}
+
+.event-modal-header.workshop {
+    background: linear-gradient(
+        135deg,
+        #5b4bdb,
+        #7c3aed
+    );
+}
+
+.event-modal-header.office {
+    background: linear-gradient(
+        135deg,
+        #2563eb,
+        #1d4ed8
+    );
+}
+
+.event-modal-header.fdp {
+    background: linear-gradient(
+        135deg,
+        #ec4899,
+        #db2777
+    );
+}
+
+.event-modal-header.online {
+    background: linear-gradient(
+        135deg,
+        #20c997,
+        #0d9488
+    );
+}
+
+.event-modal-header.meeting {
+    background: linear-gradient(
+        135deg,
+        #7c3aed,
+        #6d28d9
+    );
+}
+
+.event-modal-header.guest {
+    background: linear-gradient(
+        135deg,
+        #f59e0b,
+        #d97706
+    );
+}
+
+.event-modal-header.other {
+    background: linear-gradient(
+        135deg,
+        #64748b,
+        #475569
+    );
+}
+
+.modal-event-type {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.18);
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    margin-bottom: 10px;
+}
+
+.event-modal-header h4 {
+    margin: 0;
+    font-size: 22px;
+    line-height: 1.3;
+    font-weight: 800;
+    padding-right: 25px;
+}
+
+.event-modal-header .modal-subtitle {
+    margin-top: 7px;
+    font-size: 13px;
+    opacity: 0.88;
+}
+
+.event-modal .btn-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    filter: brightness(0) invert(1);
+    opacity: 0.9;
+}
+
+.event-modal-body {
+    padding: 24px 26px;
+}
+
+.event-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.event-detail-item {
+    display: flex;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 14px;
+    background: #f8fafc;
+    border: 1px solid #edf2f7;
+}
+
+.event-detail-item.full {
+    grid-column: 1 / -1;
+}
+
+.event-detail-icon {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    border-radius: 11px;
+    background: #eef2ff;
+    color: #4f46e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+}
+
+.event-detail-content {
+    min-width: 0;
+}
+
+.event-detail-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 3px;
+}
+
+.event-detail-value {
+    font-size: 14px;
+    color: #1e293b;
+    font-weight: 700;
+    word-break: break-word;
+}
+
+.trainer-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.trainer-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #eef2ff;
+    color: #4338ca;
+    border-radius: 20px;
+    padding: 5px 9px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.event-description {
+    margin-top: 16px;
+    padding: 15px;
+    border-radius: 14px;
+    background: #fafafa;
+    border: 1px solid #edf2f7;
+}
+
+.event-description-title {
+    font-size: 12px;
+    font-weight: 800;
+    color: #475569;
+    margin-bottom: 7px;
+}
+
+.event-description-text {
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.6;
+    white-space: pre-line;
+}
+
+.event-modal-footer {
+    padding: 16px 26px 22px;
+    border-top: 1px solid #edf2f7;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 11px;
+    border-radius: 20px;
+    background: #dcfce7;
+    color: #166534;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.view-event-btn {
+    border: 0;
+    border-radius: 10px;
+    padding: 10px 17px;
+    background: #4f46e5;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.view-event-btn:hover {
+    background: #4338ca;
+    color: #ffffff;
+}
+
+/* =========================================================
+   EMPTY VALUES
+========================================================= */
+
+.empty-value {
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .calendar-page {
+        padding: 15px 10px 30px;
+    }
+
+    .calendar-hero {
+        padding: 22px;
+    }
+
+    .calendar-title-area h1 {
+        font-size: 24px;
+    }
+
+    .calendar-title-icon {
+        width: 52px;
+        height: 52px;
+        font-size: 25px;
+    }
+
+    .calendar-card-body {
+        padding: 12px;
+    }
+
+    .fc .fc-toolbar {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 21px;
+    }
+
+    .event-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .event-detail-item.full {
+        grid-column: auto;
+    }
+}
+
+@media (max-width: 576px) {
+
+    .calendar-title-area {
+        align-items: flex-start;
+    }
+
+    .calendar-date-box {
+        width: 100%;
+    }
+
+    .legend {
+        gap: 9px;
+    }
+
+    .calendar-toolbar-card {
+        padding: 13px;
+    }
+
+    .calendar-card-body {
+        padding: 7px;
+    }
+
+    .fc .fc-button {
+        padding: 7px 9px;
+        font-size: 11px;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 19px;
+    }
+
+    .fc .fc-daygrid-day-number {
+        font-size: 11px;
+    }
+
+    .calendar-event-title {
+        font-size: 10px;
+    }
+
+    .calendar-event-trainer {
+        font-size: 9px;
+    }
+
+    .event-modal .modal-dialog {
+        margin: 8px;
+    }
+
+    .event-modal-header {
+        padding: 20px;
+    }
+
+    .event-modal-body {
+        padding: 18px;
+    }
+
+    .event-modal-footer {
+        padding: 15px 18px 18px;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .view-event-btn {
+        justify-content: center;
+    }
+}
+
+</style>
+
+
+<div class="calendar-page">
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <div class="calendar-hero">
+
+        <div class="calendar-hero-content">
+
+            <div class="calendar-title-area">
+
+                <div class="calendar-title-icon">
                     <i class="bi bi-calendar3"></i>
-                    Master Calendar
-                </h3>
+                </div>
 
                 <div>
 
-                    <span class="badge bg-success">
-                        Workshops
-                    </span>
+                    <h1>
+                        Master Calendar
+                    </h1>
 
-                    <span class="badge bg-primary">
-                        Office Trainings
-                    </span>
+                    <p>
+                        Workshops, office trainings, FDPs, meetings and scheduled activities
+                    </p>
 
+                </div>
+
+            </div>
+
+            <div class="calendar-date-box">
+
+                <div class="date-label">
+                    Today
+                </div>
+
+                <div
+                    class="date-value"
+                    id="todayDate"
+                >
+                    --
                 </div>
 
             </div>
 
         </div>
 
-        <div class="card-body">
+    </div>
+
+
+    <!-- =====================================================
+         LEGEND
+    ====================================================== -->
+
+    <div class="calendar-toolbar-card">
+
+        <div class="calendar-toolbar">
+
+            <div class="legend">
+
+                <span class="legend-title">
+                    Event Types
+                </span>
+
+                <span class="legend-item">
+                    <span class="legend-dot legend-workshop"></span>
+                    Workshop
+                </span>
+
+                <span class="legend-item">
+                    <span class="legend-dot legend-office"></span>
+                    Office Training
+                </span>
+
+                <span class="legend-item">
+                    <span class="legend-dot legend-fdp"></span>
+                    FDP
+                </span>
+
+                <span class="legend-item">
+                    <span class="legend-dot legend-online"></span>
+                    Online
+                </span>
+
+                <span class="legend-item">
+                    <span class="legend-dot legend-meeting"></span>
+                    Meeting
+                </span>
+
+                <span class="legend-item">
+                    <span class="legend-dot legend-guest"></span>
+                    Guest Training
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         CALENDAR
+    ====================================================== -->
+
+    <div class="calendar-card">
+
+        <div class="calendar-card-body">
 
             <div id="calendar"></div>
 
@@ -47,47 +835,1046 @@ Master Calendar
 
 </div>
 
+
+<!-- =========================================================
+     EVENT DETAILS MODAL
+========================================================= -->
+
+<div
+    class="modal fade event-modal"
+    id="eventDetailsModal"
+    tabindex="-1"
+    aria-hidden="true"
+>
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div
+                id="eventModalHeader"
+                class="event-modal-header workshop"
+            >
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                ></button>
+
+                <div
+                    id="modalEventType"
+                    class="modal-event-type"
+                >
+                    <i class="bi bi-calendar-event"></i>
+                    Event
+                </div>
+
+                <h4 id="modalEventTitle">
+                    Event Title
+                </h4>
+
+                <div
+                    id="modalEventSubtitle"
+                    class="modal-subtitle"
+                >
+                    Scheduled Event
+                </div>
+
+            </div>
+
+
+            <div class="event-modal-body">
+
+                <div class="event-detail-grid">
+
+
+                    <!-- DATE -->
+
+                    <div class="event-detail-item">
+
+                        <div class="event-detail-icon">
+                            <i class="bi bi-calendar-date"></i>
+                        </div>
+
+                        <div class="event-detail-content">
+
+                            <div class="event-detail-label">
+                                Date
+                            </div>
+
+                            <div
+                                class="event-detail-value"
+                                id="modalEventDate"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- TIME -->
+
+                    <div class="event-detail-item">
+
+                        <div class="event-detail-icon">
+                            <i class="bi bi-clock"></i>
+                        </div>
+
+                        <div class="event-detail-content">
+
+                            <div class="event-detail-label">
+                                Time
+                            </div>
+
+                            <div
+                                class="event-detail-value"
+                                id="modalEventTime"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- TRAINERS -->
+
+                    <div class="event-detail-item full">
+
+                        <div class="event-detail-icon">
+                            <i class="bi bi-people"></i>
+                        </div>
+
+                        <div class="event-detail-content">
+
+                            <div class="event-detail-label">
+                                Trainer(s)
+                            </div>
+
+                            <div
+                                class="event-detail-value"
+                                id="modalEventTrainer"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- COLLEGE -->
+
+                    <div class="event-detail-item">
+
+                        <div class="event-detail-icon">
+                            <i class="bi bi-building"></i>
+                        </div>
+
+                        <div class="event-detail-content">
+
+                            <div class="event-detail-label">
+                                College / Organization
+                            </div>
+
+                            <div
+                                class="event-detail-value"
+                                id="modalEventCollege"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- DEPARTMENT -->
+
+                    <div class="event-detail-item">
+
+                        <div class="event-detail-icon">
+                            <i class="bi bi-diagram-3"></i>
+                        </div>
+
+                        <div class="event-detail-content">
+
+                            <div class="event-detail-label">
+                                Department
+                            </div>
+
+                            <div
+                                class="event-detail-value"
+                                id="modalEventDepartment"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- LOCATION -->
+
+                    <div class="event-detail-item">
+
+                        <div class="event-detail-icon">
+                            <i class="bi bi-geo-alt"></i>
+                        </div>
+
+                        <div class="event-detail-content">
+
+                            <div class="event-detail-label">
+                                Location
+                            </div>
+
+                            <div
+                                class="event-detail-value"
+                                id="modalEventLocation"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- GUEST FACULTY -->
+
+                    <div
+                        class="event-detail-item"
+                        id="guestFacultyContainer"
+                    >
+
+                        <div class="event-detail-icon">
+                            <i class="bi bi-person-badge"></i>
+                        </div>
+
+                        <div class="event-detail-content">
+
+                            <div class="event-detail-label">
+                                Guest Faculty
+                            </div>
+
+                            <div
+                                class="event-detail-value"
+                                id="modalGuestFaculty"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- DESCRIPTION -->
+
+                <div
+                    class="event-description"
+                    id="descriptionContainer"
+                >
+
+                    <div class="event-description-title">
+
+                        <i class="bi bi-file-text me-1"></i>
+
+                        Description / Remarks
+
+                    </div>
+
+                    <div
+                        class="event-description-text"
+                        id="modalEventDescription"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- FOOTER -->
+
+            <div class="event-modal-footer">
+
+                <div
+                    id="modalStatus"
+                    class="status-badge"
+                >
+                    <i class="bi bi-check-circle"></i>
+                    Scheduled
+                </div>
+
+                <div>
+
+                    <a
+                        href="#"
+                        id="viewEventButton"
+                        class="view-event-btn"
+                        style="display:none;"
+                    >
+                        <i class="bi bi-box-arrow-up-right"></i>
+                        View Details
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+
 
 <script>
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
 
-    var calendarEl =
-        document.getElementById('calendar');
+        /* =====================================================
+           TODAY
+        ===================================================== */
 
-    var calendar =
-        new FullCalendar.Calendar(
-            calendarEl,
-            {
+        const todayElement =
+            document.getElementById('todayDate');
 
-                initialView: 'dayGridMonth',
+        const today = new Date();
 
-                height: 800,
-
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,listMonth'
-                },
-
-                events: {{ events_json|safe }},
-
-                eventClick: function(info){
-
-                    if(info.event.url){
-
-                        info.jsEvent.preventDefault();
-
-                        window.location.href =
-                            info.event.url;
-                    }
+        todayElement.textContent =
+            today.toLocaleDateString(
+                'en-IN',
+                {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
                 }
-            }
-        );
+            );
 
-    calendar.render();
-});
+
+        /* =====================================================
+           CALENDAR ELEMENT
+        ===================================================== */
+
+        const calendarEl =
+            document.getElementById('calendar');
+
+
+        /* =====================================================
+           EVENTS FROM DJANGO
+        ===================================================== */
+
+        const calendarEvents =
+            {{ events_json|safe }};
+
+
+        /* =====================================================
+           HELPER - ESCAPE HTML
+        ===================================================== */
+
+        function escapeHtml(value) {
+
+            if (
+                value === null ||
+                value === undefined
+            ) {
+                return '';
+            }
+
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+
+        /* =====================================================
+           TRAINER DISPLAY
+        ===================================================== */
+
+        function trainerDisplay(trainerText) {
+
+            if (
+                !trainerText ||
+                trainerText.trim() === ''
+            ) {
+                return `
+                    <span class="empty-value">
+                        No trainer assigned
+                    </span>
+                `;
+            }
+
+            const names =
+                trainerText
+                    .split(',')
+                    .map(
+                        name => name.trim()
+                    )
+                    .filter(Boolean);
+
+            return `
+                <div class="trainer-list">
+
+                    ${
+                        names.map(
+                            name => `
+                                <span class="trainer-chip">
+
+                                    <i class="bi bi-person"></i>
+
+                                    ${escapeHtml(name)}
+
+                                </span>
+                            `
+                        ).join('')
+                    }
+
+                </div>
+            `;
+        }
+
+
+        /* =====================================================
+           EVENT HEADER CLASS
+        ===================================================== */
+
+        function getHeaderClass(eventType) {
+
+            const type =
+                (eventType || '').toLowerCase();
+
+            if (type.includes('workshop')) {
+
+                if (type.includes('online')) {
+                    return 'online';
+                }
+
+                return 'workshop';
+            }
+
+            if (
+                type.includes('office')
+            ) {
+                return 'office';
+            }
+
+            if (
+                type.includes('fdp')
+            ) {
+                return 'fdp';
+            }
+
+            if (
+                type.includes('meeting')
+            ) {
+                return 'meeting';
+            }
+
+            if (
+                type.includes('guest')
+            ) {
+                return 'guest';
+            }
+
+            return 'other';
+        }
+
+
+        /* =====================================================
+           EVENT ICON
+        ===================================================== */
+
+        function getEventIcon(eventType) {
+
+            const type =
+                (eventType || '').toLowerCase();
+
+            if (
+                type.includes('workshop')
+            ) {
+                return 'bi-mortarboard';
+            }
+
+            if (
+                type.includes('fdp')
+            ) {
+                return 'bi-person-workspace';
+            }
+
+            if (
+                type.includes('office')
+            ) {
+                return 'bi-building';
+            }
+
+            if (
+                type.includes('meeting')
+            ) {
+                return 'bi-people';
+            }
+
+            if (
+                type.includes('guest')
+            ) {
+                return 'bi-person-badge';
+            }
+
+            return 'bi-calendar-event';
+        }
+
+
+        /* =====================================================
+           FORMAT DATE
+        ===================================================== */
+
+        function formatDate(date) {
+
+            if (!date) {
+                return '—';
+            }
+
+            return date.toLocaleDateString(
+                'en-IN',
+                {
+                    weekday: 'short',
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                }
+            );
+        }
+
+
+        /* =====================================================
+           FORMAT TIME
+        ===================================================== */
+
+        function formatTime(
+            start,
+            end,
+            allDay
+        ) {
+
+            if (allDay) {
+                return 'Full Day';
+            }
+
+            if (!start) {
+                return '—';
+            }
+
+            const startText =
+                start.toLocaleTimeString(
+                    'en-IN',
+                    {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true
+                    }
+                );
+
+            if (!end) {
+                return startText;
+            }
+
+            const endText =
+                end.toLocaleTimeString(
+                    'en-IN',
+                    {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true
+                    }
+                );
+
+            return `${startText} – ${endText}`;
+        }
+
+
+        /* =====================================================
+           OPEN EVENT MODAL
+        ===================================================== */
+
+        function showEventDetails(event) {
+
+            const props =
+                event.extendedProps || {};
+
+            const eventType =
+                props.event_type ||
+                'Scheduled Event';
+
+            const trainer =
+                props.trainer ||
+                '';
+
+            const college =
+                props.college ||
+                '';
+
+            const department =
+                props.department ||
+                '';
+
+            const location =
+                props.location ||
+                '';
+
+            const guestFaculty =
+                props.guest_faculty ||
+                '';
+
+            const description =
+                props.description ||
+                '';
+
+            const status =
+                props.status ||
+                'Scheduled';
+
+
+            /* -------------------------------------------------
+               HEADER
+            ------------------------------------------------- */
+
+            const header =
+                document.getElementById(
+                    'eventModalHeader'
+                );
+
+            header.className =
+                `event-modal-header ${
+                    getHeaderClass(eventType)
+                }`;
+
+
+            /* -------------------------------------------------
+               TYPE
+            ------------------------------------------------- */
+
+            document.getElementById(
+                'modalEventType'
+            ).innerHTML = `
+                <i class="bi ${getEventIcon(eventType)}"></i>
+                ${escapeHtml(eventType)}
+            `;
+
+
+            /* -------------------------------------------------
+               TITLE
+            ------------------------------------------------- */
+
+            document.getElementById(
+                'modalEventTitle'
+            ).textContent =
+                event.title || 'Untitled Event';
+
+
+            document.getElementById(
+                'modalEventSubtitle'
+            ).textContent =
+                college ||
+                'Scheduled Activity';
+
+
+            /* -------------------------------------------------
+               DATE
+            ------------------------------------------------- */
+
+            document.getElementById(
+                'modalEventDate'
+            ).textContent =
+                formatDate(event.start);
+
+
+            /* -------------------------------------------------
+               TIME
+            ------------------------------------------------- */
+
+            document.getElementById(
+                'modalEventTime'
+            ).textContent =
+                formatTime(
+                    event.start,
+                    event.end,
+                    event.allDay
+                );
+
+
+            /* -------------------------------------------------
+               TRAINERS
+            ------------------------------------------------- */
+
+            document.getElementById(
+                'modalEventTrainer'
+            ).innerHTML =
+                trainerDisplay(trainer);
+
+
+            /* -------------------------------------------------
+               COLLEGE
+            ------------------------------------------------- */
+
+            document.getElementById(
+                'modalEventCollege'
+            ).textContent =
+                college || '—';
+
+
+            /* -------------------------------------------------
+               DEPARTMENT
+            ------------------------------------------------- */
+
+            document.getElementById(
+                'modalEventDepartment'
+            ).textContent =
+                department || '—';
+
+
+            /* -------------------------------------------------
+               LOCATION
+            ------------------------------------------------- */
+
+            document.getElementById(
+                'modalEventLocation'
+            ).textContent =
+                location || '—';
+
+
+            /* -------------------------------------------------
+               GUEST FACULTY
+            ------------------------------------------------- */
+
+            const guestContainer =
+                document.getElementById(
+                    'guestFacultyContainer'
+                );
+
+            if (guestFaculty) {
+
+                guestContainer.style.display =
+                    'flex';
+
+                document.getElementById(
+                    'modalGuestFaculty'
+                ).textContent =
+                    guestFaculty;
+
+            } else {
+
+                guestContainer.style.display =
+                    'none';
+            }
+
+
+            /* -------------------------------------------------
+               DESCRIPTION
+            ------------------------------------------------- */
+
+            const descriptionContainer =
+                document.getElementById(
+                    'descriptionContainer'
+                );
+
+            if (description) {
+
+                descriptionContainer.style.display =
+                    'block';
+
+                document.getElementById(
+                    'modalEventDescription'
+                ).textContent =
+                    description;
+
+            } else {
+
+                descriptionContainer.style.display =
+                    'none';
+            }
+
+
+            /* -------------------------------------------------
+               STATUS
+            ------------------------------------------------- */
+
+            document.getElementById(
+                'modalStatus'
+            ).innerHTML = `
+                <i class="bi bi-check-circle"></i>
+                ${escapeHtml(status)}
+            `;
+
+
+            /* -------------------------------------------------
+               VIEW DETAILS BUTTON
+            ------------------------------------------------- */
+
+            const viewButton =
+                document.getElementById(
+                    'viewEventButton'
+                );
+
+            if (event.url) {
+
+                viewButton.href =
+                    event.url;
+
+                viewButton.style.display =
+                    'inline-flex';
+
+            } else {
+
+                viewButton.style.display =
+                    'none';
+            }
+
+
+            /* -------------------------------------------------
+               SHOW MODAL
+            ------------------------------------------------- */
+
+            const modalElement =
+                document.getElementById(
+                    'eventDetailsModal'
+                );
+
+            const modal =
+                bootstrap.Modal.getOrCreateInstance(
+                    modalElement
+                );
+
+            modal.show();
+        }
+
+
+        /* =====================================================
+           FULLCALENDAR
+        ===================================================== */
+
+        const calendar =
+            new FullCalendar.Calendar(
+                calendarEl,
+                {
+
+                    initialView:
+                        'dayGridMonth',
+
+                    height:
+                        'auto',
+
+                    contentHeight:
+                        720,
+
+                    expandRows:
+                        true,
+
+                    dayMaxEvents:
+                        4,
+
+                    navLinks:
+                        true,
+
+                    nowIndicator:
+                        true,
+
+                    editable:
+                        false,
+
+                    selectable:
+                        false,
+
+
+                    /* =========================================
+                       HEADER
+                    ========================================= */
+
+                    headerToolbar: {
+
+                        left:
+                            'prev,next today',
+
+                        center:
+                            'title',
+
+                        right:
+                            'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+                    },
+
+
+                    /* =========================================
+                       EVENTS
+                    ========================================= */
+
+                    events:
+                        calendarEvents,
+
+
+                    /* =========================================
+                       EVENT CONTENT
+                    ========================================= */
+
+                    eventContent:
+                        function(arg) {
+
+                            const props =
+                                arg.event.extendedProps ||
+                                {};
+
+                            const trainer =
+                                props.trainer ||
+                                '';
+
+                            const eventType =
+                                props.event_type ||
+                                '';
+
+                            let timeText =
+                                '';
+
+                            if (
+                                !arg.event.allDay &&
+                                arg.event.start
+                            ) {
+
+                                timeText =
+                                    arg.event.start.toLocaleTimeString(
+                                        'en-IN',
+                                        {
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                            hour12: true
+                                        }
+                                    );
+                            }
+
+
+                            return {
+                                html: `
+
+                                    <div
+                                        class="calendar-event-content"
+                                    >
+
+                                        <div
+                                            class="calendar-event-title"
+                                        >
+
+                                            ${escapeHtml(
+                                                arg.event.title
+                                            )}
+
+                                        </div>
+
+
+                                        ${
+                                            trainer
+                                            ?
+                                            `
+                                                <div
+                                                    class="calendar-event-trainer"
+                                                >
+
+                                                    <i
+                                                        class="bi bi-person-fill"
+                                                    ></i>
+
+                                                    ${escapeHtml(
+                                                        trainer
+                                                    )}
+
+                                                </div>
+                                            `
+                                            :
+                                            ''
+                                        }
+
+
+                                        ${
+                                            timeText
+                                            ?
+                                            `
+                                                <div
+                                                    class="calendar-event-meta"
+                                                >
+
+                                                    <i
+                                                        class="bi bi-clock"
+                                                    ></i>
+
+                                                    ${escapeHtml(
+                                                        timeText
+                                                    )}
+
+                                                </div>
+                                            `
+                                            :
+                                            ''
+                                        }
+
+                                    </div>
+
+                                `
+                            };
+                        },
+
+
+                    /* =========================================
+                       EVENT CLICK
+                    ========================================= */
+
+                    eventClick:
+                        function(info) {
+
+                            info.jsEvent.preventDefault();
+
+                            showEventDetails(
+                                info.event
+                            );
+                        },
+
+
+                    /* =========================================
+                       EVENT MOUSE ENTER
+                    ========================================= */
+
+                    eventMouseEnter:
+                        function(info) {
+
+                            info.el.title =
+                                'Click to view event details';
+                        }
+
+                }
+            );
+
+
+        /* =====================================================
+           RENDER
+        ===================================================== */
+
+        calendar.render();
+
+    }
+);
 
 </script>
 

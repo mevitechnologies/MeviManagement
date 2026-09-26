@@ -3061,33 +3061,101 @@ def calendar_view(request):
 
     events = []
 
-    # Workshops
-    for w in Workshop.objects.all():
+    # =========================================================
+    # WORKSHOPS
+    # =========================================================
+    workshops = Workshop.objects.prefetch_related(
+        "assigned_trainers"
+    ).all()
+
+    for w in workshops:
+
+        trainer_names = ", ".join(
+            trainer.Name
+            for trainer in w.assigned_trainers.all()
+        )
 
         events.append({
+            "id": f"workshop-{w.pk}",
             "title": f"📚 {w.title}",
+
             "start": w.start_date.strftime("%Y-%m-%d"),
-            "end": (w.end_date + timedelta(days=1)).strftime("%Y-%m-%d"),
+            "end": (
+                w.end_date + timedelta(days=1)
+            ).strftime("%Y-%m-%d"),
+
             "color": "#198754",
-            "url": reverse("workshop_detail", args=[w.pk])
+
+            "url": reverse(
+                "workshop_detail",
+                args=[w.pk]
+            ),
+
+            "extendedProps": {
+                "event_type": "Workshop",
+                "trainer": trainer_names,
+                "college": str(w.college) if w.college else "",
+                "department": w.departments or "",
+                "status": getattr(w, "status", ""),
+                "description": getattr(w, "remarks", ""),
+            }
         })
 
-    # Office Trainings
-    for t in OfficeTraining.objects.all():
+
+    # =========================================================
+    # OFFICE TRAININGS
+    # =========================================================
+    office_trainings = OfficeTraining.objects.prefetch_related(
+        "trainers"
+    ).all()
+
+    for t in office_trainings:
+
+        trainer_names = ", ".join(
+            trainer.Name
+            for trainer in t.trainers.all()
+        )
 
         events.append({
+            "id": f"office-{t.pk}",
             "title": f"🏢 {t.name}",
+
             "start": t.start_date.strftime("%Y-%m-%d"),
-            "end": (t.end_date + timedelta(days=1)).strftime("%Y-%m-%d"),
+            "end": (
+                t.end_date + timedelta(days=1)
+            ).strftime("%Y-%m-%d"),
+
             "color": "#0d6efd",
-            "url": reverse("view_office_training", args=[t.pk])
+
+            "url": reverse(
+                "view_office_training",
+                args=[t.pk]
+            ),
+
+            "extendedProps": {
+                "event_type": "Office Training",
+                "trainer": trainer_names,
+                "college": "Mevi Technologies",
+                "department": "",
+                "status": "Scheduled",
+                "description": f"Batch: {t.batch}",
+                "mode": getattr(t, "mode", ""),
+                "hall": getattr(t, "hall", ""),
+            }
         })
 
+
+    # =========================================================
+    # RENDER CALENDAR
+    # =========================================================
     return render(
         request,
         "calendar.html",
         {
-            "events_json": json.dumps(events)
+            "events_json": json.dumps(
+                events,
+                default=str
+            )
         }
     )
 
