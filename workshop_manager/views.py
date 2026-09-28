@@ -1094,48 +1094,202 @@ def delete_workshop(request, pk):
     )
 @login_required
 def workshop_list(request):
+
     today = timezone.now().date()
 
-    upcoming = Workshop.objects.filter(
+    # =====================================================
+    # FILTER VALUES FROM URL
+    # =====================================================
+
+    search = request.GET.get("search", "").strip()
+    status_filter = request.GET.get("status", "").strip()
+    college_filter = request.GET.get("college", "").strip()
+    trainer_filter = request.GET.get("trainer", "").strip()
+    start_date = request.GET.get("start_date", "").strip()
+    end_date = request.GET.get("end_date", "").strip()
+
+
+    # =====================================================
+    # BASE QUERY
+    # =====================================================
+
+    workshops = (
+        Workshop.objects
+        .select_related("college")
+        .prefetch_related("assigned_trainers")
+        .all()
+    )
+
+
+    # =====================================================
+    # SEARCH
+    # =====================================================
+
+    if search:
+
+        workshops = workshops.filter(
+            Q(title__icontains=search) |
+            Q(college__name__icontains=search) |
+            Q(departments__icontains=search) |
+            Q(assigned_trainers__Name__icontains=search)
+        ).distinct()
+
+
+    # =====================================================
+    # STATUS FILTER
+    # =====================================================
+
+    if status_filter:
+
+        workshops = workshops.filter(
+            status=status_filter
+        )
+
+
+    # =====================================================
+    # COLLEGE FILTER
+    # =====================================================
+
+    if college_filter:
+
+        workshops = workshops.filter(
+            college_id=college_filter
+        )
+
+
+    # =====================================================
+    # TRAINER FILTER
+    # =====================================================
+
+    if trainer_filter:
+
+        workshops = workshops.filter(
+            assigned_trainers__id=trainer_filter
+        ).distinct()
+
+
+    # =====================================================
+    # START DATE
+    # =====================================================
+
+    if start_date:
+
+        workshops = workshops.filter(
+            start_date__gte=start_date
+        )
+
+
+    # =====================================================
+    # END DATE
+    # =====================================================
+
+    if end_date:
+
+        workshops = workshops.filter(
+            end_date__lte=end_date
+        )
+
+
+    # =====================================================
+    # CATEGORISE WORKSHOPS
+    # =====================================================
+
+    upcoming = workshops.filter(
         start_date__gt=today
+    ).exclude(
+        status__in=["cancelled", "postponed"]
     ).order_by("start_date")
 
-    ongoing = Workshop.objects.filter(
+
+    ongoing = workshops.filter(
         start_date__lte=today,
         end_date__gte=today
+    ).exclude(
+        status__in=["cancelled", "postponed"]
     ).order_by("start_date")
 
-    tentative = Workshop.objects.filter(
+
+    tentative = workshops.filter(
         status="tentative",
         start_date__gte=today
     ).order_by("start_date")
 
-    fixed = Workshop.objects.filter(
+
+    fixed = workshops.filter(
         status="fixed",
         start_date__gte=today
     ).order_by("start_date")
 
-    # ❗ Past workshops that still need action
-    post_workshop = Workshop.objects.filter(
-        end_date__lt=today
-    ).exclude(status__in=["completed", "cancelled"]).order_by("-end_date")
 
-    # ✅ COMPLETED WORKSHOPS (NEW)
-    completed = Workshop.objects.filter(
+    post_workshop = workshops.filter(
+        end_date__lt=today
+    ).exclude(
+        status__in=[
+            "completed",
+            "cancelled",
+            "postponed"
+        ]
+    ).order_by("-end_date")
+
+
+    completed = workshops.filter(
         status="completed"
     ).order_by("-end_date")
 
-    return render(request, "workshop_list.html", {
-        "upcoming": upcoming,
-        "ongoing": ongoing,
-        "tentative": tentative,
-        "fixed": fixed,
-        "post_workshop": post_workshop,
-        "completed": completed,   # ✅ pass to template
-        "today": today,
-        "is_admin": request.user.is_staff,
-    })
 
+    postponed = workshops.filter(
+        status="postponed"
+    ).order_by("-start_date")
+
+
+    cancelled = workshops.filter(
+        status="cancelled"
+    ).order_by("-start_date")
+
+
+    # =====================================================
+    # FILTER OPTIONS
+    # =====================================================
+
+    colleges = College.objects.all().order_by("name")
+
+    trainers = Trainer.objects.all().order_by("Name")
+
+
+    # =====================================================
+    # RETURN
+    # =====================================================
+
+    return render(
+        request,
+        "workshop_list.html",
+        {
+
+            "upcoming": upcoming,
+            "ongoing": ongoing,
+            "tentative": tentative,
+            "fixed": fixed,
+            "post_workshop": post_workshop,
+            "completed": completed,
+            "postponed": postponed,
+            "cancelled": cancelled,
+
+            # Filter options
+            "colleges": colleges,
+            "trainers": trainers,
+
+            # Current filters
+            "search": search,
+            "status_filter": status_filter,
+            "college_filter": college_filter,
+            "trainer_filter": trainer_filter,
+            "start_date": start_date,
+            "end_date": end_date,
+
+            "today": today,
+            "is_admin": request.user.is_staff,
+        }
+    )
 
 @login_required
 def workshop_detail(request, pk):

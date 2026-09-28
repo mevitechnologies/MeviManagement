@@ -1,251 +1,2138 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
+{% block title %}Workshops | Mevi Management{% endblock %}
+
 {% block content %}
 
 <style>
-  .section-title{
-    border-left:4px solid;
-    padding-left:12px;
-    margin-top:40px;
-    margin-bottom:20px;
-  }
-  .card{
-    transition:all .25s ease;
-    border-radius:14px;
-  }
-  .card:hover{
-    transform:translateY(-4px);
-    box-shadow:0 12px 30px rgba(0,0,0,.12);
-  }
-  .badge-status{
-    font-size:.75rem;
-    padding:6px 10px;
-    border-radius:20px;
-  }
+
+    /* =========================================
+       WORKSHOP PAGE
+    ========================================= */
+
+    .workshop-page {
+        padding: 20px 0 45px;
+        background: #f6f8fc;
+    }
+
+
+    /* =========================================
+       PAGE HEADER
+    ========================================= */
+
+    .page-header {
+        background: linear-gradient(135deg, #4f46e5, #6366f1);
+        border-radius: 18px;
+        padding: 24px 28px;
+        color: white;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 28px rgba(79, 70, 229, .15);
+    }
+
+    .page-header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .page-title {
+        font-size: 28px;
+        font-weight: 800;
+        margin: 0;
+        letter-spacing: -.5px;
+    }
+
+    .page-subtitle {
+        margin: 5px 0 0;
+        font-size: 13px;
+        opacity: .85;
+    }
+
+    .add-workshop-btn {
+        background: white;
+        color: #4338ca;
+        border: 0;
+        padding: 10px 17px;
+        border-radius: 9px;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    .add-workshop-btn:hover {
+        color: #3730a3;
+        transform: translateY(-1px);
+    }
+
+
+    /* =========================================
+       FILTER
+    ========================================= */
+
+    .filter-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, .04);
+        overflow: hidden;
+    }
+
+    .filter-header {
+        padding: 13px 17px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+    }
+
+    .filter-title {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-size: 14px;
+        font-weight: 800;
+        color: #111827;
+    }
+
+    .filter-title-icon {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: #eef2ff;
+        color: #4f46e5;
+    }
+
+    .filter-body {
+        border-top: 1px solid #edf0f4;
+        padding: 17px;
+    }
+
+    .form-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: #4b5563;
+        margin-bottom: 5px;
+    }
+
+    .form-control,
+    .form-select {
+        min-height: 40px;
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        font-size: 13px;
+    }
+
+    .btn-filter {
+        min-height: 40px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 0 16px;
+    }
+
+
+    /* =========================================
+       SECTION
+    ========================================= */
+
+    .workshop-section {
+        margin-bottom: 30px;
+    }
+
+    .section-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+    }
+
+    .section-title-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+    }
+
+    .section-line {
+        width: 5px;
+        height: 25px;
+        border-radius: 5px;
+        background: #4f46e5;
+    }
+
+    .section-title {
+        margin: 0;
+        font-size: 19px;
+        font-weight: 800;
+        color: #111827;
+    }
+
+    .section-count {
+        background: #eef2ff;
+        color: #4338ca;
+        padding: 3px 9px;
+        border-radius: 15px;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+
+    /* =========================================
+       CARD GRID
+    ========================================= */
+
+    .workshop-section > .workshop-card {
+        display: inline-block;
+        vertical-align: top;
+        width: calc(50% - 8px);
+        margin-right: 12px;
+    }
+
+    .workshop-section > .workshop-card:nth-of-type(odd) {
+        margin-right: 0;
+    }
+
+
+    /* =========================================
+       WORKSHOP CARD
+    ========================================= */
+
+    .workshop-card {
+        position: relative;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 16px 17px;
+        margin-bottom: 12px;
+        min-height: 155px;
+        overflow: hidden;
+        transition: all .2s ease;
+        box-shadow: 0 3px 12px rgba(15, 23, 42, .035);
+    }
+
+    .workshop-card:hover {
+        transform: translateY(-2px);
+        border-color: #c7d2fe;
+        box-shadow: 0 9px 25px rgba(15, 23, 42, .09);
+    }
+
+
+    /* =========================================
+       CARD TOP
+    ========================================= */
+
+    .workshop-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .workshop-title {
+        font-size: 20px;
+        line-height: 1.25;
+        font-weight: 800;
+        color: #111827;
+        margin: 0 0 6px;
+        letter-spacing: -.25px;
+    }
+
+    .college-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #4b5563;
+        line-height: 1.4;
+    }
+
+    .department-name {
+        font-size: 13px;
+        color: #6b7280;
+        margin-top: 2px;
+    }
+
+
+    /* =========================================
+       STATUS
+    ========================================= */
+
+    .status-badge {
+        flex-shrink: 0;
+        padding: 5px 9px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: .4px;
+        white-space: nowrap;
+    }
+
+    .status-fixed {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-tentative {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-completed {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .status-cancelled {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .status-postponed {
+        background: #ffedd5;
+        color: #9a3412;
+    }
+
+
+    /* =========================================
+       DATE AREA
+    ========================================= */
+
+    .workshop-meta {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-top: 13px;
+    }
+
+    .meta-item {
+        background: #f8fafc;
+        border: 1px solid #edf0f4;
+        padding: 6px 9px;
+        border-radius: 7px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #374151;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .meta-item i {
+        color: #4f46e5;
+        font-size: 13px;
+    }
+
+
+    /* =========================================
+       TRAINERS
+    ========================================= */
+
+    .trainer-row {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 11px;
+    }
+
+    .trainer-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #6b7280;
+        margin-right: 2px;
+    }
+
+    .trainer-chip {
+        background: #f3f4f6;
+        border: 1px solid #e5e7eb;
+        color: #374151;
+        padding: 5px 9px;
+        border-radius: 15px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .no-trainer {
+        font-size: 12px;
+        color: #9ca3af;
+    }
+
+
+    /* =========================================
+       ACTIONS
+    ========================================= */
+
+    .card-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 6px;
+        margin-top: 12px;
+        padding-top: 10px;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .action-btn {
+        padding: 6px 10px;
+        border-radius: 7px;
+        font-size: 11px;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .view-btn {
+        background: #eef2ff;
+        color: #4338ca;
+    }
+
+    .view-btn:hover {
+        background: #e0e7ff;
+        color: #3730a3;
+    }
+
+    .edit-btn {
+        background: #f0fdf4;
+        color: #15803d;
+    }
+
+    .edit-btn:hover {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+
+    /* =========================================
+       POSTPONED / CANCELLED STAMP
+    ========================================= */
+
+    .status-stamp {
+        position: absolute;
+        top: 21px;
+        right: -48px;
+        width: 170px;
+        text-align: center;
+        transform: rotate(35deg);
+        padding: 5px 0;
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: 1px;
+        color: white;
+        z-index: 3;
+    }
+
+    .postponed-stamp {
+        background: #ea580c;
+    }
+
+    .cancelled-stamp {
+        background: #dc2626;
+    }
+
+    .special-card {
+        padding-right: 25px;
+    }
+
+
+    /* =========================================
+       EMPTY STATE
+    ========================================= */
+
+    .empty-state {
+        background: white;
+        border: 1px dashed #d1d5db;
+        border-radius: 12px;
+        padding: 25px 15px;
+        text-align: center;
+        color: #9ca3af;
+    }
+
+    .empty-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: #f3f4f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 9px;
+        font-size: 19px;
+    }
+
+    .empty-state h5 {
+        color: #4b5563;
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 3px;
+    }
+
+    .empty-state p {
+        font-size: 12px;
+        margin: 0;
+    }
+
+
+    /* =========================================
+       FILTER RESULT
+    ========================================= */
+
+    .result-summary {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 10px 14px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 12px;
+        color: #4b5563;
+    }
+
+
+    /* =========================================
+       MOBILE
+    ========================================= */
+
+    @media (max-width: 900px) {
+
+        .workshop-section > .workshop-card {
+            width: 100%;
+            margin-right: 0;
+        }
+
+    }
+
+    @media (max-width: 768px) {
+
+        .workshop-page {
+            padding: 12px 0 30px;
+        }
+
+        .page-header {
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .page-header-content {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .page-title {
+            font-size: 24px;
+        }
+
+        .add-workshop-btn {
+            width: 100%;
+            text-align: center;
+        }
+
+        .workshop-card {
+            min-height: auto;
+            padding: 15px;
+        }
+
+        .workshop-title {
+            font-size: 19px;
+        }
+
+        .college-name {
+            font-size: 14px;
+        }
+
+        .workshop-card-top {
+            flex-direction: column;
+        }
+
+        .status-badge {
+            align-self: flex-start;
+        }
+
+        .section-title {
+            font-size: 18px;
+        }
+
+        .card-actions {
+            justify-content: flex-start;
+        }
+
+    }
+
 </style>
 
-<div class="container-fluid px-4 mt-4">
 
-  <!-- ================= HEADER ================= -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h3 class="fw-bold text-primary">
-      <i class="bi bi-calendar-event-fill me-2"></i> Workshops Overview
-    </h3>
+<div class="container-fluid workshop-page">
 
-    {% if is_admin %}
-    <a href="{% url 'add_workshop' %}" class="btn btn-success shadow-sm">
-      <i class="bi bi-plus-circle"></i> Add Workshop
-    </a>
-    {% endif %}
-  </div>
+    <!-- ==========================================
+         PAGE HEADER
+    =========================================== -->
 
-  <!-- ================= UPCOMING ================= -->
-  <h5 class="section-title text-info" style="border-color:#0dcaf0;">
-    <i class="bi bi-clock-history"></i> Upcoming Workshops
-  </h5>
-  <div class="row">
-    {% for w in upcoming %}
-    <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
-      <div class="card h-100">
-        <div class="card-body">
+    <div class="page-header">
 
-          <span class="badge bg-info badge-status mb-2">Upcoming</span>
+        <div class="page-header-content">
 
-          <h5 class="fw-bold mt-2">{{ w.title }}</h5>
-          <p class="text-muted mb-1">
-            <i class="bi bi-building"></i> {{ w.college }}
-          </p>
+            <div>
+                <h1 class="page-title">
+                    <i class="bi bi-mortarboard-fill me-2"></i>
+                    Workshops
+                </h1>
 
-          <p class="small text-muted">
-            <i class="bi bi-calendar-event"></i>
-            {{ w.start_date }} → {{ w.end_date }}
-          </p>
-
-          <div class="d-grid gap-2 mt-3">
-            <a href="{% url 'workshop_detail' w.id %}" class="btn btn-outline-primary btn-sm">View</a>
+                <p class="page-subtitle">
+                    Manage workshops, trainers, colleges, schedules and workshop status
+                </p>
+            </div>
 
             {% if is_admin %}
-            <a href="{% url 'edit_workshop' w.id %}" class="btn btn-outline-warning btn-sm">Edit</a>
-
-            <form method="post" action="{% url 'delete_workshop' w.id %}"
-                  onsubmit="return confirm('Are you sure you want to delete this workshop?');">
-              {% csrf_token %}
-              <button class="btn btn-outline-danger btn-sm w-100">
-                <i class="bi bi-trash-fill"></i> Delete
-              </button>
-            </form>
+            <a href="{% url 'add_workshop' %}" class="add-workshop-btn">
+                <i class="bi bi-plus-lg me-1"></i>
+                Add Workshop
+            </a>
             {% endif %}
-          </div>
 
         </div>
-      </div>
+
     </div>
-    {% empty %}
-      <p class="text-muted ms-3">No upcoming workshops</p>
-    {% endfor %}
-  </div>
 
-  <!-- ================= ONGOING ================= -->
-  <h5 class="section-title text-success" style="border-color:#198754;">
-    <i class="bi bi-play-circle-fill"></i> Ongoing Workshops
-  </h5>
-  <div class="row">
-    {% for w in ongoing %}
-    <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
-      <div class="card border-success h-100">
-        <div class="card-body">
 
-          <span class="badge bg-success badge-status mb-2">Ongoing</span>
+    <!-- ==========================================
+         FILTER PANEL
+    =========================================== -->
 
-          <h5 class="fw-bold">{{ w.title }}</h5>
-          <p class="text-muted">{{ w.college }}</p>
+    <div class="filter-card">
 
-          <p class="small text-muted">
-            {{ w.start_date }} → {{ w.end_date }}
-          </p>
+        <div class="filter-header"
+             data-bs-toggle="collapse"
+             data-bs-target="#workshopFilters"
+             aria-expanded="true">
 
-          <a href="{% url 'workshop_detail' w.id %}" class="btn btn-outline-success btn-sm mt-2 w-100">
-            View Details
-          </a>
+            <div class="filter-title">
+
+                <div class="filter-title-icon">
+                    <i class="bi bi-funnel-fill"></i>
+                </div>
+
+                <span>Search & Filter Workshops</span>
+
+            </div>
+
+            <i class="bi bi-chevron-down"></i>
 
         </div>
-      </div>
-    </div>
-    {% empty %}
-      <p class="text-muted ms-3">No ongoing workshops</p>
-    {% endfor %}
-  </div>
 
-  <!-- ================= TENTATIVE ================= -->
-  <h5 class="section-title text-warning" style="border-color:#ffc107;">
-    <i class="bi bi-question-circle-fill"></i> Tentative Workshops
-  </h5>
-  <div class="row">
-    {% for w in tentative %}
-    <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
-      <div class="card border-warning h-100">
-        <div class="card-body">
 
-          <span class="badge bg-warning text-dark badge-status mb-2">Tentative</span>
+        <div class="collapse show" id="workshopFilters">
 
-          <h5 class="fw-bold">{{ w.title }}</h5>
-          <p class="text-muted">{{ w.college }}</p>
+            <div class="filter-body">
 
-          <p class="small text-muted">{{ w.start_date }} → {{ w.end_date }}</p>
+                <form method="GET">
 
-          <a href="{% url 'workshop_detail' w.id %}" class="btn btn-outline-warning btn-sm w-100">
-            View
-          </a>
+                    <div class="row g-3">
+
+                        <!-- SEARCH -->
+
+                        <div class="col-lg-4 col-md-6">
+
+                            <label class="form-label">
+                                Search
+                            </label>
+
+                            <div class="input-group">
+
+                                <span class="input-group-text bg-white">
+                                    <i class="bi bi-search"></i>
+                                </span>
+
+                                <input
+                                    type="text"
+                                    name="search"
+                                    class="form-control"
+                                    placeholder="Title, college, department, trainer..."
+                                    value="{{ search_query|default:'' }}"
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- STATUS -->
+
+                        <div class="col-lg-2 col-md-6">
+
+                            <label class="form-label">
+                                Status
+                            </label>
+
+                            <select name="status" class="form-select">
+
+                                <option value="">
+                                    All Status
+                                </option>
+
+                                <option value="tentative"
+                                    {% if status_filter == "tentative" %}selected{% endif %}>
+                                    Tentative
+                                </option>
+
+                                <option value="fixed"
+                                    {% if status_filter == "fixed" %}selected{% endif %}>
+                                    Fixed
+                                </option>
+
+                                <option value="completed"
+                                    {% if status_filter == "completed" %}selected{% endif %}>
+                                    Completed
+                                </option>
+
+                                <option value="postponed"
+                                    {% if status_filter == "postponed" %}selected{% endif %}>
+                                    Postponed
+                                </option>
+
+                                <option value="cancelled"
+                                    {% if status_filter == "cancelled" %}selected{% endif %}>
+                                    Cancelled
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- COLLEGE -->
+
+                        <div class="col-lg-3 col-md-6">
+
+                            <label class="form-label">
+                                College
+                            </label>
+
+                            <select name="college" class="form-select">
+
+                                <option value="">
+                                    All Colleges
+                                </option>
+
+                                {% for college in colleges %}
+
+                                <option value="{{ college.id }}"
+                                    {% if college_filter == college.id|stringformat:"s" %}
+                                        selected
+                                    {% endif %}>
+
+                                    {{ college.name }}
+
+                                </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- TRAINER -->
+
+                        <div class="col-lg-3 col-md-6">
+
+                            <label class="form-label">
+                                Trainer
+                            </label>
+
+                            <select name="trainer" class="form-select">
+
+                                <option value="">
+                                    All Trainers
+                                </option>
+
+                                {% for trainer in trainers %}
+
+                                <option value="{{ trainer.id }}"
+                                    {% if trainer_filter == trainer.id|stringformat:"s" %}
+                                        selected
+                                    {% endif %}>
+
+                                    {{ trainer.Name }}
+
+                                </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- START DATE -->
+
+                        <div class="col-lg-3 col-md-6">
+
+                            <label class="form-label">
+                                From Date
+                            </label>
+
+                            <input
+                                type="date"
+                                name="start_date"
+                                class="form-control"
+                                value="{{ start_date|default:'' }}"
+                            >
+
+                        </div>
+
+
+                        <!-- END DATE -->
+
+                        <div class="col-lg-3 col-md-6">
+
+                            <label class="form-label">
+                                To Date
+                            </label>
+
+                            <input
+                                type="date"
+                                name="end_date"
+                                class="form-control"
+                                value="{{ end_date|default:'' }}"
+                            >
+
+                        </div>
+
+
+                        <!-- BUTTONS -->
+
+                        <div class="col-lg-6 col-md-12">
+
+                            <label class="form-label d-block">
+                                &nbsp;
+                            </label>
+
+                            <div class="filter-actions">
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-primary btn-filter"
+                                >
+                                    <i class="bi bi-search me-1"></i>
+                                    Apply Filters
+                                </button>
+
+                                <a
+                                    href="{% url 'workshop_list' %}"
+                                    class="btn btn-outline-secondary btn-filter"
+                                >
+                                    <i class="bi bi-x-circle me-1"></i>
+                                    Clear
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    {% if search_query or status_filter or college_filter or trainer_filter or start_date or end_date %}
+
+                    <div class="active-filter-note">
+
+                        <i class="bi bi-info-circle me-1"></i>
+
+                        Filters are currently active.
+                        Showing workshops matching your selected criteria.
+
+                    </div>
+
+                    {% endif %}
+
+                </form>
+
+            </div>
 
         </div>
-      </div>
+
     </div>
-    {% empty %}
-      <p class="text-muted ms-3">No tentative workshops</p>
-    {% endfor %}
-  </div>
 
-  <!-- ================= FIXED ================= -->
-  <h5 class="section-title text-primary" style="border-color:#0d6efd;">
-    <i class="bi bi-check-circle-fill"></i> Fixed Workshops
-  </h5>
-  <div class="row">
-    {% for w in fixed %}
-    <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
-      <div class="card border-primary h-100">
-        <div class="card-body">
 
-          <span class="badge bg-primary badge-status mb-2">Fixed</span>
+    <!-- ==========================================
+         RESULT SUMMARY
+    =========================================== -->
 
-          <h5 class="fw-bold">{{ w.title }}</h5>
-          <p class="text-muted">{{ w.college }}</p>
+    {% if search_query or status_filter or college_filter or trainer_filter or start_date or end_date %}
 
-          <p class="small text-muted">{{ w.start_date }} → {{ w.end_date }}</p>
+    <div class="result-summary">
 
-          <a href="{% url 'workshop_detail' w.id %}" class="btn btn-outline-primary btn-sm w-100">
-            View
-          </a>
+        <div>
+            <i class="bi bi-filter-circle me-1"></i>
+
+            <strong>Filtered Results</strong>
+
+            {% if search_query %}
+                — Search: "{{ search_query }}"
+            {% endif %}
 
         </div>
-      </div>
-    </div>
-    {% empty %}
-      <p class="text-muted ms-3">No fixed workshops</p>
-    {% endfor %}
-  </div>
 
-  <!-- ================= ACTION REQUIRED ================= -->
-  <h5 class="section-title text-danger" style="border-color:#dc3545;">
-    <i class="bi bi-exclamation-triangle-fill"></i> Action Required (Past Workshops)
-  </h5>
-  <div class="row">
-    {% for w in post_workshop %}
-    <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
-      <div class="card border-danger h-100">
-        <div class="card-body">
-
-          <span class="badge bg-danger badge-status mb-2">Action Needed</span>
-
-          <h5 class="fw-bold">{{ w.title }}</h5>
-          <p class="text-muted">{{ w.college }}</p>
-
-          <p class="small text-muted">Ended on {{ w.end_date }}</p>
-
-          {% if is_admin %}
-          <div class="d-grid gap-2 mt-3">
-            <a href="{% url 'update_workshop_status' w.id 'completed' %}" class="btn btn-success btn-sm">
-              Mark Completed
-            </a>
-            <a href="{% url 'update_workshop_status' w.id 'postponed' %}" class="btn btn-warning btn-sm">
-              Postponed
-            </a>
-            <a href="{% url 'update_workshop_status' w.id 'cancelled' %}" class="btn btn-secondary btn-sm">
-              Cancelled
-            </a>
-          </div>
-          {% endif %}
-
-        </div>
-      </div>
-    </div>
-    {% empty %}
-      <p class="text-muted ms-3">No pending actions</p>
-    {% endfor %}
-  </div>
-<!-- ================= COMPLETED ================= -->
-<h5 class="section-title text-dark" style="border-color:#6c757d;">
-  <i class="bi bi-check2-circle"></i> Completed Workshops
-</h5>
-
-<div class="row">
-  {% for w in completed %}
-  <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
-    <div class="card border-secondary h-100">
-      <div class="card-body">
-
-        <span class="badge bg-secondary badge-status mb-2">Completed</span>
-
-        <h5 class="fw-bold">{{ w.title }}</h5>
-        <p class="text-muted">
-          <i class="bi bi-building"></i> {{ w.college }}
-        </p>
-
-        <p class="small text-muted">
-          <i class="bi bi-calendar-check"></i>
-          {{ w.start_date }} → {{ w.end_date }}
-        </p>
-
-        <a href="{% url 'workshop_detail' w.id %}"
-           class="btn btn-outline-secondary btn-sm w-100">
-          View Details
+        <a
+            href="{% url 'workshop_list' %}"
+            class="btn btn-sm btn-outline-secondary"
+        >
+            Reset
         </a>
 
-      </div>
     </div>
-  </div>
-  {% empty %}
-    <p class="text-muted ms-3">No completed workshops</p>
-  {% endfor %}
-</div>
+
+    {% endif %}
+
+
+
+    <!-- ==================================================
+         UPCOMING
+    =================================================== -->
+
+    <section class="workshop-section">
+
+        <div class="section-heading">
+
+            <div class="section-title-wrapper">
+
+                <div class="section-line"></div>
+
+                <h2 class="section-title">
+                    Upcoming Workshops
+                </h2>
+
+                <span class="section-count">
+                    {{ upcoming|length }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        {% if upcoming %}
+
+            {% for workshop in upcoming %}
+
+            <div class="workshop-card">
+
+                <div class="workshop-card-top">
+
+                    <div>
+
+                        <h3 class="workshop-title">
+                            {{ workshop.title }}
+                        </h3>
+
+                        {% if workshop.college %}
+                        <div class="college-name">
+                            <i class="bi bi-building me-1"></i>
+                            {{ workshop.college.name }}
+                        </div>
+                        {% endif %}
+
+                        {% if workshop.departments %}
+                        <div class="department-name">
+                            <i class="bi bi-diagram-3 me-1"></i>
+                            {{ workshop.departments }}
+                        </div>
+                        {% endif %}
+
+                    </div>
+
+
+                    <span class="status-badge
+                        {% if workshop.status == 'fixed' %}
+                            status-fixed
+                        {% elif workshop.status == 'tentative' %}
+                            status-tentative
+                        {% elif workshop.status == 'completed' %}
+                            status-completed
+                        {% elif workshop.status == 'cancelled' %}
+                            status-cancelled
+                        {% elif workshop.status == 'postponed' %}
+                            status-postponed
+                        {% endif %}
+                    ">
+
+                        {{ workshop.status|default:"Scheduled" }}
+
+                    </span>
+
+                </div>
+
+
+                <div class="workshop-meta">
+
+                    <div class="meta-item">
+                        <i class="bi bi-calendar-event"></i>
+                        {{ workshop.start_date|date:"d M Y" }}
+                    </div>
+
+                    <div class="meta-item">
+                        <i class="bi bi-calendar-check"></i>
+                        {{ workshop.end_date|date:"d M Y" }}
+                    </div>
+
+                    {% if workshop.college %}
+                    <div class="meta-item">
+                        <i class="bi bi-building"></i>
+                        College Workshop
+                    </div>
+                    {% endif %}
+
+                </div>
+
+
+                <div class="trainer-row">
+
+                    <span class="trainer-label">
+                        <i class="bi bi-person-badge me-1"></i>
+                        Trainers:
+                    </span>
+
+                    {% for trainer in workshop.assigned_trainers.all %}
+
+                        <span class="trainer-chip">
+                            {{ trainer.Name }}
+                        </span>
+
+                    {% empty %}
+
+                        <span class="no-trainer">
+                            No trainer assigned
+                        </span>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <div class="card-actions">
+
+                    <a
+                        href="{% url 'workshop_detail' workshop.id %}"
+                        class="action-btn view-btn"
+                    >
+                        <i class="bi bi-eye"></i>
+                        View
+                    </a>
+
+                    {% if is_admin %}
+
+                    <a
+                        href="{% url 'edit_workshop' workshop.id %}"
+                        class="action-btn edit-btn"
+                    >
+                        <i class="bi bi-pencil"></i>
+                        Edit
+                    </a>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    <i class="bi bi-calendar-x"></i>
+                </div>
+
+                <h5>No Upcoming Workshops</h5>
+
+                <p>
+                    No workshops match the current filters.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+
+    <!-- ==================================================
+         ONGOING
+    =================================================== -->
+
+    <section class="workshop-section">
+
+        <div class="section-heading">
+
+            <div class="section-title-wrapper">
+
+                <div class="section-line"></div>
+
+                <h2 class="section-title">
+                    Ongoing Workshops
+                </h2>
+
+                <span class="section-count">
+                    {{ ongoing|length }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        {% if ongoing %}
+
+            {% for workshop in ongoing %}
+
+            <div class="workshop-card">
+
+                <div class="workshop-card-top">
+
+                    <div>
+
+                        <h3 class="workshop-title">
+                            {{ workshop.title }}
+                        </h3>
+
+                        {% if workshop.college %}
+                        <div class="college-name">
+                            <i class="bi bi-building me-1"></i>
+                            {{ workshop.college.name }}
+                        </div>
+                        {% endif %}
+
+                        {% if workshop.departments %}
+                        <div class="department-name">
+                            <i class="bi bi-diagram-3 me-1"></i>
+                            {{ workshop.departments }}
+                        </div>
+                        {% endif %}
+
+                    </div>
+
+                    <span class="status-badge status-fixed">
+                        ONGOING
+                    </span>
+
+                </div>
+
+
+                <div class="workshop-meta">
+
+                    <div class="meta-item">
+                        <i class="bi bi-calendar-event"></i>
+                        {{ workshop.start_date|date:"d M Y" }}
+                    </div>
+
+                    <div class="meta-item">
+                        <i class="bi bi-calendar-check"></i>
+                        {{ workshop.end_date|date:"d M Y" }}
+                    </div>
+
+                </div>
+
+
+                <div class="trainer-row">
+
+                    <span class="trainer-label">
+                        <i class="bi bi-person-badge me-1"></i>
+                        Trainers:
+                    </span>
+
+                    {% for trainer in workshop.assigned_trainers.all %}
+
+                        <span class="trainer-chip">
+                            {{ trainer.Name }}
+                        </span>
+
+                    {% empty %}
+
+                        <span class="no-trainer">
+                            No trainer assigned
+                        </span>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <div class="card-actions">
+
+                    <a
+                        href="{% url 'workshop_detail' workshop.id %}"
+                        class="action-btn view-btn"
+                    >
+                        <i class="bi bi-eye"></i>
+                        View Workshop
+                    </a>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    <i class="bi bi-play-circle"></i>
+                </div>
+
+                <h5>No Ongoing Workshops</h5>
+
+                <p>
+                    There are currently no ongoing workshops.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+
+    <!-- ==================================================
+         TENTATIVE
+    =================================================== -->
+
+    <section class="workshop-section">
+
+        <div class="section-heading">
+
+            <div class="section-title-wrapper">
+
+                <div class="section-line"></div>
+
+                <h2 class="section-title">
+                    Tentative Workshops
+                </h2>
+
+                <span class="section-count">
+                    {{ tentative|length }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        {% if tentative %}
+
+            {% for workshop in tentative %}
+
+            <div class="workshop-card">
+
+                <div class="workshop-card-top">
+
+                    <div>
+
+                        <h3 class="workshop-title">
+                            {{ workshop.title }}
+                        </h3>
+
+                        {% if workshop.college %}
+                        <div class="college-name">
+                            <i class="bi bi-building me-1"></i>
+                            {{ workshop.college.name }}
+                        </div>
+                        {% endif %}
+
+                        {% if workshop.departments %}
+                        <div class="department-name">
+                            {{ workshop.departments }}
+                        </div>
+                        {% endif %}
+
+                    </div>
+
+                    <span class="status-badge status-tentative">
+                        TENTATIVE
+                    </span>
+
+                </div>
+
+
+                <div class="workshop-meta">
+
+                    <div class="meta-item">
+                        <i class="bi bi-calendar-event"></i>
+                        {{ workshop.start_date|date:"d M Y" }}
+                    </div>
+
+                    <div class="meta-item">
+                        <i class="bi bi-calendar-check"></i>
+                        {{ workshop.end_date|date:"d M Y" }}
+                    </div>
+
+                </div>
+
+
+                <div class="trainer-row">
+
+                    <span class="trainer-label">
+                        <i class="bi bi-person-badge"></i>
+                        Trainers:
+                    </span>
+
+                    {% for trainer in workshop.assigned_trainers.all %}
+
+                        <span class="trainer-chip">
+                            {{ trainer.Name }}
+                        </span>
+
+                    {% empty %}
+
+                        <span class="no-trainer">
+                            No trainer assigned
+                        </span>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <div class="card-actions">
+
+                    <a
+                        href="{% url 'workshop_detail' workshop.id %}"
+                        class="action-btn view-btn"
+                    >
+                        <i class="bi bi-eye"></i>
+                        View
+                    </a>
+
+                    {% if is_admin %}
+
+                    <a
+                        href="{% url 'edit_workshop' workshop.id %}"
+                        class="action-btn edit-btn"
+                    >
+                        <i class="bi bi-pencil"></i>
+                        Edit
+                    </a>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+
+                <h5>No Tentative Workshops</h5>
+
+                <p>
+                    No tentative workshops match the current filters.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+
+    <!-- ==================================================
+         FIXED
+    =================================================== -->
+
+    <section class="workshop-section">
+
+        <div class="section-heading">
+
+            <div class="section-title-wrapper">
+
+                <div class="section-line"></div>
+
+                <h2 class="section-title">
+                    Fixed Workshops
+                </h2>
+
+                <span class="section-count">
+                    {{ fixed|length }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        {% if fixed %}
+
+            {% for workshop in fixed %}
+
+            <div class="workshop-card">
+
+                <div class="workshop-card-top">
+
+                    <div>
+
+                        <h3 class="workshop-title">
+                            {{ workshop.title }}
+                        </h3>
+
+                        {% if workshop.college %}
+                        <div class="college-name">
+                            <i class="bi bi-building me-1"></i>
+                            {{ workshop.college.name }}
+                        </div>
+                        {% endif %}
+
+                        {% if workshop.departments %}
+                        <div class="department-name">
+                            <i class="bi bi-diagram-3 me-1"></i>
+                            {{ workshop.departments }}
+                        </div>
+                        {% endif %}
+
+                    </div>
+
+                    <span class="status-badge status-fixed">
+                        FIXED
+                    </span>
+
+                </div>
+
+
+                <div class="workshop-meta">
+
+                    <div class="meta-item">
+                        <i class="bi bi-calendar-event"></i>
+                        {{ workshop.start_date|date:"d M Y" }}
+                    </div>
+
+                    <div class="meta-item">
+                        <i class="bi bi-calendar-check"></i>
+                        {{ workshop.end_date|date:"d M Y" }}
+                    </div>
+
+                </div>
+
+
+                <div class="trainer-row">
+
+                    <span class="trainer-label">
+                        <i class="bi bi-person-badge"></i>
+                        Trainers:
+                    </span>
+
+                    {% for trainer in workshop.assigned_trainers.all %}
+
+                        <span class="trainer-chip">
+                            {{ trainer.Name }}
+                        </span>
+
+                    {% empty %}
+
+                        <span class="no-trainer">
+                            No trainer assigned
+                        </span>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <div class="card-actions">
+
+                    <a
+                        href="{% url 'workshop_detail' workshop.id %}"
+                        class="action-btn view-btn"
+                    >
+                        <i class="bi bi-eye"></i>
+                        View
+                    </a>
+
+                    {% if is_admin %}
+
+                    <a
+                        href="{% url 'edit_workshop' workshop.id %}"
+                        class="action-btn edit-btn"
+                    >
+                        <i class="bi bi-pencil"></i>
+                        Edit
+                    </a>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+
+                <h5>No Fixed Workshops</h5>
+
+                <p>
+                    No fixed workshops match the current filters.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+
+    <!-- ==================================================
+         PAST / ACTION REQUIRED
+    =================================================== -->
+
+    <section class="workshop-section">
+
+        <div class="section-heading">
+
+            <div class="section-title-wrapper">
+
+                <div class="section-line"></div>
+
+                <h2 class="section-title">
+                    Action Required
+                </h2>
+
+                <span class="section-count">
+                    {{ post_workshop|length }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        {% if post_workshop %}
+
+            {% for workshop in post_workshop %}
+
+            <div class="workshop-card">
+
+                <div class="workshop-card-top">
+
+                    <div>
+
+                        <h3 class="workshop-title">
+                            {{ workshop.title }}
+                        </h3>
+
+                        {% if workshop.college %}
+                        <div class="college-name">
+                            <i class="bi bi-building me-1"></i>
+                            {{ workshop.college.name }}
+                        </div>
+                        {% endif %}
+
+                    </div>
+
+                    <span class="status-badge status-tentative">
+                        ACTION REQUIRED
+                    </span>
+
+                </div>
+
+
+                <div class="workshop-meta">
+
+                    <div class="meta-item">
+                        <i class="bi bi-calendar-event"></i>
+                        {{ workshop.start_date|date:"d M Y" }}
+                    </div>
+
+                    <div class="meta-item">
+                        <i class="bi bi-calendar-check"></i>
+                        {{ workshop.end_date|date:"d M Y" }}
+                    </div>
+
+                </div>
+
+
+                <div class="trainer-row">
+
+                    <span class="trainer-label">
+                        <i class="bi bi-person-badge"></i>
+                        Trainers:
+                    </span>
+
+                    {% for trainer in workshop.assigned_trainers.all %}
+
+                        <span class="trainer-chip">
+                            {{ trainer.Name }}
+                        </span>
+
+                    {% empty %}
+
+                        <span class="no-trainer">
+                            No trainer assigned
+                        </span>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <div class="card-actions">
+
+                    <a
+                        href="{% url 'workshop_detail' workshop.id %}"
+                        class="action-btn view-btn"
+                    >
+                        <i class="bi bi-eye"></i>
+                        Review Workshop
+                    </a>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    <i class="bi bi-check2-all"></i>
+                </div>
+
+                <h5>No Action Required</h5>
+
+                <p>
+                    There are no past workshops waiting for action.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+
+    <!-- ==================================================
+         POSTPONED
+    =================================================== -->
+
+    <section class="workshop-section">
+
+        <div class="section-heading">
+
+            <div class="section-title-wrapper">
+
+                <div class="section-line"
+                     style="background:#ea580c;"></div>
+
+                <h2 class="section-title">
+                    Postponed Workshops
+                </h2>
+
+                <span class="section-count"
+                      style="background:#ffedd5;color:#9a3412;">
+                    {{ postponed|length }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        {% if postponed %}
+
+            {% for workshop in postponed %}
+
+            <div class="workshop-card special-card">
+
+                <div class="status-stamp postponed-stamp">
+                    POSTPONED
+                </div>
+
+
+                <div class="workshop-card-top">
+
+                    <div>
+
+                        <h3 class="workshop-title">
+                            {{ workshop.title }}
+                        </h3>
+
+                        {% if workshop.college %}
+
+                        <div class="college-name">
+                            <i class="bi bi-building me-1"></i>
+                            {{ workshop.college.name }}
+                        </div>
+
+                        {% endif %}
+
+                        {% if workshop.departments %}
+
+                        <div class="department-name">
+                            <i class="bi bi-diagram-3 me-1"></i>
+                            {{ workshop.departments }}
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                    <span class="status-badge status-postponed">
+                        POSTPONED
+                    </span>
+
+                </div>
+
+
+                <div class="workshop-meta">
+
+                    <div class="meta-item">
+                        <i class="bi bi-calendar-event"></i>
+                        {{ workshop.start_date|date:"d M Y" }}
+                    </div>
+
+                    <div class="meta-item">
+                        <i class="bi bi-calendar-check"></i>
+                        {{ workshop.end_date|date:"d M Y" }}
+                    </div>
+
+                </div>
+
+
+                <div class="trainer-row">
+
+                    <span class="trainer-label">
+                        <i class="bi bi-person-badge"></i>
+                        Trainers:
+                    </span>
+
+                    {% for trainer in workshop.assigned_trainers.all %}
+
+                        <span class="trainer-chip">
+                            {{ trainer.Name }}
+                        </span>
+
+                    {% empty %}
+
+                        <span class="no-trainer">
+                            No trainer assigned
+                        </span>
+
+                    {% endfor %}
+
+                </div>
+
+
+                {% if workshop.remarks %}
+
+                <div class="mt-3">
+
+                    <small class="text-muted">
+                        <strong>Remarks:</strong>
+                        {{ workshop.remarks }}
+                    </small>
+
+                </div>
+
+                {% endif %}
+
+
+                <div class="card-actions">
+
+                    <a
+                        href="{% url 'workshop_detail' workshop.id %}"
+                        class="action-btn view-btn"
+                    >
+                        <i class="bi bi-eye"></i>
+                        View Details
+                    </a>
+
+                    {% if is_admin %}
+
+                    <a
+                        href="{% url 'edit_workshop' workshop.id %}"
+                        class="action-btn edit-btn"
+                    >
+                        <i class="bi bi-pencil"></i>
+                        Edit
+                    </a>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    <i class="bi bi-calendar2-minus"></i>
+                </div>
+
+                <h5>No Postponed Workshops</h5>
+
+                <p>
+                    No workshops have been postponed.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+
+    <!-- ==================================================
+         CANCELLED
+    =================================================== -->
+
+    <section class="workshop-section">
+
+        <div class="section-heading">
+
+            <div class="section-title-wrapper">
+
+                <div class="section-line"
+                     style="background:#dc2626;"></div>
+
+                <h2 class="section-title">
+                    Cancelled Workshops
+                </h2>
+
+                <span class="section-count"
+                      style="background:#fee2e2;color:#991b1b;">
+                    {{ cancelled|length }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        {% if cancelled %}
+
+            {% for workshop in cancelled %}
+
+            <div class="workshop-card special-card">
+
+                <div class="status-stamp cancelled-stamp">
+                    CANCELLED
+                </div>
+
+
+                <div class="workshop-card-top">
+
+                    <div>
+
+                        <h3 class="workshop-title">
+                            {{ workshop.title }}
+                        </h3>
+
+                        {% if workshop.college %}
+
+                        <div class="college-name">
+                            <i class="bi bi-building me-1"></i>
+                            {{ workshop.college.name }}
+                        </div>
+
+                        {% endif %}
+
+                        {% if workshop.departments %}
+
+                        <div class="department-name">
+                            <i class="bi bi-diagram-3 me-1"></i>
+                            {{ workshop.departments }}
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                    <span class="status-badge status-cancelled">
+                        CANCELLED
+                    </span>
+
+                </div>
+
+
+                <div class="workshop-meta">
+
+                    <div class="meta-item">
+                        <i class="bi bi-calendar-event"></i>
+                        {{ workshop.start_date|date:"d M Y" }}
+                    </div>
+
+                    <div class="meta-item">
+                        <i class="bi bi-calendar-check"></i>
+                        {{ workshop.end_date|date:"d M Y" }}
+                    </div>
+
+                </div>
+
+
+                <div class="trainer-row">
+
+                    <span class="trainer-label">
+                        <i class="bi bi-person-badge"></i>
+                        Trainers:
+                    </span>
+
+                    {% for trainer in workshop.assigned_trainers.all %}
+
+                        <span class="trainer-chip">
+                            {{ trainer.Name }}
+                        </span>
+
+                    {% empty %}
+
+                        <span class="no-trainer">
+                            No trainer assigned
+                        </span>
+
+                    {% endfor %}
+
+                </div>
+
+
+                {% if workshop.remarks %}
+
+                <div class="mt-3">
+
+                    <small class="text-muted">
+
+                        <strong>Remarks:</strong>
+                        {{ workshop.remarks }}
+
+                    </small>
+
+                </div>
+
+                {% endif %}
+
+
+                <div class="card-actions">
+
+                    <a
+                        href="{% url 'workshop_detail' workshop.id %}"
+                        class="action-btn view-btn"
+                    >
+                        <i class="bi bi-eye"></i>
+                        View Details
+                    </a>
+
+                    {% if is_admin %}
+
+                    <a
+                        href="{% url 'edit_workshop' workshop.id %}"
+                        class="action-btn edit-btn"
+                    >
+                        <i class="bi bi-pencil"></i>
+                        Edit
+                    </a>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    <i class="bi bi-calendar-x"></i>
+                </div>
+
+                <h5>No Cancelled Workshops</h5>
+
+                <p>
+                    No workshops have been cancelled.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+
+    <!-- ==================================================
+         COMPLETED
+    =================================================== -->
+
+    <section class="workshop-section">
+
+        <div class="section-heading">
+
+            <div class="section-title-wrapper">
+
+                <div class="section-line"
+                     style="background:#2563eb;"></div>
+
+                <h2 class="section-title">
+                    Completed Workshops
+                </h2>
+
+                <span class="section-count"
+                      style="background:#dbeafe;color:#1e40af;">
+                    {{ completed|length }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        {% if completed %}
+
+            {% for workshop in completed %}
+
+            <div class="workshop-card">
+
+                <div class="workshop-card-top">
+
+                    <div>
+
+                        <h3 class="workshop-title">
+                            {{ workshop.title }}
+                        </h3>
+
+                        {% if workshop.college %}
+
+                        <div class="college-name">
+                            <i class="bi bi-building me-1"></i>
+                            {{ workshop.college.name }}
+                        </div>
+
+                        {% endif %}
+
+                        {% if workshop.departments %}
+
+                        <div class="department-name">
+                            <i class="bi bi-diagram-3 me-1"></i>
+                            {{ workshop.departments }}
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                    <span class="status-badge status-completed">
+                        COMPLETED
+                    </span>
+
+                </div>
+
+
+                <div class="workshop-meta">
+
+                    <div class="meta-item">
+                        <i class="bi bi-calendar-event"></i>
+                        {{ workshop.start_date|date:"d M Y" }}
+                    </div>
+
+                    <div class="meta-item">
+                        <i class="bi bi-calendar-check"></i>
+                        {{ workshop.end_date|date:"d M Y" }}
+                    </div>
+
+                </div>
+
+
+                <div class="trainer-row">
+
+                    <span class="trainer-label">
+                        <i class="bi bi-person-badge"></i>
+                        Trainers:
+                    </span>
+
+                    {% for trainer in workshop.assigned_trainers.all %}
+
+                        <span class="trainer-chip">
+                            {{ trainer.Name }}
+                        </span>
+
+                    {% empty %}
+
+                        <span class="no-trainer">
+                            No trainer assigned
+                        </span>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <div class="card-actions">
+
+                    <a
+                        href="{% url 'workshop_detail' workshop.id %}"
+                        class="action-btn view-btn"
+                    >
+                        <i class="bi bi-eye"></i>
+                        View Report
+                    </a>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+
+                <h5>No Completed Workshops</h5>
+
+                <p>
+                    Completed workshops will appear here.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </section>
 
 </div>
 
