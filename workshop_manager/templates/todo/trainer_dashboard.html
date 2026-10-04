@@ -5,1830 +5,1130 @@
 {% block content %}
 
 <style>
+:root{
+    --td-primary:#4f46e5;
+    --td-primary-dark:#4338ca;
+    --td-primary-light:#eef2ff;
 
-/* =========================================================
-   MEVI TRAINER DASHBOARD
-   PREMIUM • LARGE • CLEAN • READABLE UI
-========================================================= */
+    --td-success:#059669;
+    --td-success-light:#ecfdf5;
 
-:root {
-    --td-primary: #4f46e5;
-    --td-primary-dark: #4338ca;
-    --td-primary-light: #eef2ff;
+    --td-danger:#dc2626;
+    --td-danger-light:#fef2f2;
 
-    --td-success: #059669;
-    --td-success-light: #ecfdf5;
+    --td-warning:#d97706;
+    --td-warning-light:#fffbeb;
 
-    --td-danger: #dc2626;
-    --td-danger-light: #fef2f2;
+    --td-info:#2563eb;
+    --td-info-light:#eff6ff;
 
-    --td-warning: #d97706;
-    --td-warning-light: #fffbeb;
+    --td-purple:#7c3aed;
+    --td-purple-light:#f5f3ff;
 
-    --td-purple: #7c3aed;
-    --td-purple-light: #f5f3ff;
+    --td-bg:#f5f7fb;
+    --td-card:#ffffff;
+    --td-border:#e4e7ec;
 
-    --td-info: #2563eb;
-    --td-info-light: #eff6ff;
+    --td-text:#111827;
+    --td-muted:#667085;
+    --td-light:#98a2b3;
 
-    --td-bg: #f5f7fb;
-    --td-card: #ffffff;
+    --td-shadow-sm:0 3px 12px rgba(15,23,42,.055);
+    --td-shadow-md:0 10px 30px rgba(15,23,42,.09);
+    --td-shadow-lg:0 18px 45px rgba(15,23,42,.12);
 
-    --td-border: #e4e7ec;
-
-    --td-text: #111827;
-    --td-text-dark: #1f2937;
-    --td-muted: #667085;
-    --td-light: #98a2b3;
-
-    --td-shadow-sm:
-        0 3px 12px rgba(15, 23, 42, 0.055);
-
-    --td-shadow-md:
-        0 10px 30px rgba(15, 23, 42, 0.09);
-
-    --td-shadow-lg:
-        0 18px 45px rgba(15, 23, 42, 0.12);
-
-    --td-radius-sm: 10px;
-    --td-radius: 16px;
-    --td-radius-lg: 22px;
+    --td-radius-sm:10px;
+    --td-radius:16px;
+    --td-radius-lg:22px;
 }
 
+/* =========================
+   PAGE
+========================= */
 
-/* =========================================================
-   MAIN DASHBOARD
-========================================================= */
-
-.trainer-dashboard {
-    min-height: 100vh;
-
-    background:
-        linear-gradient(
-            180deg,
-            #f7f8fc 0%,
-            #f5f7fb 100%
-        );
-
-    padding: 32px;
+.trainer-dashboard{
+    min-height:100vh;
+    background:linear-gradient(180deg,#f7f8fc 0%,#f5f7fb 100%);
+    padding:30px;
 }
 
-.trainer-container {
-    max-width: 1550px;
-
-    margin: 0 auto;
+.trainer-container{
+    max-width:1550px;
+    margin:auto;
 }
 
+/* =========================
+   ERROR
+========================= */
 
-/* =========================================================
+.td-error{
+    background:#fff1f2;
+    border:1px solid #fecdd3;
+    color:#9f1239;
+    padding:18px 20px;
+    border-radius:14px;
+    margin-bottom:22px;
+    font-size:15px;
+}
+
+/* =========================
    HERO
-========================================================= */
+========================= */
 
-.trainer-hero {
-    position: relative;
-
-    overflow: hidden;
-
-    background:
-        linear-gradient(
-            135deg,
-            #111827 0%,
-            #1e293b 50%,
-            #111827 100%
-        );
-
-    color: #ffffff;
-
-    border-radius:
-        var(--td-radius-lg);
-
-    padding:
-        34px 38px;
-
-    margin-bottom: 28px;
-
-    box-shadow:
-        var(--td-shadow-lg);
+.trainer-hero{
+    position:relative;
+    overflow:hidden;
+    background:linear-gradient(135deg,#111827,#1e293b,#111827);
+    color:white;
+    border-radius:var(--td-radius-lg);
+    padding:32px 36px;
+    margin-bottom:25px;
+    box-shadow:var(--td-shadow-lg);
 }
 
-.trainer-hero::before {
-    content: "";
-
-    position: absolute;
-
-    width: 280px;
-    height: 280px;
-
-    border-radius: 50%;
-
-    right: -100px;
-    top: -130px;
-
-    background:
-        rgba(99,102,241,0.13);
-
-    pointer-events: none;
+.trainer-hero:before{
+    content:"";
+    position:absolute;
+    width:280px;
+    height:280px;
+    right:-100px;
+    top:-130px;
+    border-radius:50%;
+    background:rgba(99,102,241,.13);
 }
 
-.trainer-hero::after {
-    content: "";
-
-    position: absolute;
-
-    width: 220px;
-    height: 220px;
-
-    border-radius: 50%;
-
-    left: 40%;
-
-    bottom: -170px;
-
-    background:
-        rgba(124,58,237,0.10);
-
-    pointer-events: none;
+.trainer-hero-inner{
+    position:relative;
+    z-index:2;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:30px;
 }
 
-.trainer-hero-inner {
-    position: relative;
-
-    z-index: 2;
-
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-
-    gap: 35px;
-}
-
-
-/* =========================================================
-   TRAINER PROFILE
-========================================================= */
-
-.trainer-profile {
-    display: flex;
-
-    align-items: center;
-
-    gap: 20px;
-
-    min-width: 0;
+.trainer-profile{
+    display:flex;
+    align-items:center;
+    gap:20px;
+    min-width:0;
 }
 
 .trainer-profile-photo,
-.trainer-profile-placeholder {
-    width: 92px;
-    height: 92px;
-
-    border-radius: 50%;
-
-    flex-shrink: 0;
+.trainer-profile-placeholder{
+    width:90px;
+    height:90px;
+    border-radius:50%;
+    flex-shrink:0;
 }
 
-.trainer-profile-photo {
-    object-fit: cover;
-
-    border:
-        4px solid rgba(255,255,255,0.95);
-
-    box-shadow:
-        0 8px 25px rgba(0,0,0,0.22);
+.trainer-profile-photo{
+    object-fit:cover;
+    border:4px solid white;
+    box-shadow:0 8px 25px rgba(0,0,0,.22);
 }
 
-.trainer-profile-placeholder {
-    background:
-        linear-gradient(
-            135deg,
-            #4f46e5,
-            #7c3aed
-        );
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    font-size: 34px;
-
-    font-weight: 800;
-
-    border:
-        4px solid rgba(255,255,255,0.85);
-
-    box-shadow:
-        0 8px 25px rgba(0,0,0,0.22);
+.trainer-profile-placeholder{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(135deg,#4f46e5,#7c3aed);
+    border:4px solid rgba(255,255,255,.85);
+    font-size:32px;
+    font-weight:800;
 }
 
-.trainer-welcome {
-    min-width: 0;
+.trainer-welcome h1{
+    margin:0;
+    color:white;
+    font-size:32px;
+    font-weight:800;
 }
 
-.trainer-welcome h1 {
-    margin: 0;
-
-    font-size: 34px;
-
-    font-weight: 800;
-
-    line-height: 1.2;
-
-    letter-spacing: -0.7px;
-
-    color: #ffffff;
+.trainer-welcome p{
+    margin:7px 0 0;
+    color:rgba(255,255,255,.78);
+    font-size:15px;
 }
 
-.trainer-welcome p {
-    margin: 8px 0 0;
-
-    color:
-        rgba(255,255,255,0.80);
-
-    font-size: 16px;
-
-    line-height: 1.5;
+.trainer-date{
+    color:rgba(255,255,255,.6)!important;
+    font-size:13px!important;
 }
 
-.trainer-date {
-    margin-top: 9px !important;
-
-    color:
-        rgba(255,255,255,0.62) !important;
-
-    font-size: 14px !important;
-}
-
-
-/* =========================================================
+/* =========================
    ATTENDANCE
-========================================================= */
+========================= */
 
-.trainer-attendance {
-    text-align: right;
-
-    flex-shrink: 0;
-
-    min-width: 230px;
+.trainer-attendance{
+    min-width:280px;
+    text-align:right;
 }
 
-.attendance-label {
-    font-size: 14px;
-
-    color:
-        rgba(255,255,255,0.62);
-
-    margin-bottom: 7px;
-
-    font-weight: 600;
+.attendance-label{
+    color:rgba(255,255,255,.65);
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:5px;
 }
 
-.attendance-status {
-    font-size: 19px;
-
-    font-weight: 800;
-
-    margin-bottom: 10px;
+.attendance-date-caption{
+    color:rgba(255,255,255,.48);
+    font-size:11px;
+    margin-bottom:8px;
 }
 
-.attendance-time {
-    font-size: 14px;
-
-    color:
-        rgba(255,255,255,0.65);
-
-    margin-bottom: 14px;
+.attendance-date-form{
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    gap:7px;
+    margin-bottom:8px;
 }
 
-.attendance-buttons {
-    display: flex;
-
-    gap: 10px;
-
-    justify-content: flex-end;
+.attendance-date-form input{
+    height:38px;
+    padding:7px 9px;
+    border-radius:9px;
+    border:1px solid rgba(255,255,255,.2);
+    background:white;
+    color:#111827;
+    font-size:12px;
+    font-weight:700;
 }
 
+.attendance-selected-date{
+    color:rgba(255,255,255,.9);
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:8px;
+}
 
-/* =========================================================
+.attendance-status{
+    font-size:18px;
+    font-weight:800;
+    margin-bottom:8px;
+}
+
+.attendance-live{
+    color:#86efac;
+}
+
+.attendance-done{
+    color:#93c5fd;
+}
+
+.attendance-not-started{
+    color:#fde68a;
+}
+
+.attendance-time{
+    color:rgba(255,255,255,.62);
+    font-size:13px;
+    margin-bottom:12px;
+}
+
+.attendance-buttons{
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+}
+
+/* =========================
    BUTTONS
-========================================================= */
+========================= */
 
-.td-btn {
-    display: inline-flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    gap: 7px;
-
-    min-height: 44px;
-
-    padding:
-        10px 16px;
-
-    border-radius: 10px;
-
-    border:
-        1px solid transparent;
-
-    text-decoration: none;
-
-    cursor: pointer;
-
-    font-size: 14px;
-
-    line-height: 1.35;
-
-    font-weight: 700;
-
-    transition:
-        transform .2s ease,
-        box-shadow .2s ease,
-        background .2s ease,
-        border-color .2s ease;
+.td-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    min-height:42px;
+    padding:9px 14px;
+    border-radius:9px;
+    border:1px solid transparent;
+    text-decoration:none;
+    cursor:pointer;
+    font-size:13px;
+    font-weight:700;
+    transition:.2s ease;
 }
 
-.td-btn:hover {
-    transform:
-        translateY(-2px);
+.td-btn:hover{
+    transform:translateY(-1px);
+    text-decoration:none;
 }
 
-.td-btn-primary {
-    background:
-        linear-gradient(
-            135deg,
-            var(--td-primary),
-            var(--td-purple)
-        );
-
-    color: #ffffff;
-
-    box-shadow:
-        0 6px 17px rgba(79,70,229,0.22);
+.td-btn-primary{
+    background:linear-gradient(135deg,var(--td-primary),var(--td-purple));
+    color:white;
 }
 
-.td-btn-primary:hover {
-    background:
-        linear-gradient(
-            135deg,
-            var(--td-primary-dark),
-            #6d28d9
-        );
-
-    color: #ffffff;
-
-    box-shadow:
-        0 9px 22px rgba(79,70,229,0.28);
+.td-btn-primary:hover{
+    color:white;
+    background:linear-gradient(135deg,var(--td-primary-dark),#6d28d9);
 }
 
-.td-btn-success {
-    background:
-        var(--td-success);
-
-    color: #ffffff;
-
-    box-shadow:
-        0 5px 14px rgba(5,150,105,0.20);
+.td-btn-success{
+    background:var(--td-success);
+    color:white;
 }
 
-.td-btn-danger {
-    background:
-        var(--td-danger);
-
-    color: #ffffff;
-
-    box-shadow:
-        0 5px 14px rgba(220,38,38,0.20);
+.td-btn-danger{
+    background:var(--td-danger);
+    color:white;
 }
 
-.td-btn-secondary {
-    background:
-        #ffffff;
-
-    color:
-        #374151;
-
-    border-color:
-        #dfe3e8;
+.td-btn-secondary{
+    background:white;
+    color:#374151;
+    border-color:#dfe3e8;
 }
 
-.td-btn-secondary:hover {
-    background:
-        #f8fafc;
-
-    border-color:
-        #cbd5e1;
-
-    color:
-        #111827;
+.td-btn-secondary:hover{
+    background:#f8fafc;
+    color:#111827;
 }
 
-.td-btn-white {
-    background:
-        #ffffff;
-
-    color:
-        #111827;
+.td-btn-white{
+    background:white;
+    color:#1d4ed8;
 }
 
-.td-btn-sm {
-    min-height: 38px;
-
-    padding:
-        8px 12px;
-
-    font-size: 13px;
+.td-btn-sm{
+    min-height:36px;
+    padding:7px 11px;
+    font-size:12px;
 }
 
-
-/* =========================================================
+/* =========================
    STATISTICS
-========================================================= */
+========================= */
 
-.td-stats {
-    display: grid;
-
-    grid-template-columns:
-        repeat(5, minmax(0, 1fr));
-
-    gap: 17px;
-
-    margin-bottom: 28px;
+.td-stats{
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:16px;
+    margin-bottom:25px;
 }
 
-.td-stat-card {
-    position: relative;
-
-    overflow: hidden;
-
-    background:
-        #ffffff;
-
-    border:
-        1px solid var(--td-border);
-
-    border-radius:
-        var(--td-radius);
-
-    padding:
-        21px;
-
-    box-shadow:
-        var(--td-shadow-sm);
-
-    transition:
-        transform .2s ease,
-        box-shadow .2s ease;
+.td-stat-card{
+    background:white;
+    border:1px solid var(--td-border);
+    border-radius:var(--td-radius);
+    padding:20px;
+    box-shadow:var(--td-shadow-sm);
 }
 
-.td-stat-card:hover {
-    transform:
-        translateY(-3px);
-
-    box-shadow:
-        var(--td-shadow-md);
+.td-stat-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
 
-.td-stat-card::after {
-    content: "";
-
-    position: absolute;
-
-    width: 90px;
-    height: 90px;
-
-    right: -35px;
-    bottom: -40px;
-
-    border-radius: 50%;
-
-    background:
-        var(--td-primary-light);
-
-    opacity: .65;
+.td-stat-label{
+    color:var(--td-muted);
+    font-size:12px;
+    font-weight:800;
 }
 
-.td-stat-top {
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    position: relative;
-
-    z-index: 2;
+.td-stat-icon{
+    width:38px;
+    height:38px;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--td-primary-light);
+    color:var(--td-primary);
+    font-weight:800;
 }
 
-.td-stat-label {
-    font-size: 13px;
-
-    color:
-        var(--td-muted);
-
-    font-weight: 800;
-
-    letter-spacing: .2px;
+.td-stat-number{
+    margin-top:12px;
+    font-size:30px;
+    font-weight:800;
+    color:var(--td-text);
 }
 
-.td-stat-icon {
-    width: 40px;
-    height: 40px;
-
-    border-radius: 11px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    background:
-        var(--td-primary-light);
-
-    color:
-        var(--td-primary);
-
-    font-size: 17px;
-
-    font-weight: 800;
+.td-stat-sub{
+    margin-top:5px;
+    color:var(--td-light);
+    font-size:12px;
 }
 
-.td-stat-number {
-    position: relative;
-
-    z-index: 2;
-
-    font-size: 32px;
-
-    font-weight: 800;
-
-    color:
-        var(--td-text);
-
-    margin-top: 12px;
-
-    line-height: 1.15;
-}
-
-.td-stat-sub {
-    position: relative;
-
-    z-index: 2;
-
-    color:
-        var(--td-light);
-
-    font-size: 13px;
-
-    margin-top: 6px;
-}
-
-
-/* =========================================================
+/* =========================
    MAIN GRID
-========================================================= */
+========================= */
 
-.td-main-grid {
-    display: grid;
-
-    grid-template-columns:
-        minmax(0, 2fr)
-        minmax(350px, 1fr);
-
-    gap: 24px;
-
-    align-items: start;
+.td-main-grid{
+    display:grid;
+    grid-template-columns:minmax(0,2fr) minmax(330px,1fr);
+    gap:22px;
+    align-items:start;
 }
 
-
-/* =========================================================
+/* =========================
    CARDS
-========================================================= */
+========================= */
 
-.td-card {
-    background:
-        var(--td-card);
-
-    border:
-        1px solid var(--td-border);
-
-    border-radius:
-        var(--td-radius);
-
-    padding:
-        24px;
-
-    margin-bottom: 24px;
-
-    box-shadow:
-        var(--td-shadow-sm);
-
-    transition:
-        box-shadow .2s ease,
-        transform .2s ease;
+.td-card{
+    background:white;
+    border:1px solid var(--td-border);
+    border-radius:var(--td-radius);
+    padding:22px;
+    margin-bottom:22px;
+    box-shadow:var(--td-shadow-sm);
 }
 
-.td-card:hover {
-    box-shadow:
-        var(--td-shadow-md);
+.td-card-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+    margin-bottom:20px;
 }
 
-.td-card-header {
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    gap: 18px;
-
-    margin-bottom: 21px;
+.td-card-title{
+    color:var(--td-text);
+    font-size:20px;
+    font-weight:800;
 }
 
-.td-card-title {
-    font-size: 21px;
-
-    font-weight: 800;
-
-    line-height: 1.3;
-
-    color:
-        var(--td-text);
+.td-card-subtitle{
+    color:var(--td-muted);
+    font-size:13px;
+    margin-top:4px;
 }
 
-.td-card-subtitle {
-    font-size: 14px;
+/* =========================
+   TASKS
+========================= */
 
-    color:
-        var(--td-muted);
-
-    margin-top: 5px;
-
-    line-height: 1.5;
+.td-task{
+    border:1px solid var(--td-border);
+    border-radius:13px;
+    padding:17px;
+    margin-bottom:13px;
+    background:white;
 }
 
-
-/* =========================================================
-   TASK
-========================================================= */
-
-.td-task {
-    border:
-        1px solid var(--td-border);
-
-    border-radius:
-        14px;
-
-    padding:
-        19px;
-
-    margin-bottom: 14px;
-
-    transition:
-        .2s ease;
-
-    background:
-        #ffffff;
+.td-task:last-child{
+    margin-bottom:0;
 }
 
-.td-task:hover {
-    border-color:
-        #cbd5e1;
-
-    box-shadow:
-        0 7px 20px rgba(15,23,42,.07);
-
-    transform:
-        translateY(-1px);
+.td-task-main{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:15px;
 }
 
-.td-task:last-child {
-    margin-bottom: 0;
+.td-task-title{
+    color:var(--td-text);
+    font-size:16px;
+    font-weight:800;
+    line-height:1.45;
 }
 
-.td-task-main {
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: flex-start;
-
-    gap: 18px;
+.td-task-description{
+    color:var(--td-muted);
+    font-size:13px;
+    line-height:1.6;
+    margin-top:6px;
 }
 
-.td-task-title {
-    color:
-        var(--td-text);
-
-    font-size: 17px;
-
-    font-weight: 800;
-
-    line-height: 1.45;
+.td-task-meta{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+    margin-top:11px;
 }
 
-.td-task-description {
-    color:
-        var(--td-muted);
-
-    font-size: 14px;
-
-    margin-top: 7px;
-
-    line-height: 1.6;
+.td-badge{
+    display:inline-flex;
+    align-items:center;
+    padding:5px 9px;
+    border-radius:18px;
+    font-size:11px;
+    font-weight:800;
 }
 
-.td-task-meta {
-    display: flex;
-
-    align-items: center;
-
-    flex-wrap: wrap;
-
-    gap: 8px;
-
-    margin-top: 13px;
+.td-badge-neutral{
+    background:#f3f4f6;
+    color:#4b5563;
 }
 
-
-/* =========================================================
-   BADGES
-========================================================= */
-
-.td-badge {
-    display: inline-flex;
-
-    align-items: center;
-
-    padding:
-        6px 10px;
-
-    border-radius:
-        20px;
-
-    font-size: 12px;
-
-    font-weight: 800;
-
-    white-space: nowrap;
-
-    line-height: 1.25;
+.td-badge-pending{
+    background:#fef3c7;
+    color:#92400e;
 }
 
-.td-badge-neutral {
-    background:
-        #f3f4f6;
-
-    color:
-        #4b5563;
+.td-badge-progress{
+    background:#dbeafe;
+    color:#1e40af;
 }
 
-.td-badge-pending {
-    background:
-        #fef3c7;
-
-    color:
-        #92400e;
+.td-badge-completed{
+    background:#d1fae5;
+    color:#065f46;
 }
 
-.td-badge-progress {
-    background:
-        #dbeafe;
-
-    color:
-        #1e40af;
+.td-badge-high{
+    background:#fee2e2;
+    color:#991b1b;
 }
 
-.td-badge-completed {
-    background:
-        #d1fae5;
-
-    color:
-        #065f46;
+.td-badge-medium{
+    background:#fef3c7;
+    color:#92400e;
 }
 
-.td-badge-high {
-    background:
-        #fee2e2;
-
-    color:
-        #991b1b;
+.td-badge-low{
+    background:#e5e7eb;
+    color:#374151;
 }
 
-.td-badge-medium {
-    background:
-        #fef3c7;
-
-    color:
-        #92400e;
+.td-task-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+    margin-top:15px;
+    padding-top:13px;
+    border-top:1px solid #f1f5f9;
 }
 
-.td-badge-low {
-    background:
-        #e5e7eb;
-
-    color:
-        #374151;
+.td-task-actions form{
+    margin:0;
 }
 
-
-/* =========================================================
-   TASK ACTIONS
-========================================================= */
-
-.td-task-actions {
-    display: flex;
-
-    align-items: center;
-
-    flex-wrap: wrap;
-
-    gap: 8px;
-
-    margin-top: 16px;
-
-    padding-top: 14px;
-
-    border-top:
-        1px solid #f1f5f9;
-}
-
-.td-task-actions form {
-    margin: 0;
-}
-
-
-/* =========================================================
+/* =========================
    SUBTASKS
-========================================================= */
+========================= */
 
-.td-subtasks {
-    margin-top: 15px;
-
-    padding:
-        13px 15px;
-
-    background:
-        #f8fafc;
-
-    border-radius:
-        11px;
-
-    border-left:
-        4px solid #cbd5e1;
+.td-subtasks{
+    margin-top:13px;
+    padding:12px 14px;
+    background:#f8fafc;
+    border-radius:10px;
+    border-left:4px solid #cbd5e1;
 }
 
-.td-subtasks-title {
-    font-size: 12px;
-
-    font-weight: 800;
-
-    color:
-        #64748b;
-
-    text-transform: uppercase;
-
-    letter-spacing: .5px;
-
-    margin-bottom: 8px;
+.td-subtasks-title{
+    font-size:11px;
+    font-weight:800;
+    color:#64748b;
+    text-transform:uppercase;
+    margin-bottom:6px;
 }
 
-.td-subtask {
-    display: flex;
-
-    align-items: center;
-
-    gap: 8px;
-
-    font-size: 14px;
-
-    color:
-        #475569;
-
-    padding:
-        5px 0;
-
-    line-height: 1.5;
+.td-subtask{
+    display:flex;
+    gap:7px;
+    padding:4px 0;
+    font-size:13px;
 }
 
-.td-subtask-done {
-    color:
-        #059669;
-
-    font-weight: 700;
+.td-subtask-done{
+    color:#059669;
+    font-weight:700;
 }
 
-.td-subtask-pending {
-    color:
-        #64748b;
+.td-subtask-pending{
+    color:#64748b;
 }
 
-
-/* =========================================================
+/* =========================
    PROGRESS
-========================================================= */
+========================= */
 
-.td-progress-wrapper {
-    margin-top: 14px;
+.td-progress-wrapper{
+    margin-top:12px;
 }
 
-.td-progress-info {
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-
-    margin-bottom: 7px;
-
-    font-size: 13px;
+.td-progress-info{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:6px;
+    font-size:12px;
 }
 
-.td-progress-info span {
-    color:
-        var(--td-muted);
+.td-progress-info span{
+    color:var(--td-muted);
 }
 
-.td-progress-info strong {
-    color:
-        var(--td-text);
-
-    font-weight: 800;
+.td-progress-info strong{
+    color:var(--td-text);
 }
 
-.td-progress {
-    width: 100%;
-
-    height: 10px;
-
-    background:
-        #e5e7eb;
-
-    border-radius:
-        20px;
-
-    overflow: hidden;
+.td-progress{
+    width:100%;
+    height:9px;
+    background:#e5e7eb;
+    border-radius:20px;
+    overflow:hidden;
 }
 
-.td-progress-bar {
-    height: 100%;
-
-    background:
-        linear-gradient(
-            90deg,
-            var(--td-primary),
-            var(--td-purple)
-        );
-
-    border-radius:
-        20px;
-
-    transition:
-        width .4s ease;
+.td-progress-bar{
+    height:100%;
+    background:linear-gradient(90deg,var(--td-primary),var(--td-purple));
+    border-radius:20px;
 }
 
+/* =========================
+   CALENDAR
+========================= */
 
-/* =========================================================
-   SCHEDULE
-========================================================= */
-
-.td-schedule-day {
-    padding:
-        15px 17px;
-
-    border-left:
-        4px solid var(--td-primary);
-
-    background:
-        #f8fafc;
-
-    border-radius:
-        0 12px 12px 0;
-
-    margin-bottom:
-        12px;
+.calendar-legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    margin:-5px 0 16px;
+    color:#667085;
+    font-size:11px;
+    font-weight:700;
 }
 
-.td-schedule-day:last-child {
-    margin-bottom: 0;
+.calendar-legend span{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
 }
 
-.td-schedule-date {
-    font-weight:
-        800;
-
-    font-size:
-        14px;
-
-    color:
-        var(--td-text);
+.legend-dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    display:inline-block;
 }
 
-.td-schedule-today {
-    color:
-        var(--td-primary);
+.legend-today{
+    background:#4f46e5;
 }
 
-.td-event {
-    margin-top:
-        10px;
-
-    padding:
-        12px;
-
-    background:
-        #ffffff;
-
-    border:
-        1px solid var(--td-border);
-
-    border-radius:
-        10px;
+.legend-attendance{
+    background:#059669;
 }
 
-.td-event-title {
-    font-size:
-        14px;
-
-    font-weight:
-        800;
+.legend-event{
+    background:#2563eb;
 }
 
-.td-event-meta {
-    margin-top:
-        5px;
-
-    color:
-        var(--td-muted);
-
-    font-size:
-        12px;
+.week-calendar{
+    display:grid;
+    grid-template-columns:repeat(7,minmax(145px,1fr));
+    gap:9px;
+    overflow-x:auto;
+    padding-bottom:5px;
 }
 
-.td-workshop {
-    margin-top:
-        10px;
-
-    padding:
-        12px;
-
-    background:
-        #eff6ff;
-
-    border:
-        1px solid #dbeafe;
-
-    border-radius:
-        10px;
+.calendar-day{
+    min-height:235px;
+    background:#f8fafc;
+    border:1px solid #e4e7ec;
+    border-radius:14px;
+    padding:12px;
+    cursor:pointer;
+    transition:.2s ease;
+    position:relative;
 }
 
-.td-workshop-title {
-    font-size:
-        14px;
-
-    font-weight:
-        800;
-
-    color:
-        #1e3a8a;
+.calendar-day:hover{
+    border-color:#a5b4fc;
+    box-shadow:0 6px 18px rgba(79,70,229,.09);
+    transform:translateY(-2px);
 }
 
-.td-workshop-college {
-    margin-top:
-        4px;
-
-    font-size:
-        12px;
-
-    color:
-        #475569;
+.calendar-day-today{
+    background:#eef2ff;
+    border-color:#a5b4fc;
 }
 
-
-/* =========================================================
-   MONTHLY SUMMARY
-========================================================= */
-
-.td-summary-grid {
-    display:
-        grid;
-
-    grid-template-columns:
-        repeat(2, 1fr);
-
-    gap:
-        12px;
-
-    margin-top:
-        21px;
+.calendar-day-attendance{
+    border-bottom:3px solid #059669;
 }
 
-.td-summary-item {
-    padding:
-        15px;
-
-    background:
-        #f8fafc;
-
-    border:
-        1px solid #eef0f4;
-
-    border-radius:
-        11px;
+.calendar-day-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:5px;
 }
 
-.td-summary-number {
-    font-size:
-        22px;
-
-    font-weight:
-        800;
-
-    color:
-        var(--td-text);
+.calendar-day-name{
+    color:#667085;
+    text-transform:uppercase;
+    font-size:9px;
+    font-weight:800;
 }
 
-.td-summary-label {
-    margin-top:
-        3px;
-
-    color:
-        var(--td-muted);
-
-    font-size:
-        12px;
-
-    line-height:
-        1.4;
+.calendar-day-number{
+    color:#111827;
+    font-size:25px;
+    font-weight:800;
+    line-height:1;
+    margin-top:4px;
 }
 
+.calendar-day-month{
+    color:#98a2b3;
+    font-size:9px;
+    margin-top:4px;
+}
 
-/* =========================================================
+.calendar-today-badge,
+.calendar-attendance-badge{
+    display:inline-flex;
+    padding:4px 6px;
+    border-radius:15px;
+    font-size:8px;
+    font-weight:800;
+}
+
+.calendar-today-badge{
+    background:#e0e7ff;
+    color:#4338ca;
+}
+
+.calendar-attendance-badge{
+    background:#d1fae5;
+    color:#065f46;
+}
+
+.calendar-items{
+    margin-top:12px;
+}
+
+.calendar-event{
+    display:flex;
+    gap:7px;
+    padding:8px;
+    margin-bottom:6px;
+    background:white;
+    border:1px solid #e4e7ec;
+    border-left:3px solid #2563eb;
+    border-radius:8px;
+}
+
+.calendar-workshop{
+    border-left-color:#7c3aed;
+    background:#faf8ff;
+}
+
+.calendar-event-icon{
+    width:24px;
+    height:24px;
+    border-radius:6px;
+    background:#eff6ff;
+    color:#2563eb;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+}
+
+.calendar-event-body{
+    min-width:0;
+}
+
+.calendar-event-title{
+    color:#1f2937;
+    font-size:10px;
+    font-weight:800;
+    line-height:1.35;
+}
+
+.calendar-event-time{
+    color:#667085;
+    font-size:9px;
+    margin-top:3px;
+}
+
+.calendar-event-location{
+    color:#98a2b3;
+    font-size:8px;
+    margin-top:3px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.calendar-empty{
+    color:#b0b8c4;
+    font-size:10px;
+    text-align:center;
+    padding:20px 3px;
+}
+
+.calendar-checkin-hint{
+    position:absolute;
+    bottom:9px;
+    left:12px;
+    right:12px;
+    border-top:1px dashed #d1d5db;
+    padding-top:7px;
+    color:#059669;
+    font-size:8px;
+    font-weight:800;
+    text-align:center;
+}
+
+.calendar-attendance-panel{
+    margin-top:15px;
+    padding:13px;
+    background:linear-gradient(135deg,#f0fdf4,#eff6ff);
+    border:1px solid #dbeafe;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.calendar-attendance-panel-icon{
+    width:38px;
+    height:38px;
+    border-radius:9px;
+    background:white;
+    color:#059669;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.calendar-attendance-panel-content{
+    flex:1;
+}
+
+.calendar-attendance-panel-content strong{
+    display:block;
+    color:#111827;
+    font-size:12px;
+}
+
+.calendar-attendance-panel-content span{
+    display:block;
+    color:#667085;
+    font-size:10px;
+    margin-top:2px;
+}
+
+/* =========================
+   SUMMARY
+========================= */
+
+.td-summary-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+    margin-top:18px;
+}
+
+.td-summary-item{
+    padding:13px;
+    background:#f8fafc;
+    border:1px solid #eef0f4;
+    border-radius:10px;
+}
+
+.td-summary-number{
+    font-size:21px;
+    font-weight:800;
+    color:var(--td-text);
+}
+
+.td-summary-label{
+    margin-top:3px;
+    color:var(--td-muted);
+    font-size:11px;
+}
+
+/* =========================
    CATEGORY
-========================================================= */
+========================= */
 
-.td-category {
-    margin-bottom:
-        19px;
+.td-category{
+    margin-bottom:17px;
 }
 
-.td-category:last-child {
-    margin-bottom:
-        0;
+.td-category:last-child{
+    margin-bottom:0;
 }
 
-.td-category-header {
-    display:
-        flex;
-
-    justify-content:
-        space-between;
-
-    gap:
-        10px;
-
-    margin-bottom:
-        8px;
-
-    font-size:
-        13px;
+.td-category-header{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:7px;
+    font-size:12px;
 }
 
-.td-category-name {
-    font-weight:
-        700;
-
-    color:
-        #374151;
+.td-category-name{
+    color:#374151;
+    font-weight:700;
 }
 
-.td-category-info {
-    color:
-        var(--td-muted);
+.td-category-info{
+    color:var(--td-muted);
 }
 
-
-/* =========================================================
-   UPCOMING WORKSHOP
-========================================================= */
-
-.td-upcoming-workshop {
-    padding:
-        15px;
-
-    border:
-        1px solid var(--td-border);
-
-    border-radius:
-        12px;
-
-    margin-bottom:
-        12px;
-
-    transition:
-        .2s ease;
-}
-
-.td-upcoming-workshop:hover {
-    border-color:
-        #c7d2fe;
-
-    background:
-        #fafaff;
-
-    transform:
-        translateY(-1px);
-}
-
-.td-upcoming-workshop:last-child {
-    margin-bottom:
-        0;
-}
-
-.td-upcoming-title {
-    font-weight:
-        800;
-
-    font-size:
-        15px;
-
-    line-height:
-        1.4;
-}
-
-.td-upcoming-college {
-    color:
-        var(--td-muted);
-
-    font-size:
-        13px;
-
-    margin-top:
-        5px;
-}
-
-.td-upcoming-date {
-    color:
-        var(--td-primary);
-
-    font-size:
-        12px;
-
-    font-weight:
-        800;
-
-    margin-top:
-        7px;
-}
-
-
-/* =========================================================
+/* =========================
    LEARNING
-========================================================= */
+========================= */
 
-.td-learning {
-    padding:
-        14px 0;
-
-    border-bottom:
-        1px solid #f1f5f9;
+.td-learning{
+    padding:13px 0;
+    border-bottom:1px solid #f1f5f9;
 }
 
-.td-learning:first-child {
-    padding-top:
-        0;
+.td-learning:first-child{
+    padding-top:0;
 }
 
-.td-learning:last-child {
-    border-bottom:
-        none;
-
-    padding-bottom:
-        0;
+.td-learning:last-child{
+    border-bottom:0;
 }
 
-.td-learning-date {
-    color:
-        var(--td-muted);
-
-    font-size:
-        12px;
-
-    font-weight:
-        600;
+.td-learning-date{
+    color:var(--td-muted);
+    font-size:11px;
+    font-weight:700;
 }
 
-.td-learning-text {
-    color:
-        #374151;
-
-    font-size:
-        14px;
-
-    line-height:
-        1.65;
-
-    margin-top:
-        5px;
+.td-learning-text{
+    color:#374151;
+    font-size:13px;
+    line-height:1.6;
+    margin-top:4px;
 }
 
-
-/* =========================================================
+/* =========================
    OVERDUE
-========================================================= */
+========================= */
 
-.td-overdue {
-    padding:
-        15px;
-
-    border:
-        1px solid #fee2e2;
-
-    background:
-        #fffafa;
-
-    border-radius:
-        11px;
-
-    margin-bottom:
-        11px;
+.td-overdue{
+    padding:13px;
+    border:1px solid #fee2e2;
+    background:#fffafa;
+    border-radius:10px;
+    margin-bottom:10px;
 }
 
-.td-overdue:last-child {
-    margin-bottom:
-        0;
+.td-overdue-title{
+    color:#991b1b;
+    font-size:14px;
+    font-weight:800;
 }
 
-.td-overdue-title {
-    color:
-        #991b1b;
-
-    font-size:
-        15px;
-
-    font-weight:
-        800;
-
-    line-height:
-        1.4;
+.td-overdue-date{
+    color:#b91c1c;
+    font-size:11px;
+    margin-top:4px;
 }
 
-.td-overdue-date {
-    color:
-        #b91c1c;
+/* =========================
+   WORKSHOPS
+========================= */
 
-    font-size:
-        12px;
-
-    margin-top:
-        5px;
+.td-upcoming-workshop{
+    padding:13px;
+    border:1px solid var(--td-border);
+    border-radius:11px;
+    margin-bottom:10px;
 }
 
-
-/* =========================================================
-   EMPTY STATE
-========================================================= */
-
-.td-empty {
-    padding:
-        38px 18px;
-
-    text-align:
-        center;
-
-    color:
-        var(--td-light);
-
-    font-size:
-        14px;
-
-    line-height:
-        1.6;
+.td-upcoming-title{
+    font-size:14px;
+    font-weight:800;
 }
 
+.td-upcoming-college{
+    color:var(--td-muted);
+    font-size:11px;
+    margin-top:4px;
+}
 
-/* =========================================================
+.td-upcoming-date{
+    color:var(--td-primary);
+    font-size:11px;
+    font-weight:800;
+    margin-top:6px;
+}
+
+/* =========================
    HISTORY
-========================================================= */
+========================= */
 
-.td-history-task {
-    display:
-        grid;
-
-    grid-template-columns:
-        110px
-        minmax(0,1fr)
-        auto;
-
-    align-items:
-        center;
-
-    gap:
-        18px;
-
-    padding:
-        15px 0;
-
-    border-bottom:
-        1px solid #f1f5f9;
+.td-history-task{
+    display:grid;
+    grid-template-columns:100px minmax(0,1fr) auto;
+    align-items:center;
+    gap:15px;
+    padding:13px 0;
+    border-bottom:1px solid #f1f5f9;
 }
 
-.td-history-task:last-child {
-    border-bottom:
-        none;
+.td-history-task:last-child{
+    border-bottom:0;
 }
 
-.td-history-date {
-    color:
-        var(--td-muted);
-
-    font-size:
-        13px;
-
-    font-weight:
-        700;
+.td-history-date{
+    color:var(--td-muted);
+    font-size:12px;
+    font-weight:700;
 }
 
-.td-history-title {
-    font-size:
-        14px;
-
-    font-weight:
-        800;
-
-    color:
-        var(--td-text);
-
-    line-height:
-        1.4;
+.td-history-title{
+    color:var(--td-text);
+    font-size:13px;
+    font-weight:800;
 }
 
-.td-history-meta {
-    color:
-        var(--td-muted);
-
-    font-size:
-        12px;
-
-    margin-top:
-        4px;
+.td-history-meta{
+    color:var(--td-muted);
+    font-size:11px;
+    margin-top:3px;
 }
 
-.td-history-actions {
-    display:
-        flex;
-
-    gap:
-        7px;
-
-    flex-wrap:
-        wrap;
-
-    justify-content:
-        flex-end;
+.td-history-actions{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
 }
 
+/* =========================
+   EMPTY
+========================= */
 
-/* =========================================================
-   ERROR
-========================================================= */
-
-.td-error {
-    background:
-        #fff1f2;
-
-    border:
-        1px solid #fecdd3;
-
-    color:
-        #9f1239;
-
-    padding:
-        18px 20px;
-
-    border-radius:
-        13px;
-
-    margin-bottom:
-        24px;
-
-    font-size:
-        15px;
-
-    line-height:
-        1.5;
+.td-empty{
+    padding:30px 15px;
+    text-align:center;
+    color:var(--td-light);
+    font-size:13px;
+    line-height:1.6;
 }
 
+/* =========================
+   MOBILE
+========================= */
 
-/* =========================================================
-   RESPONSIVE — 1400
-========================================================= */
+@media(max-width:1200px){
 
-@media (max-width: 1400px) {
-
-    .trainer-dashboard {
-        padding:
-            27px;
+    .td-stats{
+        grid-template-columns:repeat(3,1fr);
     }
 
-    .td-stats {
-        grid-template-columns:
-            repeat(3, minmax(0, 1fr));
+    .td-main-grid{
+        grid-template-columns:1fr;
+    }
+
+    .week-calendar{
+        grid-template-columns:repeat(7,175px);
     }
 }
 
+@media(max-width:800px){
 
-/* =========================================================
-   RESPONSIVE — 1100
-========================================================= */
-
-@media (max-width: 1100px) {
-
-    .trainer-hero-inner {
-        align-items:
-            flex-start;
-
-        flex-direction:
-            column;
+    .trainer-dashboard{
+        padding:18px;
     }
 
-    .trainer-attendance {
-        text-align:
-            left;
-
-        width:
-            100%;
+    .trainer-hero{
+        padding:25px;
     }
 
-    .attendance-buttons {
-        justify-content:
-            flex-start;
+    .trainer-hero-inner{
+        flex-direction:column;
+        align-items:flex-start;
     }
 
-    .td-main-grid {
-        grid-template-columns:
-            1fr;
+    .trainer-attendance{
+        width:100%;
+        text-align:left;
+    }
+
+    .attendance-date-form{
+        justify-content:flex-start;
+    }
+
+    .attendance-buttons{
+        justify-content:flex-start;
+    }
+
+    .td-stats{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .td-task-main{
+        flex-direction:column;
+    }
+
+    .td-history-task{
+        grid-template-columns:1fr;
+        gap:7px;
+    }
+
+    .td-history-actions{
+        justify-content:flex-start;
     }
 }
 
+@media(max-width:520px){
 
-/* =========================================================
-   RESPONSIVE — 800
-========================================================= */
-
-@media (max-width: 800px) {
-
-    .trainer-dashboard {
-        padding:
-            18px;
+    .trainer-dashboard{
+        padding:12px;
     }
 
-    .trainer-hero {
-        padding:
-            27px;
-
-        border-radius:
-            18px;
+    .trainer-hero{
+        padding:20px;
     }
 
-    .trainer-welcome h1 {
-        font-size:
-            28px;
+    .trainer-profile{
+        align-items:flex-start;
+        gap:13px;
     }
 
     .trainer-profile-photo,
-    .trainer-profile-placeholder {
-        width:
-            78px;
-
-        height:
-            78px;
+    .trainer-profile-placeholder{
+        width:68px;
+        height:68px;
     }
 
-    .td-stats {
-        grid-template-columns:
-            repeat(2, minmax(0,1fr));
-
-        gap:
-            13px;
+    .trainer-profile-placeholder{
+        font-size:25px;
     }
 
-    .td-card {
-        padding:
-            20px;
+    .trainer-welcome h1{
+        font-size:23px;
     }
 
-    .td-task-main {
-        flex-direction:
-            column;
+    .trainer-welcome p{
+        font-size:13px;
     }
 
-    .td-history-task {
-        grid-template-columns:
-            1fr;
-
-        gap:
-            8px;
+    .td-stats{
+        grid-template-columns:1fr;
     }
 
-    .td-history-actions {
-        justify-content:
-            flex-start;
-    }
-}
-
-
-/* =========================================================
-   RESPONSIVE — 560
-========================================================= */
-
-@media (max-width: 560px) {
-
-    .trainer-dashboard {
-        padding:
-            12px;
+    .td-card{
+        padding:17px;
     }
 
-    .trainer-hero {
-        padding:
-            22px 19px;
+    .td-card-header{
+        align-items:flex-start;
+        flex-direction:column;
     }
 
-    .trainer-profile {
-        align-items:
-            flex-start;
-
-        gap:
-            14px;
+    .td-summary-grid{
+        grid-template-columns:1fr;
     }
 
-    .trainer-profile-photo,
-    .trainer-profile-placeholder {
-        width:
-            68px;
-
-        height:
-            68px;
+    .calendar-attendance-panel{
+        flex-wrap:wrap;
     }
 
-    .trainer-profile-placeholder {
-        font-size:
-            26px;
-    }
-
-    .trainer-welcome h1 {
-        font-size:
-            23px;
-    }
-
-    .trainer-welcome p {
-        font-size:
-            14px;
-    }
-
-    .trainer-date {
-        font-size:
-            13px !important;
-    }
-
-    .attendance-status {
-        font-size:
-            17px;
-    }
-
-    .attendance-buttons {
-        flex-wrap:
-            wrap;
-    }
-
-    .td-stats {
-        grid-template-columns:
-            1fr;
-    }
-
-    .td-stat-number {
-        font-size:
-            29px;
-    }
-
-    .td-card {
-        padding:
-            17px;
-    }
-
-    .td-card-title {
-        font-size:
-            19px;
-    }
-
-    .td-card-subtitle {
-        font-size:
-            13px;
-    }
-
-    .td-card-header {
-        align-items:
-            flex-start;
-
-        flex-direction:
-            column;
-    }
-
-    .td-task-title {
-        font-size:
-            16px;
-    }
-
-    .td-task-description {
-        font-size:
-            13px;
-    }
-
-    .td-summary-grid {
-        grid-template-columns:
-            1fr;
-    }
-
-    .td-btn {
-        min-height:
-            42px;
-
-        font-size:
-            13px;
+    .calendar-attendance-panel .td-btn{
+        width:100%;
     }
 }
-
-
-/* =========================================================
-   VERY SMALL MOBILE
-========================================================= */
-
-@media (max-width: 380px) {
-
-    .trainer-welcome h1 {
-        font-size:
-            21px;
-    }
-
-    .trainer-profile-photo,
-    .trainer-profile-placeholder {
-        width:
-            60px;
-
-        height:
-            60px;
-    }
-
-    .td-card {
-        padding:
-            15px;
-    }
-
-    .td-task {
-        padding:
-            15px;
-    }
-}
-
-
-/* =========================================================
-   ACCESSIBILITY
-========================================================= */
-
-:focus-visible {
-    outline:
-        3px solid rgba(79,70,229,0.35);
-
-    outline-offset:
-        2px;
-}
-
-
-/* =========================================================
-   REDUCED MOTION
-========================================================= */
-
-@media (prefers-reduced-motion: reduce) {
-
-    *,
-    *::before,
-    *::after {
-        scroll-behavior:
-            auto !important;
-
-        animation-duration:
-            0.01ms !important;
-
-        transition-duration:
-            0.01ms !important;
-    }
-}
-
 </style>
 
 
@@ -1838,17 +1138,15 @@
 
 
 {% if error %}
-
-    <div class="td-error">
-        {{ error }}
-    </div>
-
+<div class="td-error">
+    {{ error }}
+</div>
 {% endif %}
 
 
 <!-- =========================================================
      HERO
-     ========================================================= -->
+========================================================= -->
 
 <div class="trainer-hero">
 
@@ -1871,7 +1169,6 @@
                 </div>
 
             {% endif %}
-
 
             <div class="trainer-welcome">
 
@@ -1903,27 +1200,57 @@
             {% if trainer.is_full_time %}
 
                 <div class="attendance-label">
-                    Today's Attendance
+                    Attendance
+                </div>
+
+                <div class="attendance-date-caption">
+                    Today, yesterday or previous day
+                </div>
+
+                <form
+                    method="get"
+                    action="{% url 'trainer_dashboard' %}"
+                    class="attendance-date-form"
+                >
+
+                    <input
+                        type="date"
+                        name="attendance_date"
+                        value="{{ attendance_date|date:'Y-m-d' }}"
+                        min="{{ minimum_attendance_date|date:'Y-m-d' }}"
+                        max="{{ maximum_attendance_date|date:'Y-m-d' }}"
+                    >
+
+                    <button
+                        type="submit"
+                        class="td-btn td-btn-white td-btn-sm"
+                    >
+                        <i class="bi bi-calendar3"></i>
+                        Select
+                    </button>
+
+                </form>
+
+                <div class="attendance-selected-date">
+                    {{ attendance_date|date:"l, d M Y" }}
                 </div>
 
 
                 {% if checked_in %}
 
-                    <div class="attendance-status">
+                    <div class="attendance-status attendance-live">
+                        <i class="bi bi-circle-fill"></i>
                         Currently Working
                     </div>
 
                     {% if attendance.check_in %}
 
                         <div class="attendance-time">
-
                             Checked in at
                             {{ attendance.check_in|date:"h:i A" }}
-
                         </div>
 
                     {% endif %}
-
 
                     <div class="attendance-buttons">
 
@@ -1936,6 +1263,12 @@
 
                             <input
                                 type="hidden"
+                                name="attendance_date"
+                                value="{{ attendance_date|date:'Y-m-d' }}"
+                            >
+
+                            <input
+                                type="hidden"
                                 name="action"
                                 value="check_out"
                             >
@@ -1944,6 +1277,7 @@
                                 type="submit"
                                 class="td-btn td-btn-danger"
                             >
+                                <i class="bi bi-box-arrow-right"></i>
                                 Check Out
                             </button>
 
@@ -1954,7 +1288,8 @@
 
                 {% elif checked_out %}
 
-                    <div class="attendance-status">
+                    <div class="attendance-status attendance-done">
+                        <i class="bi bi-check-circle-fill"></i>
                         Attendance Completed
                     </div>
 
@@ -1972,9 +1307,11 @@
 
                     {% endif %}
 
+
                 {% else %}
 
-                    <div class="attendance-status">
+                    <div class="attendance-status attendance-not-started">
+                        <i class="bi bi-clock"></i>
                         Not Checked In
                     </div>
 
@@ -1989,6 +1326,12 @@
 
                             <input
                                 type="hidden"
+                                name="attendance_date"
+                                value="{{ attendance_date|date:'Y-m-d' }}"
+                            >
+
+                            <input
+                                type="hidden"
                                 name="action"
                                 value="check_in"
                             >
@@ -1997,6 +1340,7 @@
                                 type="submit"
                                 class="td-btn td-btn-success"
                             >
+                                <i class="bi bi-box-arrow-in-right"></i>
                                 Check In
                             </button>
 
@@ -2005,6 +1349,7 @@
                     </div>
 
                 {% endif %}
+
 
             {% else %}
 
@@ -2026,8 +1371,8 @@
 
 
 <!-- =========================================================
-     TOP STATISTICS
-     ========================================================= -->
+     STATISTICS
+========================================================= -->
 
 <div class="td-stats">
 
@@ -2041,7 +1386,7 @@
             </div>
 
             <div class="td-stat-icon">
-                W
+                <i class="bi bi-list-task"></i>
             </div>
 
         </div>
@@ -2066,7 +1411,7 @@
             </div>
 
             <div class="td-stat-icon">
-                ✓
+                <i class="bi bi-check-lg"></i>
             </div>
 
         </div>
@@ -2091,7 +1436,7 @@
             </div>
 
             <div class="td-stat-icon">
-                →
+                <i class="bi bi-arrow-right"></i>
             </div>
 
         </div>
@@ -2116,7 +1461,7 @@
             </div>
 
             <div class="td-stat-icon">
-                H
+                <i class="bi bi-clock"></i>
             </div>
 
         </div>
@@ -2161,21 +1506,19 @@
 
 <!-- =========================================================
      MAIN GRID
-     ========================================================= -->
+========================================================= -->
 
 <div class="td-main-grid">
 
 
 <!-- =========================================================
      LEFT COLUMN
-     ========================================================= -->
+========================================================= -->
 
 <div>
 
 
-<!-- =========================================================
-     TODAY'S WORK
-     ========================================================= -->
+<!-- TODAY'S WORK -->
 
 <div class="td-card">
 
@@ -2193,12 +1536,12 @@
 
         </div>
 
-
         <a
             href="{% url 'add_task_page' %}"
             class="td-btn td-btn-primary"
         >
-            + Add Work
+            <i class="bi bi-plus-lg"></i>
+            Add Work
         </a>
 
     </div>
@@ -2208,16 +1551,13 @@
 
     <div class="td-task">
 
-
         <div class="td-task-main">
-
 
             <div style="min-width:0;">
 
                 <div class="td-task-title">
                     {{ task.task }}
                 </div>
-
 
                 {% if task.description %}
 
@@ -2231,38 +1571,33 @@
                 <div class="td-task-meta">
 
                     <span class="td-badge td-badge-neutral">
-
                         {{ task.get_category_display }}
-
                     </span>
 
 
                     {% if task.priority == "high" %}
 
-                    <span class="td-badge td-badge-high">
-                        High Priority
-                    </span>
+                        <span class="td-badge td-badge-high">
+                            High Priority
+                        </span>
 
                     {% elif task.priority == "medium" %}
 
-                    <span class="td-badge td-badge-medium">
-                        Medium
-                    </span>
+                        <span class="td-badge td-badge-medium">
+                            Medium
+                        </span>
 
                     {% else %}
 
-                    <span class="td-badge td-badge-low">
-                        Low
-                    </span>
+                        <span class="td-badge td-badge-low">
+                            Low
+                        </span>
 
                     {% endif %}
 
 
                     <span class="td-badge td-badge-neutral">
-
-                        {{ task.estimated_hours }}
-                        hrs
-
+                        {{ task.estimated_hours }} hrs
                     </span>
 
                 </div>
@@ -2274,21 +1609,21 @@
 
                 {% if task.status == "completed" %}
 
-                <span class="td-badge td-badge-completed">
-                    Completed
-                </span>
+                    <span class="td-badge td-badge-completed">
+                        Completed
+                    </span>
 
                 {% elif task.status == "in_progress" %}
 
-                <span class="td-badge td-badge-progress">
-                    In Progress
-                </span>
+                    <span class="td-badge td-badge-progress">
+                        In Progress
+                    </span>
 
                 {% else %}
 
-                <span class="td-badge td-badge-pending">
-                    Pending
-                </span>
+                    <span class="td-badge td-badge-pending">
+                        Pending
+                    </span>
 
                 {% endif %}
 
@@ -2296,8 +1631,6 @@
 
         </div>
 
-
-        <!-- SUBTASKS -->
 
         {% with subtasks=task.subtasks.all %}
 
@@ -2309,10 +1642,10 @@
                     Subtasks
                 </div>
 
-
                 {% for subtask in subtasks %}
 
-                <div class="td-subtask
+                <div class="
+                    td-subtask
                     {% if subtask.is_completed %}
                         td-subtask-done
                     {% else %}
@@ -2321,19 +1654,12 @@
                 ">
 
                     {% if subtask.is_completed %}
-
-                        ✓
-
+                        <i class="bi bi-check-circle-fill"></i>
                     {% else %}
-
-                        ○
-
+                        <i class="bi bi-circle"></i>
                     {% endif %}
 
-
-                    <span>
-                        {{ subtask.title }}
-                    </span>
+                    {{ subtask.title }}
 
                 </div>
 
@@ -2345,8 +1671,6 @@
 
         {% endwith %}
 
-
-        <!-- ACTIONS -->
 
         <div class="td-task-actions">
 
@@ -2449,38 +1773,32 @@
 
         </div>
 
-
     </div>
+
 
     {% empty %}
 
-        <div class="td-empty">
+    <div class="td-empty">
 
-            No work has been added for today.
+        No work has been added for today.
 
-            <br>
+        <br><br>
 
-            <a
-                href="{% url 'add_task_page' %}"
-                style="
-                    color:#2563eb;
-                    font-weight:700;
-                    text-decoration:none;
-                "
-            >
-                Add your first task
-            </a>
+        <a
+            href="{% url 'add_task_page' %}"
+            class="td-btn td-btn-primary td-btn-sm"
+        >
+            Add First Task
+        </a>
 
-        </div>
+    </div>
 
     {% endfor %}
 
 </div>
 
 
-<!-- =========================================================
-     TODAY'S LEARNING
-     ========================================================= -->
+<!-- TODAY'S LEARNING -->
 
 <div class="td-card">
 
@@ -2498,12 +1816,12 @@
 
         </div>
 
-
         <a
             href="{% url 'add_daily_learning' %}"
             class="td-btn td-btn-primary"
         >
-            + Add Learning
+            <i class="bi bi-plus-lg"></i>
+            Add Learning
         </a>
 
     </div>
@@ -2526,9 +1844,7 @@
     {% else %}
 
         <div class="td-empty">
-
             No learning entry has been added for today.
-
         </div>
 
     {% endif %}
@@ -2536,9 +1852,7 @@
 </div>
 
 
-<!-- =========================================================
-     WEEKLY SCHEDULE
-     ========================================================= -->
+<!-- WEEKLY CALENDAR -->
 
 <div class="td-card">
 
@@ -2547,19 +1861,19 @@
         <div>
 
             <div class="td-card-title">
+                <i class="bi bi-calendar3"></i>
                 Weekly Schedule
             </div>
 
             <div class="td-card-subtitle">
-                Workshops, meetings and scheduled events
+                Previous 2 days · Today · Next 4 days
             </div>
 
         </div>
 
-
         <a
             href="{% url 'weekly_schedule' %}"
-            class="td-btn td-btn-secondary"
+            class="td-btn td-btn-secondary td-btn-sm"
         >
             Full Schedule
         </a>
@@ -2567,114 +1881,313 @@
     </div>
 
 
-    {% for day in weekly_schedule %}
+    <div class="calendar-legend">
 
-    <div class="td-schedule-day">
+        <span>
+            <i class="legend-dot legend-today"></i>
+            Today
+        </span>
 
+        <span>
+            <i class="legend-dot legend-attendance"></i>
+            Attendance
+        </span>
 
-        <div class="
-            td-schedule-date
-            {% if day.date == today %}
-                td-schedule-today
-            {% endif %}
-        ">
-
-            {{ day.date|date:"D, d M Y" }}
-
-            {% if day.date == today %}
-                · Today
-            {% endif %}
-
-        </div>
-
-
-        {% for event in day.events %}
-
-        <div class="td-event">
-
-            <div class="td-event-title">
-                {{ event.title }}
-            </div>
-
-
-            <div class="td-event-meta">
-
-                {% if event.start_time %}
-
-                    {{ event.start_time|time:"h:i A" }}
-
-                    {% if event.end_time %}
-                        - {{ event.end_time|time:"h:i A" }}
-                    {% endif %}
-
-                {% endif %}
-
-
-                {% if event.location %}
-
-                    · {{ event.location }}
-
-                {% endif %}
-
-            </div>
-
-        </div>
-
-        {% endfor %}
-
-
-        {% for workshop in day.workshops %}
-
-        <div class="td-workshop">
-
-            <div class="td-workshop-title">
-                {{ workshop.title }}
-            </div>
-
-
-            <div class="td-workshop-college">
-
-                {{ workshop.college.name }}
-
-            </div>
-
-
-            <div class="td-workshop-college">
-
-                {{ workshop.start_date|date:"d M" }}
-
-                -
-
-                {{ workshop.end_date|date:"d M" }}
-
-            </div>
-
-        </div>
-
-        {% endfor %}
-
-
-        {% if not day.events and not day.workshops %}
-
-        <div
-            style="
-                margin-top:8px;
-                color:#9ca3af;
-                font-size:12px;
-            "
-        >
-            No scheduled work
-        </div>
-
-        {% endif %}
+        <span>
+            <i class="legend-dot legend-event"></i>
+            Scheduled Work
+        </span>
 
     </div>
 
+
+    <div class="week-calendar">
+
+        {% for day in weekly_schedule %}
+
+        <div
+            class="
+                calendar-day
+                {% if day.date == today %}
+                    calendar-day-today
+                {% endif %}
+                {% if day.date >= minimum_attendance_date and day.date <= maximum_attendance_date %}
+                    calendar-day-attendance
+                {% endif %}
+            "
+            data-date="{{ day.date|date:'Y-m-d' }}"
+            data-date-label="{{ day.date|date:'l, d M Y' }}"
+            onclick="selectDashboardDate(this)"
+            tabindex="0"
+        >
+
+            <div class="calendar-day-top">
+
+                <div>
+
+                    <div class="calendar-day-name">
+                        {{ day.date|date:"D" }}
+                    </div>
+
+                    <div class="calendar-day-number">
+                        {{ day.date|date:"d" }}
+                    </div>
+
+                </div>
+
+
+                {% if day.date == today %}
+
+                    <span class="calendar-today-badge">
+                        Today
+                    </span>
+
+                {% elif day.date >= minimum_attendance_date and day.date <= maximum_attendance_date %}
+
+                    <span class="calendar-attendance-badge">
+                        Attendance
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="calendar-day-month">
+                {{ day.date|date:"M Y" }}
+            </div>
+
+
+            <div class="calendar-items">
+
+                {% for event in day.events %}
+
+                <div class="calendar-event">
+
+                    <div class="calendar-event-icon">
+                        <i class="bi bi-calendar-event"></i>
+                    </div>
+
+                    <div class="calendar-event-body">
+
+                        <div class="calendar-event-title">
+                            {{ event.title }}
+                        </div>
+
+                        <div class="calendar-event-time">
+
+                            {% if event.start_time %}
+                                {{ event.start_time|time:"h:i A" }}
+                            {% endif %}
+
+                            {% if event.end_time %}
+                                -
+                                {{ event.end_time|time:"h:i A" }}
+                            {% endif %}
+
+                        </div>
+
+                        {% if event.location %}
+
+                        <div class="calendar-event-location">
+                            <i class="bi bi-geo-alt"></i>
+                            {{ event.location }}
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+
+                {% for workshop in day.workshops %}
+
+                <div class="calendar-event calendar-workshop">
+
+                    <div class="calendar-event-icon">
+                        <i class="bi bi-mortarboard"></i>
+                    </div>
+
+                    <div class="calendar-event-body">
+
+                        <div class="calendar-event-title">
+                            {{ workshop.title }}
+                        </div>
+
+                        <div class="calendar-event-time">
+                            Workshop
+                        </div>
+
+                        {% if workshop.college %}
+
+                        <div class="calendar-event-location">
+                            <i class="bi bi-building"></i>
+                            {{ workshop.college.name }}
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+
+                {% if not day.events and not day.workshops %}
+
+                    <div class="calendar-empty">
+                        No scheduled work
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            {% if day.date >= minimum_attendance_date and day.date <= maximum_attendance_date %}
+
+            <div class="calendar-checkin-hint">
+                <i class="bi bi-hand-index"></i>
+                Click for attendance
+            </div>
+
+            {% endif %}
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    <div class="calendar-attendance-panel">
+
+        <div class="calendar-attendance-panel-icon">
+            <i class="bi bi-fingerprint"></i>
+        </div>
+
+        <div class="calendar-attendance-panel-content">
+
+            <strong id="selectedCalendarDate">
+                {{ attendance_date|date:"l, d M Y" }}
+            </strong>
+
+            <span>
+                Select one of the previous two days or today to manage attendance.
+            </span>
+
+        </div>
+
+        <a
+            id="calendarCheckinLink"
+            href="{% url 'trainer_attendance' %}?attendance_date={{ attendance_date|date:'Y-m-d' }}"
+            class="td-btn td-btn-primary td-btn-sm"
+        >
+            <i class="bi bi-fingerprint"></i>
+            Open Attendance
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- PREVIOUS WORK -->
+
+<div class="td-card">
+
+    <div class="td-card-header">
+
+        <div>
+
+            <div class="td-card-title">
+                Previous 7 Days Work
+            </div>
+
+            <div class="td-card-subtitle">
+                Your recent work history
+            </div>
+
+        </div>
+
+        <a
+            href="{% url 'task_history' %}"
+            class="td-btn td-btn-secondary"
+        >
+            Work History
+        </a>
+
+    </div>
+
+
+    {% for task in previous_tasks %}
+
+    <div class="td-history-task">
+
+        <div class="td-history-date">
+            {{ task.for_date|date:"D, d M" }}
+        </div>
+
+
+        <div>
+
+            <div class="td-history-title">
+                {{ task.task }}
+            </div>
+
+            <div class="td-history-meta">
+                {{ task.get_category_display }}
+                ·
+                {{ task.estimated_hours }} hrs
+            </div>
+
+        </div>
+
+
+        <div class="td-history-actions">
+
+            {% if task.status == "completed" %}
+
+                <span class="td-badge td-badge-completed">
+                    Completed
+                </span>
+
+            {% elif task.status == "in_progress" %}
+
+                <span class="td-badge td-badge-progress">
+                    In Progress
+                </span>
+
+            {% else %}
+
+                <span class="td-badge td-badge-pending">
+                    Pending
+                </span>
+
+            {% endif %}
+
+
+            <a
+                href="{% url 'task_detail' task.id %}"
+                class="td-btn td-btn-secondary td-btn-sm"
+            >
+                View
+            </a>
+
+        </div>
+
+    </div>
+
+
     {% empty %}
 
-        <div class="td-empty">
-            No schedule available.
-        </div>
+    <div class="td-empty">
+        No work recorded during the previous 7 days.
+    </div>
 
     {% endfor %}
 
@@ -2686,14 +2199,12 @@
 
 <!-- =========================================================
      RIGHT COLUMN
-     ========================================================= -->
+========================================================= -->
 
 <div>
 
 
-<!-- =========================================================
-     MONTHLY SUMMARY
-     ========================================================= -->
+<!-- MONTHLY SUMMARY -->
 
 <div class="td-card">
 
@@ -2728,14 +2239,11 @@
 
         </div>
 
-
         <div class="td-progress">
 
             <div
                 class="td-progress-bar"
-                style="
-                    width:{{ monthly_completion_percentage }}%;
-                "
+                style="width:{{ monthly_completion_percentage }}%;"
             ></div>
 
         </div>
@@ -2744,7 +2252,6 @@
 
 
     <div class="td-summary-grid">
-
 
         <div class="td-summary-item">
 
@@ -2823,15 +2330,12 @@
 
         </div>
 
-
     </div>
 
 </div>
 
 
-<!-- =========================================================
-     CATEGORY STATISTICS
-     ========================================================= -->
+<!-- CATEGORY -->
 
 <div class="td-card">
 
@@ -2865,13 +2369,9 @@
                 </span>
 
                 <span class="td-category-info">
-
                     {{ category.completed }}/{{ category.total }}
-
                     ·
-
                     {{ category.hours }} hrs
-
                 </span>
 
             </div>
@@ -2883,9 +2383,7 @@
 
                 <div
                     class="td-progress-bar"
-                    style="
-                        width:{{ category_percent }}%;
-                    "
+                    style="width:{{ category_percent }}%;"
                 ></div>
 
             </div>
@@ -2905,9 +2403,7 @@
 </div>
 
 
-<!-- =========================================================
-     SUBTASK PROGRESS
-     ========================================================= -->
+<!-- SUBTASK PROGRESS -->
 
 <div class="td-card">
 
@@ -2928,43 +2424,35 @@
     </div>
 
 
-    <div class="td-progress-wrapper">
+    <div class="td-progress-info">
 
-        <div class="td-progress-info">
+        <span>
+            {{ completed_subtasks }}
+            /
+            {{ total_subtasks }}
+            completed
+        </span>
 
-            <span>
-                {{ completed_subtasks }}
-                /
-                {{ total_subtasks }}
-                completed
-            </span>
+        <strong>
+            {{ subtask_percentage }}%
+        </strong>
 
-            <strong>
-                {{ subtask_percentage }}%
-            </strong>
-
-        </div>
+    </div>
 
 
-        <div class="td-progress">
+    <div class="td-progress">
 
-            <div
-                class="td-progress-bar"
-                style="
-                    width:{{ subtask_percentage }}%;
-                "
-            ></div>
-
-        </div>
+        <div
+            class="td-progress-bar"
+            style="width:{{ subtask_percentage }}%;"
+        ></div>
 
     </div>
 
 </div>
 
 
-<!-- =========================================================
-     OVERDUE WORK
-     ========================================================= -->
+<!-- OVERDUE -->
 
 <div class="td-card">
 
@@ -2981,7 +2469,6 @@
             </div>
 
         </div>
-
 
         {% if overdue_tasks %}
 
@@ -3005,7 +2492,6 @@
         <div class="td-overdue-date">
 
             Due:
-
             {{ task.for_date|date:"d M Y" }}
 
             ·
@@ -3015,7 +2501,7 @@
         </div>
 
 
-        <div style="margin-top:7px;">
+        <div style="margin-top:8px;">
 
             <span class="td-badge td-badge-high">
                 {{ task.get_priority_display }}
@@ -3043,18 +2529,16 @@
 
     {% empty %}
 
-        <div class="td-empty">
-            No overdue work.
-        </div>
+    <div class="td-empty">
+        No overdue work.
+    </div>
 
     {% endfor %}
 
 </div>
 
 
-<!-- =========================================================
-     UPCOMING WORKSHOPS
-     ========================================================= -->
+<!-- UPCOMING WORKSHOPS -->
 
 <div class="td-card">
 
@@ -3083,13 +2567,9 @@
             {{ workshop.title }}
         </div>
 
-
         <div class="td-upcoming-college">
-
             {{ workshop.college.name }}
-
         </div>
-
 
         <div class="td-upcoming-date">
 
@@ -3101,8 +2581,7 @@
 
         </div>
 
-
-        <div style="margin-top:9px;">
+        <div style="margin-top:8px;">
 
             <span class="td-badge td-badge-neutral">
                 {{ workshop.get_status_display }}
@@ -3114,18 +2593,16 @@
 
     {% empty %}
 
-        <div class="td-empty">
-            No upcoming workshops.
-        </div>
+    <div class="td-empty">
+        No upcoming workshops.
+    </div>
 
     {% endfor %}
 
 </div>
 
 
-<!-- =========================================================
-     RECENT LEARNING
-     ========================================================= -->
+<!-- RECENT LEARNING -->
 
 <div class="td-card">
 
@@ -3143,7 +2620,6 @@
 
         </div>
 
-
         <a
             href="{% url 'my_learning_history' %}"
             class="td-btn td-btn-secondary td-btn-sm"
@@ -3159,25 +2635,20 @@
     <div class="td-learning">
 
         <div class="td-learning-date">
-
             {{ learning.date|date:"d M Y" }}
-
         </div>
-
 
         <div class="td-learning-text">
-
             {{ learning.learning|truncatechars:180 }}
-
         </div>
 
     </div>
 
     {% empty %}
 
-        <div class="td-empty">
-            No learning records this month.
-        </div>
+    <div class="td-empty">
+        No learning records this month.
+    </div>
 
     {% endfor %}
 
@@ -3188,131 +2659,93 @@
 
 </div>
 
-
-<!-- =========================================================
-     PREVIOUS 7 DAYS
-     ========================================================= -->
-
-<div class="td-card">
-
-    <div class="td-card-header">
-
-        <div>
-
-            <div class="td-card-title">
-                Previous 7 Days Work
-            </div>
-
-            <div class="td-card-subtitle">
-                Your recent work history
-            </div>
-
-        </div>
-
-
-        <a
-            href="{% url 'task_history' %}"
-            class="td-btn td-btn-secondary"
-        >
-            Work History
-        </a>
-
-    </div>
-
-
-    {% for task in previous_tasks %}
-
-    <div class="td-history-task">
-
-
-        <div class="td-history-date">
-
-            {{ task.for_date|date:"D, d M" }}
-
-        </div>
-
-
-        <div>
-
-            <div class="td-history-title">
-
-                {{ task.task }}
-
-            </div>
-
-
-            <div class="td-history-meta">
-
-                {{ task.get_category_display }}
-
-                ·
-
-                {{ task.estimated_hours }} hrs
-
-            </div>
-
-        </div>
-
-
-        <div class="td-history-actions">
-
-
-            {% if task.status == "completed" %}
-
-                <span class="td-badge td-badge-completed">
-                    Completed
-                </span>
-
-            {% elif task.status == "in_progress" %}
-
-                <span class="td-badge td-badge-progress">
-                    In Progress
-                </span>
-
-            {% else %}
-
-                <span class="td-badge td-badge-pending">
-                    Pending
-                </span>
-
-            {% endif %}
-
-
-            <a
-                href="{% url 'task_detail' task.id %}"
-                class="td-btn td-btn-secondary td-btn-sm"
-            >
-                View
-            </a>
-
-
-            <a
-                href="{% url 'edit_task' task.id %}"
-                class="td-btn td-btn-secondary td-btn-sm"
-            >
-                Edit
-            </a>
-
-        </div>
-
-
-    </div>
-
-    {% empty %}
-
-        <div class="td-empty">
-
-            No work recorded during the previous 7 days.
-
-        </div>
-
-    {% endfor %}
-
 </div>
 
 
-</div>
+<script>
+function selectDashboardDate(element){
 
-</div>
+    const date = element.dataset.date;
+    const label = element.dataset.dateLabel;
+
+    if(!date){
+        return;
+    }
+
+    const minDate = "{{ minimum_attendance_date|date:'Y-m-d' }}";
+    const maxDate = "{{ maximum_attendance_date|date:'Y-m-d' }}";
+
+    const selectedDate = document.getElementById(
+        "selectedCalendarDate"
+    );
+
+    const attendanceLink = document.getElementById(
+        "calendarCheckinLink"
+    );
+
+    if(selectedDate){
+        selectedDate.textContent = label;
+    }
+
+    if(attendanceLink){
+
+        attendanceLink.href =
+            "{% url 'trainer_attendance' %}" +
+            "?attendance_date=" +
+            encodeURIComponent(date);
+
+    }
+
+    document
+        .querySelectorAll(".calendar-day")
+        .forEach(function(day){
+
+            day.classList.remove("calendar-selected");
+
+        });
+
+    element.classList.add("calendar-selected");
+
+    /*
+     * Only previous two days and today are valid
+     * attendance dates.
+     */
+
+    if(date >= minDate && date <= maxDate){
+
+        window.location.href =
+            "{% url 'trainer_attendance' %}" +
+            "?attendance_date=" +
+            encodeURIComponent(date);
+
+    }
+
+}
+
+
+document
+    .querySelectorAll(".calendar-day")
+    .forEach(function(day){
+
+        day.addEventListener(
+            "keydown",
+            function(event){
+
+                if(
+                    event.key === "Enter" ||
+                    event.key === " "
+                ){
+
+                    event.preventDefault();
+
+                    selectDashboardDate(day);
+
+                }
+
+            }
+        );
+
+    });
+</script>
 
 {% endblock %}

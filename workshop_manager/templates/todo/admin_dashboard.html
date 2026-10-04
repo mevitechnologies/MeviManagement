@@ -1,372 +1,491 @@
-{% extends 'base.html' %}
-{% load crispy_forms_tags %}
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Mevi Management Dashboard{% endblock %}
 
 {% block content %}
 
 <style>
 
 /* =========================================================
-   MEVI TASK MANAGEMENT
-   PREMIUM LARGE TYPOGRAPHY UI
+   MEVI MANAGEMENT COMMAND CENTER
+   LARGE • CLEAN • READABLE • SIDEBAR FRIENDLY
 ========================================================= */
 
 :root {
-    --mevi-primary: #5b4bdb;
-    --mevi-primary-dark: #4338ca;
-    --mevi-secondary: #7c3aed;
-    --mevi-pink: #ec4899;
+    --mc-primary: #5b4bdb;
+    --mc-primary-dark: #4338ca;
+    --mc-secondary: #7c3aed;
 
-    --pending: #ef4444;
-    --pending-soft: #fef2f2;
+    --mc-green: #16a34a;
+    --mc-green-soft: #ecfdf3;
 
-    --progress: #f59e0b;
-    --progress-soft: #fffbeb;
+    --mc-blue: #2563eb;
+    --mc-blue-soft: #eff6ff;
 
-    --completed: #16a34a;
-    --completed-soft: #f0fdf4;
+    --mc-orange: #d97706;
+    --mc-orange-soft: #fffbeb;
 
-    --blue: #2563eb;
-    --blue-soft: #eff6ff;
+    --mc-red: #dc2626;
+    --mc-red-soft: #fef2f2;
 
-    --dark: #172033;
-    --dark-soft: #344054;
+    --mc-purple-soft: #f5f3ff;
 
-    --muted: #667085;
-    --muted-light: #98a2b3;
+    --mc-dark: #172033;
+    --mc-dark-2: #344054;
+    --mc-muted: #667085;
+    --mc-light: #98a2b3;
 
-    --border: #e4e7ec;
+    --mc-border: #e4e7ec;
+    --mc-bg: #f6f7fb;
+    --mc-white: #ffffff;
 
-    --page-bg: #f5f7fb;
-    --white: #ffffff;
+    --mc-radius: 18px;
+    --mc-radius-lg: 24px;
 
-    --radius-sm: 10px;
-    --radius-md: 15px;
-    --radius-lg: 20px;
-    --radius-xl: 26px;
+    --mc-shadow:
+        0 8px 28px rgba(16, 24, 40, .065);
 
-    --shadow:
-        0 5px 18px rgba(16,24,40,.055);
+    --mc-shadow-hover:
+        0 16px 38px rgba(16, 24, 40, .11);
+}
 
-    --shadow-hover:
-        0 14px 35px rgba(16,24,40,.11);
+/* =========================================================
+   SUPERUSER EVENT ACTIONS
+========================================================= */
+
+.mc-event-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    flex-wrap: wrap;
+
+    margin-top: 12px;
+
+    padding-top: 11px;
+
+    border-top: 1px solid #e4e7ec;
+}
+
+.mc-event-action {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    padding: 6px 9px;
+
+    border-radius: 8px;
+
+    border: 1px solid #e4e7ec;
+
+    background: #ffffff;
+
+    color: #475467;
+
+    text-decoration: none;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    cursor: pointer;
+}
+
+.mc-event-action:hover {
+    background: #f5f3ff;
+
+    color: #5b4bdb;
+
+    border-color: #c7c1ff;
+}
+
+.mc-event-action.delete {
+    color: #dc2626;
+
+    border-color: #fecaca;
+
+    background: #fffafa;
+}
+
+.mc-event-action.delete:hover {
+    background: #fef2f2;
+
+    color: #b91c1c;
+
+    border-color: #fca5a5;
+}
+/* =========================================================
+   PAGE
+========================================================= */
+
+.mevi-command-center {
+    width: 100%;
+    max-width: 1750px;
+
+    margin: 0 auto;
+
+    padding: 32px 36px 70px;
+
+    color: var(--mc-dark);
 }
 
 
 /* =========================================================
-   BODY
+   GENERAL
 ========================================================= */
 
-body {
+.mevi-command-center * {
+    box-sizing: border-box;
+}
+
+.mc-section {
+    margin-top: 28px;
+}
+
+.mc-section-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 15px;
+}
+
+.mc-section-title h2 {
+    margin: 0;
+
+    font-size: 23px;
+    font-weight: 850;
+
+    color: var(--mc-dark);
+}
+
+.mc-section-title p {
+    margin: 4px 0 0;
+
+    color: var(--mc-muted);
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.mc-hero {
+    position: relative;
+
+    overflow: hidden;
+
+    min-height: 255px;
+
+    padding: 42px 46px;
+
+    margin-bottom: 25px;
+
+    border-radius: 28px;
+
+    color: white;
+
     background:
-        linear-gradient(
-            180deg,
-            #f8f9fc 0%,
-            #f5f7fb 100%
-        );
+        radial-gradient(
+            circle at 90% 8%,
+            rgba(255,255,255,.18),
+            transparent 25%
+        ),
 
-    color:
-        var(--dark);
+        radial-gradient(
+            circle at 8% 90%,
+            rgba(255,255,255,.10),
+            transparent 30%
+        ),
 
-    font-size:
-        16px;
-}
-
-
-/* =========================================================
-   MAIN PAGE
-========================================================= */
-
-.task-page {
-    width:
-        100%;
-
-    max-width:
-        1650px;
-
-    margin:
-        0 auto;
-
-    padding:
-        34px 34px 55px;
-}
-
-
-/* =========================================================
-   HEADER
-========================================================= */
-
-.page-header {
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        space-between;
-
-    gap:
-        24px;
-
-    margin-bottom:
-        28px;
-}
-
-.page-header-left {
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    gap:
-        18px;
-
-    min-width:
-        0;
-}
-
-.page-icon {
-    width:
-        62px;
-
-    height:
-        62px;
-
-    flex:
-        0 0 62px;
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-    border-radius:
-        18px;
-
-    color:
-        #ffffff;
-
-    font-size:
-        26px;
-
-    background:
         linear-gradient(
             135deg,
-            var(--mevi-primary),
-            var(--mevi-secondary)
+            #312e81 0%,
+            #5b4bdb 48%,
+            #7c3aed 100%
         );
 
     box-shadow:
-        0 12px 25px
+        0 20px 55px
         rgba(91,75,219,.22);
 }
 
-.page-title {
-    margin:
-        0;
+.mc-hero::before {
+    content: "";
 
-    color:
-        var(--dark);
+    position: absolute;
 
-    font-size:
-        34px;
+    width: 360px;
+    height: 360px;
 
-    line-height:
-        1.15;
+    right: -130px;
+    top: -170px;
 
-    font-weight:
-        850;
-
-    letter-spacing:
-        -.7px;
-}
-
-.page-subtitle {
-    margin:
-        7px 0 0;
-
-    color:
-        var(--muted);
-
-    font-size:
-        15px;
-
-    line-height:
-        1.5;
-}
-
-.page-actions {
-    display:
-        flex;
-
-    flex-wrap:
-        wrap;
-
-    gap:
-        10px;
-}
-
-.page-action {
-    min-height:
-        46px;
-
-    display:
-        inline-flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-    gap:
-        8px;
-
-    padding:
-        0 17px;
-
-    border-radius:
-        11px;
-
-    text-decoration:
-        none;
-
-    font-size:
-        14px;
-
-    font-weight:
-        750;
-
-    transition:
-        .2s ease;
-}
-
-.page-action.primary {
-    color:
-        #ffffff;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--mevi-primary),
-            var(--mevi-secondary)
-        );
-
-    box-shadow:
-        0 8px 20px
-        rgba(91,75,219,.20);
-}
-
-.page-action.secondary {
-    color:
-        var(--dark-soft);
-
-    background:
-        #ffffff;
+    border-radius: 50%;
 
     border:
-        1px solid var(--border);
-
-    box-shadow:
-        var(--shadow);
+        55px solid
+        rgba(255,255,255,.055);
 }
 
-.page-action:hover {
-    transform:
-        translateY(-2px);
+.mc-hero::after {
+    content: "";
 
-    text-decoration:
-        none;
-}
+    position: absolute;
 
-.page-action.secondary:hover {
-    color:
-        var(--mevi-primary);
+    width: 190px;
+    height: 190px;
 
-    border-color:
-        #cfc9ff;
+    right: 220px;
+    bottom: -140px;
+
+    border-radius: 50%;
 
     background:
-        #faf9ff;
+        rgba(255,255,255,.045);
+}
+
+.mc-hero-inner {
+    position: relative;
+
+    z-index: 2;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 35px;
 }
 
 
 /* =========================================================
-   TEAM STRIP
+   HERO TEXT
 ========================================================= */
 
-.team-strip {
-    display:
-        flex;
+.mc-hero-content {
+    min-width: 0;
+}
 
-    align-items:
-        center;
+.mc-hero-kicker {
+    display: inline-flex;
 
-    justify-content:
-        space-between;
+    align-items: center;
 
-    gap:
-        18px;
+    gap: 8px;
 
-    padding:
-        16px 20px;
+    padding: 7px 12px;
 
-    margin-bottom:
-        28px;
-
-    border-radius:
-        15px;
-
-    background:
-        linear-gradient(
-            90deg,
-            #f2efff,
-            #fff3fa
-        );
+    margin-bottom: 13px;
 
     border:
-        1px solid #e8e2ff;
+        1px solid
+        rgba(255,255,255,.22);
+
+    border-radius: 30px;
+
+    background:
+        rgba(255,255,255,.10);
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    letter-spacing: .8px;
+
+    text-transform: uppercase;
+}
+
+.mc-hero-title {
+    margin: 0;
+
+    font-size: 42px;
+
+    line-height: 1.12;
+
+    font-weight: 900;
+
+    letter-spacing: -1.2px;
+}
+
+.mc-hero-title span {
+    color: #ffffff;
+}
+
+.mc-hero-text {
+    max-width: 850px;
+
+    margin: 12px 0 0;
+
+    font-size: 17px;
+
+    line-height: 1.65;
+
+    color:
+        rgba(255,255,255,.82);
+}
+
+.mc-hero-user {
+    margin-top: 18px;
+
+    font-size: 16px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   DATE BOX
+========================================================= */
+
+.mc-date-box {
+    flex: 0 0 165px;
+
+    text-align: center;
+
+    padding: 20px 15px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.20);
+
+    border-radius: 20px;
+
+    background:
+        rgba(255,255,255,.10);
+
+    backdrop-filter: blur(8px);
+}
+
+.mc-date-box .day {
+    display: block;
+
+    font-size: 44px;
+
+    line-height: 1;
+
+    font-weight: 900;
+}
+
+.mc-date-box .date-full {
+    display: block;
+
+    margin-top: 8px;
+
+    font-size: 13px;
+
+    color:
+        rgba(255,255,255,.75);
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   QUICK ACTIONS
+========================================================= */
+
+.mc-actions {
+    display: grid;
+
+    grid-template-columns:
+        repeat(6, minmax(0, 1fr));
+
+    gap: 13px;
+}
+
+.mc-action {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    min-height: 76px;
+
+    padding: 14px 15px;
+
+    text-decoration: none;
+
+    border:
+        1px solid
+        var(--mc-border);
+
+    border-radius: 16px;
+
+    background: white;
+
+    color: var(--mc-dark);
 
     box-shadow:
-        0 4px 15px rgba(91,75,219,.04);
+        var(--mc-shadow);
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        border-color .2s ease;
 }
 
-.team-strip-text {
-    color:
-        var(--dark-soft);
+.mc-action:hover {
+    transform: translateY(-3px);
 
-    font-size:
-        15px;
+    color: var(--mc-primary);
 
-    line-height:
-        1.6;
+    border-color:
+        rgba(91,75,219,.25);
+
+    box-shadow:
+        var(--mc-shadow-hover);
 }
 
-.team-strip-text strong {
-    color:
-        var(--mevi-primary);
+.mc-action-icon {
+    width: 45px;
+    height: 45px;
 
-    font-size:
-        16px;
+    flex: 0 0 45px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 13px;
+
+    background:
+        var(--mc-purple-soft);
+
+    color:
+        var(--mc-primary);
+
+    font-size: 20px;
 }
 
-.team-strip-date {
-    white-space:
-        nowrap;
+.mc-action strong {
+    display: block;
 
-    color:
-        var(--muted);
+    font-size: 14px;
 
-    font-size:
-        13px;
+    font-weight: 850;
+}
 
-    font-weight:
-        700;
+.mc-action small {
+    display: block;
+
+    margin-top: 3px;
+
+    color: var(--mc-muted);
+
+    font-size: 12px;
 }
 
 
@@ -374,2508 +493,2691 @@ body {
    STATISTICS
 ========================================================= */
 
-.stats-grid {
-    display:
-        grid;
+.mc-stats {
+    display: grid;
 
     grid-template-columns:
-        repeat(4, minmax(0, 1fr));
+        repeat(6, minmax(0, 1fr));
 
-    gap:
-        18px;
-
-    margin-bottom:
-        30px;
+    gap: 15px;
 }
 
-.stat-card {
-    position:
-        relative;
+.mc-stat {
+    position: relative;
 
-    overflow:
-        hidden;
+    overflow: hidden;
 
-    min-height:
-        145px;
+    min-height: 135px;
 
-    padding:
-        22px;
-
-    border-radius:
-        18px;
-
-    background:
-        #ffffff;
+    padding: 20px;
 
     border:
-        1px solid var(--border);
+        1px solid
+        var(--mc-border);
+
+    border-radius:
+        var(--mc-radius);
+
+    background: white;
 
     box-shadow:
-        var(--shadow);
+        var(--mc-shadow);
 
     transition:
-        .2s ease;
+        transform .2s ease,
+        box-shadow .2s ease;
 }
 
-.stat-card:hover {
-    transform:
-        translateY(-4px);
+.mc-stat:hover {
+    transform: translateY(-3px);
 
     box-shadow:
-        var(--shadow-hover);
+        var(--mc-shadow-hover);
 }
 
-.stat-card::after {
-    content:
-        "";
+.mc-stat-top {
+    display: flex;
 
-    position:
-        absolute;
+    align-items: center;
 
-    width:
-        110px;
-
-    height:
-        110px;
-
-    border-radius:
-        50%;
-
-    right:
-        -45px;
-
-    bottom:
-        -45px;
-
-    background:
-        rgba(91,75,219,.05);
-
-    pointer-events:
-        none;
+    justify-content: space-between;
 }
 
-.stat-top {
-    display:
-        flex;
+.mc-stat-icon {
+    width: 44px;
+    height: 44px;
 
-    align-items:
-        center;
+    display: flex;
 
-    justify-content:
-        space-between;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 13px;
+
+    font-size: 20px;
 }
 
-.stat-icon {
-    width:
-        46px;
+.mc-stat-number {
+    margin-top: 15px;
 
-    height:
-        46px;
+    font-size: 31px;
 
-    display:
-        flex;
+    line-height: 1;
 
-    align-items:
-        center;
+    font-weight: 900;
 
-    justify-content:
-        center;
-
-    border-radius:
-        13px;
-
-    font-size:
-        19px;
+    color: var(--mc-dark);
 }
 
-.stat-total .stat-icon {
-    background:
-        #f0edff;
+.mc-stat-label {
+    margin-top: 7px;
 
-    color:
-        var(--mevi-primary);
+    color: var(--mc-muted);
+
+    font-size: 13px;
+
+    font-weight: 700;
 }
 
-.stat-pending .stat-icon {
-    background:
-        var(--pending-soft);
-
-    color:
-        var(--pending);
+.stat-purple .mc-stat-icon {
+    background: var(--mc-purple-soft);
+    color: var(--mc-primary);
 }
 
-.stat-progress .stat-icon {
-    background:
-        var(--progress-soft);
-
-    color:
-        var(--progress);
+.stat-green .mc-stat-icon {
+    background: var(--mc-green-soft);
+    color: var(--mc-green);
 }
 
-.stat-completed .stat-icon {
-    background:
-        var(--completed-soft);
-
-    color:
-        var(--completed);
+.stat-blue .mc-stat-icon {
+    background: var(--mc-blue-soft);
+    color: var(--mc-blue);
 }
 
-.stat-number {
-    margin-top:
-        17px;
-
-    color:
-        var(--dark);
-
-    font-size:
-        36px;
-
-    line-height:
-        1;
-
-    font-weight:
-        850;
+.stat-orange .mc-stat-icon {
+    background: var(--mc-orange-soft);
+    color: var(--mc-orange);
 }
 
-.stat-label {
-    margin-top:
-        8px;
-
-    color:
-        var(--muted);
-
-    font-size:
-        14px;
-
-    font-weight:
-        650;
+.stat-red .mc-stat-icon {
+    background: var(--mc-red-soft);
+    color: var(--mc-red);
 }
 
 
 /* =========================================================
-   BOARD TOOLBAR
+   TWO COLUMN LAYOUT
 ========================================================= */
 
-.board-toolbar {
-    display:
-        flex;
+.mc-two-column {
+    display: grid;
 
-    align-items:
-        center;
+    grid-template-columns:
+        minmax(0, 1.45fr)
+        minmax(350px, .85fr);
 
-    justify-content:
-        space-between;
-
-    gap:
-        20px;
-
-    margin-bottom:
-        17px;
-}
-
-.board-heading {
-    color:
-        var(--dark);
-
-    font-size:
-        23px;
-
-    font-weight:
-        850;
-
-    line-height:
-        1.3;
-}
-
-.board-description {
-    margin-top:
-        5px;
-
-    color:
-        var(--muted);
-
-    font-size:
-        14px;
-
-    line-height:
-        1.5;
-}
-
-.search-box {
-    position:
-        relative;
-
-    width:
-        300px;
-
-    flex-shrink:
-        0;
-}
-
-.search-box i {
-    position:
-        absolute;
-
-    left:
-        14px;
-
-    top:
-        50%;
-
-    transform:
-        translateY(-50%);
-
-    color:
-        var(--muted-light);
-
-    font-size:
-        15px;
-}
-
-.search-box input {
-    width:
-        100%;
-
-    height:
-        46px;
-
-    padding:
-        0 14px 0 40px;
-
-    border:
-        1px solid var(--border);
-
-    border-radius:
-        11px;
-
-    outline:
-        none;
-
-    background:
-        #ffffff;
-
-    color:
-        var(--dark);
-
-    font-size:
-        14px;
-
-    box-shadow:
-        0 3px 12px rgba(16,24,40,.035);
-
-    transition:
-        .2s ease;
-}
-
-.search-box input::placeholder {
-    color:
-        #98a2b3;
-}
-
-.search-box input:focus {
-    border-color:
-        #bdb5ff;
-
-    box-shadow:
-        0 0 0 4px
-        rgba(91,75,219,.08);
+    gap: 20px;
 }
 
 
 /* =========================================================
-   KANBAN BOARD
+   CARD
 ========================================================= */
 
-.kanban-board {
-    display:
-        grid;
+.mc-card {
+    overflow: hidden;
+
+    border:
+        1px solid
+        var(--mc-border);
+
+    border-radius:
+        var(--mc-radius-lg);
+
+    background: white;
+
+    box-shadow:
+        var(--mc-shadow);
+}
+
+.mc-card-header {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 21px 23px;
+
+    border-bottom:
+        1px solid
+        var(--mc-border);
+}
+
+.mc-card-header h3 {
+    margin: 0;
+
+    font-size: 19px;
+
+    font-weight: 850;
+
+    color: var(--mc-dark);
+}
+
+.mc-card-header p {
+    margin: 4px 0 0;
+
+    color: var(--mc-muted);
+
+    font-size: 13px;
+}
+
+.mc-card-body {
+    padding: 21px 23px;
+}
+
+
+/* =========================================================
+   TRAINER STATUS
+========================================================= */
+
+.trainer-list {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 13px;
+}
+
+.trainer-item {
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    padding: 15px;
+
+    border:
+        1px solid
+        var(--mc-border);
+
+    border-radius: 15px;
+
+    background:
+        #fbfcff;
+}
+
+.trainer-avatar {
+    width: 55px;
+    height: 55px;
+
+    flex: 0 0 55px;
+
+    overflow: hidden;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background:
+        var(--mc-purple-soft);
+
+    color:
+        var(--mc-primary);
+
+    font-size: 20px;
+
+    font-weight: 900;
+}
+
+.trainer-avatar img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+.trainer-info {
+    min-width: 0;
+
+    flex: 1;
+}
+
+.trainer-name {
+    margin: 0;
+
+    font-size: 16px;
+
+    font-weight: 850;
+
+    color: var(--mc-dark);
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+.trainer-meta {
+    margin-top: 4px;
+
+    color: var(--mc-muted);
+
+    font-size: 12px;
+}
+
+.status-badge {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    margin-top: 7px;
+
+    padding: 5px 9px;
+
+    border-radius: 30px;
+
+    font-size: 11px;
+
+    font-weight: 800;
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+}
+
+.status-working {
+    background: var(--mc-green-soft);
+    color: var(--mc-green);
+}
+
+.status-working .status-dot {
+    background: var(--mc-green);
+}
+
+.status-out {
+    background: #f2f4f7;
+    color: #667085;
+}
+
+.status-out .status-dot {
+    background: #667085;
+}
+
+.status-not {
+    background: var(--mc-red-soft);
+    color: var(--mc-red);
+}
+
+.status-not .status-dot {
+    background: var(--mc-red);
+}
+
+.trainer-work-count {
+    text-align: right;
+
+    font-size: 12px;
+
+    color: var(--mc-muted);
+
+    white-space: nowrap;
+}
+
+.trainer-work-count strong {
+    display: block;
+
+    font-size: 19px;
+
+    color: var(--mc-dark);
+
+    font-weight: 900;
+}
+
+
+/* =========================================================
+   EVENTS
+========================================================= */
+
+.event-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+}
+
+.event-item {
+    display: flex;
+
+    gap: 13px;
+
+    padding: 14px;
+
+    border:
+        1px solid
+        var(--mc-border);
+
+    border-radius: 14px;
+
+    background:
+        #fcfcff;
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease;
+}
+
+.event-item:hover {
+    transform: translateX(3px);
+
+    box-shadow:
+        0 6px 18px
+        rgba(16,24,40,.06);
+}
+
+.event-date-box {
+    width: 58px;
+    height: 62px;
+
+    flex: 0 0 58px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 13px;
+
+    background:
+        var(--mc-purple-soft);
+
+    color:
+        var(--mc-primary);
+}
+
+.event-date-box .event-day {
+    font-size: 21px;
+
+    line-height: 1;
+
+    font-weight: 900;
+}
+
+.event-date-box .event-month {
+    margin-top: 3px;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    text-transform: uppercase;
+}
+
+.event-content {
+    min-width: 0;
+
+    flex: 1;
+}
+
+.event-title {
+    margin: 0;
+
+    font-size: 15px;
+
+    line-height: 1.35;
+
+    font-weight: 850;
+
+    color: var(--mc-dark);
+}
+
+.event-detail {
+    margin-top: 5px;
+
+    color: var(--mc-muted);
+
+    font-size: 12px;
+
+    line-height: 1.5;
+}
+
+.event-type {
+    display: inline-block;
+
+    margin-top: 7px;
+
+    padding: 4px 8px;
+
+    border-radius: 20px;
+
+    background:
+        var(--mc-blue-soft);
+
+    color:
+        var(--mc-blue);
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.mc-empty {
+    padding: 30px 15px;
+
+    text-align: center;
+
+    color: var(--mc-muted);
+}
+
+.mc-empty-icon {
+    width: 52px;
+    height: 52px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 10px;
+
+    border-radius: 50%;
+
+    background:
+        #f2f4f7;
+
+    color:
+        var(--mc-light);
+
+    font-size: 21px;
+}
+
+.mc-empty strong {
+    display: block;
+
+    color: var(--mc-dark-2);
+
+    font-size: 14px;
+}
+
+.mc-empty span {
+    display: block;
+
+    margin-top: 4px;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   TODAY'S WORK
+========================================================= */
+
+.task-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+.task-item {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 13px 15px;
+
+    border:
+        1px solid
+        var(--mc-border);
+
+    border-radius: 13px;
+}
+
+.task-status-icon {
+    width: 37px;
+    height: 37px;
+
+    flex: 0 0 37px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background:
+        var(--mc-purple-soft);
+
+    color:
+        var(--mc-primary);
+}
+
+.task-content {
+    min-width: 0;
+
+    flex: 1;
+}
+
+.task-title {
+    margin: 0;
+
+    font-size: 14px;
+
+    font-weight: 800;
+
+    color: var(--mc-dark);
+}
+
+.task-trainer {
+    margin-top: 3px;
+
+    color: var(--mc-muted);
+
+    font-size: 11px;
+}
+
+.task-status {
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    text-transform: uppercase;
+}
+
+.task-pending {
+    background: var(--mc-orange-soft);
+    color: var(--mc-orange);
+}
+
+.task-progress {
+    background: var(--mc-blue-soft);
+    color: var(--mc-blue);
+}
+
+.task-completed {
+    background: var(--mc-green-soft);
+    color: var(--mc-green);
+}
+
+
+/* =========================================================
+   WORKSHOPS
+========================================================= */
+
+.workshop-grid {
+    display: grid;
 
     grid-template-columns:
         repeat(3, minmax(0, 1fr));
 
-    gap:
-        20px;
-
-    align-items:
-        start;
+    gap: 14px;
 }
 
-
-/* =========================================================
-   KANBAN COLUMN
-========================================================= */
-
-.kanban-column {
-    min-width:
-        0;
-
-    min-height:
-        620px;
-
-    padding:
-        17px;
-
-    border-radius:
-        21px;
-
-    background:
-        #edf0f5;
+.workshop-card {
+    padding: 18px;
 
     border:
-        1px solid #e2e5ea;
+        1px solid
+        var(--mc-border);
 
-    box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.65);
-}
+    border-radius: 16px;
 
-
-/* =========================================================
-   COLUMN HEADER
-========================================================= */
-
-.column-header {
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        space-between;
-
-    padding:
-        5px 4px 16px;
-
-    margin-bottom:
-        7px;
-}
-
-.column-title-wrap {
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    gap:
-        11px;
-}
-
-.column-dot {
-    width:
-        12px;
-
-    height:
-        12px;
-
-    flex:
-        0 0 12px;
-
-    border-radius:
-        50%;
-}
-
-.pending-dot {
-    background:
-        var(--pending);
-
-    box-shadow:
-        0 0 0 5px
-        rgba(239,68,68,.10);
-}
-
-.progress-dot {
-    background:
-        var(--progress);
-
-    box-shadow:
-        0 0 0 5px
-        rgba(245,158,11,.10);
-}
-
-.completed-dot {
-    background:
-        var(--completed);
-
-    box-shadow:
-        0 0 0 5px
-        rgba(22,163,74,.10);
-}
-
-.column-title {
-    color:
-        var(--dark);
-
-    font-size:
-        17px;
-
-    font-weight:
-        850;
-}
-
-.column-count {
-    min-width:
-        32px;
-
-    height:
-        30px;
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-    padding:
-        0 9px;
-
-    border-radius:
-        9px;
-
-    font-size:
-        13px;
-
-    font-weight:
-        850;
-}
-
-.pending-count {
-    color:
-        #b91c1c;
-
-    background:
-        #fee2e2;
-}
-
-.progress-count {
-    color:
-        #b45309;
-
-    background:
-        #fef3c7;
-}
-
-.completed-count {
-    color:
-        #15803d;
-
-    background:
-        #dcfce7;
-}
-
-
-/* =========================================================
-   TASK CARD
-========================================================= */
-
-.task-card {
-    position:
-        relative;
-
-    padding:
-        19px;
-
-    margin-bottom:
-        13px;
-
-    border-radius:
-        16px;
-
-    background:
-        #ffffff;
-
-    border:
-        1px solid #e5e7eb;
-
-    box-shadow:
-        0 4px 15px
-        rgba(16,24,40,.05);
+    background: white;
 
     transition:
-        .22s ease;
+        transform .2s ease,
+        box-shadow .2s ease;
 }
 
-.task-card:hover {
-    transform:
-        translateY(-3px);
-
-    border-color:
-        #d8d3ff;
+.workshop-card:hover {
+    transform: translateY(-3px);
 
     box-shadow:
-        0 13px 28px
-        rgba(16,24,40,.10);
+        var(--mc-shadow-hover);
 }
 
-.task-card:last-child {
-    margin-bottom:
-        0;
-}
+.workshop-icon {
+    width: 43px;
+    height: 43px;
 
-.task-top {
-    display:
-        flex;
+    display: flex;
 
-    justify-content:
-        space-between;
+    align-items: center;
+    justify-content: center;
 
-    align-items:
-        flex-start;
+    margin-bottom: 12px;
 
-    gap:
-        13px;
-}
+    border-radius: 12px;
 
-.task-title-wrap {
-    min-width:
-        0;
-}
-
-.task-title {
-    color:
-        var(--dark);
-
-    font-size:
-        17px;
-
-    line-height:
-        1.45;
-
-    font-weight:
-        800;
-
-    word-break:
-        break-word;
-}
-
-.task-id {
-    display:
-        block;
-
-    margin-top:
-        5px;
+    background:
+        var(--mc-blue-soft);
 
     color:
-        var(--muted-light);
+        var(--mc-blue);
 
-    font-size:
-        12px;
+    font-size: 19px;
+}
 
-    font-weight:
-        650;
+.workshop-title {
+    margin: 0;
+
+    font-size: 15px;
+
+    line-height: 1.4;
+
+    font-weight: 850;
+
+    color: var(--mc-dark);
+}
+
+.workshop-college {
+    margin-top: 5px;
+
+    color: var(--mc-muted);
+
+    font-size: 12px;
+}
+
+.workshop-date {
+    margin-top: 10px;
+
+    color: var(--mc-primary);
+
+    font-size: 12px;
+
+    font-weight: 800;
 }
 
 
 /* =========================================================
-   PRIORITY
+   MOTIVATIONAL STORY
 ========================================================= */
 
-.priority {
-    flex:
-        0 0 auto;
+.mc-story {
+    position: relative;
 
-    display:
-        inline-flex;
+    overflow: hidden;
 
-    align-items:
-        center;
+    padding: 28px 30px;
 
-    padding:
-        7px 10px;
+    border-radius: 21px;
 
-    border-radius:
-        8px;
-
-    font-size:
-        12px;
-
-    line-height:
-        1.2;
-
-    font-weight:
-        800;
-
-    white-space:
-        nowrap;
-}
-
-.priority-high {
-    color:
-        #b91c1c;
-
-    background:
-        #fee2e2;
-}
-
-.priority-medium {
-    color:
-        #a16207;
-
-    background:
-        #fef3c7;
-}
-
-.priority-low {
-    color:
-        #15803d;
-
-    background:
-        #dcfce7;
-}
-
-
-/* =========================================================
-   TASK META
-========================================================= */
-
-.task-meta {
-    display:
-        flex;
-
-    flex-wrap:
-        wrap;
-
-    gap:
-        8px;
-
-    margin-top:
-        15px;
-}
-
-.meta-item {
-    display:
-        inline-flex;
-
-    align-items:
-        center;
-
-    gap:
-        6px;
-
-    padding:
-        7px 9px;
-
-    border-radius:
-        8px;
-
-    background:
-        #f7f8fa;
-
-    color:
-        var(--muted);
-
-    font-size:
-        12px;
-
-    line-height:
-        1.3;
-
-    font-weight:
-        650;
-}
-
-.meta-item i {
-    color:
-        var(--mevi-primary);
-
-    font-size:
-        13px;
-}
-
-
-/* =========================================================
-   TRAINER
-========================================================= */
-
-.trainer-row {
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    gap:
-        10px;
-
-    margin-top:
-        15px;
-
-    padding-top:
-        13px;
-
-    border-top:
-        1px solid #eef0f3;
-}
-
-.trainer-avatar {
-    width:
-        36px;
-
-    height:
-        36px;
-
-    flex:
-        0 0 36px;
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-    border-radius:
-        50%;
-
-    color:
-        var(--mevi-primary);
-
-    background:
-        #f0edff;
-
-    font-size:
-        13px;
-
-    font-weight:
-        850;
-}
-
-.trainer-info {
-    min-width:
-        0;
-}
-
-.trainer-name {
-    color:
-        var(--dark-soft);
-
-    font-size:
-        14px;
-
-    font-weight:
-        800;
-
-    white-space:
-        nowrap;
-
-    overflow:
-        hidden;
-
-    text-overflow:
-        ellipsis;
-}
-
-.trainer-label {
-    color:
-        var(--muted-light);
-
-    font-size:
-        12px;
-
-    margin-top:
-        2px;
-}
-
-
-/* =========================================================
-   TASK PROGRESS
-========================================================= */
-
-.task-progress {
-    margin-top:
-        15px;
-}
-
-.progress-head {
-    display:
-        flex;
-
-    justify-content:
-        space-between;
-
-    align-items:
-        center;
-
-    margin-bottom:
-        7px;
-}
-
-.progress-label {
-    color:
-        var(--muted);
-
-    font-size:
-        12px;
-
-    font-weight:
-        700;
-}
-
-.progress-value {
-    color:
-        var(--dark-soft);
-
-    font-size:
-        13px;
-
-    font-weight:
-        850;
-}
-
-.progress-track {
-    width:
-        100%;
-
-    height:
-        9px;
-
-    overflow:
-        hidden;
-
-    border-radius:
-        20px;
-
-    background:
-        #e8eaf0;
-}
-
-.progress-fill {
-    height:
-        100%;
-
-    border-radius:
-        20px;
-
-    background:
-        linear-gradient(
-            90deg,
-            var(--mevi-primary),
-            var(--mevi-pink)
-        );
-
-    transition:
-        width .4s ease;
-}
-
-.progress-fill.complete {
-    background:
-        linear-gradient(
-            90deg,
-            #16a34a,
-            #22c55e
-        );
-}
-
-
-/* =========================================================
-   COMPLETED SUBTASK TEXT
-========================================================= */
-
-.task-progress > div:last-child {
-    margin-top:
-        6px !important;
-
-    color:
-        var(--muted-light) !important;
-
-    font-size:
-        11px !important;
-}
-
-
-/* =========================================================
-   TASK ACTIONS
-========================================================= */
-
-.task-actions {
-    display:
-        flex;
-
-    justify-content:
-        space-between;
-
-    align-items:
-        center;
-
-    gap:
-        9px;
-
-    margin-top:
-        16px;
-
-    padding-top:
-        13px;
-
-    border-top:
-        1px solid #f1f2f4;
-}
-
-.view-task {
-    display:
-        inline-flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-    gap:
-        6px;
-
-    min-height:
-        38px;
-
-    padding:
-        7px 12px;
-
-    border-radius:
-        9px;
-
-    color:
-        var(--mevi-primary);
-
-    background:
-        #f3f1ff;
-
-    text-decoration:
-        none;
-
-    font-size:
-        13px;
-
-    font-weight:
-        800;
-
-    transition:
-        .18s ease;
-}
-
-.view-task:hover {
-    color:
-        var(--mevi-primary-dark);
-
-    background:
-        #e9e5ff;
-
-    text-decoration:
-        none;
-
-    transform:
-        translateY(-1px);
-}
-
-.admin-actions {
-    display:
-        flex;
-
-    gap:
-        7px;
-}
-
-.icon-btn {
-    width:
-        36px;
-
-    height:
-        36px;
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-    border-radius:
-        9px;
-
-    background:
-        #ffffff;
-
-    border:
-        1px solid var(--border);
-
-    color:
-        var(--muted);
-
-    text-decoration:
-        none;
-
-    font-size:
-        14px;
-
-    transition:
-        .17s ease;
-}
-
-.icon-btn:hover {
-    color:
-        var(--mevi-primary);
-
-    border-color:
-        #cfc9ff;
-
-    background:
-        #f8f7ff;
-
-    transform:
-        translateY(-1px);
-}
-
-.icon-btn.delete:hover {
-    color:
-        var(--pending);
-
-    border-color:
-        #fecaca;
-
-    background:
-        #fef2f2;
-}
-
-
-/* =========================================================
-   VIEW ONLY
-========================================================= */
-
-.view-only {
-    margin-top:
-        12px;
-
-    padding:
-        8px;
-
-    text-align:
-        center;
-
-    border-radius:
-        8px;
-
-    color:
-        var(--muted-light);
-
-    background:
-        #f8f9fb;
-
-    font-size:
-        11px;
-
-    font-weight:
-        700;
-}
-
-
-/* =========================================================
-   EMPTY COLUMN
-========================================================= */
-
-.empty-column {
-    display:
-        flex;
-
-    flex-direction:
-        column;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-    min-height:
-        390px;
-
-    padding:
-        30px;
-
-    color:
-        var(--muted-light);
-
-    text-align:
-        center;
-}
-
-.empty-icon {
-    width:
-        68px;
-
-    height:
-        68px;
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-    margin-bottom:
-        15px;
-
-    border-radius:
-        20px;
-
-    background:
-        rgba(255,255,255,.8);
-
-    font-size:
-        29px;
-
-    box-shadow:
-        0 5px 16px rgba(16,24,40,.04);
-}
-
-.empty-title {
-    color:
-        var(--dark-soft);
-
-    font-size:
-        15px;
-
-    font-weight:
-        800;
-}
-
-.empty-text {
-    max-width:
-        240px;
-
-    margin-top:
-        6px;
-
-    color:
-        var(--muted-light);
-
-    font-size:
-        13px;
-
-    line-height:
-        1.6;
-}
-
-
-/* =========================================================
-   FOOTER MESSAGE
-========================================================= */
-
-.task-footer {
-    margin-top:
-        28px;
-
-    padding:
-        25px;
-
-    text-align:
-        center;
-
-    border-radius:
-        18px;
-
-    border:
-        1px solid #e8e2ff;
+    color: white;
 
     background:
         linear-gradient(
             135deg,
-            #f5f3ff,
-            #fff3f8
+            #172554 0%,
+            #312e81 50%,
+            #581c87 100%
         );
 
     box-shadow:
-        0 5px 18px rgba(91,75,219,.035);
+        0 14px 35px
+        rgba(49,46,129,.18);
 }
 
-.task-footer-title {
-    color:
-        var(--dark);
+.mc-story::after {
+    content: "\"";
 
-    font-size:
-        18px;
+    position: absolute;
 
-    font-weight:
-        850;
-}
+    right: 25px;
+    top: -30px;
 
-.task-footer-text {
-    max-width:
-        760px;
+    font-size: 150px;
 
-    margin:
-        8px auto 0;
+    line-height: 1;
 
     color:
-        var(--muted);
+        rgba(255,255,255,.06);
 
-    font-size:
-        14px;
-
-    line-height:
-        1.7;
+    font-family: Georgia, serif;
 }
 
-.task-footer-highlight {
+.mc-story-label {
+    font-size: 11px;
+
+    font-weight: 900;
+
+    letter-spacing: 1.5px;
+
+    text-transform: uppercase;
+
     color:
-        var(--mevi-primary);
+        rgba(255,255,255,.60);
+}
 
-    font-weight:
-        800;
+.mc-story-title {
+    position: relative;
+
+    z-index: 2;
+
+    margin: 8px 0 10px;
+
+    font-size: 25px;
+
+    font-weight: 900;
+}
+
+.mc-story-text {
+    position: relative;
+
+    z-index: 2;
+
+    max-width: 1100px;
+
+    margin: 0;
+
+    font-size: 16px;
+
+    line-height: 1.75;
+
+    color:
+        rgba(255,255,255,.86);
 }
 
 
 /* =========================================================
-   SEARCH HIDDEN
+   MANAGEMENT OPTIONS
 ========================================================= */
 
-.task-card.hidden {
-    display:
-        none;
+.management-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 14px;
+}
+
+.management-card {
+    display: block;
+
+    padding: 20px;
+
+    text-decoration: none;
+
+    border:
+        1px solid
+        var(--mc-border);
+
+    border-radius: 17px;
+
+    background: white;
+
+    color: var(--mc-dark);
+
+    box-shadow:
+        var(--mc-shadow);
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+
+.management-card:hover {
+    transform: translateY(-3px);
+
+    color:
+        var(--mc-primary);
+
+    box-shadow:
+        var(--mc-shadow-hover);
+}
+
+.management-icon {
+    width: 46px;
+    height: 46px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 13px;
+
+    border-radius: 13px;
+
+    background:
+        var(--mc-purple-soft);
+
+    color:
+        var(--mc-primary);
+
+    font-size: 20px;
+}
+
+.management-title {
+    font-size: 15px;
+
+    font-weight: 850;
+}
+
+.management-text {
+    margin-top: 5px;
+
+    color: var(--mc-muted);
+
+    font-size: 12px;
+
+    line-height: 1.5;
 }
 
 
 /* =========================================================
-   RESPONSIVE — 1250
+   BUTTON
 ========================================================= */
 
-@media (max-width: 1250px) {
+.mc-btn {
+    display: inline-flex;
 
-    .task-page {
-        padding:
-            28px 26px 48px;
-    }
+    align-items: center;
 
-    .stats-grid {
+    gap: 7px;
+
+    padding: 9px 13px;
+
+    border-radius: 10px;
+
+    text-decoration: none;
+
+    background:
+        var(--mc-primary);
+
+    color: white;
+
+    font-size: 12px;
+
+    font-weight: 800;
+}
+
+.mc-btn:hover {
+    color: white;
+
+    background:
+        var(--mc-primary-dark);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1400px) {
+
+    .mc-actions {
         grid-template-columns:
-            repeat(2, minmax(0,1fr));
+            repeat(3, minmax(0, 1fr));
     }
 
-    .kanban-board {
+    .mc-stats {
         grid-template-columns:
-            1fr;
+            repeat(3, minmax(0, 1fr));
     }
 
-    .kanban-column {
-        min-height:
-            auto;
-    }
-}
-
-
-/* =========================================================
-   RESPONSIVE — 850
-========================================================= */
-
-@media (max-width: 850px) {
-
-    .page-header {
-        align-items:
-            flex-start;
-
-        flex-direction:
-            column;
-    }
-
-    .page-actions {
-        width:
-            100%;
-    }
-
-    .page-action {
-        flex:
-            1;
-    }
-
-    .board-toolbar {
-        align-items:
-            stretch;
-
-        flex-direction:
-            column;
-    }
-
-    .search-box {
-        width:
-            100%;
-    }
-
-    .team-strip {
-        align-items:
-            flex-start;
-
-        flex-direction:
-            column;
-    }
-}
-
-
-/* =========================================================
-   RESPONSIVE — 600
-========================================================= */
-
-@media (max-width: 600px) {
-
-    .task-page {
-        padding:
-            19px 14px 38px;
-    }
-
-    .page-header-left {
-        align-items:
-            flex-start;
-    }
-
-    .page-icon {
-        width:
-            52px;
-
-        height:
-            52px;
-
-        flex-basis:
-            52px;
-
-        font-size:
-            22px;
-    }
-
-    .page-title {
-        font-size:
-            27px;
-    }
-
-    .page-subtitle {
-        font-size:
-            13px;
-    }
-
-    .page-actions {
-        flex-direction:
-            column;
-    }
-
-    .page-action {
-        width:
-            100%;
-    }
-
-    .stats-grid {
+    .workshop-grid {
         grid-template-columns:
-            repeat(2, minmax(0,1fr));
-
-        gap:
-            12px;
+            repeat(2, minmax(0, 1fr));
     }
 
-    .stat-card {
-        min-height:
-            125px;
-
-        padding:
-            17px;
-    }
-
-    .stat-number {
-        font-size:
-            29px;
-    }
-
-    .stat-label {
-        font-size:
-            12px;
-    }
-
-    .board-heading {
-        font-size:
-            20px;
-    }
-
-    .board-description {
-        font-size:
-            13px;
-    }
-
-    .kanban-column {
-        padding:
-            13px;
-
-        border-radius:
-            17px;
-    }
-
-    .task-card {
-        padding:
-            16px;
-    }
-
-    .task-top {
-        flex-direction:
-            column;
-    }
-
-    .priority {
-        align-self:
-            flex-start;
-    }
-
-    .task-title {
-        font-size:
-            16px;
-    }
-
-    .task-id {
-        font-size:
-            11px;
-    }
-
-    .meta-item {
-        font-size:
-            11px;
-    }
-
-    .trainer-name {
-        font-size:
-            13px;
-    }
-
-    .trainer-label {
-        font-size:
-            11px;
-    }
-
-    .view-task {
-        font-size:
-            12px;
-    }
-
-    .task-footer-title {
-        font-size:
-            16px;
-    }
-
-    .task-footer-text {
-        font-size:
-            13px;
-    }
-}
-
-
-/* =========================================================
-   RESPONSIVE — 400
-========================================================= */
-
-@media (max-width: 400px) {
-
-    .stats-grid {
+    .management-grid {
         grid-template-columns:
-            1fr;
-    }
-
-    .page-title {
-        font-size:
-            24px;
-    }
-
-    .team-strip-text {
-        font-size:
-            13px;
-    }
-
-    .stat-number {
-        font-size:
-            28px;
-    }
-
-    .column-title {
-        font-size:
-            15px;
+            repeat(2, minmax(0, 1fr));
     }
 }
 
 
-/* =========================================================
-   ACCESSIBILITY
-========================================================= */
+@media (max-width: 1100px) {
 
-:focus-visible {
-    outline:
-        3px solid rgba(91,75,219,.30);
+    .mc-two-column {
+        grid-template-columns: 1fr;
+    }
 
-    outline-offset:
-        2px;
+    .trainer-list {
+        grid-template-columns: 1fr;
+    }
+
+    .mc-hero-title {
+        font-size: 35px;
+    }
 }
 
 
-/* =========================================================
-   REDUCED MOTION
-========================================================= */
+@media (max-width: 768px) {
 
-@media (prefers-reduced-motion: reduce) {
+    .mevi-command-center {
+        padding: 20px 15px 45px;
+    }
 
-    *,
-    *::before,
-    *::after {
-        scroll-behavior:
-            auto !important;
+    .mc-hero {
+        padding: 28px 24px;
+    }
 
-        animation-duration:
-            .01ms !important;
+    .mc-hero-inner {
+        flex-direction: column;
 
-        transition-duration:
-            .01ms !important;
+        align-items: flex-start;
+    }
+
+    .mc-date-box {
+        width: 100%;
+
+        flex: auto;
+    }
+
+    .mc-hero-title {
+        font-size: 30px;
+    }
+
+    .mc-hero-text {
+        font-size: 15px;
+    }
+
+    .mc-actions {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .mc-stats {
+        grid-template-columns:
+            1fr 1fr;
+    }
+
+    .workshop-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .management-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 500px) {
+
+    .mc-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .mc-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .mc-hero-title {
+        font-size: 27px;
+    }
+
+    .mc-card-header {
+        padding: 17px;
+    }
+
+    .mc-card-body {
+        padding: 17px;
     }
 }
 
 </style>
 
 
-
-<div class="task-page">
-
-
-    <!-- =====================================================
-         PAGE HEADER
-    ====================================================== -->
-
-    <div class="page-header">
+<div class="mevi-command-center">
 
 
-        <div class="page-header-left">
+<!-- =========================================================
+     HERO
+========================================================= -->
 
-            <div class="page-icon">
+<section class="mc-hero">
 
-                <i class="bi bi-kanban-fill"></i>
+    <div class="mc-hero-inner">
 
-            </div>
+        <div class="mc-hero-content">
 
+            <div class="mc-hero-kicker">
 
-            <div>
+                <i class="bi bi-grid-1x2-fill"></i>
 
-                <h1 class="page-title">
-
-                    Task Management
-
-                </h1>
-
-
-                <p class="page-subtitle">
-
-                    Plan, track and complete work together —
-                    one task at a time. 🤝
-
-                </p>
+                Mevi Management Command Center
 
             </div>
 
-        </div>
 
+            <h1 class="mc-hero-title">
 
+                Welcome,
 
-        {% if request.user.is_superuser %}
-
-        <div class="page-actions">
-
-
-            <a
-                href="{% url 'add_task_page' %}"
-                class="page-action primary"
-            >
-
-                <i class="bi bi-plus-lg"></i>
-
-                New Task
-
-            </a>
-
-
-            <a
-                href="{% url 'task_history' %}"
-                class="page-action secondary"
-            >
-
-                <i class="bi bi-clock-history"></i>
-
-                History
-
-            </a>
-
-
-        </div>
-
-        {% endif %}
-
-
-    </div>
-
-
-
-    <!-- =====================================================
-         FRIENDLY STRIP
-    ====================================================== -->
-
-    <div class="team-strip">
-
-
-        <div class="team-strip-text">
-
-            💜
-
-            <strong>
-                Team Mevi,
-            </strong>
-
-            every completed task is one small step forward.
-
-            Swalpa swalpa progress kooda progress ne. 🌱
-
-        </div>
-
-
-        <div class="team-strip-date">
-
-            📅
-            {{ today|default:"Today" }}
-
-        </div>
-
-
-    </div>
-
-
-
-    <!-- =====================================================
-         STATISTICS
-    ====================================================== -->
-
-    <div class="stats-grid">
-
-
-        <!-- TOTAL -->
-
-        <div class="stat-card stat-total">
-
-            <div class="stat-top">
-
-                <div class="stat-icon">
-
-                    <i class="bi bi-layers-fill"></i>
-
-                </div>
-
-            </div>
-
-
-            <div class="stat-number">
-
-                {{ total_tasks|default:"0" }}
-
-            </div>
-
-
-            <div class="stat-label">
-
-                Total Tasks
-
-            </div>
-
-        </div>
-
-
-
-        <!-- PENDING -->
-
-        <div class="stat-card stat-pending">
-
-            <div class="stat-top">
-
-                <div class="stat-icon">
-
-                    <i class="bi bi-hourglass-split"></i>
-
-                </div>
-
-            </div>
-
-
-            <div class="stat-number">
-
-                {{ grouped_tasks.pending|length }}
-
-            </div>
-
-
-            <div class="stat-label">
-
-                Waiting to Start
-
-            </div>
-
-        </div>
-
-
-
-        <!-- IN PROGRESS -->
-
-        <div class="stat-card stat-progress">
-
-            <div class="stat-top">
-
-                <div class="stat-icon">
-
-                    <i class="bi bi-lightning-charge-fill"></i>
-
-                </div>
-
-            </div>
-
-
-            <div class="stat-number">
-
-                {{ grouped_tasks.in_progress|length }}
-
-            </div>
-
-
-            <div class="stat-label">
-
-                Currently In Progress
-
-            </div>
-
-        </div>
-
-
-
-        <!-- COMPLETED -->
-
-        <div class="stat-card stat-completed">
-
-            <div class="stat-top">
-
-                <div class="stat-icon">
-
-                    <i class="bi bi-check2-circle"></i>
-
-                </div>
-
-            </div>
-
-
-            <div class="stat-number">
-
-                {{ grouped_tasks.completed|length }}
-
-            </div>
-
-
-            <div class="stat-label">
-
-                Successfully Completed
-
-            </div>
-
-        </div>
-
-
-    </div>
-
-
-
-    <!-- =====================================================
-         BOARD TOOLBAR
-    ====================================================== -->
-
-    <div class="board-toolbar">
-
-
-        <div>
-
-            <div class="board-heading">
-
-                Today's Work Board 📋
-
-            </div>
-
-            <div class="board-description">
-
-                A simple visual view of what is waiting,
-                happening and completed.
-
-            </div>
-
-        </div>
-
-
-        <div class="search-box">
-
-            <i class="bi bi-search"></i>
-
-            <input
-                type="text"
-                id="taskSearch"
-                placeholder="Search tasks or trainers..."
-            >
-
-        </div>
-
-
-    </div>
-
-
-
-    <!-- =====================================================
-         KANBAN
-    ====================================================== -->
-
-    <div class="kanban-board">
-
-
-        {% for key, tasks in grouped_tasks.items %}
-
-
-        <!-- =================================================
-             PENDING
-        ================================================== -->
-
-        {% if key == "pending" %}
-
-        <div
-            class="kanban-column"
-            data-column="pending"
-        >
-
-
-            <div class="column-header">
-
-                <div class="column-title-wrap">
-
-                    <span
-                        class="column-dot pending-dot"
-                    ></span>
-
-                    <span class="column-title">
-
-                        Pending
-
-                    </span>
-
-                </div>
-
-
-                <span
-                    class="
-                        column-count
-                        pending-count
-                    "
-                >
-
-                    {{ tasks|length }}
-
-                </span>
-
-            </div>
-
-
-        {% elif key == "in_progress" %}
-
-
-        <!-- =================================================
-             IN PROGRESS
-        ================================================== -->
-
-        <div
-            class="kanban-column"
-            data-column="in_progress"
-        >
-
-
-            <div class="column-header">
-
-                <div class="column-title-wrap">
-
-                    <span
-                        class="column-dot progress-dot"
-                    ></span>
-
-                    <span class="column-title">
-
-                        In Progress
-
-                    </span>
-
-                </div>
-
-
-                <span
-                    class="
-                        column-count
-                        progress-count
-                    "
-                >
-
-                    {{ tasks|length }}
-
-                </span>
-
-            </div>
-
-
-        {% else %}
-
-
-        <!-- =================================================
-             COMPLETED
-        ================================================== -->
-
-        <div
-            class="kanban-column"
-            data-column="completed"
-        >
-
-
-            <div class="column-header">
-
-                <div class="column-title-wrap">
-
-                    <span
-                        class="column-dot completed-dot"
-                    ></span>
-
-                    <span class="column-title">
-
-                        Completed
-
-                    </span>
-
-                </div>
-
-
-                <span
-                    class="
-                        column-count
-                        completed-count
-                    "
-                >
-
-                    {{ tasks|length }}
-
-                </span>
-
-            </div>
-
-
-        {% endif %}
-
-
-
-            <!-- =============================================
-                 TASKS
-            ============================================== -->
-
-            {% for task in tasks %}
-
-
-            <div
-                class="task-card"
-                data-search="
-                    {{ task.task|lower }}
-                    {{ task.trainer.Name|lower }}
-                    {{ task.id }}
-                "
-            >
-
-
-                <!-- TASK TITLE -->
-
-                <div class="task-top">
-
-
-                    <div class="task-title-wrap">
-
-                        <div class="task-title">
-
-                            {{ task.task }}
-
-                        </div>
-
-
-                        <span class="task-id">
-
-                            Task #{{ task.id }}
-
-                        </span>
-
-                    </div>
-
-
-
-                    <!-- PRIORITY -->
-
-                    <span
-                        class="
-                            priority
-
-                            {% if task.priority == 'high' %}
-                                priority-high
-
-                            {% elif task.priority == 'medium' %}
-                                priority-medium
-
-                            {% else %}
-                                priority-low
-                            {% endif %}
-                        "
-                    >
-
-                        {% if task.priority == "high" %}
-                            🔴
-                        {% elif task.priority == "medium" %}
-                            🟡
-                        {% else %}
-                            🟢
-                        {% endif %}
-
-                        {{ task.get_priority_display }}
-
-                    </span>
-
-
-                </div>
-
-
-
-                <!-- META -->
-
-                <div class="task-meta">
-
-
-                    <div class="meta-item">
-
-                        <i class="bi bi-calendar3"></i>
-
-                        {{ task.for_date }}
-
-                    </div>
-
-
-                    <div class="meta-item">
-
-                        <i class="bi bi-clock"></i>
-
-                        {{ task.estimated_hours }}
-                        hr{{ task.estimated_hours|pluralize }}
-
-                    </div>
-
-
-                </div>
-
-
-
-                <!-- TRAINER -->
-
-                <div class="trainer-row">
-
-
-                    <div class="trainer-avatar">
-
-                        {{ task.trainer.Name|first|upper }}
-
-                    </div>
-
-
-                    <div class="trainer-info">
-
-                        <div class="trainer-name">
-
-                            {{ task.trainer.Name }}
-
-                        </div>
-
-                        <div class="trainer-label">
-
-                            Assigned Trainer
-
-                        </div>
-
-                    </div>
-
-
-                </div>
-
-
-
-                <!-- SUBTASK PROGRESS -->
-
-                {% if task.total_subtasks > 0 %}
-
-                <div class="task-progress">
-
-
-                    <div class="progress-head">
-
-                        <span class="progress-label">
-
-                            Subtask Progress
-
-                        </span>
-
-
-                        <span class="progress-value">
-
-                            {{ task.progress }}%
-
-                        </span>
-
-                    </div>
-
-
-                    <div class="progress-track">
-
-                        <div
-                            class="
-                                progress-fill
-
-                                {% if task.progress == 100 %}
-                                    complete
-                                {% endif %}
-                            "
-                            style="
-                                width:{{ task.progress }}%;
-                            "
-                        ></div>
-
-                    </div>
-
-
-                    <div
-                        style="
-                            margin-top:5px;
-                            color:#98A2B3;
-                            font-size:8px;
-                        "
-                    >
-
-                        {{ task.completed_subtasks }}
-                        /
-                        {{ task.total_subtasks }}
-
-                        subtasks completed
-
-                    </div>
-
-
-                </div>
-
+                {% if request.user.first_name %}
+                    {{ request.user.first_name }}
+                {% elif request.user.get_full_name %}
+                    {{ request.user.get_full_name }}
+                {% else %}
+                    {{ request.user.username }}
                 {% endif %}
 
+            </h1>
 
 
-                <!-- ACTIONS -->
+            <p class="mc-hero-text">
 
-                <div class="task-actions">
+                Manage trainers, workshops, attendance, daily work,
+                scheduled events and training activities from one place.
 
-
-                    <a
-                        href="{% url 'task_detail' task.id %}"
-                        class="view-task"
-                    >
-
-                        <i class="bi bi-eye"></i>
-
-                        View Task
-
-                    </a>
+            </p>
 
 
+            <div class="mc-hero-user">
 
-                    {% if request.user.is_superuser %}
+                <i class="bi bi-person-circle me-1"></i>
 
-                    <div class="admin-actions">
-
-
-                        <a
-                            href="{% url 'edit_task' task.id %}"
-                            class="icon-btn"
-                            title="Edit Task"
-                        >
-
-                            <i
-                                class="bi bi-pencil"
-                            ></i>
-
-                        </a>
-
-
-                        <a
-                            href="{% url 'change_task_status' task.id %}"
-                            class="icon-btn"
-                            title="Change Status"
-                        >
-
-                            <i
-                                class="bi bi-arrow-repeat"
-                            ></i>
-
-                        </a>
-
-
-                        <a
-                            href="{% url 'delete_task' task.id %}"
-                            class="
-                                icon-btn
-                                delete
-                            "
-                            title="Delete Task"
-                            onclick="
-                                return confirm(
-                                    'Delete this task?'
-                                );
-                            "
-                        >
-
-                            <i
-                                class="bi bi-trash3"
-                            ></i>
-
-                        </a>
-
-
-                    </div>
-
-                    {% endif %}
-
-
-                </div>
-
-
-
-                {% if not request.user.is_superuser %}
-
-                <div class="view-only">
-
-                    <i class="bi bi-eye"></i>
-
-                    View Only Access
-
-                </div>
-
+                {% if request.user.get_full_name %}
+                    {{ request.user.get_full_name }}
+                {% else %}
+                    {{ request.user.username }}
                 {% endif %}
 
-
             </div>
-
-
-            {% empty %}
-
-
-            <!-- EMPTY -->
-
-            <div class="empty-column">
-
-
-                <div class="empty-icon">
-
-                    {% if key == "pending" %}
-
-                        🌱
-
-                    {% elif key == "in_progress" %}
-
-                        ⚡
-
-                    {% else %}
-
-                        🎉
-
-                    {% endif %}
-
-                </div>
-
-
-                <div class="empty-title">
-
-                    {% if key == "pending" %}
-
-                        No pending tasks
-
-                    {% elif key == "in_progress" %}
-
-                        Nothing in progress
-
-                    {% else %}
-
-                        No completed tasks yet
-
-                    {% endif %}
-
-                </div>
-
-
-                <div class="empty-text">
-
-                    {% if key == "pending" %}
-
-                        Everything is clear here.
-                        Nice! 🌱
-
-                    {% elif key == "in_progress" %}
-
-                        Once work starts,
-                        it will appear here.
-
-                    {% else %}
-
-                        Every completed task
-                        becomes a small win. ❤️
-
-                    {% endif %}
-
-                </div>
-
-
-            </div>
-
-
-            {% endfor %}
-
 
         </div>
 
 
-        {% endfor %}
+        <!-- DATE -->
 
+        <div class="mc-date-box">
 
-    </div>
+            <span class="day">
+                {{ today|date:"d" }}
+            </span>
 
+            <span class="date-full">
+                {{ today|date:"F Y" }}
+            </span>
 
-
-    <!-- =====================================================
-         FOOTER
-    ====================================================== -->
-
-    <div class="task-footer">
-
-
-        <div class="task-footer-title">
-
-            💜 One Task. One Step. One Team.
-
-        </div>
-
-
-        <div class="task-footer-text">
-
-            Great work doesn't always happen in big moments.
-
-            Sometimes it is simply one task completed,
-            one problem solved,
-            one person helped.
-
-            <span class="task-footer-highlight">
-
-                Swalpa swalpa mundhe hogona —
-                together. 🌱
-
+            <span class="date-full">
+                {{ today|date:"l" }}
             </span>
 
         </div>
 
-
     </div>
 
-
-</div>
+</section>
 
 
 
 <!-- =========================================================
-     SEARCH
+     QUICK ACTIONS
 ========================================================= -->
 
-<script>
+<section class="mc-section">
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
+    <div class="mc-section-title">
 
+        <div>
+            <h2>Quick Actions</h2>
 
-        const search =
-            document.getElementById(
-                "taskSearch"
-            );
+            <p>
+                Frequently used management options
+            </p>
+        </div>
 
-
-        if (!search) {
-
-            return;
-
-        }
+    </div>
 
 
-        search.addEventListener(
-            "input",
-            function () {
+    <div class="mc-actions">
 
 
-                const query =
-                    this.value
-                        .toLowerCase()
-                        .trim();
+        <a
+            href="{% url 'trainer_dashboard' %}"
+            class="mc-action"
+        >
+
+            <div class="mc-action-icon">
+                <i class="bi bi-person-workspace"></i>
+            </div>
+
+            <div>
+                <strong>My Workspace</strong>
+
+                <small>
+                    Trainer dashboard
+                </small>
+            </div>
+
+        </a>
 
 
-                const cards =
-                    document.querySelectorAll(
-                        ".task-card"
-                    );
+        <a
+            href="{% url 'trainer_attendance' %}"
+            class="mc-action"
+        >
+
+            <div class="mc-action-icon">
+                <i class="bi bi-clock-history"></i>
+            </div>
+
+            <div>
+                <strong>Attendance</strong>
+
+                <small>
+                    Check-in & work
+                </small>
+            </div>
+
+        </a>
 
 
-                cards.forEach(
-                    function(card) {
+        <a
+            href="{% url 'add_task_page' %}"
+            class="mc-action"
+        >
+
+            <div class="mc-action-icon">
+                <i class="bi bi-plus-square"></i>
+            </div>
+
+            <div>
+                <strong>Add Work</strong>
+
+                <small>
+                    Add daily task
+                </small>
+            </div>
+
+        </a>
 
 
-                        const content =
-                            (
-                                card.dataset.search ||
-                                ""
-                            ).toLowerCase();
+        <a
+            href="{% url 'calendar_view' %}"
+            class="mc-action"
+        >
+
+            <div class="mc-action-icon">
+                <i class="bi bi-calendar3"></i>
+            </div>
+
+            <div>
+                <strong>Calendar</strong>
+
+                <small>
+                    View schedule
+                </small>
+            </div>
+
+        </a>
 
 
-                        if (
-                            !query ||
-                            content.includes(query)
-                        ) {
+        <a
+            href="{% url 'workshop_list' %}"
+            class="mc-action"
+        >
 
-                            card.classList.remove(
-                                "hidden"
-                            );
+            <div class="mc-action-icon">
+                <i class="bi bi-easel2"></i>
+            </div>
 
-                        } else {
+            <div>
+                <strong>Workshops</strong>
 
-                            card.classList.add(
-                                "hidden"
-                            );
+                <small>
+                    Manage workshops
+                </small>
+            </div>
 
-                        }
+        </a>
 
-                    }
-                );
 
-            }
-        );
+        <a
+            href="{% url 'trainer_list' %}"
+            class="mc-action"
+        >
 
-    }
-);
+            <div class="mc-action-icon">
+                <i class="bi bi-people"></i>
+            </div>
 
-</script>
+            <div>
+                <strong>Trainers</strong>
 
+                <small>
+                    Trainer profiles
+                </small>
+            </div>
+
+        </a>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     STATISTICS
+========================================================= -->
+
+<section class="mc-section">
+
+    <div class="mc-section-title">
+
+        <div>
+            <h2>Today's Overview</h2>
+
+            <p>
+                Current training and team status
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="mc-stats">
+
+
+        <!-- TOTAL TRAINERS -->
+
+        <div class="mc-stat stat-purple">
+
+            <div class="mc-stat-top">
+
+                <div class="mc-stat-icon">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+
+            </div>
+
+            <div class="mc-stat-number">
+                {{ total_trainers }}
+            </div>
+
+            <div class="mc-stat-label">
+                Total Trainers
+            </div>
+
+        </div>
+
+
+        <!-- FULL TIME -->
+
+        <div class="mc-stat stat-blue">
+
+            <div class="mc-stat-top">
+
+                <div class="mc-stat-icon">
+                    <i class="bi bi-person-badge-fill"></i>
+                </div>
+
+            </div>
+
+            <div class="mc-stat-number">
+                {{ full_time_trainer_count }}
+            </div>
+
+            <div class="mc-stat-label">
+                Full-Time Trainers
+            </div>
+
+        </div>
+
+
+        <!-- WORKING -->
+
+        <div class="mc-stat stat-green">
+
+            <div class="mc-stat-top">
+
+                <div class="mc-stat-icon">
+                    <i class="bi bi-person-check-fill"></i>
+                </div>
+
+            </div>
+
+            <div class="mc-stat-number">
+                {{ working_count }}
+            </div>
+
+            <div class="mc-stat-label">
+                Working Now
+            </div>
+
+        </div>
+
+
+        <!-- NOT CHECKED IN -->
+
+        <div class="mc-stat stat-red">
+
+            <div class="mc-stat-top">
+
+                <div class="mc-stat-icon">
+                    <i class="bi bi-person-x-fill"></i>
+                </div>
+
+            </div>
+
+            <div class="mc-stat-number">
+                {{ not_checked_in_count }}
+            </div>
+
+            <div class="mc-stat-label">
+                Not Checked In
+            </div>
+
+        </div>
+
+
+        <!-- TASKS -->
+
+        <div class="mc-stat stat-orange">
+
+            <div class="mc-stat-top">
+
+                <div class="mc-stat-icon">
+                    <i class="bi bi-list-check"></i>
+                </div>
+
+            </div>
+
+            <div class="mc-stat-number">
+                {{ today_tasks|length }}
+            </div>
+
+            <div class="mc-stat-label">
+                Today's Tasks
+            </div>
+
+        </div>
+
+
+        <!-- WORKSHOPS -->
+
+        <div class="mc-stat stat-purple">
+
+            <div class="mc-stat-top">
+
+                <div class="mc-stat-icon">
+                    <i class="bi bi-easel-fill"></i>
+                </div>
+
+            </div>
+
+            <div class="mc-stat-number">
+                {{ active_workshop_count }}
+            </div>
+
+            <div class="mc-stat-label">
+                Active Workshops
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     TRAINER STATUS + TODAY EVENTS
+========================================================= -->
+
+<section class="mc-section">
+
+    <div class="mc-two-column">
+
+
+        <!-- =================================================
+             TRAINER STATUS
+        ================================================== -->
+
+        <div class="mc-card">
+
+            <div class="mc-card-header">
+
+                <div>
+
+                    <h3>
+                        <i class="bi bi-people-fill me-2"></i>
+                        Trainer Status
+                    </h3>
+
+                    <p>
+                        Today's full-time trainer attendance
+                    </p>
+
+                </div>
+
+
+                <a
+                    href="{% url 'trainer_list' %}"
+                    class="mc-btn"
+                >
+
+                    <i class="bi bi-arrow-right"></i>
+
+                    View Trainers
+
+                </a>
+
+            </div>
+
+
+            <div class="mc-card-body">
+
+                {% if trainer_status %}
+
+                    <div class="trainer-list">
+
+                        {% for item in trainer_status %}
+
+                            <div class="trainer-item">
+
+
+                                <!-- AVATAR -->
+
+                                <div class="trainer-avatar">
+
+                                    {% if item.trainer.profile_photo %}
+
+                                        <img
+                                            src="{{ item.trainer.profile_photo.url }}"
+                                            alt="{{ item.trainer.Name }}"
+                                        >
+
+                                    {% else %}
+
+                                        {{ item.trainer.Name|first|upper }}
+
+                                    {% endif %}
+
+                                </div>
+
+
+                                <!-- INFO -->
+
+                                <div class="trainer-info">
+
+                                    <p class="trainer-name">
+
+                                        {{ item.trainer.Name }}
+
+                                    </p>
+
+
+                                    <div class="trainer-meta">
+
+                                        {% if item.trainer.is_full_time %}
+                                            Full-Time Trainer
+                                        {% else %}
+                                            Trainer
+                                        {% endif %}
+
+                                    </div>
+
+
+                                    {% if item.status == "working" %}
+
+                                        <span class="status-badge status-working">
+
+                                            <span class="status-dot"></span>
+
+                                            Working
+
+                                        </span>
+
+
+                                    {% elif item.status == "checked_out" %}
+
+                                        <span class="status-badge status-out">
+
+                                            <span class="status-dot"></span>
+
+                                            Checked Out
+
+                                        </span>
+
+
+                                    {% else %}
+
+                                        <span class="status-badge status-not">
+
+                                            <span class="status-dot"></span>
+
+                                            Not Checked In
+
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+
+                                <!-- TASK COUNT -->
+
+                                <div class="trainer-work-count">
+
+                                    <strong>
+                                        {{ item.task_count }}
+                                    </strong>
+
+                                    Tasks
+
+                                    {% if item.completed_count %}
+
+                                        <br>
+
+                                        <span
+                                            style="
+                                                color:#16a34a;
+                                                font-weight:700;
+                                            "
+                                        >
+                                            {{ item.completed_count }}
+                                            completed
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                {% else %}
+
+                    <div class="mc-empty">
+
+                        <div class="mc-empty-icon">
+                            <i class="bi bi-people"></i>
+                        </div>
+
+                        <strong>
+                            No full-time trainers found
+                        </strong>
+
+                        <span>
+                            Trainer attendance will appear here.
+                        </span>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             TODAY'S EVENTS
+        ================================================== -->
+
+        <div class="mc-card">
+
+            <div class="mc-card-header">
+
+                <div>
+
+                    <h3>
+                        <i class="bi bi-calendar-event me-2"></i>
+                        Today's Events
+                    </h3>
+
+                    <p>
+                        Scheduled for {{ today|date:"d M Y" }}
+                    </p>
+
+                </div>
+
+
+                <a
+                    href="{% url 'calendar_view' %}"
+                    class="mc-btn"
+                >
+
+                    Calendar
+
+                </a>
+
+            </div>
+
+
+            <div class="mc-card-body">
+
+
+                {% if todays_events %}
+
+                    <div class="event-list">
+
+                        {% for event in todays_events %}
+
+                            <div class="event-item">
+
+                                <div class="event-date-box">
+
+                                    <span class="event-day">
+                                        {{ event.date|date:"d" }}
+                                    </span>
+
+                                    <span class="event-month">
+                                        {{ event.date|date:"M" }}
+                                    </span>
+
+                                </div>
+
+
+                                <div class="event-content">
+
+                                    <h4 class="event-title">
+
+                                        {{ event.title }}
+
+                                    </h4>
+
+
+                                    <div class="event-detail">
+
+                                        {% if event.start_time %}
+
+                                            <i class="bi bi-clock me-1"></i>
+
+                                            {{ event.start_time|time:"h:i A" }}
+
+                                            {% if event.end_time %}
+                                                -
+                                                {{ event.end_time|time:"h:i A" }}
+                                            {% endif %}
+
+                                            <br>
+
+                                        {% endif %}
+
+
+                                        {% if event.location %}
+
+                                            <i class="bi bi-geo-alt me-1"></i>
+
+                                            {{ event.location }}
+
+                                        {% endif %}
+
+
+                                        {% if event.college %}
+
+                                            <br>
+
+                                            <i class="bi bi-building me-1"></i>
+
+                                            {{ event.college }}
+
+                                        {% endif %}
+
+                                    </div>
+
+
+{% if request.user.is_superuser %}
+
+    <div class="mc-event-actions">
+
+        <a
+            href="{% url 'edit_calendar_event' event.id %}"
+            class="mc-event-action"
+        >
+            <i class="bi bi-pencil-square"></i>
+            Edit
+        </a>
+
+
+        <form
+            method="post"
+            action="{% url 'delete_calendar_event' event.id %}"
+            style="display:inline;"
+        >
+
+            {% csrf_token %}
+
+            <button
+                type="submit"
+                class="mc-event-action delete"
+                onclick="return confirm('Are you sure you want to delete this event?');"
+            >
+
+                <i class="bi bi-trash3"></i>
+                Delete
+
+            </button>
+
+        </form>
+
+    </div>
+
+{% endif %}
+
+                                </div>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                {% else %}
+
+                    <div class="mc-empty">
+
+                        <div class="mc-empty-icon">
+
+                            <i class="bi bi-calendar-x"></i>
+
+                        </div>
+
+                        <strong>
+                            No events scheduled today
+                        </strong>
+
+                        <span>
+                            Your calendar is clear for today.
+                        </span>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     UPCOMING EVENTS
+========================================================= -->
+
+<section class="mc-section">
+
+    <div class="mc-card">
+
+        <div class="mc-card-header">
+
+            <div>
+
+                <h3>
+
+                    <i class="bi bi-calendar-week me-2"></i>
+
+                    Upcoming Events
+
+                </h3>
+
+                <p>
+                    Events scheduled after today
+                </p>
+
+            </div>
+
+
+            <a
+                href="{% url 'calendar_view' %}"
+                class="mc-btn"
+            >
+
+                <i class="bi bi-calendar3"></i>
+
+                Open Calendar
+
+            </a>
+
+        </div>
+
+
+        <div class="mc-card-body">
+
+
+            {% if upcoming_events %}
+
+                <div class="event-list">
+
+                    {% for event in upcoming_events %}
+
+                        <div class="event-item">
+
+                            <div class="event-date-box">
+
+                                <span class="event-day">
+                                    {{ event.date|date:"d" }}
+                                </span>
+
+                                <span class="event-month">
+                                    {{ event.date|date:"M" }}
+                                </span>
+
+                            </div>
+
+
+                            <div class="event-content">
+
+                                <h4 class="event-title">
+
+                                    {{ event.title }}
+
+                                </h4>
+
+
+                                <div class="event-detail">
+
+                                    <strong>
+                                        {{ event.date|date:"l, d F Y" }}
+                                    </strong>
+
+                                    {% if event.start_time %}
+
+                                        <br>
+
+                                        <i class="bi bi-clock me-1"></i>
+
+                                        {{ event.start_time|time:"h:i A" }}
+
+                                        {% if event.end_time %}
+                                            -
+                                            {{ event.end_time|time:"h:i A" }}
+                                        {% endif %}
+
+                                    {% endif %}
+
+
+                                    {% if event.location %}
+
+                                        <br>
+
+                                        <i class="bi bi-geo-alt me-1"></i>
+
+                                        {{ event.location }}
+
+                                    {% endif %}
+
+                                </div>
+
+{% if request.user.is_superuser %}
+
+    <div class="mc-event-actions">
+
+        <a
+            href="{% url 'edit_calendar_event' event.id %}"
+            class="mc-event-action"
+        >
+            <i class="bi bi-pencil-square"></i>
+            Edit
+        </a>
+
+
+        <form
+            method="post"
+            action="{% url 'delete_calendar_event' event.id %}"
+            style="display:inline;"
+        >
+
+            {% csrf_token %}
+
+            <button
+                type="submit"
+                class="mc-event-action delete"
+                onclick="return confirm('Are you sure you want to delete this event?');"
+            >
+
+                <i class="bi bi-trash3"></i>
+                Delete
+
+            </button>
+
+        </form>
+
+    </div>
+
+{% endif %}
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+            {% else %}
+
+                <div class="mc-empty">
+
+                    <div class="mc-empty-icon">
+
+                        <i class="bi bi-calendar-check"></i>
+
+                    </div>
+
+                    <strong>
+                        No upcoming events
+                    </strong>
+
+                    <span>
+                        There are no future scheduled events currently.
+                    </span>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     TODAY'S TASKS + UPCOMING WORKSHOPS
+========================================================= -->
+
+<section class="mc-section">
+
+    <div class="mc-two-column">
+
+
+        <!-- =================================================
+             TODAY TASKS
+        ================================================== -->
+
+        <div class="mc-card">
+
+            <div class="mc-card-header">
+
+                <div>
+
+                    <h3>
+
+                        <i class="bi bi-check2-square me-2"></i>
+
+                        Today's Work
+
+                    </h3>
+
+                    <p>
+                        Tasks assigned for {{ today|date:"d M Y" }}
+                    </p>
+
+                </div>
+
+
+                <a
+                    href="{% url 'admin_task_dashboard' %}"
+                    class="mc-btn"
+                >
+
+                    View All
+
+                </a>
+
+            </div>
+
+
+            <div class="mc-card-body">
+
+
+                {% if today_tasks %}
+
+                    <div class="task-list">
+
+                        {% for task in today_tasks|slice:":10" %}
+
+                            <div class="task-item">
+
+                                <div class="task-status-icon">
+
+                                    {% if task.status == "completed" %}
+
+                                        <i class="bi bi-check-lg"></i>
+
+                                    {% elif task.status == "in_progress" %}
+
+                                        <i class="bi bi-arrow-repeat"></i>
+
+                                    {% else %}
+
+                                        <i class="bi bi-hourglass-split"></i>
+
+                                    {% endif %}
+
+                                </div>
+
+
+                                <div class="task-content">
+
+                                    <p class="task-title">
+
+                                        {{ task.task }}
+
+                                    </p>
+
+
+                                    <div class="task-trainer">
+
+                                        {% if task.trainer %}
+
+                                            <i class="bi bi-person me-1"></i>
+
+                                            {{ task.trainer.Name }}
+
+                                        {% else %}
+
+                                            Unassigned
+
+                                        {% endif %}
+
+                                        {% if task.category %}
+
+                                            &nbsp; • &nbsp;
+
+                                            {{ task.get_category_display }}
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+
+                                {% if task.status == "completed" %}
+
+                                    <span class="task-status task-completed">
+                                        Completed
+                                    </span>
+
+                                {% elif task.status == "in_progress" %}
+
+                                    <span class="task-status task-progress">
+                                        In Progress
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="task-status task-pending">
+                                        Pending
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                {% else %}
+
+                    <div class="mc-empty">
+
+                        <div class="mc-empty-icon">
+
+                            <i class="bi bi-check2-all"></i>
+
+                        </div>
+
+                        <strong>
+                            No tasks for today
+                        </strong>
+
+                        <span>
+                            New work will appear here.
+                        </span>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             UPCOMING WORKSHOPS
+        ================================================== -->
+
+        <div class="mc-card">
+
+            <div class="mc-card-header">
+
+                <div>
+
+                    <h3>
+
+                        <i class="bi bi-easel2 me-2"></i>
+
+                        Upcoming Workshops
+
+                    </h3>
+
+                    <p>
+                        Next scheduled training programs
+                    </p>
+
+                </div>
+
+
+                <a
+                    href="{% url 'workshop_list' %}"
+                    class="mc-btn"
+                >
+
+                    View All
+
+                </a>
+
+            </div>
+
+
+            <div class="mc-card-body">
+
+
+                {% if upcoming_workshops %}
+
+                    <div class="event-list">
+
+                        {% for workshop in upcoming_workshops|slice:":8" %}
+
+                            <div class="event-item">
+
+                                <div class="event-date-box">
+
+                                    <span class="event-day">
+
+                                        {{ workshop.start_date|date:"d" }}
+
+                                    </span>
+
+                                    <span class="event-month">
+
+                                        {{ workshop.start_date|date:"M" }}
+
+                                    </span>
+
+                                </div>
+
+
+                                <div class="event-content">
+
+                                    <h4 class="event-title">
+
+                                        {{ workshop.title }}
+
+                                    </h4>
+
+
+                                    <div class="event-detail">
+
+                                        <strong>
+
+                                            {{ workshop.start_date|date:"d M Y" }}
+
+                                            {% if workshop.end_date %}
+                                                -
+                                                {{ workshop.end_date|date:"d M Y" }}
+                                            {% endif %}
+
+                                        </strong>
+
+
+                                        {% if workshop.college %}
+
+                                            <br>
+
+                                            <i class="bi bi-building me-1"></i>
+
+                                            {{ workshop.college }}
+
+                                        {% endif %}
+
+
+                                        {% if workshop.departments %}
+
+                                            <br>
+
+                                            <i class="bi bi-diagram-3 me-1"></i>
+
+                                            {{ workshop.departments }}
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                {% else %}
+
+                    <div class="mc-empty">
+
+                        <div class="mc-empty-icon">
+
+                            <i class="bi bi-easel"></i>
+
+                        </div>
+
+                        <strong>
+                            No upcoming workshops
+                        </strong>
+
+                        <span>
+                            Upcoming training programs will appear here.
+                        </span>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     MOTIVATIONAL STORY
+========================================================= -->
+
+<section class="mc-section">
+
+    <div class="mc-story">
+
+        <div class="mc-story-label">
+
+            <i class="bi bi-lightbulb-fill me-1"></i>
+
+            Today's Thought
+
+        </div>
+
+
+        {% if story %}
+
+            <h2 class="mc-story-title">
+
+                {{ story.title }}
+
+            </h2>
+
+
+            <p class="mc-story-text">
+
+                "{{ story.text }}"
+
+            </p>
+
+        {% else %}
+
+            <h2 class="mc-story-title">
+
+                Keep Moving Forward
+
+            </h2>
+
+
+            <p class="mc-story-text">
+
+                Every workshop, every learner and every completed task
+                contributes to the bigger journey of Mevi Technologies.
+
+            </p>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     MANAGEMENT OPTIONS
+========================================================= -->
+
+<section class="mc-section">
+
+    <div class="mc-section-title">
+
+        <div>
+
+            <h2>Management</h2>
+
+            <p>
+                Access the main areas of Mevi Management
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="management-grid">
+
+
+        <!-- TRAINERS -->
+
+        <a
+            href="{% url 'trainer_list' %}"
+            class="management-card"
+        >
+
+            <div class="management-icon">
+
+                <i class="bi bi-people-fill"></i>
+
+            </div>
+
+            <div class="management-title">
+
+                Trainer Management
+
+            </div>
+
+            <div class="management-text">
+
+                View trainer profiles, availability and
+                trainer information.
+
+            </div>
+
+        </a>
+
+
+        <!-- WORKSHOPS -->
+
+        <a
+            href="{% url 'workshop_list' %}"
+            class="management-card"
+        >
+
+            <div class="management-icon">
+
+                <i class="bi bi-easel2-fill"></i>
+
+            </div>
+
+            <div class="management-title">
+
+                Workshop Management
+
+            </div>
+
+            <div class="management-text">
+
+                Manage upcoming, ongoing and completed
+                workshops.
+
+            </div>
+
+        </a>
+
+
+        <!-- CALENDAR -->
+
+        <a
+            href="{% url 'calendar_view' %}"
+            class="management-card"
+        >
+
+            <div class="management-icon">
+
+                <i class="bi bi-calendar3"></i>
+
+            </div>
+
+            <div class="management-title">
+
+                Calendar
+
+            </div>
+
+            <div class="management-text">
+
+                Manage workshops, meetings, FDPs and
+                scheduled events.
+
+            </div>
+
+        </a>
+
+
+        <!-- WEEKLY -->
+
+        <a
+            href="{% url 'weekly_schedule' %}"
+            class="management-card"
+        >
+
+            <div class="management-icon">
+
+                <i class="bi bi-calendar-week"></i>
+
+            </div>
+
+            <div class="management-title">
+
+                Weekly Schedule
+
+            </div>
+
+            <div class="management-text">
+
+                See the complete weekly training
+                schedule.
+
+            </div>
+
+        </a>
+
+
+        <!-- TASKS -->
+
+        <a
+            href="{% url 'admin_task_dashboard' %}"
+            class="management-card"
+        >
+
+            <div class="management-icon">
+
+                <i class="bi bi-list-check"></i>
+
+            </div>
+
+            <div class="management-title">
+
+                Task Management
+
+            </div>
+
+            <div class="management-text">
+
+                Track pending, in-progress and completed
+                work.
+
+            </div>
+
+        </a>
+
+
+        <!-- TRAINER WORKSPACE -->
+
+        <a
+            href="{% url 'trainer_dashboard' %}"
+            class="management-card"
+        >
+
+            <div class="management-icon">
+
+                <i class="bi bi-person-workspace"></i>
+
+            </div>
+
+            <div class="management-title">
+
+                Trainer Workspace
+
+            </div>
+
+            <div class="management-text">
+
+                Open your personal trainer dashboard,
+                attendance and daily work.
+
+            </div>
+
+        </a>
+
+
+        <!-- ATTENDANCE -->
+
+        <a
+            href="{% url 'trainer_attendance' %}"
+            class="management-card"
+        >
+
+            <div class="management-icon">
+
+                <i class="bi bi-clock-history"></i>
+
+            </div>
+
+            <div class="management-title">
+
+                Attendance & Learning
+
+            </div>
+
+            <div class="management-text">
+
+                Check attendance, add daily work and
+                record learning.
+
+            </div>
+
+        </a>
+
+
+        <!-- ADD WORK -->
+
+        <a
+            href="{% url 'add_task_page' %}"
+            class="management-card"
+        >
+
+            <div class="management-icon">
+
+                <i class="bi bi-plus-circle-fill"></i>
+
+            </div>
+
+            <div class="management-title">
+
+                Add Work
+
+            </div>
+
+            <div class="management-text">
+
+                Add a new task, preparation work or
+                development activity.
+
+            </div>
+
+        </a>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+
+<div
+    style="
+        text-align:center;
+        margin-top:40px;
+        padding-top:22px;
+        border-top:1px solid #e4e7ec;
+        color:#98a2b3;
+        font-size:13px;
+    "
+>
+
+    <strong style="color:#667085;">
+        Mevi Technologies
+    </strong>
+
+    &nbsp; • &nbsp;
+
+    Training & Development Management System
+
+    &nbsp; • &nbsp;
+
+    {{ today|date:"Y" }}
+
+</div>
+
+
+</div>
 
 {% endblock %}

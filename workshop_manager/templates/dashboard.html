@@ -1,88 +1,71 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Mevi Management Dashboard{% endblock %}
+{% block title %}
+Mevi Management Dashboard
+{% endblock %}
 
-{% block content %}
+{% block extra_css %}
 
 <style>
 
 /* =========================================================
-   MEVI DASHBOARD
-========================================================= */
-
-
-
-/* =========================================================
    MEVI MANAGEMENT DASHBOARD
-   PREMIUM • CLEAN • LARGE TYPOGRAPHY • RESPONSIVE
+   LARGE TYPOGRAPHY + BASE SIDEBAR COMPATIBLE
 ========================================================= */
-
-:root {
-    --mevi-primary: #5B4BDB;
-    --mevi-primary-dark: #4338CA;
-    --mevi-secondary: #7C3AED;
-    --mevi-pink: #EC4899;
-    --mevi-blue: #2563EB;
-
-    --mevi-green: #16A34A;
-    --mevi-orange: #F59E0B;
-    --mevi-red: #DC2626;
-
-    --dark: #172033;
-    --dark-soft: #344054;
-    --muted: #667085;
-    --muted-light: #98A2B3;
-
-    --border: #E7E9F0;
-    --background: #F6F7FB;
-    --white: #FFFFFF;
-
-    --radius-sm: 12px;
-    --radius-md: 16px;
-    --radius-lg: 21px;
-    --radius-xl: 30px;
-
-    --shadow:
-        0 8px 28px rgba(16, 24, 40, .055);
-
-    --shadow-hover:
-        0 18px 42px rgba(16, 24, 40, .11);
-}
-
-
-/* =========================================================
-   GLOBAL
-========================================================= */
-
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-
-    background:
-        linear-gradient(
-            180deg,
-            #F7F8FC 0%,
-            #FFFFFF 100%
-        ) !important;
-
-    color: var(--dark-soft);
-
-    font-size: 16px;
-}
 
 .mevi-dashboard {
     width: 100%;
     max-width: 1750px;
-
     margin: 0 auto;
+    padding: 30px 34px 70px;
+    color: #172033;
+}
 
-    padding:
-        32px
-        36px
-        65px;
+
+/* =========================================================
+   GLOBAL TYPOGRAPHY
+========================================================= */
+
+.mevi-dashboard h1 {
+    font-size: 38px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.mevi-dashboard h2 {
+    font-size: 30px;
+    font-weight: 800;
+}
+
+.mevi-dashboard h3 {
+    font-size: 24px;
+    font-weight: 750;
+}
+
+.mevi-dashboard h4 {
+    font-size: 21px;
+    font-weight: 750;
+}
+
+.mevi-dashboard h5 {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.mevi-dashboard p,
+.mevi-dashboard span,
+.mevi-dashboard div {
+    letter-spacing: .05px;
+}
+
+.dashboard-small {
+    font-size: 15px;
+}
+
+.dashboard-muted {
+    color: #667085;
+    font-size: 15px;
 }
 
 
@@ -91,201 +74,328 @@ body {
 ========================================================= */
 
 .mevi-hero {
+
     position: relative;
 
     overflow: hidden;
 
-    min-height: 285px;
+    min-height: 250px;
 
-    padding:
-        46px
-        52px;
+    padding: 42px 48px;
 
     margin-bottom: 30px;
 
-    color: white;
+    border-radius: 26px;
 
-    border-radius: var(--radius-xl);
+    color: white;
 
     background:
         radial-gradient(
-            circle at 90% 8%,
+            circle at 90% 10%,
             rgba(255,255,255,.20),
             transparent 25%
         ),
 
         radial-gradient(
-            circle at 8% 90%,
-            rgba(255,255,255,.13),
+            circle at 10% 90%,
+            rgba(255,255,255,.12),
             transparent 30%
         ),
 
         linear-gradient(
             135deg,
-            #4438CA 0%,
-            #6246D9 43%,
-            #A43BC7 100%
+            #4438CA,
+            #6246D9 45%,
+            #A43BC7
         );
 
     box-shadow:
-        0 24px 60px
-        rgba(91,75,219,.20);
+        0 20px 55px rgba(91,75,219,.20);
 }
 
-.mevi-hero::before {
-    content: "";
 
-    position: absolute;
+.mevi-hero h1 {
 
-    width: 360px;
-    height: 360px;
+    margin: 0 0 12px;
 
-    right: -125px;
-    top: -155px;
+    color: white;
 
-    border-radius: 50%;
+    font-size: 40px;
 
-    border:
-        58px solid
-        rgba(255,255,255,.055);
+    font-weight: 800;
 }
 
-.mevi-hero::after {
-    content: "✦";
 
-    position: absolute;
+.mevi-hero p {
 
-    right: 13%;
-    bottom: 12px;
+    margin: 0;
 
-    font-size: 110px;
+    font-size: 18px;
 
-    color:
-        rgba(255,255,255,.055);
-
-    transform:
-        rotate(15deg);
+    opacity: .92;
 }
 
-.hero-content {
-    position: relative;
 
-    z-index: 3;
+.hero-date {
 
-    max-width: 1050px;
+    margin-top: 12px !important;
+
+    font-size: 16px !important;
+
+    opacity: .80 !important;
 }
 
-.hero-topline {
+
+/* =========================================================
+   HERO BUTTONS
+========================================================= */
+
+.hero-actions {
+
     display: flex;
-
-    align-items: center;
 
     flex-wrap: wrap;
 
-    gap: 10px;
+    gap: 12px;
 
-    margin-bottom: 14px;
+    margin-top: 28px;
+}
+
+
+.hero-actions .btn {
+
+    padding: 12px 20px;
+
+    border-radius: 11px;
 
     font-size: 16px;
 
     font-weight: 700;
-
-    letter-spacing: .2px;
-
-    opacity: .96;
 }
 
-.hero-title {
-    margin: 0;
+
+/* =========================================================
+   TRAINER WORKSPACE FEATURE
+========================================================= */
+
+.trainer-workspace-card {
+
+    position: relative;
+
+    height: 100%;
+
+    padding: 30px;
+
+    border-radius: 22px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f5f3ff,
+            #ffffff
+        );
+
+    border: 1px solid #e3defe;
+
+    box-shadow:
+        0 10px 35px rgba(15,23,42,.07);
+
+    transition: .25s ease;
+}
+
+
+.trainer-workspace-card:hover {
+
+    transform: translateY(-4px);
+
+    box-shadow:
+        0 18px 40px rgba(15,23,42,.12);
+}
+
+
+.workspace-icon {
+
+    width: 64px;
+
+    height: 64px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    margin-bottom: 18px;
+
+    border-radius: 17px;
+
+    background: #5B4BDB;
 
     color: white;
 
-    font-size: 48px;
-
-    line-height: 1.1;
-
-    font-weight: 850;
-
-    letter-spacing: -1.4px;
+    font-size: 28px;
 }
 
-.hero-title .name {
-    color: #FFE5F7;
+
+.trainer-workspace-card h3 {
+
+    margin-bottom: 9px;
+
+    font-size: 25px;
 }
 
-.hero-message {
-    max-width: 1000px;
 
-    margin:
-        18px
-        0
-        0;
+.trainer-workspace-card p {
 
-    color:
-        rgba(255,255,255,.95);
+    margin-bottom: 20px;
 
-    font-size: 18px;
+    color: #667085;
 
-    line-height: 1.7;
-}
-
-.hero-thought {
-    display: inline-flex;
-
-    align-items: flex-start;
-
-    gap: 11px;
-
-    max-width: 900px;
-
-    margin-top: 23px;
-
-    padding:
-        14px
-        19px;
-
-    border:
-        1px solid
-        rgba(255,255,255,.15);
-
-    border-radius: 15px;
-
-    background:
-        rgba(255,255,255,.105);
-
-    backdrop-filter:
-        blur(10px);
-
-    font-size: 14px;
+    font-size: 16px;
 
     line-height: 1.6;
 }
 
-.hero-date {
-    display: inline-flex;
+
+/* =========================================================
+   STAT CARDS
+========================================================= */
+
+.dashboard-stat {
+
+    height: 100%;
+
+    padding: 24px;
+
+    border-radius: 20px;
+
+    background: white;
+
+    border: 1px solid #E7E9F0;
+
+    box-shadow:
+        0 8px 28px rgba(16,24,40,.055);
+
+    transition: .25s ease;
+}
+
+
+.dashboard-stat:hover {
+
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 15px 35px rgba(16,24,40,.10);
+}
+
+
+.stat-top {
+
+    display: flex;
 
     align-items: center;
 
-    gap: 8px;
+    justify-content: space-between;
 
-    margin-top: 19px;
+    margin-bottom: 17px;
+}
 
-    padding:
-        9px
-        15px;
 
-    border:
-        1px solid
-        rgba(255,255,255,.16);
+.stat-icon {
 
-    border-radius: 999px;
+    width: 54px;
 
-    background:
-        rgba(255,255,255,.12);
+    height: 54px;
 
-    font-size: 13px;
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 15px;
+
+    background: #f1efff;
+
+    color: #5B4BDB;
+
+    font-size: 23px;
+}
+
+
+.stat-number {
+
+    font-size: 34px;
+
+    line-height: 1;
+
+    font-weight: 800;
+
+    color: #172033;
+}
+
+
+.stat-title {
+
+    margin-top: 10px;
+
+    font-size: 17px;
 
     font-weight: 700;
+
+    color: #344054;
+}
+
+
+.stat-description {
+
+    margin-top: 5px;
+
+    font-size: 14px;
+
+    color: #667085;
+}
+
+
+/* =========================================================
+   SECTION HEADER
+========================================================= */
+
+.dashboard-section {
+
+    margin-top: 34px;
+}
+
+
+.section-heading {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 18px;
+}
+
+
+.section-heading h2 {
+
+    margin: 0;
+
+    font-size: 25px;
+}
+
+
+.section-heading p {
+
+    margin: 4px 0 0;
+
+    color: #667085;
+
+    font-size: 15px;
 }
 
 
@@ -293,594 +403,183 @@ body {
    QUICK ACTIONS
 ========================================================= */
 
-.quick-actions {
-    display: flex;
-
-    flex-wrap: wrap;
-
-    gap: 13px;
-
-    margin-bottom: 38px;
-}
-
 .quick-action {
-    display: inline-flex;
+
+    display: flex;
 
     align-items: center;
 
-    justify-content: center;
+    gap: 16px;
 
-    gap: 9px;
+    height: 100%;
 
-    min-height: 51px;
-
-    padding:
-        0
-        21px;
-
-    border:
-        1px solid
-        var(--border);
-
-    border-radius: 14px;
+    padding: 22px;
 
     background: white;
 
-    color: var(--dark-soft);
+    border: 1px solid #E7E9F0;
+
+    border-radius: 18px;
 
     text-decoration: none;
 
-    font-size: 14px;
+    color: #172033;
 
-    font-weight: 750;
-
-    box-shadow:
-        0 4px 15px
-        rgba(16,24,40,.035);
-
-    transition:
-        transform .2s ease,
-        box-shadow .2s ease,
-        border-color .2s ease,
-        color .2s ease;
+    transition: .2s ease;
 }
+
 
 .quick-action:hover {
-    transform:
-        translateY(-3px);
 
-    color:
-        var(--mevi-primary);
+    transform: translateY(-3px);
 
-    border-color:
-        #D7D1FF;
+    color: #172033;
 
     box-shadow:
-        0 10px 25px
-        rgba(91,75,219,.11);
-}
-
-.quick-action.primary {
-    color: white;
-
-    border-color: transparent;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--mevi-primary),
-            var(--mevi-secondary)
-        );
-
-    box-shadow:
-        0 8px 22px
-        rgba(91,75,219,.20);
+        0 14px 30px rgba(16,24,40,.09);
 }
 
 
-/* =========================================================
-   SECTION HEADINGS
-========================================================= */
+.quick-action-icon {
 
-.dashboard-section {
-    margin-bottom: 40px;
-}
+    width: 52px;
 
-.section-heading {
-    display: flex;
+    height: 52px;
 
-    align-items: flex-end;
+    min-width: 52px;
 
-    justify-content: space-between;
-
-    gap: 20px;
-
-    margin-bottom: 18px;
-}
-
-.section-title {
-    margin: 0;
-
-    color: var(--dark);
-
-    font-size: 30px;
-
-    line-height: 1.25;
-
-    font-weight: 850;
-
-    letter-spacing: -.45px;
-}
-
-.section-subtitle {
-    margin:
-        6px
-        0
-        0;
-
-    color: var(--muted);
-
-    font-size: 16px;
-
-    line-height: 1.6;
-}
-
-
-/* =========================================================
-   SNAPSHOT
-========================================================= */
-
-.snapshot-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(8, minmax(0, 1fr));
-
-    gap: 15px;
-}
-
-.snapshot-card {
-    min-height: 155px;
-
-    padding: 21px;
-
-    border:
-        1px solid
-        var(--border);
-
-    border-radius: 19px;
-
-    background: white;
-
-    box-shadow:
-        var(--shadow);
-
-    transition:
-        transform .2s ease,
-        box-shadow .2s ease;
-}
-
-.snapshot-card:hover {
-    transform:
-        translateY(-5px);
-
-    box-shadow:
-        var(--shadow-hover);
-}
-
-.snapshot-icon {
     display: flex;
 
     align-items: center;
 
     justify-content: center;
 
-    width: 45px;
-    height: 45px;
+    border-radius: 14px;
 
-    margin-bottom: 15px;
+    background: #f3f1ff;
 
-    border-radius: 13px;
-
-    background:
-        #F1EFFF;
+    color: #5B4BDB;
 
     font-size: 22px;
 }
 
-.snapshot-value {
-    color: var(--dark);
 
-    font-size: 32px;
+.quick-action-title {
 
-    line-height: 1;
+    font-size: 17px;
 
-    font-weight: 850;
+    font-weight: 750;
+
+    margin-bottom: 4px;
 }
 
-.snapshot-label {
-    margin-top: 9px;
 
-    color: var(--muted);
+.quick-action-text {
+
+    color: #667085;
 
     font-size: 14px;
 
-    line-height: 1.4;
-
-    font-weight: 650;
+    line-height: 1.45;
 }
 
 
 /* =========================================================
-   TWO COLUMN
+   GENERAL PANEL
 ========================================================= */
 
-.two-column {
-    display: grid;
+.dashboard-panel {
 
-    grid-template-columns:
-        minmax(0, 1.55fr)
-        minmax(340px, .75fr);
+    height: 100%;
 
-    gap: 22px;
-}
-
-
-/* =========================================================
-   COMMON CARD
-========================================================= */
-
-.dashboard-card,
-.schedule-card,
-.calendar-card {
     overflow: hidden;
 
-    border:
-        1px solid
-        var(--border);
+    border-radius: 21px;
 
-    border-radius:
-        var(--radius-lg);
+    background: white;
 
-    background:
-        rgba(255,255,255,.98);
+    border: 1px solid #E7E9F0;
 
     box-shadow:
-        var(--shadow);
-
-    transition:
-        box-shadow .2s ease;
+        0 8px 28px rgba(16,24,40,.055);
 }
 
-.dashboard-card:hover,
-.schedule-card:hover,
-.calendar-card:hover {
-    box-shadow:
-        0 13px 35px
-        rgba(16,24,40,.08);
-}
 
-.card-header {
-    padding:
-        23px
-        25px;
+.panel-header {
 
-    border-bottom:
-        1px solid
-        var(--border);
-}
-
-.card-header-row {
     display: flex;
 
     align-items: center;
 
     justify-content: space-between;
 
-    gap: 15px;
+    padding: 21px 24px;
+
+    border-bottom: 1px solid #E7E9F0;
 }
 
-.card-title {
+
+.panel-header h3 {
+
     margin: 0;
 
-    color: var(--dark);
-
-    font-size: 20px;
-
-    line-height: 1.35;
-
-    font-weight: 850;
+    font-size: 21px;
 }
 
-.card-description {
-    margin-top: 7px;
 
-    color: var(--muted);
+.panel-body {
 
-    font-size: 14px;
-
-    line-height: 1.5;
-}
-
-.card-body {
-    padding:
-        22px
-        25px;
+    padding: 22px 24px;
 }
 
 
 /* =========================================================
-   TEAM TABLE
+   ATTENDANCE
 ========================================================= */
 
-.team-table-wrap {
-    width: 100%;
+.attendance-person {
 
-    overflow-x: auto;
+    display: flex;
 
-    border-radius: 12px;
+    align-items: center;
+
+    gap: 14px;
+
+    padding: 15px 0;
+
+    border-bottom: 1px solid #f0f1f4;
 }
 
-.team-table {
-    width: 100%;
 
-    min-width: 920px;
+.attendance-person:last-child {
 
-    border-collapse:
-        collapse;
-}
-
-.team-table th {
-    padding:
-        14px
-        12px;
-
-    text-align: left;
-
-    color: var(--muted-light);
-
-    background:
-        #FAFBFC;
-
-    border-bottom:
-        1px solid
-        var(--border);
-
-    font-size: 13px;
-
-    font-weight: 800;
-
-    text-transform:
-        uppercase;
-
-    letter-spacing:
-        .7px;
-}
-
-.team-table td {
-    padding:
-        17px
-        12px;
-
-    color:
-        var(--dark-soft);
-
-    border-bottom:
-        1px solid
-        #F1F2F5;
-
-    font-size: 14px;
-
-    line-height: 1.5;
-
-    vertical-align:
-        middle;
-}
-
-.team-table tr:last-child td {
     border-bottom: none;
 }
 
-.team-table tbody tr {
-    transition:
-        background .18s ease;
-}
 
-.team-table tbody tr:hover {
-    background:
-        #FBFAFF;
-}
+.trainer-photo {
 
-.trainer-name {
-    color: var(--dark);
+    width: 48px;
 
-    font-size: 15px;
+    height: 48px;
 
-    font-weight: 800;
-}
-
-.trainer-role {
-    display: block;
-
-    max-width: 220px;
-
-    margin-top: 4px;
-
-    overflow: hidden;
-
-    color:
-        var(--muted-light);
-
-    font-size: 13px;
-
-    text-overflow: ellipsis;
-
-    white-space: nowrap;
-}
-
-
-/* =========================================================
-   STATUS
-========================================================= */
-
-.status-pill {
-    display: inline-flex;
-
-    align-items: center;
-
-    gap: 7px;
-
-    padding:
-        7px
-        11px;
-
-    border-radius:
-        999px;
-
-    font-size: 13px;
-
-    font-weight: 800;
-}
-
-.status-dot {
-    width: 7px;
-    height: 7px;
+    min-width: 48px;
 
     border-radius: 50%;
 
-    background:
-        currentColor;
-}
+    object-fit: cover;
 
-.status-working {
-    color: #15803D;
-
-    background:
-        #ECFDF3;
-}
-
-.status-not {
-    color: #B45309;
-
-    background:
-        #FFFBEB;
-}
-
-.status-out {
-    color: #667085;
-
-    background:
-        #F2F4F7;
+    border: 2px solid #eee;
 }
 
 
-/* =========================================================
-   ACTIVITY
-========================================================= */
+.trainer-placeholder {
 
-.activity-box {
-    display: inline-flex;
+    width: 48px;
 
-    align-items: center;
+    height: 48px;
 
-    gap: 7px;
-
-    padding:
-        7px
-        11px;
-
-    border-radius: 9px;
-
-    background:
-        #F5F3FF;
-
-    color:
-        var(--mevi-primary);
-
-    font-size: 13px;
-
-    font-weight: 800;
-}
-
-.activity-number {
-    font-size: 16px;
-}
-
-.activity-completed {
-    margin-left: 4px;
-
-    color:
-        var(--mevi-green);
-
-    font-size: 13px;
-}
-
-.last-activity {
-    max-width: 280px;
-
-    overflow: hidden;
-
-    color:
-        var(--muted);
-
-    font-size: 14px;
-
-    text-overflow: ellipsis;
-
-    white-space: nowrap;
-}
-
-
-/* =========================================================
-   ATTENTION
-========================================================= */
-
-.attention-list {
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 13px;
-}
-
-.attention-item {
-    display: flex;
-
-    align-items: flex-start;
-
-    gap: 13px;
-
-    padding: 15px;
-
-    border:
-        1px solid
-        #EFF0F3;
-
-    border-radius: 15px;
-
-    background:
-        #FCFCFD;
-
-    transition:
-        transform .2s ease,
-        box-shadow .2s ease;
-}
-
-.attention-item:hover {
-    transform:
-        translateY(-2px);
-
-    box-shadow:
-        0 7px 20px
-        rgba(16,24,40,.06);
-}
-
-.attention-icon {
-    flex:
-        0 0 42px;
-
-    width: 42px;
-    height: 42px;
+    min-width: 48px;
 
     display: flex;
 
@@ -888,171 +587,139 @@ body {
 
     justify-content: center;
 
-    border-radius: 12px;
+    border-radius: 50%;
 
-    background:
-        #FFF7ED;
+    background: #eeeafe;
 
-    font-size: 21px;
-}
-
-.attention-title {
-    color: var(--dark);
-
-    font-size: 14px;
-
-    line-height: 1.45;
+    color: #5B4BDB;
 
     font-weight: 800;
+
+    font-size: 18px;
 }
 
-.attention-text {
-    margin-top: 5px;
 
-    color: var(--muted);
+.trainer-name {
+
+    font-size: 16px;
+
+    font-weight: 750;
+}
+
+
+.trainer-role {
+
+    margin-top: 3px;
+
+    color: #667085;
 
     font-size: 14px;
-
-    line-height: 1.55;
 }
 
-.all-good {
-    background:
-        #F0FDF4;
 
-    border-color:
-        #DCFCE7;
+.status-badge {
+
+    margin-left: auto;
+
+    padding: 7px 12px;
+
+    border-radius: 30px;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
 }
 
-.all-good .attention-icon {
-    background:
-        #DCFCE7;
+
+.status-working {
+
+    background: #eaf8ef;
+
+    color: #18733b;
+}
+
+
+.status-out {
+
+    background: #f1f3f5;
+
+    color: #5f6368;
+}
+
+
+.status-not {
+
+    background: #fff0f0;
+
+    color: #b42318;
 }
 
 
 /* =========================================================
-   UPCOMING SCHEDULE
+   TASK LIST
 ========================================================= */
 
-.schedule-wrap {
-    overflow-x: auto;
+.task-item {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 14px;
+
+    padding: 16px 0;
+
+    border-bottom: 1px solid #f0f1f4;
 }
 
-.schedule-table {
-    width: 100%;
 
-    min-width: 1050px;
+.task-item:last-child {
 
-    border-collapse:
-        collapse;
-}
-
-.schedule-table th {
-    padding:
-        15px
-        16px;
-
-    text-align: left;
-
-    color: var(--muted);
-
-    background:
-        #FAFBFC;
-
-    border-bottom:
-        1px solid
-        var(--border);
-
-    font-size: 13px;
-
-    font-weight: 800;
-
-    text-transform:
-        uppercase;
-
-    letter-spacing:
-        .6px;
-}
-
-.schedule-table td {
-    padding:
-        17px
-        16px;
-
-    color:
-        var(--dark-soft);
-
-    border-bottom:
-        1px solid
-        #F1F2F5;
-
-    font-size: 15px;
-
-    line-height: 1.5;
-}
-
-.schedule-table tr:last-child td {
     border-bottom: none;
 }
 
-.schedule-table tbody tr {
-    transition:
-        background .18s ease;
-}
 
-.schedule-table tbody tr:hover {
-    background:
-        #FBFAFF;
-}
+.task-check {
 
-.schedule-date {
-    color: var(--dark);
+    width: 38px;
 
-    font-size: 16px;
+    height: 38px;
 
-    font-weight: 850;
-}
+    min-width: 38px;
 
-.schedule-day {
-    margin-top: 3px;
-
-    color:
-        var(--muted-light);
-
-    font-size: 14px;
-}
-
-.program-name {
-    color: var(--dark);
-
-    font-size: 16px;
-
-    font-weight: 800;
-}
-
-.type-badge {
-    display: inline-flex;
+    display: flex;
 
     align-items: center;
 
-    padding:
-        7px
-        10px;
+    justify-content: center;
 
-    border-radius: 8px;
+    border-radius: 11px;
 
-    background:
-        #F2F0FF;
+    background: #f3f1ff;
 
-    color:
-        var(--mevi-primary);
+    color: #5B4BDB;
 
-    font-size: 12px;
+    font-size: 17px;
+}
 
-    font-weight: 800;
 
-    text-transform:
-        capitalize;
+.task-title {
+
+    font-size: 16px;
+
+    font-weight: 700;
+}
+
+
+.task-meta {
+
+    margin-top: 5px;
+
+    color: #667085;
+
+    font-size: 14px;
 }
 
 
@@ -1060,460 +727,115 @@ body {
    WORKSHOP CARDS
 ========================================================= */
 
-.workshop-grid {
-    display: grid;
+.workshop-card {
 
-    grid-template-columns:
-        repeat(3, minmax(0, 1fr));
+    height: 100%;
 
-    gap: 18px;
+    padding: 21px;
+
+    border-radius: 18px;
+
+    background: white;
+
+    border: 1px solid #E7E9F0;
+
+    transition: .2s ease;
 }
 
-.workshop-card {
-    position: relative;
 
-    min-height: 215px;
+.workshop-card:hover {
 
-    padding:
-        24px;
+    transform: translateY(-3px);
 
-    overflow: hidden;
+    box-shadow:
+        0 13px 30px rgba(16,24,40,.09);
+}
 
-    border:
-        1px solid
-        var(--border);
+
+.workshop-title {
+
+    font-size: 18px;
+
+    font-weight: 750;
+
+    line-height: 1.35;
+}
+
+
+.workshop-meta {
+
+    margin-top: 9px;
+
+    color: #667085;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   MANAGEMENT OPTIONS
+========================================================= */
+
+.management-card {
+
+    height: 100%;
+
+    padding: 24px;
 
     border-radius: 19px;
 
-    background:
-        white;
+    border: 1px solid #E7E9F0;
+
+    background: white;
+
+    text-decoration: none;
+
+    color: #172033;
+
+    transition: .2s ease;
+}
+
+
+.management-card:hover {
+
+    color: #172033;
+
+    transform: translateY(-3px);
 
     box-shadow:
-        0 5px 20px
-        rgba(16,24,40,.04);
-
-    transition:
-        transform .2s ease,
-        box-shadow .2s ease;
+        0 14px 30px rgba(16,24,40,.09);
 }
 
-.workshop-card::before {
-    content: "";
 
-    position: absolute;
+.management-card i {
 
-    left: 0;
-    top: 0;
-    bottom: 0;
+    font-size: 27px;
 
-    width: 5px;
-
-    background:
-        linear-gradient(
-            180deg,
-            var(--mevi-primary),
-            var(--mevi-pink)
-        );
+    color: #5B4BDB;
 }
 
-.workshop-card:hover {
-    transform:
-        translateY(-5px);
 
-    box-shadow:
-        var(--shadow-hover);
+.management-card h4 {
+
+    margin-top: 14px;
+
+    margin-bottom: 5px;
+
+    font-size: 18px;
 }
 
-.workshop-date {
-    color:
-        var(--mevi-primary);
 
-    font-size: 14px;
+.management-card p {
 
-    font-weight: 850;
+    margin: 0;
 
-    text-transform:
-        uppercase;
-
-    letter-spacing:
-        .25px;
-}
-
-.workshop-title {
-    margin:
-        11px
-        0
-        14px;
-
-    color:
-        var(--dark);
-
-    font-size: 19px;
-
-    line-height: 1.45;
-
-    font-weight: 850;
-}
-
-.workshop-info {
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 9px;
-
-    color:
-        var(--muted);
+    color: #667085;
 
     font-size: 14px;
 
     line-height: 1.5;
-}
-
-
-/* =========================================================
-   MASTER CALENDAR
-========================================================= */
-
-.calendar-card {
-    overflow: hidden;
-}
-
-.calendar-toolbar {
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    flex-wrap: wrap;
-
-    gap: 16px;
-
-    padding:
-        22px
-        25px;
-
-    border-bottom:
-        1px solid
-        var(--border);
-}
-
-.calendar-heading {
-    color:
-        var(--dark);
-
-    font-size: 22px;
-
-    font-weight: 850;
-}
-
-.calendar-description {
-    margin-top: 5px;
-
-    color:
-        var(--muted);
-
-    font-size: 14px;
-
-    line-height: 1.5;
-}
-
-.calendar-filter {
-    min-width: 195px;
-
-    padding:
-        11px
-        13px;
-
-    border:
-        1px solid
-        var(--border);
-
-    border-radius: 10px;
-
-    outline: none;
-
-    background:
-        white;
-
-    color:
-        var(--dark-soft);
-
-    font-size: 14px;
-
-    font-weight: 600;
-
-    cursor: pointer;
-}
-
-.calendar-filter:focus {
-    border-color:
-        var(--mevi-primary);
-
-    box-shadow:
-        0 0 0 3px
-        rgba(91,75,219,.10);
-}
-
-#calendar {
-    padding: 24px;
-}
-
-.calendar-legend {
-    display: flex;
-
-    flex-wrap: wrap;
-
-    gap: 17px;
-
-    padding:
-        16px
-        25px;
-
-    border-top:
-        1px solid
-        var(--border);
-
-    background:
-        #FAFBFC;
-}
-
-.legend-item {
-    display: inline-flex;
-
-    align-items: center;
-
-    gap: 7px;
-
-    color:
-        var(--muted);
-
-    font-size: 13px;
-
-    font-weight: 650;
-}
-
-.legend-dot {
-    width: 9px;
-    height: 9px;
-
-    border-radius: 50%;
-}
-
-
-/* =========================================================
-   FULL CALENDAR
-========================================================= */
-
-.fc {
-    --fc-border-color: #EAECF0;
-    --fc-button-bg-color: #5B4BDB;
-    --fc-button-border-color: #5B4BDB;
-    --fc-button-hover-bg-color: #4338CA;
-    --fc-button-hover-border-color: #4338CA;
-    --fc-today-bg-color: #F5F3FF;
-}
-
-.fc .fc-toolbar-title {
-    color:
-        var(--dark);
-
-    font-size: 23px;
-
-    font-weight: 850;
-}
-
-.fc .fc-button {
-    min-height: 40px;
-
-    padding:
-        8px
-        13px;
-
-    border-radius: 9px;
-
-    font-size: 13px;
-
-    font-weight: 750;
-}
-
-.fc .fc-col-header-cell-cushion {
-    padding:
-        11px
-        5px;
-
-    color:
-        var(--dark-soft);
-
-    font-size: 13px;
-
-    font-weight: 800;
-}
-
-.fc .fc-daygrid-day-number {
-    padding: 9px;
-
-    color:
-        var(--dark-soft);
-
-    font-size: 13px;
-
-    font-weight: 650;
-}
-
-.fc .fc-event {
-    padding:
-        4px
-        6px;
-
-    border:
-        none;
-
-    border-radius: 6px;
-
-    font-size: 12px;
-
-    line-height: 1.35;
-
-    font-weight: 700;
-
-    cursor: pointer;
-}
-
-.fc .fc-daygrid-event {
-    margin:
-        3px
-        4px;
-}
-
-
-/* =========================================================
-   MEVI HEART MESSAGE
-========================================================= */
-
-.mevi-heart {
-    position: relative;
-
-    overflow: hidden;
-
-    margin-top: 36px;
-
-    padding:
-        38px
-        30px;
-
-    text-align: center;
-
-    border:
-        1px solid
-        #E9E4FF;
-
-    border-radius: 25px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #F5F3FF,
-            #FFF1F8
-        );
-
-    box-shadow:
-        0 7px 25px
-        rgba(91,75,219,.05);
-}
-
-.mevi-heart::before {
-    content: "✦";
-
-    position: absolute;
-
-    left: 7%;
-
-    top: 20px;
-
-    font-size: 45px;
-
-    color:
-        rgba(91,75,219,.08);
-}
-
-.mevi-heart::after {
-    content: "✦";
-
-    position: absolute;
-
-    right: 8%;
-
-    bottom: 10px;
-
-    font-size: 55px;
-
-    color:
-        rgba(236,72,153,.07);
-}
-
-.mevi-heart-title {
-    position: relative;
-
-    z-index: 2;
-
-    color:
-        var(--dark);
-
-    font-size: 23px;
-
-    font-weight: 850;
-}
-
-.mevi-heart-text {
-    position: relative;
-
-    z-index: 2;
-
-    max-width: 920px;
-
-    margin:
-        11px
-        auto
-        0;
-
-    color:
-        var(--muted);
-
-    font-size: 15px;
-
-    line-height: 1.8;
-}
-
-.mevi-heart-highlight {
-    display: block;
-
-    margin-top: 15px;
-
-    color:
-        var(--mevi-primary);
-
-    font-size: 15px;
-
-    font-weight: 800;
-}
-
-.mevi-values {
-    position: relative;
-
-    z-index: 2;
-
-    margin-top: 20px;
-
-    color:
-        var(--mevi-primary);
-
-    font-size: 11px;
-
-    letter-spacing: 3px;
-
-    font-weight: 850;
 }
 
 
@@ -1521,1140 +843,290 @@ body {
    EMPTY STATE
 ========================================================= */
 
-.empty-state {
-    padding:
-        48px
-        20px;
+.empty-dashboard {
+
+    padding: 35px 20px;
 
     text-align: center;
 
-    color:
-        var(--muted-light);
+    color: #667085;
+}
 
-    font-size: 15px;
 
-    line-height: 1.7;
+.empty-dashboard i {
+
+    display: block;
+
+    margin-bottom: 10px;
+
+    font-size: 38px;
+
+    color: #98A2B3;
 }
 
 
 /* =========================================================
-   LINKS
+   RESPONSIVE
 ========================================================= */
 
-.mevi-dashboard a {
-    transition:
-        color .2s ease,
-        background .2s ease,
-        transform .2s ease;
-}
-
-
-/* =========================================================
-   MOBILE / TABLET
-========================================================= */
-
-@media (max-width: 1450px) {
-
-    .snapshot-grid {
-        grid-template-columns:
-            repeat(4, minmax(0, 1fr));
-    }
-}
-
-
-@media (max-width: 1100px) {
+@media (max-width: 1200px) {
 
     .mevi-dashboard {
-        padding:
-            26px
-            24px
-            50px;
+
+        padding: 25px 25px 60px;
     }
 
-    .mevi-hero {
-        padding:
-            40px
-            38px;
+    .mevi-hero h1 {
+
+        font-size: 34px;
     }
 
-    .hero-title {
-        font-size: 42px;
-    }
-
-    .two-column {
-        grid-template-columns:
-            1fr;
-    }
-
-    .workshop-grid {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-    }
 }
 
 
 @media (max-width: 768px) {
 
     .mevi-dashboard {
-        padding:
-            18px
-            14px
-            40px;
+
+        padding: 20px 15px 50px;
     }
 
     .mevi-hero {
-        min-height: auto;
 
-        padding:
-            31px
-            24px;
+        padding: 30px 25px;
 
-        border-radius: 23px;
+        border-radius: 20px;
     }
 
-    .hero-topline {
-        font-size: 13px;
-    }
+    .mevi-hero h1 {
 
-    .hero-title {
-        font-size: 34px;
-
-        letter-spacing:
-            -.8px;
-    }
-
-    .hero-message {
-        font-size: 15px;
-
-        line-height: 1.65;
-    }
-
-    .hero-thought {
-        font-size: 13px;
-    }
-
-    .hero-date {
-        font-size: 12px;
-    }
-
-    .quick-actions {
-        display: grid;
-
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-
-        gap: 10px;
-    }
-
-    .quick-action {
-        width: 100%;
-
-        min-height: 48px;
-
-        padding:
-            0
-            10px;
-
-        font-size: 13px;
-    }
-
-    .section-title {
-        font-size: 25px;
-    }
-
-    .section-subtitle {
-        font-size: 14px;
-    }
-
-    .snapshot-grid {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-
-        gap: 11px;
-    }
-
-    .snapshot-card {
-        min-height: 140px;
-
-        padding: 18px;
-    }
-
-    .snapshot-value {
-        font-size: 28px;
-    }
-
-    .snapshot-label {
-        font-size: 13px;
-    }
-
-    .card-header {
-        padding:
-            19px;
-    }
-
-    .card-body {
-        padding:
-            18px;
-    }
-
-    .card-title {
-        font-size: 18px;
-    }
-
-    .workshop-grid {
-        grid-template-columns:
-            1fr;
-    }
-
-    .workshop-card {
-        min-height: auto;
-
-        padding:
-            21px;
-    }
-
-    .workshop-title {
-        font-size: 18px;
-    }
-
-    .calendar-toolbar {
-        align-items:
-            flex-start;
-
-        padding:
-            19px;
-    }
-
-    .calendar-filter {
-        width: 100%;
-
-        min-width: 0;
-    }
-
-    #calendar {
-        padding:
-            10px;
-    }
-
-    .fc .fc-toolbar {
-        flex-wrap: wrap;
-
-        gap: 8px;
-    }
-
-    .fc .fc-toolbar-title {
-        font-size: 19px;
-    }
-
-    .fc .fc-button {
-        font-size: 11px;
-
-        min-height: 36px;
-    }
-
-    .mevi-heart {
-        padding:
-            30px
-            20px;
-    }
-
-    .mevi-heart-title {
-        font-size: 20px;
-    }
-
-    .mevi-heart-text {
-        font-size: 14px;
-    }
-}
-
-
-@media (max-width: 480px) {
-
-    .mevi-dashboard {
-        padding:
-            13px
-            10px
-            30px;
-    }
-
-    .mevi-hero {
-        padding:
-            25px
-            19px;
-    }
-
-    .hero-title {
         font-size: 29px;
     }
 
-    .hero-message {
-        font-size: 14px;
+    .mevi-hero p {
+
+        font-size: 16px;
     }
 
-    .quick-actions {
-        grid-template-columns:
-            1fr;
+    .dashboard-stat {
+
+        padding: 20px;
     }
 
-    .section-title {
+    .stat-number {
+
+        font-size: 30px;
+    }
+
+    .section-heading h2 {
+
         font-size: 22px;
     }
 
-    .snapshot-card {
-        min-height: 125px;
-
-        padding:
-            16px;
-    }
-
-    .snapshot-icon {
-        width: 39px;
-        height: 39px;
-
-        font-size: 19px;
-    }
-
-    .snapshot-value {
-        font-size: 25px;
-    }
-
-    .snapshot-label {
-        font-size: 12px;
-    }
-
-    .mevi-heart {
-        padding:
-            26px
-            16px;
-    }
-
-    .mevi-heart-title {
-        font-size: 18px;
-    }
-}
-
-
-/* =========================================================
-   ACCESSIBILITY / REDUCED MOTION
-========================================================= */
-
-@media (prefers-reduced-motion: reduce) {
-
-    *,
-    *::before,
-    *::after {
-        transition: none !important;
-        animation: none !important;
-    }
 }
 
 </style>
 
+{% endblock %}
 
+
+{% block content %}
 
 <div class="mevi-dashboard">
-
 
     <!-- =====================================================
          HERO
     ====================================================== -->
 
-    <section class="mevi-hero">
+    <div class="mevi-hero">
 
-        <div class="hero-content">
+        <h1>
+            {{ greeting }}, Welcome to Mevi Management
+        </h1>
 
-            <div class="hero-topline">
+        <p>
+            {{ greeting_message }}
+        </p>
 
-                <span>
-                    {{ greeting_icon }}
-                </span>
-
-                <span>
-                    {{ greeting }}
-                </span>
-
-                <span>
-                    •
-                </span>
-
-                <span>
-                    Mevi Family
-                </span>
-
-            </div>
+        <p class="hero-date">
+            <i class="bi bi-calendar3 me-2"></i>
+            {{ today|date:"l, d F Y" }}
+        </p>
 
 
-            <h1 class="hero-title">
+        <div class="hero-actions">
 
-                Hello,
-                <span class="name">
-                    {{ request.user.first_name|default:request.user.username }}
-                </span>
-                👋
-
-            </h1>
-
-
-            <p class="hero-message">
-
-                {{ greeting_message }}
-
-            </p>
+            <a
+                href="{% url 'trainer_dashboard' %}"
+                class="btn btn-light"
+            >
+                <i class="bi bi-person-workspace me-2"></i>
+                My Trainer Workspace
+            </a>
 
 
-            <div class="hero-thought">
-
-                <span>💭</span>
-
-                <span>
-                    {{ daily_thought }}
-                </span>
-
-            </div>
+            <a
+                href="{% url 'calendar_view' %}"
+                class="btn btn-outline-light"
+            >
+                <i class="bi bi-calendar3 me-2"></i>
+                Master Calendar
+            </a>
 
 
-            <div class="hero-date">
-
-                📅
-
-                {{ today|date:"l, d F Y" }}
-
-            </div>
+            <a
+                href="{% url 'admin_task_dashboard' %}"
+                class="btn btn-outline-light"
+            >
+                <i class="bi bi-check2-square me-2"></i>
+                Task Management
+            </a>
 
         </div>
-
-    </section>
-
-
-
-    <!-- =====================================================
-         QUICK ACTIONS
-    ====================================================== -->
-
-    <div class="quick-actions">
-
-        <a
-            href="{% url 'workshop_list' %}"
-            class="quick-action primary"
-        >
-            🎓
-            Workshops
-        </a>
-
-
-        <a
-            href="{% url 'trainer_list' %}"
-            class="quick-action"
-        >
-            👥
-            Trainers
-        </a>
-
-
-        {% if request.user.is_superuser %}
-
-        <a
-            href="{% url 'add_calendar_event' %}"
-            class="quick-action"
-        >
-            ➕
-            Add Event
-        </a>
-
-        {% endif %}
-
-
-        <a
-            href="{% url 'calendar_view' %}"
-            class="quick-action"
-        >
-            🗓️
-            Calendar
-        </a>
-
-
-        <a
-            href="{% url 'trainer_dashboard' %}"
-            class="quick-action"
-        >
-            💼
-            My Workspace
-        </a>
 
     </div>
 
 
-
     <!-- =====================================================
-         TODAY SNAPSHOT
+         TOP STATISTICS
     ====================================================== -->
 
-    <section class="dashboard-section">
+    <div class="row g-4">
 
-        <div class="section-heading">
+        <div class="col-xl-3 col-md-6">
 
-            <div>
+            <div class="dashboard-stat">
 
-                <h2 class="section-title">
-                    Today's Snapshot ☀️
-                </h2>
+                <div class="stat-top">
 
-                <p class="section-subtitle">
-                    One quick look at how the Mevi day is moving.
-                    Ivattu namma team enu madtha ide anta simple view.
-                </p>
+                    <div class="stat-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
 
-            </div>
+                    <div class="stat-number">
+                        {{ total_trainers }}
+                    </div>
 
-        </div>
-
-
-        <div class="snapshot-grid">
-
-
-            <div class="snapshot-card">
-
-                <div class="snapshot-icon">
-                    👥
                 </div>
 
-                <div class="snapshot-value">
-                    {{ total_trainers }}
-                </div>
-
-                <div class="snapshot-label">
+                <div class="stat-title">
                     Total Trainers
                 </div>
 
+                <div class="stat-description">
+                    All trainers in Mevi Management
+                </div>
+
             </div>
 
+        </div>
 
-            <div class="snapshot-card">
 
-                <div class="snapshot-icon">
-                    🟢
+        <div class="col-xl-3 col-md-6">
+
+            <div class="dashboard-stat">
+
+                <div class="stat-top">
+
+                    <div class="stat-icon">
+                        <i class="bi bi-person-check-fill"></i>
+                    </div>
+
+                    <div class="stat-number">
+                        {{ full_time_trainer_count }}
+                    </div>
+
                 </div>
 
-                <div class="snapshot-value">
-                    {{ working_count }}
+                <div class="stat-title">
+                    Full-Time Trainers
                 </div>
 
-                <div class="snapshot-label">
+                <div class="stat-description">
+                    Trainers under daily attendance
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-xl-3 col-md-6">
+
+            <div class="dashboard-stat">
+
+                <div class="stat-top">
+
+                    <div class="stat-icon">
+                        <i class="bi bi-clock-fill"></i>
+                    </div>
+
+                    <div class="stat-number">
+                        {{ working_count }}
+                    </div>
+
+                </div>
+
+                <div class="stat-title">
                     Currently Working
                 </div>
 
-            </div>
-
-
-            <div class="snapshot-card">
-
-                <div class="snapshot-icon">
-                    🟡
-                </div>
-
-                <div class="snapshot-value">
-                    {{ not_checked_in_count }}
-                </div>
-
-                <div class="snapshot-label">
-                    Not Checked In
+                <div class="stat-description">
+                    Checked in and not checked out
                 </div>
 
             </div>
-
-
-            <div class="snapshot-card">
-
-                <div class="snapshot-icon">
-                    ☑️
-                </div>
-
-                <div class="snapshot-value">
-                    {{ checked_out_count }}
-                </div>
-
-                <div class="snapshot-label">
-                    Checked Out
-                </div>
-
-            </div>
-
-
-            <div class="snapshot-card">
-
-                <div class="snapshot-icon">
-                    🎓
-                </div>
-
-                <div
-                    class="snapshot-value"
-                    id="workshop-count"
-                >
-                    0
-                </div>
-
-                <div class="snapshot-label">
-                    Workshops Today
-                </div>
-
-            </div>
-
-
-            <div class="snapshot-card">
-
-                <div class="snapshot-icon">
-                    🏢
-                </div>
-
-                <div
-                    class="snapshot-value"
-                    id="office-count"
-                >
-                    0
-                </div>
-
-                <div class="snapshot-label">
-                    Office Trainings
-                </div>
-
-            </div>
-
-
-            <div class="snapshot-card">
-
-                <div class="snapshot-icon">
-                    📚
-                </div>
-
-                <div
-                    class="snapshot-value"
-                    id="fdp-count"
-                >
-                    0
-                </div>
-
-                <div class="snapshot-label">
-                    FDPs Today
-                </div>
-
-            </div>
-
-
-            <div class="snapshot-card">
-
-                <div class="snapshot-icon">
-                    🤝
-                </div>
-
-                <div
-                    class="snapshot-value"
-                    id="meeting-count"
-                >
-                    0
-                </div>
-
-                <div class="snapshot-label">
-                    Meetings Today
-                </div>
-
-            </div>
-
 
         </div>
 
-    </section>
 
+        <div class="col-xl-3 col-md-6">
 
+            <div class="dashboard-stat">
 
-    <!-- =====================================================
-         TEAM + ATTENTION
-    ====================================================== -->
+                <div class="stat-top">
 
-    <section class="dashboard-section">
+                    <div class="stat-icon">
+                        <i class="bi bi-calendar-event-fill"></i>
+                    </div>
 
-        <div class="two-column">
-
-
-            <!-- =============================================
-                 LIVE TEAM STATUS
-            ============================================== -->
-
-            <div class="dashboard-card">
-
-                <div class="card-header">
-
-                    <div class="card-header-row">
-
-                        <div>
-
-                            <h3 class="card-title">
-                                👥 Live Team Status
-                            </h3>
-
-                            <div class="card-description">
-                                Who is working, who has checked out,
-                                and how many activities are recorded today.
-                            </div>
-
-                        </div>
-
+                    <div class="stat-number">
+                        {{ upcoming_workshops|length }}
                     </div>
 
                 </div>
 
-
-                <div class="card-body">
-
-                    {% if trainer_status %}
-
-                    <div class="team-table-wrap">
-
-                        <table class="team-table">
-
-                            <thead>
-
-                                <tr>
-
-                                    <th>
-                                        Trainer
-                                    </th>
-
-                                    <th>
-                                        Status
-                                    </th>
-
-                                    <th>
-                                        Check In
-                                    </th>
-
-                                    <th>
-                                        Check Out
-                                    </th>
-
-                                    <th>
-                                        Today's Activity
-                                    </th>
-
-                                    <th>
-                                        Latest Work
-                                    </th>
-
-                                </tr>
-
-                            </thead>
-
-
-                            <tbody>
-
-                            {% for item in trainer_status %}
-
-                                <tr>
-
-
-                                    <!-- TRAINER -->
-
-                                    <td>
-
-                                        <div class="trainer-name">
-
-                                            {{ item.trainer.Name }}
-
-                                        </div>
-
-
-                                        {% if item.trainer.expertise %}
-
-                                        <span class="trainer-role">
-
-                                            {{ item.trainer.expertise }}
-
-                                        </span>
-
-                                        {% endif %}
-
-                                    </td>
-
-
-
-                                    <!-- STATUS -->
-
-                                    <td>
-
-                                        {% if item.status == "working" %}
-
-                                            <span
-                                                class="
-                                                    status-pill
-                                                    status-working
-                                                "
-                                            >
-
-                                                <span
-                                                    class="status-dot"
-                                                ></span>
-
-                                                Working
-
-                                            </span>
-
-
-                                        {% elif item.status == "checked_out" %}
-
-                                            <span
-                                                class="
-                                                    status-pill
-                                                    status-out
-                                                "
-                                            >
-
-                                                <span
-                                                    class="status-dot"
-                                                ></span>
-
-                                                Checked Out
-
-                                            </span>
-
-
-                                        {% else %}
-
-                                            <span
-                                                class="
-                                                    status-pill
-                                                    status-not
-                                                "
-                                            >
-
-                                                <span
-                                                    class="status-dot"
-                                                ></span>
-
-                                                Not Checked In
-
-                                            </span>
-
-                                        {% endif %}
-
-                                    </td>
-
-
-
-                                    <!-- CHECK IN -->
-
-                                    <td>
-
-                                        {% if item.attendance and item.attendance.check_in %}
-
-                                            {{ item.attendance.check_in|date:"h:i A" }}
-
-                                        {% else %}
-
-                                            —
-
-                                        {% endif %}
-
-                                    </td>
-
-
-
-                                    <!-- CHECK OUT -->
-
-                                    <td>
-
-                                        {% if item.attendance and item.attendance.check_out %}
-
-                                            {{ item.attendance.check_out|date:"h:i A" }}
-
-                                        {% else %}
-
-                                            —
-
-                                        {% endif %}
-
-                                    </td>
-
-
-
-                                    <!-- ACTIVITY -->
-
-                                    <td>
-
-                                        <span class="activity-box">
-
-                                            📝
-
-                                            <span class="activity-number">
-                                                {{ item.activity_count }}
-                                            </span>
-
-                                            activity{{ item.activity_count|pluralize }}
-
-                                            {% if item.completed_activity_count %}
-
-                                            <span class="activity-completed">
-
-                                                ✓
-                                                {{ item.completed_activity_count }}
-
-                                            </span>
-
-                                            {% endif %}
-
-                                        </span>
-
-                                    </td>
-
-
-
-                                    <!-- LATEST WORK -->
-
-                                    <td>
-
-                                        {% if item.latest_task %}
-
-                                            <div
-                                                class="last-activity"
-                                                title="{{ item.latest_task.task }}"
-                                            >
-
-                                                {{ item.latest_task.task }}
-
-                                            </div>
-
-                                        {% else %}
-
-                                            <span
-                                                style="
-                                                    color:#98A2B3;
-                                                    font-size:10px;
-                                                "
-                                            >
-                                                No activity yet
-                                            </span>
-
-                                        {% endif %}
-
-                                    </td>
-
-
-                                </tr>
-
-                            {% endfor %}
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                    {% else %}
-
-                    <div class="empty-state">
-
-                        👋
-
-                        <br>
-
-                        No full-time trainer data available.
-
-                    </div>
-
-                    {% endif %}
-
+                <div class="stat-title">
+                    Upcoming Workshops
+                </div>
+
+                <div class="stat-description">
+                    Scheduled training programs
                 </div>
 
             </div>
-
-
-
-            <!-- =============================================
-                 NEEDS ATTENTION
-            ============================================== -->
-
-            <div class="dashboard-card">
-
-                <div class="card-header">
-
-                    <h3 class="card-title">
-                        🔔 Needs Attention
-                    </h3>
-
-                    <div class="card-description">
-                        Small things that may need a little care today.
-                    </div>
-
-                </div>
-
-
-                <div class="card-body">
-
-                    <div class="attention-list">
-
-
-                        {% if not_checked_in_count %}
-
-                        <div class="attention-item">
-
-                            <div class="attention-icon">
-                                👋
-                            </div>
-
-                            <div>
-
-                                <div class="attention-title">
-
-                                    {{ not_checked_in_count }}
-                                    trainer{{ not_checked_in_count|pluralize }}
-                                    not checked in
-
-                                </div>
-
-                                <div class="attention-text">
-
-                                    Ondu small reminder can help
-                                    them start the day smoothly.
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        {% endif %}
-
-
-
-                        {% if pending_workshops_count %}
-
-                        <div class="attention-item">
-
-                            <div class="attention-icon">
-                                🎓
-                            </div>
-
-                            <div>
-
-                                <div class="attention-title">
-
-                                    {{ pending_workshops_count }}
-                                    workshop{{ pending_workshops_count|pluralize }}
-                                    tentative
-
-                                </div>
-
-                                <div class="attention-text">
-
-                                    Check trainer confirmation
-                                    and final schedule.
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        {% endif %}
-
-
-
-                        {% if pending_reports_count %}
-
-                        <div class="attention-item">
-
-                            <div class="attention-icon">
-                                📄
-                            </div>
-
-                            <div>
-
-                                <div class="attention-title">
-
-                                    {{ pending_reports_count }}
-                                    workshop{{ pending_reports_count|pluralize }}
-                                    need closure
-
-                                </div>
-
-                                <div class="attention-text">
-
-                                    Past workshops still need
-                                    completion or documentation.
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        {% endif %}
-
-
-
-                        {% if not not_checked_in_count and not pending_workshops_count and not pending_reports_count %}
-
-                        <div
-                            class="
-                                attention-item
-                                all-good
-                            "
-                        >
-
-                            <div class="attention-icon">
-                                💚
-                            </div>
-
-                            <div>
-
-                                <div class="attention-title">
-
-                                    Everything looks good!
-
-                                </div>
-
-                                <div class="attention-text">
-
-                                    Ivattu urgent items illa.
-                                    Keep doing the good work. 🌱
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        {% endif %}
-
-
-                    </div>
-
-                </div>
-
-            </div>
-
 
         </div>
 
-    </section>
-
+    </div>
 
 
     <!-- =====================================================
-         UPCOMING 7 DAYS
+         TRAINER WORKSPACE + QUICK ACTIONS
     ====================================================== -->
 
-    <section class="dashboard-section">
+    <div class="dashboard-section">
 
         <div class="section-heading">
 
             <div>
 
-                <h2 class="section-title">
-                    Upcoming 7 Days 📅
+                <h2>
+                    Workspace
                 </h2>
 
-                <p class="section-subtitle">
-                    Next few days at a glance — workshops,
-                    FDPs, meetings and planned programs.
+                <p>
+                    Frequently used trainer and management tools
                 </p>
 
             </div>
@@ -2662,185 +1134,420 @@ body {
         </div>
 
 
-        <div class="schedule-card">
+        <div class="row g-4">
 
-            <div class="schedule-wrap">
+            <div class="col-xl-5">
 
-                <table class="schedule-table">
+                <a
+                    href="{% url 'trainer_dashboard' %}"
+                    class="text-decoration-none"
+                >
 
-                    <thead>
+                    <div class="trainer-workspace-card">
 
-                        <tr>
+                        <div class="workspace-icon">
 
-                            <th>
-                                Date
-                            </th>
+                            <i class="bi bi-person-workspace"></i>
 
-                            <th>
-                                Program
-                            </th>
-
-                            <th>
-                                Type
-                            </th>
-
-                            <th>
-                                College
-                            </th>
-
-                            <th>
-                                Trainer
-                            </th>
-
-                            <th>
-                                Time
-                            </th>
-
-                            <th>
-                                Location
-                            </th>
-
-                            <th>
-                                Status
-                            </th>
-
-                        </tr>
-
-                    </thead>
+                        </div>
 
 
-                    <tbody>
+                        <h3>
+                            My Trainer Workspace
+                        </h3>
 
-                    {% for item in upcoming_schedule %}
+                        <p>
+                            Manage your attendance, daily work,
+                            learning, assigned workshops, schedule
+                            and personal trainer activities.
+                        </p>
 
-                        <tr>
 
-                            <td>
+                        <span class="btn btn-primary px-4 py-2">
 
-                                <div class="schedule-date">
+                            Open Trainer Dashboard
 
-                                    {{ item.date|date:"d M" }}
+                            <i class="bi bi-arrow-right ms-2"></i>
 
+                        </span>
+
+                    </div>
+
+                </a>
+
+            </div>
+
+
+            <div class="col-xl-7">
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+
+                        <a
+                            href="{% url 'trainer_schedule' %}"
+                            class="quick-action"
+                        >
+
+                            <div class="quick-action-icon">
+
+                                <i class="bi bi-calendar-week"></i>
+
+                            </div>
+
+                            <div>
+
+                                <div class="quick-action-title">
+                                    My Schedule
                                 </div>
 
-                                <div class="schedule-day">
-
-                                    {{ item.date|date:"D" }}
-
+                                <div class="quick-action-text">
+                                    View workshops and scheduled activities
                                 </div>
 
-                            </td>
+                            </div>
+
+                        </a>
+
+                    </div>
 
 
-                            <td>
+                    <div class="col-md-6">
 
-                                <div class="program-name">
+                        <a
+                            href="{% url 'daily_checkin' %}"
+                            class="quick-action"
+                        >
 
-                                    {{ item.title }}
+                            <div class="quick-action-icon">
 
+                                <i class="bi bi-fingerprint"></i>
+
+                            </div>
+
+                            <div>
+
+                                <div class="quick-action-title">
+                                    Attendance
                                 </div>
 
-                            </td>
-
-
-                            <td>
-
-                                <span class="type-badge">
-
-                                    {{ item.type }}
-
-                                </span>
-
-                            </td>
-
-
-                            <td>
-
-                                {{ item.college }}
-
-                            </td>
-
-
-                            <td>
-
-                                {{ item.trainer }}
-
-                            </td>
-
-
-                            <td>
-
-                                {{ item.time }}
-
-                            </td>
-
-
-                            <td>
-
-                                {{ item.location }}
-
-                            </td>
-
-
-                            <td>
-
-                                {{ item.status }}
-
-                            </td>
-
-                        </tr>
-
-                    {% empty %}
-
-                        <tr>
-
-                            <td colspan="8">
-
-                                <div class="empty-state">
-
-                                    🌱
-
-                                    <br>
-
-                                    Nothing scheduled for
-                                    the next 7 days.
-
+                                <div class="quick-action-text">
+                                    Check in and manage your attendance
                                 </div>
 
-                            </td>
+                            </div>
 
-                        </tr>
+                        </a>
 
-                    {% endfor %}
+                    </div>
 
-                    </tbody>
 
-                </table>
+                    <div class="col-md-6">
+
+                        <a
+                            href="{% url 'add_task_page' %}"
+                            class="quick-action"
+                        >
+
+                            <div class="quick-action-icon">
+
+                                <i class="bi bi-plus-circle"></i>
+
+                            </div>
+
+                            <div>
+
+                                <div class="quick-action-title">
+                                    Add Work
+                                </div>
+
+                                <div class="quick-action-text">
+                                    Add today's work and tasks
+                                </div>
+
+                            </div>
+
+                        </a>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <a
+                            href="{% url 'weekly_schedule' %}"
+                            class="quick-action"
+                        >
+
+                            <div class="quick-action-icon">
+
+                                <i class="bi bi-calendar3"></i>
+
+                            </div>
+
+                            <div>
+
+                                <div class="quick-action-title">
+                                    Weekly Schedule
+                                </div>
+
+                                <div class="quick-action-text">
+                                    See the complete weekly plan
+                                </div>
+
+                            </div>
+
+                        </a>
+
+                    </div>
+
+                </div>
 
             </div>
 
         </div>
 
-    </section>
+    </div>
 
+
+    <!-- =====================================================
+         ATTENDANCE + TODAY TASKS
+    ====================================================== -->
+
+    <div class="dashboard-section">
+
+        <div class="row g-4">
+
+            <!-- ATTENDANCE -->
+
+            <div class="col-xl-6">
+
+                <div class="dashboard-panel">
+
+                    <div class="panel-header">
+
+                        <div>
+
+                            <h3>
+                                <i class="bi bi-person-check me-2"></i>
+                                Today's Attendance
+                            </h3>
+
+                            <div class="dashboard-muted">
+                                Full-time trainer status
+                            </div>
+
+                        </div>
+
+                        <span class="badge bg-light text-dark fs-6 px-3 py-2">
+                            {{ working_count }} Working
+                        </span>
+
+                    </div>
+
+
+                    <div class="panel-body">
+
+                        {% for item in trainer_status %}
+
+                            <div class="attendance-person">
+
+                                {% if item.trainer.profile_photo %}
+
+                                    <img
+                                        src="{{ item.trainer.profile_photo.url }}"
+                                        class="trainer-photo"
+                                        alt="{{ item.trainer.Name }}"
+                                    >
+
+                                {% else %}
+
+                                    <div class="trainer-placeholder">
+                                        {{ item.trainer.Name|first|upper }}
+                                    </div>
+
+                                {% endif %}
+
+
+                                <div>
+
+                                    <div class="trainer-name">
+                                        {{ item.trainer.Name }}
+                                    </div>
+
+                                    <div class="trainer-role">
+
+                                        {% if item.trainer.expertise %}
+                                            {{ item.trainer.expertise }}
+                                        {% else %}
+                                            Trainer
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+
+                                {% if item.status == "working" %}
+
+                                    <span class="status-badge status-working">
+                                        Working
+                                    </span>
+
+                                {% elif item.status == "checked_out" %}
+
+                                    <span class="status-badge status-out">
+                                        Checked Out
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-badge status-not">
+                                        Not Checked In
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+                        {% empty %}
+
+                            <div class="empty-dashboard">
+
+                                <i class="bi bi-people"></i>
+
+                                No attendance records available.
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- TASKS -->
+
+            <div class="col-xl-6">
+
+                <div class="dashboard-panel">
+
+                    <div class="panel-header">
+
+                        <div>
+
+                            <h3>
+                                <i class="bi bi-check2-square me-2"></i>
+                                Today's Work
+                            </h3>
+
+                            <div class="dashboard-muted">
+                                Current trainer tasks
+                            </div>
+
+                        </div>
+
+                        <a
+                            href="{% url 'admin_task_dashboard' %}"
+                            class="btn btn-sm btn-outline-primary"
+                        >
+                            View All
+                        </a>
+
+                    </div>
+
+
+                    <div class="panel-body">
+
+                        {% for task in today_tasks|slice:":6" %}
+
+                            <div class="task-item">
+
+                                <div class="task-check">
+
+                                    {% if task.status == "completed" %}
+
+                                        <i class="bi bi-check-lg"></i>
+
+                                    {% elif task.status == "in_progress" %}
+
+                                        <i class="bi bi-hourglass-split"></i>
+
+                                    {% else %}
+
+                                        <i class="bi bi-circle"></i>
+
+                                    {% endif %}
+
+                                </div>
+
+
+                                <div>
+
+                                    <div class="task-title">
+                                        {{ task.task }}
+                                    </div>
+
+                                    <div class="task-meta">
+
+                                        {{ task.get_category_display }}
+
+                                        {% if task.priority %}
+                                            · {{ task.priority|title }} priority
+                                        {% endif %}
+
+                                        {% if task.estimated_hours %}
+                                            · {{ task.estimated_hours }} hrs
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        {% empty %}
+
+                            <div class="empty-dashboard">
+
+                                <i class="bi bi-check2-circle"></i>
+
+                                No work added for today.
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
 
 
     <!-- =====================================================
          UPCOMING WORKSHOPS
     ====================================================== -->
 
-    <section class="dashboard-section">
+    <div class="dashboard-section">
 
         <div class="section-heading">
 
             <div>
 
-                <h2 class="section-title">
-                    Upcoming Workshops 🎓
+                <h2>
+                    Upcoming Workshops
                 </h2>
 
-                <p class="section-subtitle">
-                    Planned programs coming up next.
+                <p>
+                    Your upcoming training programs
                 </p>
 
             </div>
@@ -2848,151 +1555,114 @@ body {
 
             <a
                 href="{% url 'workshop_list' %}"
-                style="
-                    color:#5B4BDB;
-                    font-size:11px;
-                    font-weight:800;
-                    text-decoration:none;
-                "
+                class="btn btn-outline-primary"
             >
-                View All →
+                View All Workshops
             </a>
 
         </div>
 
 
-        <div class="workshop-grid">
+        <div class="row g-4">
 
-        {% for workshop in upcoming_workshops %}
+            {% for workshop in upcoming_workshops|slice:":6" %}
 
-            <div class="workshop-card">
+                <div class="col-xl-4 col-lg-6">
 
-                <div class="workshop-date">
+                    <div class="workshop-card">
 
-                    📅
-                    {{ workshop.start_date|date:"d M Y" }}
+                        <div class="workshop-title">
 
-                </div>
+                            {{ workshop.title }}
 
-
-                <div class="workshop-title">
-
-                    {{ workshop.title }}
-
-                </div>
+                        </div>
 
 
-                <div class="workshop-info">
+                        <div class="workshop-meta">
 
-                    <span>
+                            <div>
 
-                        🏫
+                                <i class="bi bi-building me-2"></i>
 
-                        {% if workshop.college %}
+                                {{ workshop.college }}
 
-                            {{ workshop.college.name }}
-
-                        {% else %}
-
-                            College not assigned
-
-                        {% endif %}
-
-                    </span>
+                            </div>
 
 
-                    {% if workshop.departments %}
+                            <div>
 
-                    <span>
+                                <i class="bi bi-calendar3 me-2"></i>
 
-                        🎯
-                        {{ workshop.departments }}
+                                {{ workshop.start_date|date:"d M Y" }}
 
-                    </span>
+                                {% if workshop.end_date %}
 
-                    {% endif %}
+                                    -
+                                    {{ workshop.end_date|date:"d M Y" }}
 
+                                {% endif %}
 
-                    <span>
+                            </div>
 
-                        👤
-
-                        {% with assigned=workshop.assigned_trainers.all %}
-
-                            {% if assigned %}
-
-                                {% for trainer in assigned %}
-
-                                    {{ trainer.Name }}{% if not forloop.last %}, {% endif %}
-
-                                {% endfor %}
-
-                            {% else %}
-
-                                Trainer not assigned
-
-                            {% endif %}
-
-                        {% endwith %}
-
-                    </span>
+                        </div>
 
 
-                    <span>
+                        <div class="mt-3">
 
-                        📌
+                            <a
+                                href="{% url 'workshop_detail' workshop.pk %}"
+                                class="btn btn-sm btn-primary"
+                            >
+                                View Workshop
+                            </a>
 
-                        {{ workshop.get_status_display }}
+                        </div>
 
-                    </span>
+                    </div>
 
                 </div>
 
-            </div>
+            {% empty %}
 
-        {% empty %}
+                <div class="col-12">
 
-            <div
-                class="dashboard-card"
-                style="grid-column:1/-1;"
-            >
+                    <div class="dashboard-panel">
 
-                <div class="empty-state">
+                        <div class="empty-dashboard">
 
-                    🎓
+                            <i class="bi bi-calendar-x"></i>
 
-                    <br>
+                            No upcoming workshops.
 
-                    No upcoming workshops at the moment.
+                        </div>
+
+                    </div>
 
                 </div>
 
-            </div>
-
-        {% endfor %}
+            {% endfor %}
 
         </div>
 
-    </section>
-
+    </div>
 
 
     <!-- =====================================================
-         MASTER CALENDAR
+         MANAGEMENT OPTIONS
     ====================================================== -->
 
-    <section class="dashboard-section">
+    <div class="dashboard-section">
 
         <div class="section-heading">
 
             <div>
 
-                <h2 class="section-title">
-                    Master Calendar 🗓️
+                <h2>
+                    Management
                 </h2>
 
-                <p class="section-subtitle">
-                    Your complete planning space — everything in one calendar.
+                <p>
+                    Other important areas of Mevi Management
                 </p>
 
             </div>
@@ -3000,616 +1670,161 @@ body {
         </div>
 
 
-        <div class="calendar-card">
+        <div class="row g-4">
 
+            <div class="col-xl-3 col-md-6">
 
-            <div class="calendar-toolbar">
-
-                <div>
-
-                    <div class="calendar-heading">
-
-                        Mevi Schedule
-
-                    </div>
-
-                    <div class="calendar-description">
-
-                        Workshops • FDPs • Online Workshops •
-                        Office Training • Guest Faculty • Meetings
-
-                    </div>
-
-                </div>
-
-
-                <select
-                    id="eventTypeFilter"
-                    class="calendar-filter"
+                <a
+                    href="{% url 'workshop_list' %}"
+                    class="management-card d-block"
                 >
 
-                    <option value="all">
-                        All Events
-                    </option>
+                    <i class="bi bi-mortarboard-fill"></i>
 
-                    <option value="Workshop">
+                    <h4>
                         Workshops
-                    </option>
+                    </h4>
 
-                    <option value="FDP">
-                        FDP
-                    </option>
+                    <p>
+                        Manage workshops, colleges,
+                        dates and assigned trainers.
+                    </p>
 
-                    <option value="Online Workshop">
-                        Online Workshop
-                    </option>
-
-                    <option value="Office Training">
-                        Office Training
-                    </option>
-
-                    <option value="Guest Faculty Training">
-                        Guest Faculty Training
-                    </option>
-
-                    <option value="Meeting">
-                        Meetings
-                    </option>
-
-                    <option value="Other">
-                        Other
-                    </option>
-
-                </select>
+                </a>
 
             </div>
 
 
-            <div id="calendar"></div>
+            <div class="col-xl-3 col-md-6">
+
+                <a
+                    href="{% url 'trainer_list' %}"
+                    class="management-card d-block"
+                >
+
+                    <i class="bi bi-people-fill"></i>
+
+                    <h4>
+                        Trainers
+                    </h4>
+
+                    <p>
+                        View trainer profiles,
+                        expertise and availability.
+                    </p>
+
+                </a>
+
+            </div>
 
 
-            <div class="calendar-legend">
+            <div class="col-xl-3 col-md-6">
 
-                <div class="legend-item">
+                <a
+                    href="{% url 'calendar_view' %}"
+                    class="management-card d-block"
+                >
 
-                    <span
-                        class="legend-dot"
-                        style="background:#5B4BDB;"
-                    ></span>
+                    <i class="bi bi-calendar-event-fill"></i>
 
-                    Workshop
+                    <h4>
+                        Calendar
+                    </h4>
 
-                </div>
+                    <p>
+                        View workshops, meetings,
+                        FDPs and other events.
+                    </p>
 
+                </a>
 
-                <div class="legend-item">
-
-                    <span
-                        class="legend-dot"
-                        style="background:#EC4899;"
-                    ></span>
-
-                    FDP
-
-                </div>
+            </div>
 
 
-                <div class="legend-item">
+            <div class="col-xl-3 col-md-6">
 
-                    <span
-                        class="legend-dot"
-                        style="background:#2563EB;"
-                    ></span>
+                <a
+                    href="{% url 'admin_task_dashboard' %}"
+                    class="management-card d-block"
+                >
 
-                    Online Workshop
+                    <i class="bi bi-list-check"></i>
 
-                </div>
+                    <h4>
+                        Task Management
+                    </h4>
 
+                    <p>
+                        Monitor pending, active
+                        and completed work.
+                    </p>
 
-                <div class="legend-item">
-
-                    <span
-                        class="legend-dot"
-                        style="background:#16A34A;"
-                    ></span>
-
-                    Office Training
-
-                </div>
-
-
-                <div class="legend-item">
-
-                    <span
-                        class="legend-dot"
-                        style="background:#F59E0B;"
-                    ></span>
-
-                    Guest Faculty
-
-                </div>
-
-
-                <div class="legend-item">
-
-                    <span
-                        class="legend-dot"
-                        style="background:#7C3AED;"
-                    ></span>
-
-                    Meeting
-
-                </div>
+                </a>
 
             </div>
 
         </div>
 
-    </section>
-
+    </div>
 
 
     <!-- =====================================================
-         HEART MESSAGE
+         DAILY THOUGHT
     ====================================================== -->
 
-    <section class="mevi-heart">
+    {% if daily_thought %}
 
-        <div class="mevi-heart-title">
+        <div class="dashboard-section">
 
-            🌱 Small Steps. Big Impact. Together.
+            <div
+                class="dashboard-panel"
+                style="
+                    background:
+                    linear-gradient(
+                        135deg,
+                        #f8f7ff,
+                        #ffffff
+                    );
+                "
+            >
 
-        </div>
+                <div class="panel-body text-center py-4">
 
-
-        <div class="mevi-heart-text">
-
-            Namma work andre just tasks complete madodu alla.
-
-            Every workshop, every student interaction,
-            every follow-up, every small problem solved
-            contributes to something bigger. ❤️
-
-            <br><br>
-
-            <span class="mevi-heart-highlight">
-
-                “Ondu dina perfect agirbeku anta illa —
-                every day swalpa better agbeku.”
-
-            </span>
-
-            <br>
-
-            Let's learn together, help each other,
-            celebrate small wins and grow together.
-
-            <br><br>
-
-            Because Mevi is not just a workplace —
-
-            <strong>
-                it's a team of people building something together. 🤝
-            </strong>
-
-        </div>
+                    <i
+                        class="bi bi-lightbulb-fill"
+                        style="
+                            font-size:30px;
+                            color:#F59E0B;
+                        "
+                    ></i>
 
 
-        <div class="mevi-values">
+                    <h3 class="mt-3">
+                        Thought of the Day
+                    </h3>
 
-            LEARN
-            &nbsp; • &nbsp;
-            BUILD
-            &nbsp; • &nbsp;
-            TEACH
-            &nbsp; • &nbsp;
-            INSPIRE
+
+                    <p
+                        class="mb-0"
+                        style="
+                            max-width:900px;
+                            margin:auto;
+                            font-size:17px;
+                            line-height:1.7;
+                            color:#475467;
+                        "
+                    >
+                        {{ daily_thought }}
+                    </p>
+
+                </div>
+
+            </div>
 
         </div>
 
-    </section>
-
+    {% endif %}
 
 </div>
-
-
-
-<!-- =========================================================
-     FULLCALENDAR
-========================================================= -->
-
-<link
-    href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css"
-    rel="stylesheet"
->
-
-
-<script
-    src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js">
-</script>
-
-
-<script>
-
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
-
-
-        /* =====================================================
-           LOAD EVENTS
-        ===================================================== */
-
-        let events =
-            {{ events_json|default:"[]"|safe }};
-
-
-        if (!Array.isArray(events)) {
-
-            events = [];
-
-        }
-
-
-        /* =====================================================
-           TODAY
-        ===================================================== */
-
-        const today =
-            "{{ today|date:'Y-m-d' }}";
-
-
-        /* =====================================================
-           TODAY EVENT COUNTS
-        ===================================================== */
-
-        let workshopCount = 0;
-
-        let officeCount = 0;
-
-        let fdpCount = 0;
-
-        let meetingCount = 0;
-
-
-        events.forEach(
-            function (event) {
-
-
-                if (!event.start) {
-
-                    return;
-
-                }
-
-
-                const eventDate =
-                    String(event.start)
-                    .substring(0, 10);
-
-
-                if (eventDate !== today) {
-
-                    return;
-
-                }
-
-
-                const type =
-                    (
-                        event.extendedProps?.event_type ||
-                        ""
-                    ).toLowerCase();
-
-
-                if (type === "workshop") {
-
-                    workshopCount++;
-
-                }
-
-
-                if (
-                    type === "office training"
-                ) {
-
-                    officeCount++;
-
-                }
-
-
-                if (type === "fdp") {
-
-                    fdpCount++;
-
-                }
-
-
-                if (type === "meeting") {
-
-                    meetingCount++;
-
-                }
-
-            }
-        );
-
-
-        document.getElementById(
-            "workshop-count"
-        ).textContent =
-            workshopCount;
-
-
-        document.getElementById(
-            "office-count"
-        ).textContent =
-            officeCount;
-
-
-        document.getElementById(
-            "fdp-count"
-        ).textContent =
-            fdpCount;
-
-
-        document.getElementById(
-            "meeting-count"
-        ).textContent =
-            meetingCount;
-
-
-
-        /* =====================================================
-           CALENDAR
-        ===================================================== */
-
-        const calendarElement =
-            document.getElementById(
-                "calendar"
-            );
-
-
-        if (!calendarElement) {
-
-            return;
-
-        }
-
-
-        const calendar =
-            new FullCalendar.Calendar(
-                calendarElement,
-                {
-
-                    initialView:
-                        "dayGridMonth",
-
-                    height:
-                        "auto",
-
-                    dayMaxEvents:
-                        3,
-
-                    eventDisplay:
-                        "block",
-
-
-                    headerToolbar: {
-
-                        left:
-                            "prev,next today",
-
-                        center:
-                            "title",
-
-                        right:
-                            "dayGridMonth,timeGridWeek,timeGridDay,listWeek"
-
-                    },
-
-
-                    buttonText: {
-
-                        today:
-                            "Today",
-
-                        month:
-                            "Month",
-
-                        week:
-                            "Week",
-
-                        day:
-                            "Day",
-
-                        list:
-                            "List"
-
-                    },
-
-
-                    events:
-                        events,
-
-
-                    eventClick:
-                        function(info) {
-
-
-                            const event =
-                                info.event;
-
-
-                            const props =
-                                event.extendedProps ||
-                                {};
-
-
-                            let details =
-                                event.title ||
-                                "Event";
-
-
-                            if (
-                                props.event_type
-                            ) {
-
-                                details +=
-                                    "\n\nType: " +
-                                    props.event_type;
-
-                            }
-
-
-                            if (
-                                props.college
-                            ) {
-
-                                details +=
-                                    "\nCollege: " +
-                                    props.college;
-
-                            }
-
-
-                            if (
-                                props.trainer
-                            ) {
-
-                                details +=
-                                    "\nTrainer: " +
-                                    props.trainer;
-
-                            }
-
-
-                            if (
-                                props.location
-                            ) {
-
-                                details +=
-                                    "\nLocation: " +
-                                    props.location;
-
-                            }
-
-
-                            if (
-                                props.status
-                            ) {
-
-                                details +=
-                                    "\nStatus: " +
-                                    props.status;
-
-                            }
-
-
-                            if (
-                                props.guest_faculty
-                            ) {
-
-                                details +=
-                                    "\nGuest Faculty: " +
-                                    props.guest_faculty;
-
-                            }
-
-
-                            if (
-                                props.description
-                            ) {
-
-                                details +=
-                                    "\n\n" +
-                                    props.description;
-
-                            }
-
-
-                            alert(details);
-
-                        }
-
-                }
-            );
-
-
-        calendar.render();
-
-
-
-        /* =====================================================
-           EVENT FILTER
-        ===================================================== */
-
-        const filter =
-            document.getElementById(
-                "eventTypeFilter"
-            );
-
-
-        if (filter) {
-
-            filter.addEventListener(
-                "change",
-                function () {
-
-
-                    const selected =
-                        this.value;
-
-
-                    calendar.removeAllEventSources();
-
-
-                    if (
-                        selected === "all"
-                    ) {
-
-                        calendar.addEventSource(
-                            events
-                        );
-
-                        return;
-
-                    }
-
-
-                    const filtered =
-                        events.filter(
-                            function(event) {
-
-
-                                const type =
-                                    event
-                                        .extendedProps
-                                        ?.event_type ||
-                                    "";
-
-
-                                return type ===
-                                    selected;
-
-                            }
-                        );
-
-
-                    calendar.addEventSource(
-                        filtered
-                    );
-
-                }
-            );
-
-        }
-
-    }
-
-);
-
-</script>
-
 
 {% endblock %}

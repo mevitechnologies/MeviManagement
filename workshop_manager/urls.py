@@ -107,7 +107,47 @@ urlpatterns = [
     # =====================================================
     # TRAINER DASHBOARD
     # =====================================================
+# =====================================================
+# TRAINER DASHBOARD
+# =====================================================
 
+path(
+    "trainer/dashboard/",
+    views.trainer_dashboard,
+    name="trainer_dashboard",
+),
+
+path(
+    "trainer/schedule/",
+    views.trainer_schedule,
+    name="trainer_schedule",
+),
+
+# =====================================================
+# TRAINER ATTENDANCE
+# =====================================================
+
+path(
+    "trainer/attendance/",
+    views.trainer_attendance,
+    name="trainer_attendance",
+),
+
+# =====================================================
+# TRAINER CHECK-IN
+# =====================================================
+
+path(
+    "checkin/",
+    views.checkin_portal,
+    name="checkin_portal",
+),
+
+path(
+    "trainer/checkin/",
+    views.daily_checkin,
+    name="daily_checkin",
+),
     path(
         "trainer/dashboard/",
         views.trainer_dashboard,
@@ -310,11 +350,7 @@ urlpatterns = [
         name="edit_calendar_event",
     ),
 
-    path(
-        "calendar/events/<int:pk>/delete/",
-        views.delete_calendar_event,
-        name="delete_calendar_event",
-    ),
+
 
     path(
         "calendar/events/<int:pk>/duplicate/",
@@ -459,6 +495,57 @@ path(
     "trainer/full-time-work/",
     views.full_time_work_list,
     name="full_time_work_list"
+),
+path(
+    "calendar/add/",
+    views.add_calendar_event,
+    name="add_calendar_event"
+),
+path(
+    "trainer/attendance/",
+    views.trainer_attendance,
+    name="trainer_attendance",
+),
+path(
+    "calendar/<int:pk>/edit/",
+    views.edit_calendar_event,
+    name="edit_calendar_event"
+),
+
+path(
+    "calendar/events/<int:pk>/delete/",
+    views.delete_calendar_event,
+    name="delete_calendar_event"
+)
+,
+path(
+    "calendar/<int:pk>/duplicate/",
+    views.duplicate_calendar_event,
+    name="duplicate_calendar_event"
+),
+
+path(
+    "calendar/<int:pk>/duplicate-next-day/",
+    views.duplicate_calendar_event_next_day,
+    name="duplicate_calendar_event_next_day"
+),
+
+path(
+    "calendar/<int:pk>/duplicate-next-week/",
+    views.duplicate_calendar_event_next_week,
+    name="duplicate_calendar_event_next_week"
+),
+
+path(
+    "calendar/<int:pk>/move/",
+    views.move_calendar_event,
+    name="move_calendar_event"
+),
+
+path(
+    "calendar/<int:pk>/resize/",
+    views.resize_calendar_event,
+    name="resize_calendar_event"
 ),
 
 ]

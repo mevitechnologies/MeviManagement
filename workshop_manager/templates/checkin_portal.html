@@ -1,0 +1,1209 @@
+{% extends "base.html" %}
+
+{% block title %}Trainer Check-In | Mevi{% endblock %}
+
+{% block content %}
+
+<style>
+    :root {
+        --cp-primary: #4f46e5;
+        --cp-primary-dark: #3730a3;
+        --cp-purple: #7c3aed;
+        --cp-green: #059669;
+        --cp-red: #dc2626;
+        --cp-orange: #d97706;
+        --cp-blue: #0284c7;
+        --cp-ink: #111827;
+        --cp-muted: #667085;
+        --cp-line: #e5e7eb;
+        --cp-soft: #f7f8fc;
+        --cp-white: #ffffff;
+        --cp-shadow: 0 10px 30px rgba(15, 23, 42, 0.07);
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .checkin-page {
+        min-height: calc(100vh - 70px);
+        background: #f5f7fb;
+        padding: 30px 28px 55px;
+        color: var(--cp-ink);
+    }
+
+    .checkin-container {
+        max-width: 1500px;
+        margin: 0 auto;
+    }
+
+    /* ================================
+       HERO
+    ================================= */
+
+    .checkin-hero {
+        position: relative;
+        overflow: hidden;
+        border-radius: 24px;
+        padding: 30px 34px;
+        margin-bottom: 22px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #292172 0%,
+                #5143c7 55%,
+                #7540d9 100%
+            );
+
+        color: white;
+        box-shadow: 0 18px 45px rgba(67, 56, 202, .18);
+    }
+
+    .checkin-hero::before {
+        content: "";
+        position: absolute;
+        width: 320px;
+        height: 320px;
+        border-radius: 50%;
+        background: rgba(255,255,255,.07);
+        right: -120px;
+        top: -190px;
+    }
+
+    .checkin-hero::after {
+        content: "";
+        position: absolute;
+        width: 170px;
+        height: 170px;
+        border-radius: 50%;
+        background: rgba(255,255,255,.06);
+        right: 180px;
+        bottom: -120px;
+    }
+
+    .checkin-hero-content {
+        position: relative;
+        z-index: 1;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 25px;
+    }
+
+    .hero-left {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+    }
+
+    .hero-icon {
+        width: 62px;
+        height: 62px;
+        flex: 0 0 62px;
+
+        display: grid;
+        place-items: center;
+
+        border-radius: 17px;
+
+        background: rgba(255,255,255,.14);
+        border: 1px solid rgba(255,255,255,.20);
+
+        font-size: 27px;
+    }
+
+    .hero-kicker {
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        opacity: .72;
+    }
+
+    .hero-title {
+        margin: 5px 0 7px;
+
+        font-size: 34px;
+        line-height: 1.1;
+        font-weight: 900;
+        letter-spacing: -1px;
+    }
+
+    .hero-description {
+        margin: 0;
+
+        font-size: 14px;
+        line-height: 1.6;
+
+        color: rgba(255,255,255,.82);
+    }
+
+    .hero-date {
+        min-width: 150px;
+
+        padding: 15px 20px;
+
+        text-align: center;
+
+        border-radius: 16px;
+
+        background: rgba(255,255,255,.10);
+        border: 1px solid rgba(255,255,255,.20);
+    }
+
+    .hero-date-label {
+        display: block;
+
+        font-size: 10px;
+        font-weight: 800;
+
+        text-transform: uppercase;
+        letter-spacing: 1px;
+
+        opacity: .65;
+    }
+
+    .hero-date-value {
+        display: block;
+
+        margin-top: 5px;
+
+        font-size: 17px;
+        font-weight: 900;
+    }
+
+
+    /* ================================
+       SUMMARY CARDS
+    ================================= */
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+
+        margin-bottom: 22px;
+    }
+
+    .summary-card {
+        background: white;
+
+        border: 1px solid var(--cp-line);
+        border-radius: 17px;
+
+        padding: 18px;
+
+        box-shadow: var(--cp-shadow);
+    }
+
+    .summary-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .summary-icon {
+        width: 40px;
+        height: 40px;
+
+        display: grid;
+        place-items: center;
+
+        border-radius: 11px;
+
+        font-size: 17px;
+    }
+
+    .summary-card.total .summary-icon {
+        background: #eeebff;
+        color: var(--cp-primary);
+    }
+
+    .summary-card.working .summary-icon {
+        background: #eafaf2;
+        color: var(--cp-green);
+    }
+
+    .summary-card.completed .summary-icon {
+        background: #eaf6ff;
+        color: var(--cp-blue);
+    }
+
+    .summary-card.pending .summary-icon {
+        background: #fff4e8;
+        color: var(--cp-orange);
+    }
+
+    .summary-number {
+        margin-top: 14px;
+
+        font-size: 29px;
+        line-height: 1;
+
+        font-weight: 900;
+    }
+
+    .summary-label {
+        margin-top: 5px;
+
+        font-size: 12px;
+        font-weight: 700;
+
+        color: var(--cp-muted);
+    }
+
+
+    /* ================================
+       MAIN CARD
+    ================================= */
+
+    .main-card {
+        background: white;
+
+        border: 1px solid var(--cp-line);
+        border-radius: 21px;
+
+        box-shadow: var(--cp-shadow);
+
+        overflow: hidden;
+    }
+
+    .main-card-header {
+        padding: 22px 24px;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+
+        border-bottom: 1px solid #eef0f3;
+    }
+
+    .section-title {
+        margin: 0;
+
+        font-size: 20px;
+        font-weight: 900;
+    }
+
+    .section-subtitle {
+        margin: 5px 0 0;
+
+        font-size: 12px;
+        color: var(--cp-muted);
+    }
+
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+
+        padding: 10px 14px;
+
+        border-radius: 10px;
+
+        background: #f1efff;
+        color: var(--cp-primary);
+
+        text-decoration: none;
+
+        font-size: 12px;
+        font-weight: 900;
+
+        transition: .18s ease;
+    }
+
+    .back-button:hover {
+        background: #e8e4ff;
+        color: var(--cp-primary-dark);
+        text-decoration: none;
+        transform: translateY(-1px);
+    }
+
+
+    /* ================================
+       TABLE
+    ================================= */
+
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .trainer-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .trainer-table th {
+        padding: 14px 18px;
+
+        background: #fafbfc;
+
+        border-bottom: 1px solid #e8eaee;
+
+        text-align: left;
+
+        font-size: 10px;
+        font-weight: 900;
+
+        text-transform: uppercase;
+        letter-spacing: .6px;
+
+        color: #667085;
+        white-space: nowrap;
+    }
+
+    .trainer-table td {
+        padding: 15px 18px;
+
+        border-bottom: 1px solid #f0f1f4;
+
+        vertical-align: middle;
+
+        font-size: 12px;
+    }
+
+    .trainer-table tbody tr {
+        transition: .16s ease;
+    }
+
+    .trainer-table tbody tr:hover {
+        background: #fafaff;
+    }
+
+    .trainer-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+
+    /* ================================
+       TRAINER
+    ================================= */
+
+    .trainer-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        min-width: 220px;
+    }
+
+    .trainer-avatar {
+        width: 44px;
+        height: 44px;
+
+        flex: 0 0 44px;
+
+        border-radius: 50%;
+
+        display: grid;
+        place-items: center;
+
+        overflow: hidden;
+
+        background:
+            linear-gradient(
+                135deg,
+                #4f46e5,
+                #7c3aed
+            );
+
+        color: white;
+
+        font-size: 14px;
+        font-weight: 900;
+    }
+
+    .trainer-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .trainer-name {
+        font-size: 13px;
+        font-weight: 900;
+        color: #172033;
+    }
+
+    .trainer-role {
+        margin-top: 3px;
+
+        font-size: 10px;
+        color: #98a2b3;
+    }
+
+
+    /* ================================
+       STATUS
+    ================================= */
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+
+        padding: 6px 9px;
+
+        border-radius: 8px;
+
+        font-size: 10px;
+        font-weight: 900;
+
+        white-space: nowrap;
+    }
+
+    .status-dot {
+        width: 7px;
+        height: 7px;
+
+        border-radius: 50%;
+    }
+
+    .status-working {
+        background: #ecfdf3;
+        color: #047857;
+    }
+
+    .status-working .status-dot {
+        background: #10b981;
+    }
+
+    .status-completed {
+        background: #eff6ff;
+        color: #2563eb;
+    }
+
+    .status-completed .status-dot {
+        background: #3b82f6;
+    }
+
+    .status-pending {
+        background: #fff7ed;
+        color: #c2410c;
+    }
+
+    .status-pending .status-dot {
+        background: #f97316;
+    }
+
+
+    /* ================================
+       TIME
+    ================================= */
+
+    .time-cell {
+        min-width: 130px;
+    }
+
+    .time-row {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+
+        margin-bottom: 5px;
+
+        font-size: 11px;
+        font-weight: 700;
+        color: #475467;
+    }
+
+    .time-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .time-row i {
+        width: 15px;
+        color: var(--cp-primary);
+    }
+
+    .no-time {
+        color: #98a2b3;
+        font-size: 11px;
+    }
+
+
+    /* ================================
+       ACTION
+    ================================= */
+
+    .action-cell {
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .action-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+
+        padding: 8px 11px;
+
+        border-radius: 9px;
+
+        background: #f1efff;
+        color: var(--cp-primary);
+
+        text-decoration: none;
+
+        font-size: 10px;
+        font-weight: 900;
+
+        transition: .18s ease;
+    }
+
+    .action-button:hover {
+        background: #e8e4ff;
+        color: var(--cp-primary-dark);
+        text-decoration: none;
+        transform: translateY(-1px);
+    }
+
+
+    /* ================================
+       EMPTY
+    ================================= */
+
+    .empty-state {
+        padding: 60px 20px;
+
+        text-align: center;
+    }
+
+    .empty-icon {
+        width: 60px;
+        height: 60px;
+
+        margin: 0 auto 14px;
+
+        display: grid;
+        place-items: center;
+
+        border-radius: 17px;
+
+        background: #f1efff;
+        color: var(--cp-primary);
+
+        font-size: 25px;
+    }
+
+    .empty-state h3 {
+        margin: 0;
+
+        font-size: 17px;
+        font-weight: 900;
+    }
+
+    .empty-state p {
+        margin: 6px 0 0;
+
+        font-size: 12px;
+        color: var(--cp-muted);
+    }
+
+
+    /* ================================
+       FOOTER
+    ================================= */
+
+    .page-footer {
+        margin-top: 18px;
+
+        text-align: center;
+
+        font-size: 10px;
+        color: #98a2b3;
+    }
+
+
+    /* ================================
+       RESPONSIVE
+    ================================= */
+
+    @media (max-width: 1050px) {
+
+        .summary-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+    }
+
+    @media (max-width: 750px) {
+
+        .checkin-page {
+            padding: 20px 14px 40px;
+        }
+
+        .checkin-hero {
+            padding: 24px;
+        }
+
+        .checkin-hero-content {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .hero-date {
+            width: 100%;
+        }
+
+        .hero-title {
+            font-size: 28px;
+        }
+
+        .main-card-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .back-button {
+            width: 100%;
+            justify-content: center;
+        }
+
+    }
+
+    @media (max-width: 520px) {
+
+        .summary-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .hero-left {
+            align-items: flex-start;
+        }
+
+        .hero-icon {
+            width: 52px;
+            height: 52px;
+            flex-basis: 52px;
+            font-size: 22px;
+        }
+
+        .hero-title {
+            font-size: 24px;
+        }
+
+    }
+</style>
+
+
+<div class="checkin-page">
+
+    <div class="checkin-container">
+
+        <!-- =========================================
+             HERO
+        ========================================== -->
+
+        <section class="checkin-hero">
+
+            <div class="checkin-hero-content">
+
+                <div class="hero-left">
+
+                    <div class="hero-icon">
+                        <i class="bi bi-fingerprint"></i>
+                    </div>
+
+                    <div>
+
+                        <div class="hero-kicker">
+                            Mevi Trainer Management
+                        </div>
+
+                        <h1 class="hero-title">
+                            Trainer Check-In
+                        </h1>
+
+                        <p class="hero-description">
+                            Monitor today's full-time trainer attendance,
+                            check-in status and working hours.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="hero-date">
+
+                    <span class="hero-date-label">
+                        Today's Date
+                    </span>
+
+                    <span class="hero-date-value">
+                        {{ today|date:"d M Y" }}
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             SUMMARY
+        ========================================== -->
+
+        <div class="summary-grid">
+
+            <div class="summary-card total">
+
+                <div class="summary-top">
+
+                    <div>
+                        <div class="summary-label">
+                            Total Full-Time Trainers
+                        </div>
+
+                        <div class="summary-number">
+                            {{ trainer_list|length }}
+                        </div>
+                    </div>
+
+                    <div class="summary-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="summary-card working">
+
+                <div class="summary-top">
+
+                    <div>
+                        <div class="summary-label">
+                            Currently Working
+                        </div>
+
+                        <div class="summary-number" id="workingCount">
+                            0
+                        </div>
+                    </div>
+
+                    <div class="summary-icon">
+                        <i class="bi bi-person-check-fill"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="summary-card completed">
+
+                <div class="summary-top">
+
+                    <div>
+                        <div class="summary-label">
+                            Checked Out
+                        </div>
+
+                        <div class="summary-number" id="checkedOutCount">
+                            0
+                        </div>
+                    </div>
+
+                    <div class="summary-icon">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="summary-card pending">
+
+                <div class="summary-top">
+
+                    <div>
+                        <div class="summary-label">
+                            Not Checked In
+                        </div>
+
+                        <div class="summary-number" id="pendingCount">
+                            0
+                        </div>
+                    </div>
+
+                    <div class="summary-icon">
+                        <i class="bi bi-person-x-fill"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             MAIN TABLE
+        ========================================== -->
+
+        <section class="main-card">
+
+            <div class="main-card-header">
+
+                <div>
+
+                    <h2 class="section-title">
+                        Today's Trainer Attendance
+                    </h2>
+
+                    <p class="section-subtitle">
+                        Full-time trainers and their attendance status
+                    </p>
+
+                </div>
+
+                <a href="{% url 'dashboard' %}" class="back-button">
+                    <i class="bi bi-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+
+            </div>
+
+
+            {% if trainer_list %}
+
+                <div class="table-wrapper">
+
+                    <table class="trainer-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Trainer
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Check In
+                                </th>
+
+                                <th>
+                                    Check Out
+                                </th>
+
+                                <th>
+                                    Attendance
+                                </th>
+
+                                <th>
+                                    Action
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for item in trainer_list %}
+
+                                {% with trainer=item.trainer attendance=item.attendance %}
+
+                                    <tr>
+
+                                        <!-- TRAINER -->
+
+                                        <td>
+
+                                            <div class="trainer-info">
+
+                                                <div class="trainer-avatar">
+
+                                                    {% if trainer.profile_photo %}
+
+                                                        <img
+                                                            src="{{ trainer.profile_photo.url }}"
+                                                            alt="{{ trainer.Name }}"
+                                                        >
+
+                                                    {% else %}
+
+                                                        {{ trainer.Name|first|upper }}
+
+                                                    {% endif %}
+
+                                                </div>
+
+                                                <div>
+
+                                                    <div class="trainer-name">
+                                                        {{ trainer.Name }}
+                                                    </div>
+
+                                                    <div class="trainer-role">
+
+                                                        {% if trainer.expertise %}
+                                                            {{ trainer.expertise }}
+                                                        {% else %}
+                                                            Full-Time Trainer
+                                                        {% endif %}
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        </td>
+
+
+                                        <!-- STATUS -->
+
+                                        <td>
+
+                                            {% if attendance and attendance.check_out %}
+
+                                                <span class="status-badge status-completed">
+                                                    <span class="status-dot"></span>
+                                                    Checked Out
+                                                </span>
+
+                                            {% elif attendance and attendance.check_in %}
+
+                                                <span class="status-badge status-working">
+                                                    <span class="status-dot"></span>
+                                                    Working
+                                                </span>
+
+                                            {% else %}
+
+                                                <span class="status-badge status-pending">
+                                                    <span class="status-dot"></span>
+                                                    Not Checked In
+                                                </span>
+
+                                            {% endif %}
+
+                                        </td>
+
+
+                                        <!-- CHECK IN -->
+
+                                        <td class="time-cell">
+
+                                            {% if attendance and attendance.check_in %}
+
+                                                <div class="time-row">
+
+                                                    <i class="bi bi-box-arrow-in-right"></i>
+
+                                                    {{ attendance.check_in|date:"h:i A" }}
+
+                                                </div>
+
+                                            {% else %}
+
+                                                <span class="no-time">
+                                                    —
+                                                </span>
+
+                                            {% endif %}
+
+                                        </td>
+
+
+                                        <!-- CHECK OUT -->
+
+                                        <td class="time-cell">
+
+                                            {% if attendance and attendance.check_out %}
+
+                                                <div class="time-row">
+
+                                                    <i class="bi bi-box-arrow-right"></i>
+
+                                                    {{ attendance.check_out|date:"h:i A" }}
+
+                                                </div>
+
+                                            {% else %}
+
+                                                <span class="no-time">
+                                                    —
+                                                </span>
+
+                                            {% endif %}
+
+                                        </td>
+
+
+                                        <!-- ATTENDANCE -->
+
+                                        <td>
+
+                                            {% if attendance %}
+
+                                                {% if attendance.check_out %}
+
+                                                    <span
+                                                        class="status-badge status-completed attendance-status"
+                                                        data-status="checked_out"
+                                                    >
+                                                        Complete
+                                                    </span>
+
+                                                {% elif attendance.check_in %}
+
+                                                    <span
+                                                        class="status-badge status-working attendance-status"
+                                                        data-status="working"
+                                                    >
+                                                        Active
+                                                    </span>
+
+                                                {% else %}
+
+                                                    <span
+                                                        class="status-badge status-pending attendance-status"
+                                                        data-status="pending"
+                                                    >
+                                                        Pending
+                                                    </span>
+
+                                                {% endif %}
+
+                                            {% else %}
+
+                                                <span
+                                                    class="status-badge status-pending attendance-status"
+                                                    data-status="pending"
+                                                >
+                                                    Pending
+                                                </span>
+
+                                            {% endif %}
+
+                                        </td>
+
+
+                                        <!-- ACTION -->
+
+                                        <td class="action-cell">
+
+                                            <a
+                                                href="{% url 'trainer_attendance' %}?attendance_date={{ today|date:'Y-m-d' }}"
+                                                class="action-button"
+                                            >
+                                                <i class="bi bi-eye"></i>
+                                                View
+                                            </a>
+
+                                        </td>
+
+                                    </tr>
+
+                                {% endwith %}
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+
+                    <h3>
+                        No Full-Time Trainers
+                    </h3>
+
+                    <p>
+                        There are currently no full-time trainers available.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+
+        <div class="page-footer">
+            Mevi Technologies • Trainer Attendance Management
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const statusElements =
+        document.querySelectorAll(".attendance-status");
+
+    let working = 0;
+    let checkedOut = 0;
+    let pending = 0;
+
+    statusElements.forEach(function (element) {
+
+        const status = element.dataset.status;
+
+        if (status === "working") {
+            working++;
+        }
+
+        else if (status === "checked_out") {
+            checkedOut++;
+        }
+
+        else {
+            pending++;
+        }
+
+    });
+
+    const workingElement =
+        document.getElementById("workingCount");
+
+    const checkedOutElement =
+        document.getElementById("checkedOutCount");
+
+    const pendingElement =
+        document.getElementById("pendingCount");
+
+
+    if (workingElement) {
+        workingElement.textContent = working;
+    }
+
+    if (checkedOutElement) {
+        checkedOutElement.textContent = checkedOut;
+    }
+
+    if (pendingElement) {
+        pendingElement.textContent = pending;
+    }
+
+});
+</script>
+
+{% endblock %}

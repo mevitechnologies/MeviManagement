@@ -97,222 +97,157 @@ def logout_view(request):
 # MAIN DASHBOARD
 # =====================================================
 
+# ============================================================
+# MEVI COMMAND CENTER / ADMIN DASHBOARD
+# ============================================================
 @login_required
 def dashboard(request):
 
     today = timezone.localdate()
 
-    # =====================================================
-    # GREETINGS
-    # =====================================================
+    # ============================================================
+    # TASKS — TODAY ONLY FOR DASHBOARD
+    # ============================================================
 
-    greetings = {
-        "morning": [
-            (
-                "Good Morning, Mevi Family! 🌻",
-                "Nenne enaythu anta worry beda… ivattu namma fresh start. "
-                "Ondu small step, ondu good thought, ondu happy smile — "
-                "let's make today meaningful. ❤️"
-            ),
-            (
-                "Namaskara, Team Mevi! ☀️",
-                "Coffee ready aa? 😄 "
-                "Let's learn something, finish something, help someone "
-                "and make the day count."
-            ),
-            (
-                "Good Morning, Wonderful People! 🌱",
-                "Perfect day bekagilla… swalpa progress saaku. "
-                "Let's move forward together."
-            ),
-            (
-                "Good Morning, Mevi Family! 💜",
-                "Every new day gives us one more chance to learn, improve "
-                "and make someone's journey a little easier."
-            ),
-            (
-                "Namaskara! A New Day, A New Beginning. 🌸",
-                "Namma work just tasks alla — every small effort "
-                "contributes to something bigger."
-            ),
-        ],
-
-        "afternoon": [
-            (
-                "Good Afternoon, Mevi Family! ☀️",
-                "Half day done! 😄 "
-                "Swalpa energy recharge madi, let's finish the day strong."
-            ),
-            (
-                "Hello Team Mevi! 🌻",
-                "Ivattu perfect agirbeku anta illa. "
-                "Just keep moving, keep helping and keep learning."
-            ),
-            (
-                "Good Afternoon, Wonderful Team! 💜",
-                "One task completed, one student helped, one problem solved — "
-                "small wins become big journeys."
-            ),
-            (
-                "Namaskara Mevi Family! 🌱",
-                "Work pressure irbahudu… but together handle madidre "
-                "everything becomes a little lighter. 🤝"
-            ),
-        ],
-
-        "evening": [
-            (
-                "Good Evening, Mevi Family! 🌙",
-                "Before the day ends, remember — "
-                "today's small efforts may become tomorrow's big achievements."
-            ),
-            (
-                "Hello Team! 🌸",
-                "Ivattu enu complete madidru, be proud of the progress. "
-                "Tomorrow is another beautiful opportunity."
-            ),
-            (
-                "Good Evening, Wonderful People! 💜",
-                "Work is important, but the people we work with make "
-                "the journey special. Thank you for being a team."
-            ),
-        ],
-    }
-
-    hour = timezone.localtime().hour
-
-    if hour < 12:
-        greeting_period = "morning"
-        greeting_icon = "🌅"
-
-    elif hour < 17:
-        greeting_period = "afternoon"
-        greeting_icon = "☀️"
-
-    else:
-        greeting_period = "evening"
-        greeting_icon = "🌙"
-
-    greeting_index = today.toordinal() % len(
-        greetings[greeting_period]
+    today_tasks = (
+        TodoTask.objects
+        .filter(for_date=today)
+        .select_related("trainer")
+        .prefetch_related("subtasks")
+        .order_by("-created_on")
     )
 
-    greeting, greeting_message = greetings[
-        greeting_period
-    ][greeting_index]
+    today_pending = today_tasks.filter(
+        status="pending"
+    )
 
-    # =====================================================
-    # THOUGHT OF THE DAY
-    # =====================================================
+    today_in_progress = today_tasks.filter(
+        status="in_progress"
+    )
 
-    DAILY_THOUGHTS = [
+    today_completed = today_tasks.filter(
+        status="completed"
+    )
 
-        (
-            "A great trainer doesn't just teach a skill — "
-            "they inspire someone to believe they can master it."
-        ),
+    # ============================================================
+    # ALL TASK STATUS COUNTS
+    # These are kept for the statistics cards.
+    # ============================================================
 
-        (
-            "Knowledge becomes powerful when it is shared."
-        ),
+    all_tasks = TodoTask.objects.all()
 
-        (
-            "The best trainers never stop being learners."
-        ),
+    pending_tasks = all_tasks.filter(
+        status="pending"
+    )
 
-        (
-            "Every learner you teach today carries a possibility "
-            "you may never fully see. Teach with purpose."
-        ),
+    in_progress_tasks = all_tasks.filter(
+        status="in_progress"
+    )
 
-        (
-            "Teaching is not about having all the answers. "
-            "It is about creating an environment where people "
-            "love discovering them."
-        ),
+    completed_tasks = all_tasks.filter(
+        status="completed"
+    )
 
-        (
-            "Learn something new. Teach something useful. "
-            "Inspire someone. Repeat."
-        ),
+    # ============================================================
+    # WORKSHOPS
+    #
+    # ACTIVE:
+    # start <= today <= end
+    #
+    # UPCOMING:
+    # start > today
+    #
+    # PAST WORKSHOPS ARE NOT SHOWN
+    # ============================================================
 
-        (
-            "One hour of teaching can create an impact "
-            "that lasts for years."
-        ),
+    base_workshops = (
+        Workshop.objects
+        .select_related("college")
+        .prefetch_related("assigned_trainers")
+    )
 
-        (
-            "Your passion for learning can become "
-            "someone else's motivation to grow."
-        ),
+    active_workshops = (
+        base_workshops
+        .filter(
+            start_date__lte=today,
+            end_date__gte=today
+        )
+        .exclude(
+            status__in=[
+                "cancelled",
+                "postponed",
+            ]
+        )
+        .order_by(
+            "end_date",
+            "title"
+        )
+    )
 
-        (
-            "Don't just complete a training session. "
-            "Create a learning experience."
-        ),
+    upcoming_workshops = (
+        base_workshops
+        .filter(
+            start_date__gt=today
+        )
+        .exclude(
+            status__in=[
+                "cancelled",
+                "postponed",
+            ]
+        )
+        .order_by(
+            "start_date",
+            "title"
+        )[:10]
+    )
 
-        (
-            "Every question from a student is an opportunity "
-            "to make your teaching better."
-        ),
+    # ============================================================
+    # CALENDAR EVENTS
+    #
+    # TODAY:
+    # date == today
+    #
+    # UPCOMING:
+    # date > today
+    #
+    # PAST EVENTS ARE NOT SHOWN
+    # ============================================================
 
-        (
-            "Great teaching begins with curiosity "
-            "and grows through patience."
-        ),
+    base_events = (
+        CalendarEvent.objects
+        .select_related(
+            "college",
+            "workshop"
+        )
+        .prefetch_related("trainers")
+    )
 
-        (
-            "Train minds. Build skills. Create confidence."
-        ),
+    todays_events = (
+        base_events
+        .filter(
+            date=today
+        )
+        .order_by(
+            "start_time",
+            "title"
+        )
+    )
 
-        (
-            "The goal isn't simply to finish the syllabus. "
-            "The goal is to create understanding."
-        ),
+    upcoming_events = (
+        base_events
+        .filter(
+            date__gt=today
+        )
+        .order_by(
+            "date",
+            "start_time",
+            "title"
+        )[:15]
+    )
 
-        (
-            "Keep learning, keep teaching, keep improving."
-        ),
-
-        (
-            "Behind every skilled professional is someone "
-            "who once took the time to teach them."
-        ),
-
-        (
-            "Ondu dina perfect agiralla. "
-            "But every day has something beautiful to teach us."
-        ),
-
-        (
-            "Swalpa swalpa progress kooda progress ne. "
-            "Never underestimate small steps."
-        ),
-
-        (
-            "Namma journey nammade. "
-            "Compare beda. Just keep growing."
-        ),
-
-        (
-            "Someone may remember your lesson, "
-            "but they will definitely remember how you made them feel."
-        ),
-
-        (
-            "Ondu helping hand, ondu kind word, "
-            "ondu little appreciation — it can change someone's day."
-        ),
-
-    ]
-
-    daily_thought = DAILY_THOUGHTS[
-        today.toordinal() % len(DAILY_THOUGHTS)
-    ]
-
-    # =====================================================
-    # ALL TRAINERS
-    # =====================================================
+    # ============================================================
+    # TRAINERS
+    # ============================================================
 
     trainers = (
         Trainer.objects
@@ -320,24 +255,13 @@ def dashboard(request):
         .order_by("Name")
     )
 
-    total_trainers = trainers.count()
-
-    # =====================================================
-    # FULL-TIME TRAINERS
-    # =====================================================
-
-    full_time_trainers = (
-        Trainer.objects
-        .filter(is_full_time=True)
-        .select_related("user")
-        .order_by("Name")
+    full_time_trainers = trainers.filter(
+        is_full_time=True
     )
 
-    full_time_trainer_count = full_time_trainers.count()
-
-    # =====================================================
+    # ============================================================
     # TODAY ATTENDANCE
-    # =====================================================
+    # ============================================================
 
     attendance_records = (
         DailyAttendance.objects
@@ -349,57 +273,37 @@ def dashboard(request):
     )
 
     attendance_map = {
-        attendance.trainer_id: attendance
-        for attendance in attendance_records
+        record.trainer_id: record
+        for record in attendance_records
     }
 
     checked_in_count = sum(
         1
-        for attendance in attendance_records
-        if attendance.check_in
+        for record in attendance_records
+        if record.check_in
     )
 
     working_count = sum(
         1
-        for attendance in attendance_records
-        if (
-            attendance.check_in
-            and not attendance.check_out
-        )
+        for record in attendance_records
+        if record.check_in and not record.check_out
     )
 
     checked_out_count = sum(
         1
-        for attendance in attendance_records
-        if (
-            attendance.check_in
-            and attendance.check_out
-        )
+        for record in attendance_records
+        if record.check_out
     )
 
     not_checked_in_count = max(
-        full_time_trainer_count - checked_in_count,
+        full_time_trainers.count()
+        - checked_in_count,
         0
     )
 
-    # =====================================================
-    # TODAY'S TASKS
-    # =====================================================
-
-    today_tasks = (
-        TodoTask.objects
-        .filter(for_date=today)
-        .select_related("trainer")
-        .order_by(
-            "trainer__Name",
-            "-created_on"
-        )
-    )
-
-    # =====================================================
+    # ============================================================
     # TRAINER STATUS
-    # WITH ACTIVITY COUNT
-    # =====================================================
+    # ============================================================
 
     trainer_status = []
 
@@ -409,29 +313,20 @@ def dashboard(request):
             trainer.id
         )
 
-        trainer_tasks = today_tasks.filter(
+        trainer_today_tasks = today_tasks.filter(
             trainer=trainer
         )
 
-        activity_count = trainer_tasks.count()
-
-        completed_activity_count = trainer_tasks.filter(
-            status="completed"
-        ).count()
-
-        working_activity_count = trainer_tasks.exclude(
-            status="completed"
-        ).count()
-
-        latest_task = trainer_tasks.first()
-
         if attendance and attendance.check_out:
+
             status = "checked_out"
 
         elif attendance and attendance.check_in:
+
             status = "working"
 
         else:
+
             status = "not_checked_in"
 
         trainer_status.append({
@@ -442,578 +337,243 @@ def dashboard(request):
 
             "status": status,
 
-            "activity_count":
-                activity_count,
+            "task_count":
+                trainer_today_tasks.count(),
 
-            "completed_activity_count":
-                completed_activity_count,
-
-            "working_activity_count":
-                working_activity_count,
-
-            "latest_task":
-                latest_task,
-
-            "tasks":
-                trainer_tasks,
-
+            "completed_count":
+                trainer_today_tasks.filter(
+                    status="completed"
+                ).count(),
         })
 
-    # =====================================================
-    # UPCOMING WORKSHOPS
-    # =====================================================
+    # ============================================================
+    # SUPER ADMIN TASK FORM
+    # ============================================================
 
-    upcoming_workshops = (
-        Workshop.objects
-        .filter(
-            start_date__gte=today
-        )
-        .exclude(
-            status="cancelled"
-        )
-        .select_related("college")
-        .prefetch_related("assigned_trainers")
-        .order_by("start_date")[:6]
-    )
+    form = None
 
-    # =====================================================
-    # UPCOMING 7 DAYS
-    # =====================================================
+    if request.user.is_superuser:
 
-    next_seven_days = today + timedelta(days=7)
-
-    upcoming_schedule = []
-
-    # -----------------------------------------------------
-    # WORKSHOPS
-    # -----------------------------------------------------
-
-    upcoming_workshops_schedule = (
-        Workshop.objects
-        .filter(
-            start_date__lte=next_seven_days,
-            end_date__gte=today
-        )
-        .exclude(status="cancelled")
-        .select_related("college")
-        .prefetch_related("assigned_trainers")
-        .order_by(
-            "start_date",
-            "title"
-        )
-    )
-
-    for workshop in upcoming_workshops_schedule:
-
-        trainer_names = ", ".join(
-            trainer.Name
-            for trainer
-            in workshop.assigned_trainers.all()
+        form = TodoTaskForm(
+            request.POST or None
         )
 
-        upcoming_schedule.append({
+        if (
+            request.method == "POST"
+            and form.is_valid()
+        ):
 
-            "date":
-                workshop.start_date,
+            form.save()
 
-            "end_date":
-                workshop.end_date,
-
-            "title":
-                workshop.title,
-
-            "type":
-                "Workshop",
-
-            "college":
-                workshop.college.name
-                if workshop.college
-                else "—",
-
-            "trainer":
-                trainer_names
-                if trainer_names
-                else "—",
-
-            "time":
-                "As scheduled",
-
-            "location":
-                workshop.college.name
-                if workshop.college
-                else "—",
-
-            "status":
-                workshop.get_status_display(),
-
-        })
-
-    # -----------------------------------------------------
-    # CALENDAR EVENTS
-    # -----------------------------------------------------
-
-    calendar_schedule_events = (
-        CalendarEvent.objects
-        .filter(
-            date__gte=today,
-            date__lte=next_seven_days
-        )
-        .exclude(
-            event_type="workshop",
-            workshop__isnull=False
-        )
-        .select_related(
-            "college",
-            "workshop"
-        )
-        .prefetch_related(
-            "trainers"
-        )
-        .order_by(
-            "date",
-            "start_time"
-        )
-    )
-
-    for event in calendar_schedule_events:
-
-        trainer_names = ", ".join(
-            trainer.Name
-            for trainer in event.trainers.all()
-        )
-
-        if event.start_time and event.end_time:
-
-            time_text = (
-                f"{event.start_time.strftime('%I:%M %p')}"
-                f" – "
-                f"{event.end_time.strftime('%I:%M %p')}"
+            messages.success(
+                request,
+                "Task created successfully."
             )
 
-        elif event.start_time:
-
-            time_text = event.start_time.strftime(
-                "%I:%M %p"
+            return redirect(
+                "admin_task_dashboard"
             )
 
-        else:
-
-            time_text = "—"
-
-        upcoming_schedule.append({
-
-            "date":
-                event.date,
-
-            "end_date":
-                event.date,
-
-            "title":
-                event.title,
-
-            "type":
-                event.get_event_type_display(),
-
-            "college":
-                event.college.name
-                if event.college
-                else "—",
-
-            "trainer":
-                trainer_names
-                if trainer_names
-                else "—",
-
-            "time":
-                time_text,
-
-            "location":
-                event.location
-                if event.location
-                else "—",
-
-            "status":
-                "Scheduled",
-
-        })
-
-    upcoming_schedule.sort(
-        key=lambda item: (
-            item["date"],
-            item["title"].lower()
-        )
-    )
-
-    # =====================================================
-    # NEEDS ATTENTION
-    # =====================================================
-
-    pending_workshops_count = (
-        Workshop.objects
-        .filter(
-            start_date__gte=today
-        )
-        .filter(
-            status="tentative"
-        )
-        .count()
-    )
-
-    pending_reports_count = (
-        Workshop.objects
-        .filter(
-            end_date__lt=today
-        )
-        .exclude(
-            status__in=[
-                "completed",
-                "cancelled"
-            ]
-        )
-        .count()
-    )
-
-    # =====================================================
-    # CALENDAR EVENTS FOR MASTER CALENDAR
-    # =====================================================
-
-    events = []
-
-    # -----------------------------------------------------
-    # WORKSHOPS
-    # -----------------------------------------------------
-
-    workshops = (
-        Workshop.objects
-        .prefetch_related("assigned_trainers")
-        .select_related("college")
-        .all()
-    )
-
-    for workshop in workshops:
-
-        trainer_names = ", ".join(
-            trainer.Name
-            for trainer
-            in workshop.assigned_trainers.all()
-        )
-
-        events.append({
-
-            "id":
-                f"workshop-{workshop.pk}",
-
-            "title":
-                f"📚 {workshop.title}",
-
-            "start":
-                workshop.start_date.strftime(
-                    "%Y-%m-%d"
-                )
-                if workshop.start_date
-                else None,
-
-            "end":
-                (
-                    workshop.end_date +
-                    timedelta(days=1)
-                ).strftime("%Y-%m-%d")
-                if workshop.end_date
-                else None,
-
-            "color":
-                "#5B4BDB",
-
-            "url":
-                reverse(
-                    "workshop_detail",
-                    args=[workshop.pk]
-                ),
-
-            "extendedProps": {
-
-                "trainer":
-                    trainer_names,
-
-                "college":
-                    workshop.college.name
-                    if workshop.college
-                    else "",
-
-                "department":
-                    workshop.departments or "",
-
-                "event_type":
-                    "Workshop",
-
-                "status":
-                    workshop.get_status_display(),
-
-                "description":
-                    workshop.remarks or "",
-
-            }
-        })
-
-    # -----------------------------------------------------
-    # OFFICE TRAINING
-    # -----------------------------------------------------
-
-    office_trainings = (
-        OfficeTraining.objects
-        .prefetch_related("trainers")
-        .all()
-    )
-
-    for training in office_trainings:
-
-        trainer_names = ", ".join(
-            trainer.Name
-            for trainer
-            in training.trainers.all()
-        )
-
-        events.append({
-
-            "id":
-                f"office-{training.pk}",
-
-            "title":
-                f"🏢 {training.name}",
-
-            "start":
-                training.start_date.strftime(
-                    "%Y-%m-%d"
-                )
-                if training.start_date
-                else None,
-
-            "end":
-                (
-                    training.end_date +
-                    timedelta(days=1)
-                ).strftime("%Y-%m-%d")
-                if training.end_date
-                else None,
-
-            "color":
-                "#2563EB",
-
-            "url":
-                reverse(
-                    "view_office_training",
-                    args=[training.pk]
-                ),
-
-            "extendedProps": {
-
-                "trainer":
-                    trainer_names,
-
-                "college":
-                    "Mevi Technologies",
-
-                "department":
-                    "",
-
-                "event_type":
-                    "Office Training",
-
-                "status":
-                    "Scheduled",
-
-                "description":
-                    (
-                        f"Batch: {training.batch_id}"
-                        if training.batch_id
-                        else ""
-                    ),
-
-            }
-        })
-
-    # -----------------------------------------------------
-    # CALENDAR EVENTS
-    # -----------------------------------------------------
-
-    calendar_events = (
-        CalendarEvent.objects
-        .select_related(
-            "college",
-            "workshop"
-        )
-        .prefetch_related(
-            "trainers"
-        )
-        .all()
-    )
-
-    event_colors = {
-
-        "workshop":
-            "#5B4BDB",
-
-        "fdp":
-            "#EC4899",
-
-        "online_workshop":
-            "#2563EB",
-
-        "office":
-            "#16A34A",
-
-        "guest_training":
-            "#F59E0B",
-
-        "meeting":
-            "#7C3AED",
-
-        "other":
-            "#64748B",
-
-    }
-
-    for event in calendar_events:
-
-        trainer_names = ", ".join(
-            trainer.Name
-            for trainer
-            in event.trainers.all()
-        )
-
-        start = str(event.date)
-
-        end = None
-
-        if event.start_time:
-
-            start = (
-                f"{event.date}T"
-                f"{event.start_time}"
+    # ============================================================
+    # MOTIVATIONAL STORIES
+    # ============================================================
+
+    stories = [
+
+        {
+            "title": "The Extra Mile",
+            "text": (
+                "A trainer once stayed back after a session "
+                "because one student still had a question. "
+                "That one extra conversation changed the student's "
+                "confidence completely. Sometimes impact is created "
+                "after the official work is already finished."
             )
+        },
 
-        if event.end_time:
-
-            end = (
-                f"{event.date}T"
-                f"{event.end_time}"
+        {
+            "title": "Small Steps Become Big Journeys",
+            "text": (
+                "A workshop does not become successful in one moment. "
+                "It starts with one idea, one preparation task, one "
+                "trainer, one classroom and one learner at a time. "
+                "Every small task completed today contributes to "
+                "tomorrow's bigger achievement."
             )
+        },
 
-        event_type_key = (
-            event.event_type
-            if event.event_type
-            else "other"
-        )
+        {
+            "title": "Teach Beyond the Syllabus",
+            "text": (
+                "Students may forget a topic, a command or a syntax. "
+                "But they remember the person who encouraged them "
+                "when they were struggling. Great training is not "
+                "only about completing content. It is about building confidence."
+            )
+        },
 
-        events.append({
+        {
+            "title": "The Mevi Way",
+            "text": (
+                "Learn continuously. Share generously. "
+                "Build patiently. Help genuinely. "
+                "Every workshop, every project and every conversation "
+                "is an opportunity to create meaningful impact."
+            )
+        },
 
-            "id":
-                f"event-{event.pk}",
+        {
+            "title": "One Student Can Change Everything",
+            "text": (
+                "Behind every successful learner is often a trainer "
+                "who decided to explain something one more time. "
+                "Never underestimate the value of patience, clarity "
+                "and encouragement."
+            )
+        },
 
-            "title":
-                event.title,
+        {
+            "title": "Progress Over Perfection",
+            "text": (
+                "Some days everything goes according to plan. "
+                "Some days nothing does. What matters is that the team "
+                "keeps moving, keeps learning and keeps improving."
+            )
+        },
 
-            "start":
-                start,
+        {
+            "title": "Build People, Not Just Projects",
+            "text": (
+                "A completed project is an achievement. "
+                "A student who gains confidence because of that project "
+                "is an impact. The strongest teams create both."
+            )
+        },
 
-            "end":
-                end,
+        {
+            "title": "Today's Work Becomes Tomorrow's Reputation",
+            "text": (
+                "Every training session, every document, every follow-up "
+                "and every small responsibility contributes to the reputation "
+                "of the entire team. Do today's work with tomorrow in mind."
+            )
+        },
+    ]
 
-            "allDay":
-                not bool(event.start_time),
+    story = stories[
+        today.toordinal() % len(stories)
+    ]
 
-            "color":
-                event_colors.get(
-                    event_type_key,
-                    "#64748B"
-                ),
-
-            "borderColor":
-                event_colors.get(
-                    event_type_key,
-                    "#64748B"
-                ),
-
-            "url":
-                reverse(
-                    "edit_calendar_event",
-                    args=[event.pk]
-                )
-                if request.user.is_superuser
-                else None,
-
-            "extendedProps": {
-
-                "trainer":
-                    trainer_names,
-
-                "college":
-                    event.college.name
-                    if event.college
-                    else "",
-
-                "department":
-                    event.department or "",
-
-                "event_type":
-                    event.get_event_type_display(),
-
-                "status":
-                    "Scheduled",
-
-                "location":
-                    event.location or "",
-
-                "guest_faculty":
-                    getattr(
-                        event,
-                        "guest_faculty",
-                        ""
-                    ),
-
-                "description":
-                    event.description or "",
-
-            }
-        })
-
-    # =====================================================
+    # ============================================================
     # RENDER
-    # =====================================================
+    # ============================================================
 
     return render(
         request,
-        "dashboard.html",
+        "todo/admin_dashboard.html",
         {
 
-            "today":
-                today,
+            # ----------------------------------------------------
+            # DATE
+            # ----------------------------------------------------
 
-            "greeting":
-                greeting,
+            "today": today,
 
-            "greeting_message":
-                greeting_message,
+            # ----------------------------------------------------
+            # TASKS
+            # ----------------------------------------------------
 
-            "greeting_icon":
-                greeting_icon,
+            "today_tasks":
+                today_tasks,
 
-            "daily_thought":
-                daily_thought,
+            "today_pending":
+                today_pending,
 
-            # Trainers
+            "today_in_progress":
+                today_in_progress,
+
+            "today_completed":
+                today_completed,
+
+            "today_pending_count":
+                today_pending.count(),
+
+            "today_in_progress_count":
+                today_in_progress.count(),
+
+            "today_completed_count":
+                today_completed.count(),
+
+            # All task statistics
+            "tasks":
+                all_tasks,
+
+            "pending_tasks":
+                pending_tasks,
+
+            "in_progress_tasks":
+                in_progress_tasks,
+
+            "completed_tasks":
+                completed_tasks,
+
+            "pending_count":
+                pending_tasks.count(),
+
+            "in_progress_count":
+                in_progress_tasks.count(),
+
+            "completed_count":
+                completed_tasks.count(),
+
+            # ----------------------------------------------------
+            # WORKSHOPS
+            # ----------------------------------------------------
+
+            "active_workshops":
+                active_workshops,
+
+            "upcoming_workshops":
+                upcoming_workshops,
+
+            "active_workshop_count":
+                active_workshops.count(),
+
+            # ----------------------------------------------------
+            # EVENTS
+            # ----------------------------------------------------
+
+            "todays_events":
+                todays_events,
+
+            "upcoming_events":
+                upcoming_events,
+
+            "upcoming_event_count":
+                upcoming_events.count(),
+
+            # ----------------------------------------------------
+            # TRAINERS
+            # ----------------------------------------------------
+
             "trainers":
                 trainers,
 
-            "total_trainers":
-                total_trainers,
+            "full_time_trainers":
+                full_time_trainers,
 
             "full_time_trainer_count":
-                full_time_trainer_count,
+                full_time_trainers.count(),
 
-            # Attendance
+            "total_trainers":
+                trainers.count(),
+
             "trainer_status":
                 trainer_status,
+
+            # ----------------------------------------------------
+            # ATTENDANCE
+            # ----------------------------------------------------
 
             "checked_in_count":
                 checked_in_count,
@@ -1027,31 +587,19 @@ def dashboard(request):
             "not_checked_in_count":
                 not_checked_in_count,
 
-            # Work
-            "today_tasks":
-                today_tasks,
+            # ----------------------------------------------------
+            # FORM
+            # ----------------------------------------------------
 
-            # Workshops
-            "upcoming_workshops":
-                upcoming_workshops,
+            "form":
+                form,
 
-            "upcoming_schedule":
-                upcoming_schedule,
+            # ----------------------------------------------------
+            # MOTIVATION
+            # ----------------------------------------------------
 
-            # Attention
-            "pending_workshops_count":
-                pending_workshops_count,
-
-            "pending_reports_count":
-                pending_reports_count,
-
-            # Calendar
-            "events_json":
-                json.dumps(
-                    events,
-                    default=str
-                ),
-
+            "story":
+                story,
         }
     )
 # =====================================================
@@ -1446,33 +994,355 @@ def delete_trainer(request, pk):
 # ADMIN TASK DASHBOARD
 # =====================================================
 
+# ============================================================
+# MEVI COMMAND CENTER / ADMIN DASHBOARD
+# ============================================================
+
 @login_required
 def admin_task_dashboard(request):
-    today = timezone.now().date()
-    one_week_ago = today - timedelta(days=7)
 
-    tasks = TodoTask.objects.filter(
-        for_date__gte=one_week_ago
-    ).select_related("trainer")
+    today = timezone.localdate()
+
+    # ========================================================
+    # TASKS
+    # ========================================================
+
+    tasks = (
+        TodoTask.objects
+        .select_related("trainer")
+        .prefetch_related("subtasks")
+        .order_by("for_date", "-created_on")
+    )
+
+    pending_tasks = tasks.filter(
+        status="pending"
+    )
+
+    in_progress_tasks = tasks.filter(
+        status="in_progress"
+    )
+
+    completed_tasks = tasks.filter(
+        status="completed"
+    )
+
+    today_tasks = tasks.filter(
+        for_date=today
+    )
+
+    # ========================================================
+    # WORKSHOPS
+    # ========================================================
+
+    workshops = (
+        Workshop.objects
+        .select_related("college")
+        .prefetch_related("assigned_trainers")
+        .order_by("start_date", "title")
+    )
+
+    upcoming_workshops = workshops.filter(
+        end_date__gte=today
+    ).exclude(
+        status="cancelled"
+    )[:10]
+
+    active_workshops = workshops.filter(
+        start_date__lte=today,
+        end_date__gte=today
+    ).exclude(
+        status="cancelled"
+    )
+
+    # ========================================================
+    # CALENDAR EVENTS
+    # ========================================================
+
+    events = (
+        CalendarEvent.objects
+        .select_related(
+            "college",
+            "workshop"
+        )
+        .prefetch_related("trainers")
+        .filter(
+            date__gte=today
+        )
+        .order_by(
+            "date",
+            "start_time"
+        )[:15]
+    )
+
+    # ========================================================
+    # TRAINERS
+    # ========================================================
+
+    trainers = (
+        Trainer.objects
+        .select_related("user")
+        .order_by("Name")
+    )
+
+    full_time_trainers = trainers.filter(
+        is_full_time=True
+    )
+
+    # ========================================================
+    # TODAY ATTENDANCE
+    # ========================================================
+
+    attendance_records = (
+        DailyAttendance.objects
+        .filter(
+            date=today,
+            trainer__is_full_time=True
+        )
+        .select_related("trainer")
+    )
+
+    attendance_map = {
+        record.trainer_id: record
+        for record in attendance_records
+    }
+
+    checked_in_count = sum(
+        1
+        for record in attendance_records
+        if record.check_in
+    )
+
+    working_count = sum(
+        1
+        for record in attendance_records
+        if record.check_in and not record.check_out
+    )
+
+    checked_out_count = sum(
+        1
+        for record in attendance_records
+        if record.check_out
+    )
+
+    not_checked_in_count = max(
+        full_time_trainers.count() - checked_in_count,
+        0
+    )
+
+    # ========================================================
+    # TRAINER STATUS
+    # ========================================================
+
+    trainer_status = []
+
+    for trainer in full_time_trainers:
+
+        attendance = attendance_map.get(
+            trainer.id
+        )
+
+        trainer_today_tasks = today_tasks.filter(
+            trainer=trainer
+        )
+
+        if attendance and attendance.check_out:
+
+            status = "checked_out"
+
+        elif attendance and attendance.check_in:
+
+            status = "working"
+
+        else:
+
+            status = "not_checked_in"
+
+        trainer_status.append({
+            "trainer": trainer,
+            "attendance": attendance,
+            "status": status,
+            "task_count": trainer_today_tasks.count(),
+            "completed_count": trainer_today_tasks.filter(
+                status="completed"
+            ).count(),
+        })
+
+    # ========================================================
+    # FORM
+    # ========================================================
 
     form = None
 
-    # ✅ Only superuser can add task
     if request.user.is_superuser:
-        form = TodoTaskForm(request.POST or None)
-        if request.method == "POST" and form.is_valid():
+
+        form = TodoTaskForm(
+            request.POST or None
+        )
+
+        if (
+            request.method == "POST"
+            and form.is_valid()
+        ):
+
             form.save()
-            return redirect("admin_task_dashboard")
 
-    return render(request, "todo/admin_dashboard.html", {
-        "form": form,   # None for normal users
-        "grouped_tasks": {
-            "pending": tasks.filter(status="pending"),
-            "in_progress": tasks.filter(status="in_progress"),
-            "completed": tasks.filter(status="completed"),
+            messages.success(
+                request,
+                "Task created successfully."
+            )
+
+            return redirect(
+                "admin_task_dashboard"
+            )
+
+    # ========================================================
+    # MOTIVATIONAL STORIES
+    # ========================================================
+
+    stories = [
+
+        {
+            "title": "The Extra Mile",
+            "text": (
+                "A trainer once stayed back after a session "
+                "because one student still had a question. "
+                "That one extra conversation changed the student's "
+                "confidence completely. Sometimes impact is created "
+                "after the official work is already finished."
+            )
+        },
+
+        {
+            "title": "Small Steps Become Big Journeys",
+            "text": (
+                "A workshop does not become successful in one moment. "
+                "It starts with one idea, one preparation task, one "
+                "trainer, one classroom and one learner at a time. "
+                "Every small task completed today contributes to "
+                "tomorrow's bigger achievement."
+            )
+        },
+
+        {
+            "title": "Teach Beyond the Syllabus",
+            "text": (
+                "Students may forget a topic, a command or a syntax. "
+                "But they remember the person who encouraged them "
+                "when they were struggling. Great training is not "
+                "only about completing content. It is about building confidence."
+            )
+        },
+
+        {
+            "title": "The Mevi Way",
+            "text": (
+                "Learn continuously. Share generously. "
+                "Build patiently. Help genuinely. "
+                "Every workshop, every project and every conversation "
+                "is an opportunity to create meaningful impact."
+            )
+        },
+
+        {
+            "title": "One Student Can Change Everything",
+            "text": (
+                "Behind every successful learner is often a trainer "
+                "who decided to explain something one more time. "
+                "Never underestimate the value of patience, clarity "
+                "and encouragement."
+            )
+        },
+
+        {
+            "title": "Progress Over Perfection",
+            "text": (
+                "Some days everything goes according to plan. "
+                "Some days nothing does. What matters is that the team "
+                "keeps moving, keeps learning and keeps improving."
+            )
+        },
+
+        {
+            "title": "Build People, Not Just Projects",
+            "text": (
+                "A completed project is an achievement. "
+                "A student who gains confidence because of that project "
+                "is an impact. The strongest teams create both."
+            )
+        },
+
+        {
+            "title": "Today's Work Becomes Tomorrow's Reputation",
+            "text": (
+                "Every training session, every document, every follow-up "
+                "and every small responsibility contributes to the reputation "
+                "of the entire team. Do today's work with tomorrow in mind."
+            )
+        },
+
+    ]
+
+    story = stories[
+        today.toordinal() % len(stories)
+    ]
+
+    # ========================================================
+    # RENDER
+    # ========================================================
+
+    return render(
+        request,
+        "todo/admin_dashboard.html",
+        {
+            "today": today,
+
+            # Tasks
+            "form": form,
+            "tasks": tasks,
+            "today_tasks": today_tasks,
+            "pending_tasks": pending_tasks,
+            "in_progress_tasks": in_progress_tasks,
+            "completed_tasks": completed_tasks,
+
+            "grouped_tasks": {
+                "pending": pending_tasks,
+                "in_progress": in_progress_tasks,
+                "completed": completed_tasks,
+            },
+
+            # Workshops
+            "workshops": workshops,
+            "upcoming_workshops": upcoming_workshops,
+            "active_workshops": active_workshops,
+
+            # Events
+            "events": events,
+
+            # Trainers
+            "trainers": trainers,
+            "full_time_trainers": full_time_trainers,
+            "trainer_status": trainer_status,
+
+            # Attendance
+            "checked_in_count": checked_in_count,
+            "working_count": working_count,
+            "checked_out_count": checked_out_count,
+            "not_checked_in_count": not_checked_in_count,
+
+            # Statistics
+            "total_trainers": trainers.count(),
+            "full_time_trainer_count": full_time_trainers.count(),
+            "total_tasks": tasks.count(),
+            "pending_count": pending_tasks.count(),
+            "in_progress_count": in_progress_tasks.count(),
+            "completed_count": completed_tasks.count(),
+            "active_workshop_count": active_workshops.count(),
+            "upcoming_event_count": events.count(),
+
+            # Motivation
+            "story": story,
         }
-    })
-
+    )
 
 # =====================================================
 # ADD TASK / ADD WORK
@@ -1800,10 +1670,6 @@ def delete_task(request, task_id):
     return redirect("task_history")
 
 
-# ============================================================
-# CHANGE TASK STATUS
-# ============================================================
-
 @login_required
 @require_POST
 def change_task_status(request, task_id):
@@ -1826,12 +1692,13 @@ def change_task_status(request, task_id):
     ).first()
 
     if not trainer:
+
         trainer = Trainer.objects.filter(
             email__iexact=request.user.email
         ).first()
 
     # ============================================================
-    # TRAINER PROFILE CHECK
+    # TRAINER CHECK
     # ============================================================
 
     if not trainer and not request.user.is_superuser:
@@ -1859,14 +1726,12 @@ def change_task_status(request, task_id):
             return redirect("trainer_dashboard")
 
     # ============================================================
-    # GET NEW STATUS
+    # STATUS
     # ============================================================
 
-    new_status = request.POST.get("status")
-
-    # ============================================================
-    # VALID STATUS
-    # ============================================================
+    new_status = request.POST.get(
+        "status"
+    )
 
     allowed_statuses = [
         "pending",
@@ -1881,13 +1746,12 @@ def change_task_status(request, task_id):
             "Invalid task status."
         )
 
-        if request.user.is_superuser:
-            return redirect("admin_task_dashboard")
-
-        return redirect("trainer_dashboard")
+        return redirect(
+            f"{reverse('trainer_dashboard')}?attendance_date={task.for_date.isoformat()}"
+        )
 
     # ============================================================
-    # UPDATE TASK
+    # UPDATE
     # ============================================================
 
     task.status = new_status
@@ -1904,7 +1768,7 @@ def change_task_status(request, task_id):
     )
 
     # ============================================================
-    # SUCCESS MESSAGE
+    # MESSAGE
     # ============================================================
 
     if new_status == "completed":
@@ -1929,7 +1793,7 @@ def change_task_status(request, task_id):
         )
 
     # ============================================================
-    # REDIRECT
+    # RETURN TO THE SAME DAY
     # ============================================================
 
     if request.user.is_superuser:
@@ -1939,7 +1803,7 @@ def change_task_status(request, task_id):
         )
 
     return redirect(
-        "trainer_dashboard"
+        f"{reverse('trainer_dashboard')}?attendance_date={task.for_date.isoformat()}"
     )
 @login_required
 @user_passes_test(is_superuser)
@@ -1975,75 +1839,780 @@ def edit_task(request, task_id):
     })
 
 
-# =====================================================
-# TRAINER DASHBOARD
-# =====================================================
+# ============================================================
+# TRAINER ATTENDANCE PAGE
+# ============================================================
 
-# =====================================================
-# TRAINER DASHBOARD
-# =====================================================
+# ============================================================
+# TRAINER ATTENDANCE + DAILY WORKSPACE
+# ============================================================
 
-# =====================================================
-# TRAINER DASHBOARD
-# =====================================================
+@login_required
+def trainer_attendance(request):
 
-# =====================================================
+    # --------------------------------------------------------
+    # FIND LOGGED-IN TRAINER
+    # --------------------------------------------------------
+
+    trainer = (
+        Trainer.objects
+        .filter(user=request.user)
+        .first()
+    )
+
+    if not trainer:
+        trainer = (
+            Trainer.objects
+            .filter(email__iexact=request.user.email)
+            .first()
+        )
+
+    if not trainer:
+        messages.error(
+            request,
+            "Your account is not linked to a Trainer profile."
+        )
+        return redirect("dashboard")
+
+    # --------------------------------------------------------
+    # FULL-TIME TRAINERS ONLY
+    # --------------------------------------------------------
+
+    if not trainer.is_full_time:
+        messages.error(
+            request,
+            "Attendance is available only for full-time trainers."
+        )
+        return redirect("trainer_dashboard")
+
+    today = timezone.localdate()
+
+    # Trainer can manage:
+    # today
+    # yesterday
+    # day before yesterday
+
+    minimum_date = today - timedelta(days=2)
+    maximum_date = today
+
+    # --------------------------------------------------------
+    # SELECTED DATE
+    # --------------------------------------------------------
+
+    selected_date = today
+
+    date_value = request.GET.get("attendance_date")
+
+    if date_value:
+
+        try:
+            selected_date = date.fromisoformat(date_value)
+
+        except (ValueError, TypeError):
+
+            messages.error(
+                request,
+                "Invalid attendance date."
+            )
+
+            selected_date = today
+
+    # --------------------------------------------------------
+    # VALIDATE DATE
+    # --------------------------------------------------------
+
+    if selected_date < minimum_date:
+
+        messages.warning(
+            request,
+            "You can manage attendance only for today and the previous two days."
+        )
+
+        selected_date = minimum_date
+
+    if selected_date > today:
+
+        messages.warning(
+            request,
+            "Future attendance is not allowed."
+        )
+
+        selected_date = today
+
+    # --------------------------------------------------------
+    # ATTENDANCE RECORD
+    # --------------------------------------------------------
+
+    attendance, created = (
+        DailyAttendance.objects.get_or_create(
+            trainer=trainer,
+            date=selected_date
+        )
+    )
+
+    # --------------------------------------------------------
+    # HANDLE POST ACTIONS
+    # --------------------------------------------------------
+
+    if request.method == "POST":
+
+        action = request.POST.get("action", "").strip()
+
+        # ====================================================
+        # CHECK IN NOW
+        # ====================================================
+
+        if action == "check_in_now":
+
+            if selected_date != today:
+
+                messages.error(
+                    request,
+                    "Use manual time entry for previous days."
+                )
+
+            elif attendance.check_in:
+
+                messages.warning(
+                    request,
+                    "You have already checked in."
+                )
+
+            else:
+
+                now = timezone.now()
+
+                attendance.check_in = now
+                attendance.check_out = None
+                attendance.save(
+                    update_fields=[
+                        "check_in",
+                        "check_out"
+                    ]
+                )
+
+                messages.success(
+                    request,
+                    "You have successfully checked in."
+                )
+
+        # ====================================================
+        # CHECK OUT NOW
+        # ====================================================
+
+        elif action == "check_out_now":
+
+            if selected_date != today:
+
+                messages.error(
+                    request,
+                    "Use manual time entry for previous days."
+                )
+
+            elif not attendance.check_in:
+
+                messages.error(
+                    request,
+                    "You must check in before checking out."
+                )
+
+            elif attendance.check_out:
+
+                messages.warning(
+                    request,
+                    "You have already checked out."
+                )
+
+            else:
+
+                now = timezone.localtime()
+
+                # Automatic checkout limit = 8:30 PM
+                auto_checkout_time = time(20, 30)
+
+                if now.time() > auto_checkout_time:
+
+                    local_checkout = datetime.combine(
+                        today,
+                        auto_checkout_time
+                    )
+
+                    checkout_datetime = timezone.make_aware(
+                        local_checkout,
+                        timezone.get_current_timezone()
+                    )
+
+                else:
+
+                    checkout_datetime = timezone.now()
+
+                attendance.check_out = checkout_datetime
+
+                attendance.save(
+                    update_fields=["check_out"]
+                )
+
+                messages.success(
+                    request,
+                    "You have successfully checked out."
+                )
+
+        # ====================================================
+        # MANUAL PREVIOUS-DAY ATTENDANCE
+        # ====================================================
+
+        elif action == "save_manual_attendance":
+
+            if selected_date == today:
+
+                messages.error(
+                    request,
+                    "For today, please use Check In Now / Check Out Now."
+                )
+
+            else:
+
+                check_in_value = (
+                    request.POST
+                    .get("check_in_time", "")
+                    .strip()
+                )
+
+                check_out_value = (
+                    request.POST
+                    .get("check_out_time", "")
+                    .strip()
+                )
+
+                if not check_in_value:
+
+                    messages.error(
+                        request,
+                        "Please enter the check-in time."
+                    )
+
+                else:
+
+                    try:
+
+                        check_in_clock = time.fromisoformat(
+                            check_in_value
+                        )
+
+                        check_in_datetime = timezone.make_aware(
+                            datetime.combine(
+                                selected_date,
+                                check_in_clock
+                            ),
+                            timezone.get_current_timezone()
+                        )
+
+                        check_out_datetime = None
+
+                        if check_out_value:
+
+                            check_out_clock = time.fromisoformat(
+                                check_out_value
+                            )
+
+                            check_out_datetime = timezone.make_aware(
+                                datetime.combine(
+                                    selected_date,
+                                    check_out_clock
+                                ),
+                                timezone.get_current_timezone()
+                            )
+
+                        # ------------------------------------
+                        # VALIDATE CHECK-IN
+                        # ------------------------------------
+
+                        if check_in_clock >= time(20, 30):
+
+                            messages.error(
+                                request,
+                                "Check-in time cannot be 8:30 PM or later."
+                            )
+
+                        # ------------------------------------
+                        # VALIDATE CHECK-OUT
+                        # ------------------------------------
+
+                        elif (
+                            check_out_datetime
+                            and check_out_clock > time(20, 30)
+                        ):
+
+                            messages.error(
+                                request,
+                                "Check-out cannot be later than 8:30 PM."
+                            )
+
+                        # ------------------------------------
+                        # CHECKOUT MUST BE AFTER CHECKIN
+                        # ------------------------------------
+
+                        elif (
+                            check_out_datetime
+                            and check_out_datetime <= check_in_datetime
+                        ):
+
+                            messages.error(
+                                request,
+                                "Check-out time must be after check-in time."
+                            )
+
+                        else:
+
+                            attendance.check_in = (
+                                check_in_datetime
+                            )
+
+                            attendance.check_out = (
+                                check_out_datetime
+                            )
+
+                            attendance.save(
+                                update_fields=[
+                                    "check_in",
+                                    "check_out"
+                                ]
+                            )
+
+                            messages.success(
+                                request,
+                                "Attendance time saved successfully."
+                            )
+
+                    except ValueError:
+
+                        messages.error(
+                            request,
+                            "Please enter a valid time."
+                        )
+
+        # ====================================================
+        # ADD WORK
+        # ====================================================
+
+        elif action == "add_work":
+
+            task_text = (
+                request.POST
+                .get("task", "")
+                .strip()
+            )
+
+            description = (
+                request.POST
+                .get("description", "")
+                .strip()
+            )
+
+            category = (
+                request.POST
+                .get("category", "other")
+                .strip()
+            )
+
+            priority = (
+                request.POST
+                .get("priority", "medium")
+                .strip()
+            )
+
+            estimated_hours_value = (
+                request.POST
+                .get("estimated_hours", "1")
+                .strip()
+            )
+
+            if not task_text:
+
+                messages.error(
+                    request,
+                    "Please enter the work/task."
+                )
+
+            elif (
+                not attendance.check_in
+            ):
+
+                messages.error(
+                    request,
+                    "Please record attendance before adding work."
+                )
+
+            else:
+
+                # --------------------------------------------
+                # Prevent work after checkout
+                # --------------------------------------------
+
+                if attendance.check_out:
+
+                    messages.error(
+                        request,
+                        "You cannot add work after checkout."
+                    )
+
+                else:
+
+                    try:
+
+                        estimated_hours = Decimal(
+                            estimated_hours_value
+                        )
+
+                    except (
+                        ValueError,
+                        TypeError,
+                        InvalidOperation
+                    ):
+
+                        estimated_hours = Decimal("1")
+
+                    # ----------------------------------------
+                    # VALID CATEGORY
+                    # ----------------------------------------
+
+                    valid_categories = dict(
+                        TodoTask.CATEGORY_CHOICES
+                    )
+
+                    if category not in valid_categories:
+                        category = "other"
+
+                    # ----------------------------------------
+                    # VALID PRIORITY
+                    # ----------------------------------------
+
+                    valid_priorities = dict(
+                        TodoTask.PRIORITY_CHOICES
+                    )
+
+                    if priority not in valid_priorities:
+                        priority = "medium"
+
+                    # ----------------------------------------
+                    # CREATE WORK
+                    # ----------------------------------------
+
+                    TodoTask.objects.create(
+                        trainer=trainer,
+                        task=task_text,
+                        description=description,
+                        category=category,
+                        priority=priority,
+                        estimated_hours=estimated_hours,
+                        for_date=selected_date,
+                        status="in_progress",
+                        is_done=False,
+                    )
+
+                    messages.success(
+                        request,
+                        "Work has been added successfully."
+                    )
+
+        # ====================================================
+        # SAVE LEARNING
+        # ====================================================
+
+        elif action == "save_learning":
+
+            learning_text = (
+                request.POST
+                .get("learning", "")
+                .strip()
+            )
+
+            if not learning_text:
+
+                messages.error(
+                    request,
+                    "Please enter your learning."
+                )
+
+            else:
+
+                DailyLearning.objects.update_or_create(
+                    trainer=trainer,
+                    date=selected_date,
+                    defaults={
+                        "learning": learning_text
+                    }
+                )
+
+                messages.success(
+                    request,
+                    "Daily learning saved successfully."
+                )
+
+        # ----------------------------------------------------
+        # REDIRECT TO SAME DATE
+        # ----------------------------------------------------
+
+        return redirect(
+            f"{reverse('trainer_attendance')}"
+            f"?attendance_date={selected_date.isoformat()}"
+        )
+
+    # --------------------------------------------------------
+    # GET CURRENT LEARNING
+    # --------------------------------------------------------
+
+    learning = (
+        DailyLearning.objects
+        .filter(
+            trainer=trainer,
+            date=selected_date
+        )
+        .first()
+    )
+
+    # --------------------------------------------------------
+    # WORK FOR SELECTED DATE
+    # --------------------------------------------------------
+
+    work_items = (
+        TodoTask.objects
+        .filter(
+            trainer=trainer,
+            for_date=selected_date
+        )
+        .order_by(
+            "-created_on"
+        )
+    )
+
+    # --------------------------------------------------------
+    # CALCULATE WORKED HOURS
+    # --------------------------------------------------------
+
+    worked_hours = None
+
+    if attendance.check_in and attendance.check_out:
+
+        duration = (
+            attendance.check_out
+            - attendance.check_in
+        )
+
+        total_seconds = duration.total_seconds()
+
+        worked_hours = round(
+            total_seconds / 3600,
+            2
+        )
+
+    # --------------------------------------------------------
+    # STATUS
+    # --------------------------------------------------------
+
+    checked_in = bool(
+        attendance.check_in
+        and not attendance.check_out
+    )
+
+    checked_out = bool(
+        attendance.check_out
+    )
+
+    # --------------------------------------------------------
+    # DATE OPTIONS
+    # --------------------------------------------------------
+
+    date_options = []
+
+    for offset in range(2, -1, -1):
+
+        day = today - timedelta(
+            days=offset
+        )
+
+        day_attendance = (
+            DailyAttendance.objects
+            .filter(
+                trainer=trainer,
+                date=day
+            )
+            .first()
+        )
+
+        date_options.append({
+            "date": day,
+            "attendance": day_attendance,
+            "is_today": day == today,
+        })
+
+    # --------------------------------------------------------
+    # RENDER
+    # --------------------------------------------------------
+
+    return render(
+        request,
+        "todo/trainer_attendance.html",
+        {
+            "trainer": trainer,
+            "attendance": attendance,
+
+            "attendance_date": selected_date,
+
+            "minimum_attendance_date": minimum_date,
+            "maximum_attendance_date": today,
+
+            "today": today,
+
+            "checked_in": checked_in,
+            "checked_out": checked_out,
+
+            "worked_hours": worked_hours,
+
+            "learning": learning,
+            "work_items": work_items,
+
+            "date_options": date_options,
+
+            "category_choices":
+                TodoTask.CATEGORY_CHOICES,
+
+            "priority_choices":
+                TodoTask.PRIORITY_CHOICES,
+        }
+    )
+# ============================================================
 # TRAINER DASHBOARD
-# =====================================================
+# ============================================================
 
 @login_required
 def trainer_dashboard(request):
 
+    # ============================================================
+    # BASIC DATE
+    # ============================================================
+
     today = timezone.localdate()
 
-    # =====================================================
+    # ============================================================
     # FIND TRAINER
-    # =====================================================
+    # ============================================================
 
-    trainer = Trainer.objects.filter(
-        user=request.user
-    ).first()
+    trainer = (
+        Trainer.objects
+        .filter(user=request.user)
+        .first()
+    )
 
     if not trainer:
-        trainer = Trainer.objects.filter(
-            email=request.user.email
-        ).first()
+
+        trainer = (
+            Trainer.objects
+            .filter(
+                email__iexact=request.user.email
+            )
+            .first()
+        )
 
     if not trainer:
 
         return render(
             request,
-            "trainer/trainer_dashboard.html",
+            "todo/trainer_dashboard.html",
             {
-                "error": (
+                "error":
                     "Your account is not linked to a Trainer profile."
-                )
             }
         )
 
-    # =====================================================
-    # TODAY ATTENDANCE
-    # =====================================================
+    # ============================================================
+    # ============================================================
+    # ATTENDANCE
+    # TODAY + PREVIOUS 2 DAYS
+    # ============================================================
+    # ============================================================
 
-    attendance = DailyAttendance.objects.filter(
-        trainer=trainer,
-        date=today
-    ).first()
+    minimum_attendance_date = (
+        today - timedelta(days=2)
+    )
+
+    maximum_attendance_date = today
+
+    # ------------------------------------------------------------
+    # DATE SELECTED FROM DASHBOARD
+    # ------------------------------------------------------------
+
+    attendance_date_value = request.GET.get(
+        "attendance_date"
+    )
+
+    attendance_date = today
+
+    if attendance_date_value:
+
+        try:
+
+            attendance_date = date.fromisoformat(
+                attendance_date_value
+            )
+
+        except (
+            ValueError,
+            TypeError
+        ):
+
+            attendance_date = today
+
+    # ------------------------------------------------------------
+    # NEVER ALLOW FUTURE DATE
+    # NEVER ALLOW MORE THAN 2 DAYS OLD
+    # ------------------------------------------------------------
+
+    if attendance_date < minimum_attendance_date:
+
+        messages.warning(
+            request,
+            "Attendance can only be opened for today or the previous 2 days."
+        )
+
+        attendance_date = today
+
+    elif attendance_date > maximum_attendance_date:
+
+        messages.warning(
+            request,
+            "Future attendance is not allowed."
+        )
+
+        attendance_date = today
+
+    # ------------------------------------------------------------
+    # GET ATTENDANCE FOR SELECTED DATE
+    # ------------------------------------------------------------
+
+    attendance, attendance_created = (
+        DailyAttendance.objects.get_or_create(
+            trainer=trainer,
+            date=attendance_date
+        )
+    )
+
+    # ------------------------------------------------------------
+    # ATTENDANCE STATUS
+    # ------------------------------------------------------------
 
     checked_in = bool(
-        attendance
-        and attendance.check_in
+        attendance.check_in
         and not attendance.check_out
     )
 
     checked_out = bool(
-        attendance
-        and attendance.check_out
+        attendance.check_out
     )
 
-    # =====================================================
-    # TODAY TASKS
-    # =====================================================
+    # ============================================================
+    # TODAY'S TASKS
+    # ============================================================
 
     today_tasks = (
         TodoTask.objects
@@ -2051,7 +2620,9 @@ def trainer_dashboard(request):
             trainer=trainer,
             for_date=today
         )
-        .prefetch_related("subtasks")
+        .prefetch_related(
+            "subtasks"
+        )
         .order_by(
             "is_done",
             "-priority",
@@ -2059,9 +2630,9 @@ def trainer_dashboard(request):
         )
     )
 
-    # =====================================================
+    # ============================================================
     # TODAY TASK STATISTICS
-    # =====================================================
+    # ============================================================
 
     task_stats = (
         TodoTask.objects
@@ -2070,6 +2641,7 @@ def trainer_dashboard(request):
             for_date=today
         )
         .aggregate(
+
             total=Count("id"),
 
             completed=Count(
@@ -2133,9 +2705,9 @@ def trainer_dashboard(request):
 
         completion_percentage = 0
 
-    # =====================================================
+    # ============================================================
     # TODAY LEARNING
-    # =====================================================
+    # ============================================================
 
     daily_learning = (
         DailyLearning.objects
@@ -2146,9 +2718,9 @@ def trainer_dashboard(request):
         .first()
     )
 
-    # =====================================================
+    # ============================================================
     # PREVIOUS 7 DAYS
-    # =====================================================
+    # ============================================================
 
     previous_7_days_start = (
         today - timedelta(days=6)
@@ -2161,16 +2733,18 @@ def trainer_dashboard(request):
             for_date__gte=previous_7_days_start,
             for_date__lte=today
         )
-        .prefetch_related("subtasks")
+        .prefetch_related(
+            "subtasks"
+        )
         .order_by(
             "-for_date",
             "-created_on"
         )
     )
 
-    # =====================================================
+    # ============================================================
     # OVERDUE WORK
-    # =====================================================
+    # ============================================================
 
     overdue_tasks = (
         TodoTask.objects
@@ -2181,16 +2755,18 @@ def trainer_dashboard(request):
         .exclude(
             status="completed"
         )
-        .prefetch_related("subtasks")
+        .prefetch_related(
+            "subtasks"
+        )
         .order_by(
             "for_date",
             "-priority"
         )
     )
 
-    # =====================================================
+    # ============================================================
     # CURRENT MONTH
-    # =====================================================
+    # ============================================================
 
     month_start = today.replace(
         day=1
@@ -2215,9 +2791,9 @@ def trainer_dashboard(request):
         next_month - timedelta(days=1)
     )
 
-    # =====================================================
+    # ============================================================
     # MONTHLY TASKS
-    # =====================================================
+    # ============================================================
 
     monthly_tasks = (
         TodoTask.objects
@@ -2294,9 +2870,9 @@ def trainer_dashboard(request):
 
         monthly_completion_percentage = 0
 
-    # =====================================================
+    # ============================================================
     # MONTHLY CATEGORY STATISTICS
-    # =====================================================
+    # ============================================================
 
     monthly_category_stats = []
 
@@ -2333,20 +2909,25 @@ def trainer_dashboard(request):
 
         monthly_category_stats.append({
 
-            "code": category_code,
+            "code":
+                category_code,
 
-            "name": category_name,
+            "name":
+                category_name,
 
-            "total": category_total,
+            "total":
+                category_total,
 
-            "completed": category_completed,
+            "completed":
+                category_completed,
 
-            "hours": category_hours,
+            "hours":
+                category_hours,
         })
 
-    # =====================================================
+    # ============================================================
     # MONTHLY LEARNING
-    # =====================================================
+    # ============================================================
 
     monthly_learning = (
         DailyLearning.objects
@@ -2362,22 +2943,26 @@ def trainer_dashboard(request):
         monthly_learning.count()
     )
 
-    # =====================================================
+    # ============================================================
     # ASSIGNED WORKSHOPS
-    # =====================================================
+    # ============================================================
 
     assigned_workshops = (
         Workshop.objects
         .filter(
             assigned_trainers=trainer
         )
-        .select_related("college")
-        .order_by("-start_date")
+        .select_related(
+            "college"
+        )
+        .order_by(
+            "-start_date"
+        )
     )
 
-    # =====================================================
+    # ============================================================
     # UPCOMING WORKSHOPS
-    # =====================================================
+    # ============================================================
 
     upcoming_workshops = (
         assigned_workshops
@@ -2385,16 +2970,19 @@ def trainer_dashboard(request):
             start_date__gte=today
         )
         .exclude(
-            status="cancelled"
+            status__in=[
+                "cancelled",
+                "postponed"
+            ]
         )
         .order_by(
             "start_date"
         )[:5]
     )
 
-    # =====================================================
+    # ============================================================
     # ONGOING WORKSHOPS
-    # =====================================================
+    # ============================================================
 
     ongoing_workshops = (
         assigned_workshops
@@ -2405,26 +2993,37 @@ def trainer_dashboard(request):
         .exclude(
             status__in=[
                 "cancelled",
-                "completed"
+                "completed",
+                "postponed"
             ]
         )
     )
 
-    # =====================================================
-    # WEEKLY CALENDAR
-    # =====================================================
+    # ============================================================
+    # ============================================================
+    # ROLLING 7-DAY CALENDAR
+    # ============================================================
+    #
+    # IMPORTANT:
+    # Instead of Monday-Sunday, this uses:
+    #
+    # previous 2 days + today + next 4 days
+    #
+    # This guarantees that the attendance dates are ALWAYS visible.
+    # ============================================================
+    # ============================================================
 
     week_start = (
-        today
-        - timedelta(
-            days=today.weekday()
-        )
+        today - timedelta(days=2)
     )
 
     week_end = (
-        week_start
-        + timedelta(days=6)
+        today + timedelta(days=4)
     )
+
+    # ------------------------------------------------------------
+    # CALENDAR EVENTS FOR TRAINER
+    # ------------------------------------------------------------
 
     calendar_events = (
         CalendarEvent.objects
@@ -2446,6 +3045,10 @@ def trainer_dashboard(request):
         )
     )
 
+    # ------------------------------------------------------------
+    # WEEKLY SCHEDULE
+    # ------------------------------------------------------------
+
     weekly_schedule = []
 
     for offset in range(7):
@@ -2456,15 +3059,26 @@ def trainer_dashboard(request):
         )
 
         day_events = [
+
             event
-            for event in calendar_events
+
+            for event
+            in calendar_events
+
             if event.date == current_date
         ]
 
         day_workshops = [
+
             workshop
-            for workshop in assigned_workshops
+
+            for workshop
+            in assigned_workshops
+
             if (
+                workshop.start_date
+                and workshop.end_date
+                and
                 workshop.start_date
                 <= current_date
                 <= workshop.end_date
@@ -2473,16 +3087,20 @@ def trainer_dashboard(request):
 
         weekly_schedule.append({
 
-            "date": current_date,
+            "date":
+                current_date,
 
-            "events": day_events,
+            "events":
+                day_events,
 
-            "workshops": day_workshops,
+            "workshops":
+                day_workshops,
+
         })
 
-    # =====================================================
+    # ============================================================
     # TODAY SUBTASK STATISTICS
-    # =====================================================
+    # ============================================================
 
     today_subtasks = (
         SubTask.objects
@@ -2517,58 +3135,127 @@ def trainer_dashboard(request):
 
         subtask_percentage = 0
 
-    # =====================================================
-    # CONTEXT
-    # =====================================================
+    # ============================================================
+    # FINAL CONTEXT
+    # ============================================================
 
     context = {
 
-        "trainer": trainer,
+        "trainer":
+            trainer,
 
-        # Attendance
-        "attendance": attendance,
-        "checked_in": checked_in,
-        "checked_out": checked_out,
+        # --------------------------------------------------------
+        # ATTENDANCE
+        # --------------------------------------------------------
 
-        # Date
-        "today": today,
+        "attendance":
+            attendance,
 
-        # Today
-        "today_tasks": today_tasks,
-        "daily_learning": daily_learning,
+        "checked_in":
+            checked_in,
 
-        # Today statistics
-        "total_tasks": total_tasks,
-        "completed_tasks": completed_tasks,
-        "in_progress_tasks": in_progress_tasks,
-        "pending_tasks": pending_tasks,
-        "planned_hours": planned_hours,
-        "completion_percentage": completion_percentage,
+        "checked_out":
+            checked_out,
 
-        # Previous work
-        "previous_tasks": previous_tasks,
-        "overdue_tasks": overdue_tasks,
+        "attendance_date":
+            attendance_date,
 
-        # Monthly
-        "month_start": month_start,
-        "monthly_total": monthly_total,
-        "monthly_completed": monthly_completed,
-        "monthly_in_progress": monthly_in_progress,
-        "monthly_pending": monthly_pending,
-        "monthly_planned_hours": monthly_planned_hours,
+        "minimum_attendance_date":
+            minimum_attendance_date,
+
+        "maximum_attendance_date":
+            maximum_attendance_date,
+
+        "is_full_time":
+            trainer.is_full_time,
+
+        # --------------------------------------------------------
+        # DATE
+        # --------------------------------------------------------
+
+        "today":
+            today,
+
+        # --------------------------------------------------------
+        # TODAY
+        # --------------------------------------------------------
+
+        "today_tasks":
+            today_tasks,
+
+        "daily_learning":
+            daily_learning,
+
+        "total_tasks":
+            total_tasks,
+
+        "completed_tasks":
+            completed_tasks,
+
+        "in_progress_tasks":
+            in_progress_tasks,
+
+        "pending_tasks":
+            pending_tasks,
+
+        "planned_hours":
+            planned_hours,
+
+        "completion_percentage":
+            completion_percentage,
+
+        # --------------------------------------------------------
+        # PREVIOUS WORK
+        # --------------------------------------------------------
+
+        "previous_tasks":
+            previous_tasks,
+
+        "overdue_tasks":
+            overdue_tasks,
+
+        # --------------------------------------------------------
+        # MONTHLY
+        # --------------------------------------------------------
+
+        "month_start":
+            month_start,
+
+        "monthly_total":
+            monthly_total,
+
+        "monthly_completed":
+            monthly_completed,
+
+        "monthly_in_progress":
+            monthly_in_progress,
+
+        "monthly_pending":
+            monthly_pending,
+
+        "monthly_planned_hours":
+            monthly_planned_hours,
+
         "monthly_completion_percentage":
             monthly_completion_percentage,
+
         "monthly_category_stats":
             monthly_category_stats,
 
-        # Learning
+        # --------------------------------------------------------
+        # LEARNING
+        # --------------------------------------------------------
+
         "monthly_learning":
             monthly_learning,
 
         "monthly_learning_days":
             monthly_learning_days,
 
-        # Workshops
+        # --------------------------------------------------------
+        # WORKSHOPS
+        # --------------------------------------------------------
+
         "assigned_workshops":
             assigned_workshops,
 
@@ -2578,15 +3265,23 @@ def trainer_dashboard(request):
         "ongoing_workshops":
             ongoing_workshops,
 
-        # Calendar
-        "week_start": week_start,
+        # --------------------------------------------------------
+        # CALENDAR
+        # --------------------------------------------------------
 
-        "week_end": week_end,
+        "week_start":
+            week_start,
+
+        "week_end":
+            week_end,
 
         "weekly_schedule":
             weekly_schedule,
 
-        # Subtasks
+        # --------------------------------------------------------
+        # SUBTASKS
+        # --------------------------------------------------------
+
         "total_subtasks":
             total_subtasks,
 
@@ -3798,6 +4493,8 @@ def custom_404(request, exception):
 
 @login_required
 @user_passes_test(is_superuser)
+@login_required
+@user_passes_test(is_superuser)
 def add_calendar_event(request):
 
     selected_date = request.GET.get("date")
@@ -3808,6 +4505,29 @@ def add_calendar_event(request):
         form = CalendarEventForm(request.POST)
 
         if form.is_valid():
+
+            event_date = form.cleaned_data.get("date")
+
+            # ==========================================
+            # TWO-DAY BACKDATE CHECK
+            # ==========================================
+
+            if not is_within_two_day_window(event_date):
+
+                messages.error(
+                    request,
+                    "You can only add events for today, "
+                    "yesterday, or the day before yesterday."
+                )
+
+                return render(
+                    request,
+                    "calendar/add_event.html",
+                    {
+                        "form": form,
+                        "title": "Add Calendar Event",
+                    }
+                )
 
             event = form.save(commit=False)
 
@@ -3831,9 +4551,23 @@ def add_calendar_event(request):
         initial = {}
 
         if selected_date:
-            initial["date"] = selected_date
+
+            try:
+
+                requested_date = date.fromisoformat(
+                    selected_date
+                )
+
+                if is_within_two_day_window(
+                    requested_date
+                ):
+                    initial["date"] = selected_date
+
+            except ValueError:
+                pass
 
         if selected_time:
+
             initial["start_time"] = selected_time
 
         form = CalendarEventForm(
@@ -3857,6 +4591,24 @@ def edit_calendar_event(request, pk):
         pk=pk
     )
 
+    # ==========================================
+    # EXISTING EVENT TOO OLD
+    # ==========================================
+
+    if not is_within_two_day_window(
+        event.date
+    ):
+
+        messages.error(
+            request,
+            "This event is older than the allowed "
+            "2-day editing window."
+        )
+
+        return redirect(
+            "trainer_schedule"
+        )
+
     if request.method == "POST":
 
         form = CalendarEventForm(
@@ -3866,16 +4618,36 @@ def edit_calendar_event(request, pk):
 
         if form.is_valid():
 
-            form.save()
-
-            messages.success(
-                request,
-                "Calendar event updated successfully."
+            new_date = form.cleaned_data.get(
+                "date"
             )
 
-            return redirect(
-                "trainer_schedule"
-            )
+            # ======================================
+            # PREVENT MOVING INTO OLD DATE
+            # ======================================
+
+            if not is_within_two_day_window(
+                new_date
+            ):
+
+                messages.error(
+                    request,
+                    "Events can only be scheduled from "
+                    "the last 2 days onward."
+                )
+
+            else:
+
+                form.save()
+
+                messages.success(
+                    request,
+                    "Calendar event updated successfully."
+                )
+
+                return redirect(
+                    "trainer_schedule"
+                )
 
     else:
 
@@ -3894,6 +4666,7 @@ def edit_calendar_event(request, pk):
     )
 @login_required
 @user_passes_test(is_superuser)
+@require_POST
 def delete_calendar_event(request, pk):
 
     event = get_object_or_404(
@@ -3901,14 +4674,36 @@ def delete_calendar_event(request, pk):
         pk=pk
     )
 
+    # ==========================================
+    # TWO-DAY DELETE WINDOW
+    # ==========================================
+
+    if not is_within_two_day_window(
+        event.date
+    ):
+
+        messages.error(
+            request,
+            "This event is older than the allowed "
+            "2-day deletion window."
+        )
+
+        return redirect(
+            "trainer_schedule"
+        )
+
+    event_title = event.title
+
     event.delete()
 
     messages.success(
         request,
-        "Calendar event deleted."
+        f'"{event_title}" was deleted successfully.'
     )
 
-    return redirect("trainer_schedule")
+    return redirect(
+        "trainer_schedule"
+    )
 
 @login_required
 @user_passes_test(is_superuser)
@@ -4134,6 +4929,25 @@ def resize_calendar_event(request, pk):
         pk=pk
     )
 
+    # ==========================================
+    # OLD EVENT CHECK
+    # ==========================================
+
+    if not is_within_two_day_window(
+        event.date
+    ):
+
+        return JsonResponse(
+            {
+                "success": False,
+                "error": (
+                    "This event is older than "
+                    "the 2-day editing window."
+                )
+            },
+            status=403
+        )
+
     try:
 
         data = json.loads(
@@ -4168,187 +4982,499 @@ def resize_calendar_event(request, pk):
         )
 
 
+# ============================================================
+# DAILY ATTENDANCE
+# ============================================================
+
+# ============================================================
+# TRAINER ATTENDANCE
+# TODAY + PREVIOUS 2 DAYS
+# ============================================================
+
 @login_required
 def daily_checkin(request):
 
-    trainer = Trainer.objects.filter(
-        user=request.user
-    ).first()
+    trainer = get_logged_in_trainer(request)
 
     if not trainer:
-        trainer = Trainer.objects.filter(
-            email=request.user.email
-        ).first()
 
-    if not trainer:
         messages.error(
             request,
             "Your account is not linked to a Trainer profile."
         )
+
         return redirect("dashboard")
 
-    # =====================================================
-    # ONLY FULL-TIME TRAINERS CAN CHECK IN
-    # =====================================================
+    # --------------------------------------------------------
+    # FULL-TIME TRAINERS ONLY
+    # --------------------------------------------------------
 
     if not trainer.is_full_time:
+
         messages.error(
             request,
-            "Only full-time trainers are allowed to check in."
+            "Only full-time trainers can manage attendance."
         )
+
         return redirect("trainer_dashboard")
 
-    today = timezone.localdate()
+    # --------------------------------------------------------
+    # ALLOWED DATES
+    # --------------------------------------------------------
 
-    attendance, created = DailyAttendance.objects.get_or_create(
-        trainer=trainer,
-        date=today
+    today, minimum_date = get_allowed_attendance_dates()
+
+    attendance_date_raw = (
+        request.POST.get("attendance_date")
+        or
+        request.GET.get("attendance_date")
     )
+
+    if attendance_date_raw:
+
+        try:
+
+            attendance_date = date.fromisoformat(
+                attendance_date_raw
+            )
+
+        except ValueError:
+
+            messages.error(
+                request,
+                "Invalid attendance date."
+            )
+
+            return redirect(
+                f"{reverse('daily_checkin')}?attendance_date={today}"
+            )
+
+    else:
+
+        attendance_date = today
+
+    # --------------------------------------------------------
+    # DATE VALIDATION
+    # --------------------------------------------------------
+
+    if attendance_date < minimum_date:
+
+        messages.error(
+            request,
+            "You can manage attendance only for today and the previous 2 days."
+        )
+
+        return redirect(
+            f"{reverse('daily_checkin')}?attendance_date={today}"
+        )
+
+    if attendance_date > today:
+
+        messages.error(
+            request,
+            "Future attendance is not allowed."
+        )
+
+        return redirect(
+            f"{reverse('daily_checkin')}?attendance_date={today}"
+        )
+
+    # --------------------------------------------------------
+    # GET / CREATE ATTENDANCE
+    # --------------------------------------------------------
+
+    attendance, created = (
+        DailyAttendance.objects.get_or_create(
+            trainer=trainer,
+            date=attendance_date
+        )
+    )
+
+    # --------------------------------------------------------
+    # POST
+    # --------------------------------------------------------
 
     if request.method == "POST":
 
         action = request.POST.get("action")
 
-        # =================================================
-        # CHECK IN
-        # =================================================
+        # ====================================================
+        # CHECK IN NOW
+        # ====================================================
 
-        if action == "check_in":
+        if action == "check_in_now":
+
+            if attendance.check_in:
+
+                messages.info(
+                    request,
+                    "You have already checked in for this date."
+                )
+
+            else:
+
+                now = timezone.now()
+
+                # Safety: check-in cannot be after 8:30 PM.
+                local_now = timezone.localtime(now)
+
+                if attendance_date == today:
+
+                    if local_now.time() >= time(20, 30):
+
+                        messages.error(
+                            request,
+                            "Check-in is closed after 8:30 PM."
+                        )
+
+                    else:
+
+                        attendance.check_in = now
+                        attendance.check_out = None
+                        attendance.save(
+                            update_fields=[
+                                "check_in",
+                                "check_out"
+                            ]
+                        )
+
+                        messages.success(
+                            request,
+                            "You are successfully checked in."
+                        )
+
+                else:
+
+                    messages.error(
+                        request,
+                        "For previous dates, enter the actual check-in time."
+                    )
+
+        # ====================================================
+        # CHECK IN AT SPECIFIC TIME
+        # ====================================================
+
+        elif action == "check_in_time":
+
+            check_in_raw = request.POST.get("check_in_time")
+
+            if attendance.check_in:
+
+                messages.info(
+                    request,
+                    "Check-in time already exists for this date."
+                )
+
+            elif not check_in_raw:
+
+                messages.error(
+                    request,
+                    "Please enter a check-in time."
+                )
+
+            else:
+
+                try:
+
+                    selected_time = time.fromisoformat(
+                        check_in_raw
+                    )
+
+                    check_in_datetime = make_local_datetime(
+                        attendance_date,
+                        selected_time
+                    )
+
+                    # Do not allow future time.
+                    if (
+                        attendance_date == today
+                        and check_in_datetime > timezone.now()
+                    ):
+
+                        messages.error(
+                            request,
+                            "Check-in time cannot be in the future."
+                        )
+
+                    elif selected_time >= time(20, 30):
+
+                        messages.error(
+                            request,
+                            "Check-in must be before 8:30 PM."
+                        )
+
+                    else:
+
+                        attendance.check_in = check_in_datetime
+                        attendance.check_out = None
+
+                        attendance.save(
+                            update_fields=[
+                                "check_in",
+                                "check_out"
+                            ]
+                        )
+
+                        messages.success(
+                            request,
+                            (
+                                f"Check-in recorded at "
+                                f"{selected_time.strftime('%I:%M %p')}."
+                            )
+                        )
+
+                except ValueError:
+
+                    messages.error(
+                        request,
+                        "Invalid check-in time."
+                    )
+
+        # ====================================================
+        # CHECK OUT NOW
+        # ====================================================
+
+        elif action == "check_out_now":
 
             if not attendance.check_in:
 
-                attendance.check_in = timezone.now()
-                attendance.check_out = None
-                attendance.save()
-
-                messages.success(
+                messages.error(
                     request,
-                    "You have successfully checked in."
+                    "You must check in before checking out."
                 )
 
-        # =================================================
-        # CHECK OUT
-        # =================================================
+            elif attendance.check_out:
 
-        elif action == "check_out":
-
-            if (
-                attendance.check_in
-                and not attendance.check_out
-            ):
-
-                attendance.check_out = timezone.now()
-                attendance.save()
-
-                messages.success(
+                messages.info(
                     request,
-                    "You have successfully checked out."
+                    "You have already checked out."
                 )
 
-    return redirect("trainer_dashboard")
-@login_required
-def add_today_task(request):
+            else:
 
-    trainer = Trainer.objects.filter(
-        user=request.user
-    ).first()
+                now = timezone.now()
 
-    if not trainer:
-        trainer = Trainer.objects.filter(
-            email=request.user.email
-        ).first()
+                local_now = timezone.localtime(now)
 
-    if not trainer:
-        messages.error(
-            request,
-            "Your account is not linked to a Trainer profile."
-        )
-        return redirect("dashboard")
+                # Today cannot checkout after 8:30 PM manually.
+                if attendance_date == today:
 
-    # =====================================================
-    # ONLY FULL-TIME TRAINERS
-    # =====================================================
+                    if local_now.time() >= time(20, 30):
 
-    if not trainer.is_full_time:
-        messages.error(
-            request,
-            "Only full-time trainers can add daily work updates."
-        )
-        return redirect("trainer_dashboard")
+                        # At/after 8:30 PM, use automatic checkout time.
+                        checkout_datetime = make_local_datetime(
+                            today,
+                            time(20, 30)
+                        )
 
-    today = timezone.localdate()
+                    else:
 
-    attendance = DailyAttendance.objects.filter(
-        trainer=trainer,
-        date=today
-    ).first()
+                        checkout_datetime = now
 
-    # =====================================================
-    # MUST CHECK IN FIRST
-    # =====================================================
+                else:
 
-    if not attendance or not attendance.check_in:
+                    messages.error(
+                        request,
+                        "For previous dates, enter the actual checkout time."
+                    )
 
-        messages.error(
-            request,
-            "Please check in before adding today's work."
-        )
+                    checkout_datetime = None
 
-        return redirect("trainer_dashboard")
+                if checkout_datetime:
 
-    # =====================================================
-    # CANNOT ADD AFTER CHECKOUT
-    # =====================================================
+                    if checkout_datetime <= attendance.check_in:
 
-    if attendance.check_out:
+                        messages.error(
+                            request,
+                            "Checkout time must be after check-in time."
+                        )
 
-        messages.error(
-            request,
-            "You have already checked out for today."
-        )
+                    else:
 
-        return redirect("trainer_dashboard")
+                        attendance.check_out = checkout_datetime
 
-    if request.method == "POST":
+                        attendance.save(
+                            update_fields=[
+                                "check_out"
+                            ]
+                        )
 
-        task_text = request.POST.get(
-            "task",
-            ""
-        ).strip()
+                        messages.success(
+                            request,
+                            "You have successfully checked out."
+                        )
 
-        description = request.POST.get(
-            "description",
-            ""
-        ).strip()
+        # ====================================================
+        # CHECK OUT AT SPECIFIC TIME
+        # ====================================================
 
-        if not task_text:
+        elif action == "check_out_time":
+
+            check_out_raw = request.POST.get(
+                "check_out_time"
+            )
+
+            if not attendance.check_in:
+
+                messages.error(
+                    request,
+                    "You must enter check-in before checkout."
+                )
+
+            elif attendance.check_out:
+
+                messages.info(
+                    request,
+                    "Checkout has already been recorded."
+                )
+
+            elif not check_out_raw:
+
+                messages.error(
+                    request,
+                    "Please enter a checkout time."
+                )
+
+            else:
+
+                try:
+
+                    selected_time = time.fromisoformat(
+                        check_out_raw
+                    )
+
+                    # ------------------------------------------------
+                    # AUTO CHECKOUT LIMIT
+                    # ------------------------------------------------
+
+                    if selected_time > time(20, 30):
+
+                        selected_time = time(20, 30)
+
+                        messages.info(
+                            request,
+                            "Checkout time was limited to 8:30 PM."
+                        )
+
+                    checkout_datetime = make_local_datetime(
+                        attendance_date,
+                        selected_time
+                    )
+
+                    if (
+                        attendance_date == today
+                        and checkout_datetime > timezone.now()
+                    ):
+
+                        messages.error(
+                            request,
+                            "Checkout time cannot be in the future."
+                        )
+
+                    elif checkout_datetime <= attendance.check_in:
+
+                        messages.error(
+                            request,
+                            "Checkout time must be after check-in time."
+                        )
+
+                    else:
+
+                        attendance.check_out = checkout_datetime
+
+                        attendance.save(
+                            update_fields=[
+                                "check_out"
+                            ]
+                        )
+
+                        messages.success(
+                            request,
+                            (
+                                f"Checkout recorded at "
+                                f"{selected_time.strftime('%I:%M %p')}."
+                            )
+                        )
+
+                except ValueError:
+
+                    messages.error(
+                        request,
+                        "Invalid checkout time."
+                    )
+
+        # ====================================================
+        # UNKNOWN ACTION
+        # ====================================================
+
+        else:
 
             messages.error(
                 request,
-                "Please enter what you are working on."
+                "Invalid attendance action."
             )
 
-            return redirect("trainer_dashboard")
+        return redirect(
+            f"{reverse('daily_checkin')}?attendance_date={attendance_date}"
+        )
 
-        TodoTask.objects.create(
+    # --------------------------------------------------------
+    # LEARNING FOR SELECTED DATE
+    # --------------------------------------------------------
+
+    learning = (
+        DailyLearning.objects
+        .filter(
             trainer=trainer,
-            task=task_text,
-            description=description,
-            for_date=today,
-            status="in_progress",
-            priority="medium",
-            estimated_hours=1.0,
-            is_done=False,
+            date=attendance_date
+        )
+        .first()
+    )
+
+    # --------------------------------------------------------
+    # TODAY / PREVIOUS DATE FLAGS
+    # --------------------------------------------------------
+
+    is_today = attendance_date == today
+    is_previous_date = attendance_date < today
+
+    # --------------------------------------------------------
+    # WORKED HOURS
+    # --------------------------------------------------------
+
+    worked_hours = None
+
+    if attendance.check_in and attendance.check_out:
+
+        seconds = (
+            attendance.check_out
+            - attendance.check_in
+        ).total_seconds()
+
+        worked_hours = round(
+            seconds / 3600,
+            2
         )
 
-        messages.success(
-            request,
-            "Today's work was added successfully."
-        )
+    # --------------------------------------------------------
+    # RENDER
+    # --------------------------------------------------------
 
-    return redirect("trainer_dashboard")
-@login_required
-
+    return render(
+        request,
+        "todo/daily_checkin.html",
+        {
+            "trainer": trainer,
+            "attendance": attendance,
+            "attendance_date": attendance_date,
+            "today": today,
+            "minimum_date": minimum_date,
+            "is_today": is_today,
+            "is_previous_date": is_previous_date,
+            "worked_hours": worked_hours,
+            "learning": learning,
+        }
+    )
 @login_required
 def checkin_portal(request):
     trainers = (
@@ -4390,7 +5516,65 @@ def checkin_portal(request):
             "today": today,
         }
     )
+# ============================================================
+# ATTENDANCE HELPERS
+# ============================================================
 
+def get_logged_in_trainer(request):
+    """
+    Get Trainer profile connected to the logged-in user.
+    Falls back to trainer email if user relation is missing.
+    """
+
+    trainer = (
+        Trainer.objects
+        .filter(user=request.user)
+        .first()
+    )
+
+    if not trainer:
+        trainer = (
+            Trainer.objects
+            .filter(email__iexact=request.user.email)
+            .first()
+        )
+
+    return trainer
+
+
+def get_allowed_attendance_dates():
+    """
+    Returns:
+        today
+        minimum_date = today - 2 days
+
+    Trainers can manage:
+        today
+        yesterday
+        day before yesterday
+    """
+
+    today = timezone.localdate()
+
+    minimum_date = today - timedelta(days=2)
+
+    return today, minimum_date
+
+from datetime import date, datetime, time, timedelta
+def make_local_datetime(selected_date, selected_time):
+    """
+    Convert selected date + time into timezone-aware datetime.
+    """
+
+    naive_datetime = datetime.combine(
+        selected_date,
+        selected_time
+    )
+
+    return timezone.make_aware(
+        naive_datetime,
+        timezone.get_current_timezone()
+    )
 
 # =====================================================
 # WEEKLY WORK SCHEDULE
@@ -4508,38 +5692,100 @@ def weekly_schedule(request):
     )
 from .models import DailyLearning
 from .forms import DailyLearningForm
+# ============================================================
+# DAILY LEARNING
+# TODAY + PREVIOUS 2 DAYS
+# ============================================================
+
 @login_required
 def add_daily_learning(request):
 
-    trainer = (
-        Trainer.objects
-        .filter(user=request.user)
-        .first()
-    )
+    trainer = get_logged_in_trainer(request)
 
     if not trainer:
-        trainer = (
-            Trainer.objects
-            .filter(email=request.user.email)
-            .first()
-        )
 
-    if not trainer:
         messages.error(
             request,
             "Your account is not linked to a Trainer profile."
         )
+
         return redirect("dashboard")
 
-    today = timezone.localdate()
+    if not trainer.is_full_time:
 
-    learning, created = DailyLearning.objects.get_or_create(
-        trainer=trainer,
-        date=today,
-        defaults={
-            "learning": ""
-        }
+        messages.error(
+            request,
+            "Only full-time trainers can add daily learning."
+        )
+
+        return redirect("trainer_dashboard")
+
+    today, minimum_date = get_allowed_attendance_dates()
+
+    # --------------------------------------------------------
+    # SELECT DATE
+    # --------------------------------------------------------
+
+    date_raw = (
+        request.POST.get("learning_date")
+        or
+        request.GET.get("learning_date")
     )
+
+    if date_raw:
+
+        try:
+
+            learning_date = date.fromisoformat(
+                date_raw
+            )
+
+        except ValueError:
+
+            messages.error(
+                request,
+                "Invalid learning date."
+            )
+
+            return redirect("daily_checkin")
+
+    else:
+
+        learning_date = today
+
+    # --------------------------------------------------------
+    # DATE VALIDATION
+    # --------------------------------------------------------
+
+    if (
+        learning_date < minimum_date
+        or learning_date > today
+    ):
+
+        messages.error(
+            request,
+            "Learning can only be added for today or the previous 2 days."
+        )
+
+        return redirect("daily_checkin")
+
+    # --------------------------------------------------------
+    # GET / CREATE
+    # --------------------------------------------------------
+
+    learning, created = (
+        DailyLearning.objects.get_or_create(
+            trainer=trainer,
+            date=learning_date,
+            defaults={
+                "learning": ""
+            }
+        )
+    )
+
+    # --------------------------------------------------------
+    # POST
+    # --------------------------------------------------------
 
     if request.method == "POST":
 
@@ -4554,10 +5800,15 @@ def add_daily_learning(request):
 
             messages.success(
                 request,
-                "Today's learning has been saved successfully."
+                (
+                    f"Learning saved for "
+                    f"{learning_date.strftime('%d %B %Y')}."
+                )
             )
 
-            return redirect("trainer_dashboard")
+            return redirect(
+                f"{reverse('daily_checkin')}?attendance_date={learning_date}"
+            )
 
     else:
 
@@ -4571,6 +5822,8 @@ def add_daily_learning(request):
         {
             "trainer": trainer,
             "today": today,
+            "minimum_date": minimum_date,
+            "learning_date": learning_date,
             "form": form,
             "learning": learning,
         }
@@ -4904,3 +6157,335 @@ def full_time_work_list(request):
         }
     )
 
+# =====================================================
+# TWO-DAY BACKDATE PERMISSION
+# =====================================================
+
+def is_within_two_day_window(target_date):
+    """
+    Allows:
+        Today
+        Yesterday
+        Day before yesterday
+        Any future date
+
+    Blocks:
+        Anything older than 2 days
+    """
+
+    today = timezone.localdate()
+
+    minimum_date = today - timedelta(days=2)
+
+    return target_date >= minimum_date
+
+# ============================================================
+# ADD TODAY TASK
+# ============================================================
+
+@login_required
+def add_today_task(request):
+
+    # ============================================================
+    # FIND TRAINER
+    # ============================================================
+
+    trainer = Trainer.objects.filter(
+        user=request.user
+    ).first()
+
+    if not trainer:
+
+        trainer = Trainer.objects.filter(
+            email__iexact=request.user.email
+        ).first()
+
+    if not trainer:
+
+        messages.error(
+            request,
+            "Your account is not linked to a Trainer profile."
+        )
+
+        return redirect("dashboard")
+
+    # ============================================================
+    # FULL-TIME TRAINERS
+    # ============================================================
+
+    if not trainer.is_full_time:
+
+        messages.error(
+            request,
+            "Only full-time trainers can add daily work."
+        )
+
+        return redirect("trainer_dashboard")
+
+    # ============================================================
+    # DATES
+    # ============================================================
+
+    today = timezone.localdate()
+
+    minimum_date = today - timedelta(days=2)
+
+    # ============================================================
+    # GET WORK DATE
+    # ============================================================
+
+    work_date_raw = request.POST.get(
+        "work_date"
+    )
+
+    if not work_date_raw:
+
+        work_date_raw = request.POST.get(
+            "attendance_date"
+        )
+
+    if not work_date_raw:
+
+        work_date_raw = request.GET.get(
+            "work_date"
+        )
+
+    if not work_date_raw:
+
+        work_date_raw = request.GET.get(
+            "attendance_date"
+        )
+
+    # ============================================================
+    # DEFAULT = TODAY
+    # ============================================================
+
+    if not work_date_raw:
+
+        work_date = today
+
+    else:
+
+        try:
+
+            work_date = date.fromisoformat(
+                work_date_raw
+            )
+
+        except ValueError:
+
+            messages.error(
+                request,
+                "Invalid work date."
+            )
+
+            return redirect(
+                f"{reverse('trainer_dashboard')}?attendance_date={today}"
+            )
+
+    # ============================================================
+    # ONLY LAST 3 DAYS
+    # ============================================================
+
+    if (
+        work_date < minimum_date
+        or work_date > today
+    ):
+
+        messages.error(
+            request,
+            "Work can only be added for today, "
+            "yesterday, or the day before yesterday."
+        )
+
+        return redirect(
+            f"{reverse('trainer_dashboard')}?attendance_date={today}"
+        )
+
+    # ============================================================
+    # ATTENDANCE FOR SELECTED DATE
+    # ============================================================
+
+    attendance = DailyAttendance.objects.filter(
+        trainer=trainer,
+        date=work_date
+    ).first()
+
+    # ============================================================
+    # MUST CHECK IN FOR THAT DATE
+    # ============================================================
+
+    if not attendance or not attendance.check_in:
+
+        messages.error(
+            request,
+            (
+                f"Please check in for "
+                f"{work_date.strftime('%d %b %Y')} "
+                f"before adding work."
+            )
+        )
+
+        return redirect(
+            f"{reverse('trainer_dashboard')}?attendance_date={work_date.isoformat()}"
+        )
+
+    # ============================================================
+    # AFTER CHECKOUT
+    # ============================================================
+
+    if attendance.check_out:
+
+        messages.error(
+            request,
+            (
+                f"You have already checked out for "
+                f"{work_date.strftime('%d %b %Y')}. "
+                f"New work cannot be added."
+            )
+        )
+
+        return redirect(
+            f"{reverse('trainer_dashboard')}?attendance_date={work_date.isoformat()}"
+        )
+
+    # ============================================================
+    # POST
+    # ============================================================
+
+    if request.method != "POST":
+
+        return redirect(
+            f"{reverse('trainer_dashboard')}?attendance_date={work_date.isoformat()}"
+        )
+
+    # ============================================================
+    # FORM DATA
+    # ============================================================
+
+    task_text = request.POST.get(
+        "task",
+        ""
+    ).strip()
+
+    description = request.POST.get(
+        "description",
+        ""
+    ).strip()
+
+    category = request.POST.get(
+        "category",
+        "other"
+    )
+
+    priority = request.POST.get(
+        "priority",
+        "medium"
+    )
+
+    estimated_hours_raw = request.POST.get(
+        "estimated_hours",
+        "1"
+    )
+
+    # ============================================================
+    # TASK REQUIRED
+    # ============================================================
+
+    if not task_text:
+
+        messages.error(
+            request,
+            "Please enter what you worked on."
+        )
+
+        return redirect(
+            f"{reverse('trainer_dashboard')}?attendance_date={work_date.isoformat()}"
+        )
+
+    # ============================================================
+    # VALID CATEGORY
+    # ============================================================
+
+    valid_categories = dict(
+        TodoTask.CATEGORY_CHOICES
+    )
+
+    if category not in valid_categories:
+
+        category = "other"
+
+    # ============================================================
+    # VALID PRIORITY
+    # ============================================================
+
+    valid_priorities = dict(
+        TodoTask.PRIORITY_CHOICES
+    )
+
+    if priority not in valid_priorities:
+
+        priority = "medium"
+
+    # ============================================================
+    # HOURS
+    # ============================================================
+
+    try:
+
+        estimated_hours = Decimal(
+            estimated_hours_raw
+        )
+
+    except (ValueError, TypeError, InvalidOperation):
+
+        estimated_hours = Decimal("1")
+
+    if estimated_hours < 0:
+
+        estimated_hours = Decimal("1")
+
+    # ============================================================
+    # CREATE WORK
+    # ============================================================
+
+    TodoTask.objects.create(
+
+        trainer=trainer,
+
+        task=task_text,
+
+        description=description,
+
+        category=category,
+
+        priority=priority,
+
+        estimated_hours=estimated_hours,
+
+        for_date=work_date,
+
+        status="in_progress",
+
+        is_done=False,
+    )
+
+    # ============================================================
+    # SUCCESS
+    # ============================================================
+
+    messages.success(
+        request,
+        (
+            f'Work "{task_text}" was added for '
+            f'{work_date.strftime("%d %b %Y")}.'
+        )
+    )
+
+    # ============================================================
+    # KEEP SAME DATE SELECTED
+    # ============================================================
+
+    return redirect(
+        f"{reverse('trainer_dashboard')}?attendance_date={work_date.isoformat()}"
+    )
