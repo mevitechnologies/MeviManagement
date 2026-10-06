@@ -1847,6 +1847,10 @@ def edit_task(request, task_id):
 # TRAINER ATTENDANCE + DAILY WORKSPACE
 # ============================================================
 
+# ============================================================
+# TRAINER ATTENDANCE + DAILY WORKSPACE
+# ============================================================
+
 @login_required
 def trainer_attendance(request):
 
@@ -1863,7 +1867,9 @@ def trainer_attendance(request):
     if not trainer:
         trainer = (
             Trainer.objects
-            .filter(email__iexact=request.user.email)
+            .filter(
+                email__iexact=request.user.email
+            )
             .first()
         )
 
@@ -1879,18 +1885,20 @@ def trainer_attendance(request):
     # --------------------------------------------------------
 
     if not trainer.is_full_time:
+
         messages.error(
             request,
             "Attendance is available only for full-time trainers."
         )
+
         return redirect("trainer_dashboard")
 
     today = timezone.localdate()
 
-    # Trainer can manage:
-    # today
-    # yesterday
-    # day before yesterday
+    # --------------------------------------------------------
+    # ATTENDANCE DATE RANGE
+    # TODAY + PREVIOUS 2 DAYS
+    # --------------------------------------------------------
 
     minimum_date = today - timedelta(days=2)
     maximum_date = today
@@ -1901,14 +1909,22 @@ def trainer_attendance(request):
 
     selected_date = today
 
-    date_value = request.GET.get("attendance_date")
+    date_value = request.GET.get(
+        "attendance_date"
+    )
 
     if date_value:
 
         try:
-            selected_date = date.fromisoformat(date_value)
 
-        except (ValueError, TypeError):
+            selected_date = date.fromisoformat(
+                date_value
+            )
+
+        except (
+            ValueError,
+            TypeError
+        ):
 
             messages.error(
                 request,
@@ -1930,7 +1946,7 @@ def trainer_attendance(request):
 
         selected_date = minimum_date
 
-    if selected_date > today:
+    elif selected_date > maximum_date:
 
         messages.warning(
             request,
@@ -1940,7 +1956,7 @@ def trainer_attendance(request):
         selected_date = today
 
     # --------------------------------------------------------
-    # ATTENDANCE RECORD
+    # GET / CREATE ATTENDANCE
     # --------------------------------------------------------
 
     attendance, created = (
@@ -1950,19 +1966,30 @@ def trainer_attendance(request):
         )
     )
 
-    # --------------------------------------------------------
-    # HANDLE POST ACTIONS
-    # --------------------------------------------------------
+    # ========================================================
+    # POST ACTIONS
+    # ========================================================
 
     if request.method == "POST":
 
-        action = request.POST.get("action", "").strip()
+        action = (
+            request.POST
+            .get("action", "")
+            .strip()
+        )
 
         # ====================================================
         # CHECK IN NOW
         # ====================================================
 
-        if action == "check_in_now":
+        if action in (
+            "check_in_now",
+            "check_in"
+        ):
+
+            # -----------------------------------------------
+            # ONLY TODAY
+            # -----------------------------------------------
 
             if selected_date != today:
 
@@ -1970,6 +1997,10 @@ def trainer_attendance(request):
                     request,
                     "Use manual time entry for previous days."
                 )
+
+            # -----------------------------------------------
+            # ALREADY CHECKED IN
+            # -----------------------------------------------
 
             elif attendance.check_in:
 
@@ -1980,27 +2011,52 @@ def trainer_attendance(request):
 
             else:
 
-                now = timezone.now()
+                now = timezone.localtime()
 
-                attendance.check_in = now
-                attendance.check_out = None
-                attendance.save(
-                    update_fields=[
-                        "check_in",
-                        "check_out"
-                    ]
-                )
+                # -------------------------------------------
+                # CHECK-IN CUTOFF
+                # 8:30 PM
+                # -------------------------------------------
 
-                messages.success(
-                    request,
-                    "You have successfully checked in."
-                )
+                if now.time() >= time(20, 30):
+
+                    messages.error(
+                        request,
+                        "Check-in is closed after 8:30 PM."
+                    )
+
+                else:
+
+                    attendance.check_in = timezone.now()
+
+                    # In case an old checkout exists,
+                    # clear it when starting a fresh check-in.
+                    attendance.check_out = None
+
+                    attendance.save(
+                        update_fields=[
+                            "check_in",
+                            "check_out"
+                        ]
+                    )
+
+                    messages.success(
+                        request,
+                        "You have successfully checked in."
+                    )
 
         # ====================================================
         # CHECK OUT NOW
         # ====================================================
 
-        elif action == "check_out_now":
+        elif action in (
+            "check_out_now",
+            "check_out"
+        ):
+
+            # -----------------------------------------------
+            # ONLY TODAY
+            # -----------------------------------------------
 
             if selected_date != today:
 
@@ -2009,12 +2065,20 @@ def trainer_attendance(request):
                     "Use manual time entry for previous days."
                 )
 
+            # -----------------------------------------------
+            # MUST CHECK IN FIRST
+            # -----------------------------------------------
+
             elif not attendance.check_in:
 
                 messages.error(
                     request,
                     "You must check in before checking out."
                 )
+
+            # -----------------------------------------------
+            # ALREADY CHECKED OUT
+            # -----------------------------------------------
 
             elif attendance.check_out:
 
@@ -2027,41 +2091,70 @@ def trainer_attendance(request):
 
                 now = timezone.localtime()
 
-                # Automatic checkout limit = 8:30 PM
-                auto_checkout_time = time(20, 30)
+                # -------------------------------------------
+                # MAXIMUM CHECKOUT = 8:30 PM
+                # -------------------------------------------
 
-                if now.time() > auto_checkout_time:
+                maximum_checkout_time = time(
+                    20,
+                    30
+                )
+
+                if now.time() > maximum_checkout_time:
 
                     local_checkout = datetime.combine(
                         today,
-                        auto_checkout_time
+                        maximum_checkout_time
                     )
 
-                    checkout_datetime = timezone.make_aware(
-                        local_checkout,
-                        timezone.get_current_timezone()
+                    checkout_datetime = (
+                        timezone.make_aware(
+                            local_checkout,
+                            timezone.get_current_timezone()
+                        )
                     )
 
                 else:
 
                     checkout_datetime = timezone.now()
 
-                attendance.check_out = checkout_datetime
+                # -------------------------------------------
+                # SAFETY CHECK
+                # -------------------------------------------
 
-                attendance.save(
-                    update_fields=["check_out"]
-                )
+                if checkout_datetime <= attendance.check_in:
 
-                messages.success(
-                    request,
-                    "You have successfully checked out."
-                )
+                    messages.error(
+                        request,
+                        "Check-out time must be after check-in time."
+                    )
+
+                else:
+
+                    attendance.check_out = (
+                        checkout_datetime
+                    )
+
+                    attendance.save(
+                        update_fields=[
+                            "check_out"
+                        ]
+                    )
+
+                    messages.success(
+                        request,
+                        "You have successfully checked out."
+                    )
 
         # ====================================================
         # MANUAL PREVIOUS-DAY ATTENDANCE
         # ====================================================
 
         elif action == "save_manual_attendance":
+
+            # ------------------------------------------------
+            # TODAY USES LIVE BUTTONS
+            # ------------------------------------------------
 
             if selected_date == today:
 
@@ -2074,15 +2167,25 @@ def trainer_attendance(request):
 
                 check_in_value = (
                     request.POST
-                    .get("check_in_time", "")
+                    .get(
+                        "check_in_time",
+                        ""
+                    )
                     .strip()
                 )
 
                 check_out_value = (
                     request.POST
-                    .get("check_out_time", "")
+                    .get(
+                        "check_out_time",
+                        ""
+                    )
                     .strip()
                 )
+
+                # --------------------------------------------
+                # CHECK-IN REQUIRED
+                # --------------------------------------------
 
                 if not check_in_value:
 
@@ -2095,39 +2198,59 @@ def trainer_attendance(request):
 
                     try:
 
-                        check_in_clock = time.fromisoformat(
-                            check_in_value
-                        )
+                        # ------------------------------------
+                        # CHECK-IN TIME
+                        # ------------------------------------
 
-                        check_in_datetime = timezone.make_aware(
-                            datetime.combine(
-                                selected_date,
-                                check_in_clock
-                            ),
-                            timezone.get_current_timezone()
-                        )
-
-                        check_out_datetime = None
-
-                        if check_out_value:
-
-                            check_out_clock = time.fromisoformat(
-                                check_out_value
+                        check_in_clock = (
+                            time.fromisoformat(
+                                check_in_value
                             )
+                        )
 
-                            check_out_datetime = timezone.make_aware(
+                        check_in_datetime = (
+                            timezone.make_aware(
                                 datetime.combine(
                                     selected_date,
-                                    check_out_clock
+                                    check_in_clock
                                 ),
                                 timezone.get_current_timezone()
                             )
+                        )
 
                         # ------------------------------------
-                        # VALIDATE CHECK-IN
+                        # CHECK-OUT TIME
                         # ------------------------------------
 
-                        if check_in_clock >= time(20, 30):
+                        check_out_datetime = None
+                        check_out_clock = None
+
+                        if check_out_value:
+
+                            check_out_clock = (
+                                time.fromisoformat(
+                                    check_out_value
+                                )
+                            )
+
+                            check_out_datetime = (
+                                timezone.make_aware(
+                                    datetime.combine(
+                                        selected_date,
+                                        check_out_clock
+                                    ),
+                                    timezone.get_current_timezone()
+                                )
+                            )
+
+                        # ------------------------------------
+                        # CHECK-IN VALIDATION
+                        # ------------------------------------
+
+                        if check_in_clock >= time(
+                            20,
+                            30
+                        ):
 
                             messages.error(
                                 request,
@@ -2135,12 +2258,15 @@ def trainer_attendance(request):
                             )
 
                         # ------------------------------------
-                        # VALIDATE CHECK-OUT
+                        # CHECK-OUT VALIDATION
                         # ------------------------------------
 
                         elif (
-                            check_out_datetime
-                            and check_out_clock > time(20, 30)
+                            check_out_clock
+                            and check_out_clock > time(
+                                20,
+                                30
+                            )
                         ):
 
                             messages.error(
@@ -2149,12 +2275,13 @@ def trainer_attendance(request):
                             )
 
                         # ------------------------------------
-                        # CHECKOUT MUST BE AFTER CHECKIN
+                        # CHECKOUT AFTER CHECKIN
                         # ------------------------------------
 
                         elif (
                             check_out_datetime
-                            and check_out_datetime <= check_in_datetime
+                            and check_out_datetime <=
+                            check_in_datetime
                         ):
 
                             messages.error(
@@ -2184,7 +2311,10 @@ def trainer_attendance(request):
                                 "Attendance time saved successfully."
                             )
 
-                    except ValueError:
+                    except (
+                        ValueError,
+                        TypeError
+                    ):
 
                         messages.error(
                             request,
@@ -2199,33 +2329,52 @@ def trainer_attendance(request):
 
             task_text = (
                 request.POST
-                .get("task", "")
+                .get(
+                    "task",
+                    ""
+                )
                 .strip()
             )
 
             description = (
                 request.POST
-                .get("description", "")
+                .get(
+                    "description",
+                    ""
+                )
                 .strip()
             )
 
             category = (
                 request.POST
-                .get("category", "other")
+                .get(
+                    "category",
+                    "other"
+                )
                 .strip()
             )
 
             priority = (
                 request.POST
-                .get("priority", "medium")
+                .get(
+                    "priority",
+                    "medium"
+                )
                 .strip()
             )
 
             estimated_hours_value = (
                 request.POST
-                .get("estimated_hours", "1")
+                .get(
+                    "estimated_hours",
+                    "1"
+                )
                 .strip()
             )
+
+            # -----------------------------------------------
+            # TASK REQUIRED
+            # -----------------------------------------------
 
             if not task_text:
 
@@ -2234,9 +2383,14 @@ def trainer_attendance(request):
                     "Please enter the work/task."
                 )
 
-            elif (
-                not attendance.check_in
-            ):
+            # -----------------------------------------------
+            # CHECK-IN REQUIRED
+            #
+            # IMPORTANT:
+            # CHECKOUT DOES NOT BLOCK WORK.
+            # -----------------------------------------------
+
+            elif not attendance.check_in:
 
                 messages.error(
                     request,
@@ -2245,75 +2399,72 @@ def trainer_attendance(request):
 
             else:
 
-                # --------------------------------------------
-                # Prevent work after checkout
-                # --------------------------------------------
+                # -------------------------------------------
+                # ESTIMATED HOURS
+                # -------------------------------------------
 
-                if attendance.check_out:
+                try:
 
-                    messages.error(
-                        request,
-                        "You cannot add work after checkout."
+                    estimated_hours = Decimal(
+                        estimated_hours_value
                     )
 
-                else:
+                except (
+                    ValueError,
+                    TypeError,
+                    InvalidOperation
+                ):
 
-                    try:
-
-                        estimated_hours = Decimal(
-                            estimated_hours_value
-                        )
-
-                    except (
-                        ValueError,
-                        TypeError,
-                        InvalidOperation
-                    ):
-
-                        estimated_hours = Decimal("1")
-
-                    # ----------------------------------------
-                    # VALID CATEGORY
-                    # ----------------------------------------
-
-                    valid_categories = dict(
-                        TodoTask.CATEGORY_CHOICES
+                    estimated_hours = Decimal(
+                        "1"
                     )
 
-                    if category not in valid_categories:
-                        category = "other"
+                # -------------------------------------------
+                # VALID CATEGORY
+                # -------------------------------------------
 
-                    # ----------------------------------------
-                    # VALID PRIORITY
-                    # ----------------------------------------
+                valid_categories = dict(
+                    TodoTask.CATEGORY_CHOICES
+                )
 
-                    valid_priorities = dict(
-                        TodoTask.PRIORITY_CHOICES
-                    )
+                if category not in valid_categories:
 
-                    if priority not in valid_priorities:
-                        priority = "medium"
+                    category = "other"
 
-                    # ----------------------------------------
-                    # CREATE WORK
-                    # ----------------------------------------
+                # -------------------------------------------
+                # VALID PRIORITY
+                # -------------------------------------------
 
-                    TodoTask.objects.create(
-                        trainer=trainer,
-                        task=task_text,
-                        description=description,
-                        category=category,
-                        priority=priority,
-                        estimated_hours=estimated_hours,
-                        for_date=selected_date,
-                        status="in_progress",
-                        is_done=False,
-                    )
+                valid_priorities = dict(
+                    TodoTask.PRIORITY_CHOICES
+                )
 
-                    messages.success(
-                        request,
-                        "Work has been added successfully."
-                    )
+                if priority not in valid_priorities:
+
+                    priority = "medium"
+
+                # -------------------------------------------
+                # CREATE WORK
+                #
+                # NO CHECKOUT RESTRICTION HERE
+                # -------------------------------------------
+
+                TodoTask.objects.create(
+                    trainer=trainer,
+                    task=task_text,
+                    description=description,
+                    category=category,
+                    priority=priority,
+                    estimated_hours=estimated_hours,
+                    for_date=selected_date,
+                    status="in_progress",
+                    is_done=False,
+                )
+
+                messages.success(
+                    request,
+                    "Work has been added successfully."
+                )
 
         # ====================================================
         # SAVE LEARNING
@@ -2323,7 +2474,10 @@ def trainer_attendance(request):
 
             learning_text = (
                 request.POST
-                .get("learning", "")
+                .get(
+                    "learning",
+                    ""
+                )
                 .strip()
             )
 
@@ -2355,12 +2509,13 @@ def trainer_attendance(request):
 
         return redirect(
             f"{reverse('trainer_attendance')}"
-            f"?attendance_date={selected_date.isoformat()}"
+            f"?attendance_date="
+            f"{selected_date.isoformat()}"
         )
 
-    # --------------------------------------------------------
+    # ========================================================
     # GET CURRENT LEARNING
-    # --------------------------------------------------------
+    # ========================================================
 
     learning = (
         DailyLearning.objects
@@ -2371,9 +2526,9 @@ def trainer_attendance(request):
         .first()
     )
 
-    # --------------------------------------------------------
+    # ========================================================
     # WORK FOR SELECTED DATE
-    # --------------------------------------------------------
+    # ========================================================
 
     work_items = (
         TodoTask.objects
@@ -2386,29 +2541,34 @@ def trainer_attendance(request):
         )
     )
 
-    # --------------------------------------------------------
+    # ========================================================
     # CALCULATE WORKED HOURS
-    # --------------------------------------------------------
+    # ========================================================
 
     worked_hours = None
 
-    if attendance.check_in and attendance.check_out:
+    if (
+        attendance.check_in
+        and attendance.check_out
+    ):
 
         duration = (
             attendance.check_out
             - attendance.check_in
         )
 
-        total_seconds = duration.total_seconds()
+        total_seconds = (
+            duration.total_seconds()
+        )
 
         worked_hours = round(
             total_seconds / 3600,
             2
         )
 
-    # --------------------------------------------------------
+    # ========================================================
     # STATUS
-    # --------------------------------------------------------
+    # ========================================================
 
     checked_in = bool(
         attendance.check_in
@@ -2419,16 +2579,21 @@ def trainer_attendance(request):
         attendance.check_out
     )
 
-    # --------------------------------------------------------
+    # ========================================================
     # DATE OPTIONS
-    # --------------------------------------------------------
+    # ========================================================
 
     date_options = []
 
-    for offset in range(2, -1, -1):
+    for offset in range(
+        2,
+        -1,
+        -1
+    ):
 
-        day = today - timedelta(
-            days=offset
+        day = (
+            today
+            - timedelta(days=offset)
         )
 
         day_attendance = (
@@ -2441,38 +2606,60 @@ def trainer_attendance(request):
         )
 
         date_options.append({
+
             "date": day,
-            "attendance": day_attendance,
-            "is_today": day == today,
+
+            "attendance":
+                day_attendance,
+
+            "is_today":
+                day == today,
+
         })
 
-    # --------------------------------------------------------
+    # ========================================================
     # RENDER
-    # --------------------------------------------------------
+    # ========================================================
 
     return render(
         request,
         "todo/trainer_attendance.html",
         {
-            "trainer": trainer,
-            "attendance": attendance,
+            "trainer":
+                trainer,
 
-            "attendance_date": selected_date,
+            "attendance":
+                attendance,
 
-            "minimum_attendance_date": minimum_date,
-            "maximum_attendance_date": today,
+            "attendance_date":
+                selected_date,
 
-            "today": today,
+            "minimum_attendance_date":
+                minimum_date,
 
-            "checked_in": checked_in,
-            "checked_out": checked_out,
+            "maximum_attendance_date":
+                maximum_date,
 
-            "worked_hours": worked_hours,
+            "today":
+                today,
 
-            "learning": learning,
-            "work_items": work_items,
+            "checked_in":
+                checked_in,
 
-            "date_options": date_options,
+            "checked_out":
+                checked_out,
+
+            "worked_hours":
+                worked_hours,
+
+            "learning":
+                learning,
+
+            "work_items":
+                work_items,
+
+            "date_options":
+                date_options,
 
             "category_choices":
                 TodoTask.CATEGORY_CHOICES,
